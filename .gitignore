@@ -33,3 +33,24 @@ coverage
 # Database
 *.db
 *.sqlite
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+.scrapy/
+*.sqlite3
+
+# Node / TypeScript
+node_modules/
+dist/
+build/
+*.log
+
+# IDE / OS files
+.vscode/
+.DS_Store
+Thumbs.db
