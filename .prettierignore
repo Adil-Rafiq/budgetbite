@@ -1,0 +1,23 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+build
+.next
+out
+coverage
+
+# Generated files
+*.log
+.env
+.env.local
+
+# Database
+**/migrations/*.sql
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock

@@ -1,0 +1,29 @@
+{
+  "name": "@budgetbite/scraper",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "scripts": {
+    "dev": "tsx --watch src/index.ts",
+    "scrape": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@budgetbite/database": "*",
+    "@budgetbite/shared-types": "*",
+    "cheerio": "^1.2.0",
+    "playwright": "^1.58.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "license": "ISC"
+}

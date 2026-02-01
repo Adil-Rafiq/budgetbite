@@ -1,0 +1,14 @@
+{
+  "name": "@budgetbite/database",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "drizzle-kit": "^0.20.0"
+  }
+}
