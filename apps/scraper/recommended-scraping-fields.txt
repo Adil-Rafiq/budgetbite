@@ -1,0 +1,29 @@
+Listing Title
+Brand / Chain
+Restaurant ID / URL
+Cuisine Type(s)
+Address
+Opening Hours
+Availability Status
+Menu Category
+Item Name
+Item ID / SKU
+Item Description
+Item Image URL
+Veg / Non-veg
+Item ID / SKU
+Ingredients
+Allergens
+Nutrition Info
+Item Price
+Discount Price
+Taxes & Fees
+Minimum Order
+Delivery Fee
+Delivery Time
+Distance
+Rating Score
+Review Count
+Platform Name
+Region / City
+Currency

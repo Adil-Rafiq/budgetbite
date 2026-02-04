@@ -17,6 +17,6 @@ class ScraperConfig:
     
     # Rate limiting
     request_delay: float = 2.0
-    max_restaurants: int | None = 2  # None = scrape all
+    max_restaurants: int | None = 1  # None = scrape all
 
 config = ScraperConfig()
