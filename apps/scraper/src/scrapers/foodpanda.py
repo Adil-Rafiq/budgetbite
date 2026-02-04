@@ -55,6 +55,9 @@ class FoodpandaScraper(BaseScraper):
         self.handle_captcha()
         self.browser.delay(self.config.page_load_delay)
 
+        # Scroll to load lazy-loaded images before extracting
+        self.scroll_to_bottom(step=1000, delay=1.0)
+
         # Parse menu items
         menu = self.parser.parse_menu_items(page)
         

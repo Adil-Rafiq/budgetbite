@@ -1,8 +1,10 @@
 """Parsers for extracting data from Foodpanda pages."""
 
+import re
 from playwright.sync_api import Page, Locator
 from typing import List
 from models import MenuItem
+
 
 class FoodpandaParser:
     """Parser for Foodpanda-specific data extraction."""
@@ -27,6 +29,34 @@ class FoodpandaParser:
         return [link.get_attribute("href") for link in links if link.get_attribute("href")]
 
     @staticmethod
+    def _get_menu_product_image_url(product: Locator) -> str | None:
+        """Get image URL from data-testid='menu-product-image': <img src> or background-image."""
+        image_locator = product.get_by_test_id("menu-product-image")
+        if image_locator.count() == 0:
+            return None
+        el = image_locator.first
+
+        # 1) <img src="...">
+        image_url = el.get_attribute("src")
+        if not image_url and el.locator("img").count() > 0:
+            image_url = el.locator("img").first.get_attribute("src")
+
+        # 2) background-image: url("...") on div (e.g. lazy-loaded-dish-photo)
+        if not image_url:
+            style = el.get_attribute("style")
+            if style:
+                match = re.search(r'url\s*\(\s*(?:"|\'|&quot;)(.+?)(?:"|\'|&quot;)\s*\)', style)
+                if match:
+                    url = match.group(1).replace("&amp;", "&").replace("&quot;", '"').strip()
+                    if url.startswith("http"):
+                        image_url = url
+
+        # Reject known placeholder (Foodpanda logo)
+        if image_url and ("logo-simple-fp.svg" in image_url or "micro-assets.foodora.com" in image_url):
+            return None
+        return image_url
+
+    @staticmethod
     def parse_menu_item(product: Locator, index: int) -> MenuItem | None:
         """Parse a single menu item from the page."""
         try:
@@ -46,6 +76,9 @@ class FoodpandaParser:
             current_price = float(price_parts[0].replace(",", "")) if len(price_parts) >= 1 else 0.0
             original_price = float(price_parts[1].replace(",", "")) if len(price_parts) >= 2 else None
 
+            # Extract product image URL from data-testid="menu-product-image"
+            image_url = FoodpandaParser._get_menu_product_image_url(product)
+
             return MenuItem(
                 foodpanda_id=f"item_{index}",  # Placeholder - extract from API later
                 name=name,
@@ -54,7 +87,7 @@ class FoodpandaParser:
                 original_price=original_price,
                 variations=None,
                 category="General",  # Extract from page structure later
-                image_url=None,  # Extract if needed
+                image_url=image_url,
                 is_available=True,
             )
 
