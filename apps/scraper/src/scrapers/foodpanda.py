@@ -45,8 +45,8 @@ class FoodpandaScraper(BaseScraper):
         """Scrape data from a single restaurant page."""
         page = self.browser.page
         
-        vendor_id = self.parser.extract_vendor_id(url)
-        print(f"[INFO] Scraping restaurant: {vendor_id}")
+        [vendor_id, restaurant_slug] = self.parser.parse_restaurant_url(url)
+        print(f"[INFO] Scraping restaurant: {vendor_id}/{restaurant_slug}")
         
         page.goto(url, wait_until="domcontentloaded")
         self.browser.delay(self.config.page_load_delay)
@@ -66,7 +66,7 @@ class FoodpandaScraper(BaseScraper):
         return Restaurant(
             url=url,
             vendor_id=vendor_id,
-            name="",  # Extract from page/API
+            name=restaurant_slug,
             rating=None,
             rating_count=None,
             cuisine_types=[],

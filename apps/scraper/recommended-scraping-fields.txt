@@ -1,6 +1,6 @@
-Listing Title
+[DONE] Listing Title
 Brand / Chain
-Restaurant ID / URL
+[DONE] Restaurant ID / URL
 Cuisine Type(s)
 Address
 Opening Hours

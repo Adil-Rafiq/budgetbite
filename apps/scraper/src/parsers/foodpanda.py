@@ -23,6 +23,31 @@ class FoodpandaParser:
             raise ValueError(f"Could not extract vendor ID from URL: {url}")
 
     @staticmethod
+    def extract_restaurant_slug(url: str) -> str:
+        """Extract restaurant name slug from URL.
+        
+        Example: /restaurant/s9vx/ny-212-dha -> ny-212-dha
+        """
+        parts = url.split('/')
+        try:
+            restaurant_idx = parts.index('restaurant')
+            return parts[restaurant_idx + 2]
+        except (ValueError, IndexError):
+            raise ValueError(f"Could not extract restaurant slug from URL: {url}")
+
+    @staticmethod
+    def parse_restaurant_url(url: str) -> dict[str, str]:
+        """Parse restaurant URL into components.
+        
+        Example: /restaurant/s9vx/ny-212-dha -> 
+                {"vendor_id": "s9vx", "slug": "ny-212-dha"}
+        """
+        return {
+            "vendor_id": FoodpandaParser.extract_vendor_id(url),
+            "slug": FoodpandaParser.extract_restaurant_slug(url),
+        }
+
+    @staticmethod
     def parse_restaurant_links(page: Page) -> List[str]:
         """Extract all restaurant links from the page."""
         links = page.locator("xpath=//a[contains(@href, '/restaurant/')]").all()
