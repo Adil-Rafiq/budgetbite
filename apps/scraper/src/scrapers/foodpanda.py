@@ -45,8 +45,10 @@ class FoodpandaScraper(BaseScraper):
         """Scrape data from a single restaurant page."""
         page = self.browser.page
         
-        vendor_id = self.parser.extract_vendor_id(url)
-        print(f"[INFO] Scraping restaurant: {vendor_id}")
+        url_data = self.parser.parse_restaurant_url(url)
+        vendor_id = url_data["vendor_id"]
+        restaurant_slug = url_data["slug"]
+        print(f"[INFO] Scraping: {vendor_id}/{restaurant_slug}")
         
         page.goto(url, wait_until="domcontentloaded")
         self.browser.delay(self.config.page_load_delay)
@@ -54,6 +56,15 @@ class FoodpandaScraper(BaseScraper):
         # Handle CAPTCHA
         self.handle_captcha()
         self.browser.delay(self.config.page_load_delay)
+
+        # Scroll to load lazy-loaded content
+        self.scroll_to_bottom(step=1000, delay=1.0)
+
+        # Parse restaurant details
+        rating = self.parser.parse_rating(page)
+        rating_count = self.parser.parse_rating_count(page)
+        delivery_fee = self.parser.parse_delivery_fee(page)
+        minimum_order = self.parser.parse_minimum_order(page)
 
         # Parse menu items
         menu = self.parser.parse_menu_items(page)
@@ -63,13 +74,11 @@ class FoodpandaScraper(BaseScraper):
         return Restaurant(
             url=url,
             vendor_id=vendor_id,
-            name="",  # Extract from page/API
-            rating=None,
-            rating_count=None,
-            cuisine_types=[],
-            delivery_time=None,
-            minimum_order=0.0,
-            delivery_fee=0.0,
+            slug=restaurant_slug,
+            rating=rating,
+            rating_count=rating_count,
+            minimum_order=delivery_fee,
+            delivery_fee=minimum_order,
             menu=menu,
         )
 

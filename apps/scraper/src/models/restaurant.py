@@ -24,11 +24,9 @@ class Restaurant(TypedDict):
     """Restaurant data structure."""
     url: str
     vendor_id: str
-    name: str
+    slug: str
     rating: Optional[float]
     rating_count: Optional[int]
-    cuisine_types: List[str]
-    delivery_time: Optional[int]
     minimum_order: float
     delivery_fee: float
     menu: List[MenuItem]
