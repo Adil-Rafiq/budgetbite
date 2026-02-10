@@ -265,10 +265,7 @@ class FoodpandaParser:
                 description=description,
                 price=current_price,
                 original_price=original_price,
-                variations=None,
-                category="General",
                 image_url=image_url,
-                is_available=True,
             )
 
         except Exception as e:

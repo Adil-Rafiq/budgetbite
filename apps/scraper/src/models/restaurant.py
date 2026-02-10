@@ -2,12 +2,6 @@
 
 from typing import TypedDict, List, Optional
 
-class MenuItemVariation(TypedDict):
-    """Menu item variation (e.g., different sizes)."""
-    id: str
-    name: str
-    price: float
-
 class MenuItem(TypedDict):
     """Menu item data structure."""
     foodpanda_id: str
@@ -15,10 +9,7 @@ class MenuItem(TypedDict):
     description: str
     price: float
     original_price: Optional[float]
-    variations: Optional[List[MenuItemVariation]]
-    category: str
     image_url: Optional[str]
-    is_available: bool
 
 class Restaurant(TypedDict):
     """Restaurant data structure."""
