@@ -1,7 +1,8 @@
 import { sql } from "drizzle-orm";
-import { date, decimal, integer, pgTable, text, timestamp, uniqueIndex, check, uuid } from "drizzle-orm/pg-core";
+import { date, decimal, integer, pgTable, timestamp, uniqueIndex, check, text, uuid } from "drizzle-orm/pg-core";
 
 import { budgetPlans } from "./budget-plans";
+import { mealTypes } from "./meal-types";
 import { menuItems } from "./menu-items";
 import { restaurants } from "./restaurants";
 
@@ -21,8 +22,10 @@ export const mealSuggestions = pgTable(
       .notNull()
       .references(() => mealPlanGenerations.id, { onDelete: "cascade" }),
     slotDate: date("slot_date", { mode: "string" }).notNull(),
-    mealType: text("meal_type").notNull(),
-    optionIndex: integer("option_index").notNull(),
+    mealTypeId: uuid("meal_type_id")
+      .notNull()
+      .references(() => mealTypes.id, { onDelete: "restrict" }),
+    optionIndex: integer("option_index").notNull(), // more the once choice for a single meal
     restaurantId: uuid("restaurant_id")
       .notNull()
       .references(() => restaurants.id, { onDelete: "cascade" }),
@@ -33,7 +36,7 @@ export const mealSuggestions = pgTable(
     notes: text("notes"),
   },
   (table) => [
-    uniqueIndex("unique_generation_slot").on(table.generationId, table.slotDate, table.mealType, table.optionIndex),
+    uniqueIndex("unique_generation_slot").on(table.generationId, table.slotDate, table.mealTypeId, table.optionIndex),
     check("valid_option_index", sql`${table.optionIndex} >= 0`),
   ],
 );

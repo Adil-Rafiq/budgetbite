@@ -16,7 +16,6 @@ export const budgetPlans = pgTable(
     startDate: date("start_date", { mode: "string" }).notNull(),
     endDate: date("end_date", { mode: "string" }).notNull(),
     mealsPerDay: integer("meals_per_day").notNull(),
-    mealTypes: jsonb("meal_types").$type<string[]>().notNull(),
     notificationTimes: jsonb("notification_times").$type<string[]>(),
     status: text("status", { enum: ["active", "completed", "cancelled"] })
       .notNull()
@@ -25,9 +24,6 @@ export const budgetPlans = pgTable(
     ...timestamps,
   },
   (table) => [
-    // mealTypes length must equal mealsPerDay
-    check("budget_plans_meal_types_length", sql`jsonb_array_length(${table.mealTypes}) = ${table.mealsPerDay}`),
-    // when notificationTimes is provided, its length must equal mealsPerDay
     check(
       "budget_plans_notification_times_length",
       sql`(${table.notificationTimes} IS NULL OR jsonb_array_length(${table.notificationTimes}) = ${table.mealsPerDay})`,
