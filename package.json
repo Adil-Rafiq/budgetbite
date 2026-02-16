@@ -27,5 +27,8 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.54.0"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.3.0"
+  }
 }
