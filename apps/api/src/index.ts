@@ -37,5 +37,5 @@ app.use((_req, res) => {
 app.use(errorMiddleware);
 
 app.listen(port, () => {
-  console.log(`BudgetBite API listening on http://localhost:${port}`);
+  console.log(`BudgetBite API listening on ${process.env.API_URL ?? "http://localhost"}:${port}`);
 });

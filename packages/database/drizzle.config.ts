@@ -6,7 +6,7 @@ import { defineConfig } from "drizzle-kit";
 // Load .env from monorepo root so DATABASE_URL is available when running from packages/database
 config({ path: path.resolve(__dirname, "../../.env") });
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DIRECT_DATABASE_URL;
 if (!connectionString) {
   throw new Error("DATABASE_URL is not set. Add it to .env in the repo root.");
 }
