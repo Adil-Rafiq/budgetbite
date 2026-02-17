@@ -1,7 +1,7 @@
 import { decimal, pgTable, text, uuid } from "drizzle-orm/pg-core";
 
-import { timestamps } from "./common/timestamps";
-import { restaurants } from "./restaurants";
+import { timestamps } from "./common/timestamps.js";
+import { restaurants } from "./restaurants.js";
 
 export const menuItems = pgTable("menu_items", {
   id: uuid("id").primaryKey().defaultRandom(),

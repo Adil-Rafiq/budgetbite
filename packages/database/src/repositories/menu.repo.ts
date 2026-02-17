@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "../db.js";
-import { menuItems, type MenuItem, type NewMenuItem } from "../schema";
+import { menuItems, type MenuItem, type NewMenuItem } from "../schema/index.js";
 
 export const menuRepository = {
   async findById(id: string): Promise<MenuItem | undefined> {

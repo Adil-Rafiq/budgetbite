@@ -1,6 +1,6 @@
 import { pgTable, uuid, text, decimal } from "drizzle-orm/pg-core";
 
-import { timestamps } from "./common/timestamps";
+import { timestamps } from "./common/timestamps.js";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
