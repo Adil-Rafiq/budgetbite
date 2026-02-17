@@ -54,3 +54,6 @@ build/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# others
+project_structure.md
