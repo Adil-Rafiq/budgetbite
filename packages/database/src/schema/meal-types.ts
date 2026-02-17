@@ -1,6 +1,6 @@
 import { pgTable, uuid, text, integer, boolean } from "drizzle-orm/pg-core";
 
-import { timestamps } from "./common/timestamps";
+import { timestamps } from "./common/timestamps.js";
 
 export const mealTypes = pgTable("meal_types", {
   id: uuid("id").primaryKey().defaultRandom(),

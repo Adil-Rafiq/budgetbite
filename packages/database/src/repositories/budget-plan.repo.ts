@@ -1,13 +1,7 @@
 import { eq, and, desc } from "drizzle-orm";
 
 import { db } from "../db.js";
-import {
-  budgetPlans,
-  budgetPlanMealTypes,
-  type BudgetPlan,
-  type NewBudgetPlan,
-  type NewBudgetPlanMealType,
-} from "../schema";
+import { budgetPlans, budgetPlanMealTypes, type BudgetPlan, type NewBudgetPlan, type NewBudgetPlanMealType } from "../schema/index.js";
 
 export const budgetPlanRepository = {
   async findById(id: string): Promise<BudgetPlan | undefined> {
@@ -26,12 +20,7 @@ export const budgetPlanRepository = {
   },
 
   async listByUserId(userId: string, limit = 20): Promise<BudgetPlan[]> {
-    return db
-      .select()
-      .from(budgetPlans)
-      .where(eq(budgetPlans.userId, userId))
-      .orderBy(desc(budgetPlans.startDate))
-      .limit(limit);
+    return db.select().from(budgetPlans).where(eq(budgetPlans.userId, userId)).orderBy(desc(budgetPlans.startDate)).limit(limit);
   },
 
   async create(data: NewBudgetPlan, mealTypeIds?: string[]): Promise<BudgetPlan> {

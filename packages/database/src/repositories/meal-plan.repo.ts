@@ -1,5 +1,6 @@
-import { db } from "../db.js";
+import { eq, and, asc } from "drizzle-orm";
 
+import { db } from "../db.js";
 import {
     mealPlanGenerations,
     mealSuggestions,
@@ -8,9 +9,7 @@ import {
     mealTypes,
     type MealPlanGeneration,
     type MealSuggestion,
-    type NewMealPlanGeneration,
-    type NewMealSuggestion,
-} from "../schema";
+} from "../schema/index.js";
 
 export const mealPlanRepository = {
     async createGeneration(budgetPlanId: string): Promise<MealPlanGeneration> {
@@ -21,12 +20,12 @@ export const mealPlanRepository = {
 
         if (!inserted) throw new Error("MealPlanGeneration insert failed");
         return inserted;
-    }
+    },
 
     async getLatestGenerationId(budgetPlanId: string): Promise<string | undefined> {
         const [row] = await db.select({ id: mealPlanGenerations.id }).from(mealPlanGenerations).where(eq(mealPlanGenerations.budgetPlanId, budgetPlanId)).orderBy(mealPlanGenerations.generatedAt).limit(1);
         return row?.id;
-    }
+    },
 
     async getSuggestionsForSlot(
         generationId: string,
