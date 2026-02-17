@@ -30,3 +30,6 @@ export const budgetPlans = pgTable(
     ),
   ],
 );
+
+export type BudgetPlan = typeof budgetPlans.$inferSelect;
+export type NewBudgetPlan = typeof budgetPlans.$inferInsert;
