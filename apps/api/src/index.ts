@@ -1,6 +1,7 @@
 import "dotenv/config";
-import express from "express";
 import cors from "cors";
+import express from "express";
+
 import { errorMiddleware } from "./middleware/error.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
@@ -12,7 +13,7 @@ import feedbackRoutes from "./routes/feedback.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 
 const app = express();
-const port = Number(process.env.PORT) || 3001;
+const port = Number(process.env.API_PORT) || 3001;
 
 app.use(cors());
 app.use(express.json());
