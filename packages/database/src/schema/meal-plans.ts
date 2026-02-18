@@ -1,10 +1,10 @@
 import { sql } from "drizzle-orm";
 import { date, decimal, integer, pgTable, timestamp, uniqueIndex, check, text, uuid } from "drizzle-orm/pg-core";
 
-import { budgetPlans } from "./budget-plans.js";
-import { mealTypes } from "./meal-types.js";
-import { menuItems } from "./menu-items.js";
-import { restaurants } from "./restaurants.js";
+import { budgetPlans } from "./budget-plans";
+import { mealTypes } from "./meal-types";
+import { menuItems } from "./menu-items";
+import { restaurants } from "./restaurants";
 
 export const mealPlanGenerations = pgTable("meal_plan_generations", {
   id: uuid("id").primaryKey().defaultRandom(),

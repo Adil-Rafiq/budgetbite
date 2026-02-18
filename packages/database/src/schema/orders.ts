@@ -1,9 +1,9 @@
 import { date, decimal, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-import { budgetPlans } from "./budget-plans.js";
-import { mealSuggestions } from "./meal-plans.js";
-import { mealTypes } from "./meal-types.js";
-import { users } from "./users.js";
+import { budgetPlans } from "./budget-plans";
+import { mealSuggestions } from "./meal-plans";
+import { mealTypes } from "./meal-types";
+import { users } from "./users";
 
 export const mealChoices = pgTable("meal_choices", {
   id: uuid("id").primaryKey().defaultRandom(),

@@ -1,7 +1,7 @@
 import { pgTable, uuid, integer, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { budgetPlans } from "./budget-plans.js";
-import { mealTypes } from "./meal-types.js";
+import { budgetPlans } from "./budget-plans";
+import { mealTypes } from "./meal-types";
 
 export const budgetPlanMealTypes = pgTable(
   "budget_plan_meal_types",

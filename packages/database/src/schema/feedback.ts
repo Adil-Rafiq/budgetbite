@@ -1,7 +1,7 @@
 import { boolean, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-import { mealChoices } from "./orders.js";
-import { users } from "./users.js";
+import { mealChoices } from "./orders";
+import { users } from "./users";
 
 export const feedback = pgTable("feedback", {
   id: uuid("id").primaryKey().defaultRandom(),

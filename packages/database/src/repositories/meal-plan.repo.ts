@@ -1,6 +1,6 @@
 import { eq, and, asc } from "drizzle-orm";
 
-import { db } from "../db.js";
+import { db } from "../db";
 import {
     mealPlanGenerations,
     mealSuggestions,
@@ -9,7 +9,7 @@ import {
     mealTypes,
     type MealPlanGeneration,
     type MealSuggestion,
-} from "../schema/index.js";
+} from "../schema/index";
 
 export const mealPlanRepository = {
     async createGeneration(budgetPlanId: string): Promise<MealPlanGeneration> {

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
-import { db } from "../db.js";
-import { feedback, type Feedback, type NewFeedback } from "../schema/index.js";
+import { db } from "../db";
+import { feedback, type Feedback, type NewFeedback } from "../schema/index";
 
 export const feedbackRepository = {
   async findByMealChoiceId(mealChoiceId: string): Promise<Feedback | undefined> {

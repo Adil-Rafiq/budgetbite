@@ -1,7 +1,7 @@
 import { eq, and, desc } from "drizzle-orm";
 
-import { db } from "../db.js";
-import { budgetPlans, budgetPlanMealTypes, type BudgetPlan, type NewBudgetPlan, type NewBudgetPlanMealType } from "../schema/index.js";
+import { db } from "../db";
+import { budgetPlans, budgetPlanMealTypes, type BudgetPlan, type NewBudgetPlan, type NewBudgetPlanMealType } from "../schema/index";
 
 export const budgetPlanRepository = {
   async findById(id: string): Promise<BudgetPlan | undefined> {
