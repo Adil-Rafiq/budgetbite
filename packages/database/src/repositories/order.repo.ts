@@ -1,7 +1,7 @@
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
 
-import { db } from "../db.js";
-import { mealChoices, type MealChoice, type NewMealChoice } from "../schema/index.js";
+import { db } from "../db";
+import { mealChoices, type MealChoice, type NewMealChoice } from "../schema/index";
 
 export const orderRepository = {
   async findById(id: string): Promise<MealChoice | undefined> {

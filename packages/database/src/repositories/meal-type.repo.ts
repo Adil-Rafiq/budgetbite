@@ -1,7 +1,7 @@
 import { asc, eq } from "drizzle-orm";
 
-import { db } from "../db.js";
-import { mealTypes, type MealType } from "../schema/index.js";
+import { db } from "../db";
+import { mealTypes, type MealType } from "../schema/index";
 
 export const mealTypeRepository = {
   async listActive(): Promise<MealType[]> {

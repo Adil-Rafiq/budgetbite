@@ -1,7 +1,7 @@
 import { sql, and, gte, eq } from "drizzle-orm";
 
-import { db } from "../db.js";
-import { restaurants, type NewRestaurant, type Restaurant } from "../schema/index.js";
+import { db } from "../db";
+import { restaurants, type NewRestaurant, type Restaurant } from "../schema/index";
 
 const haversineFragment = (userLat: number, userLng: number) =>
   sql<number>`(
