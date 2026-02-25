@@ -1,6 +1,6 @@
 import { pgTable, uuid, text, decimal } from "drizzle-orm/pg-core";
 
-import { timestamps } from "./common/timestamps";
+import { timestamps } from "./common/timestamps.js";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -10,6 +10,7 @@ export const users = pgTable("users", {
   lastName: text("last_name"),
   latitude: decimal("latitude", { precision: 10, scale: 7 }),
   longitude: decimal("longitude", { precision: 10, scale: 7 }),
+  role: text("role").notNull().default("user"),
 
   ...timestamps,
 });

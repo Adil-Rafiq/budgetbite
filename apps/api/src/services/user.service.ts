@@ -1,5 +1,5 @@
 import type { UpdateProfileInput } from "../lib/validation.js";
-import { userRepository } from "@budgetbite/database";
+import { userRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 
 export const userService = {

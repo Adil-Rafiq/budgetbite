@@ -1,5 +1,5 @@
 import type { RecordMealChoiceInput } from "../lib/validation.js";
-import { budgetPlanRepository, orderRepository } from "@budgetbite/database";
+import { budgetPlanRepository, orderRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 
 export const orderService = {

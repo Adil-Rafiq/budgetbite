@@ -6,6 +6,7 @@ CREATE TABLE "users" (
 	"last_name" text,
 	"latitude" numeric(10, 7),
 	"longitude" numeric(10, 7),
+	"role" text DEFAULT 'user' NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email")

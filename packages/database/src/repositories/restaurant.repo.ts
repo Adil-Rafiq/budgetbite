@@ -1,7 +1,7 @@
 import { sql, and, gte, eq } from "drizzle-orm";
 
-import { db } from "../db";
-import { restaurants, type NewRestaurant, type Restaurant } from "../schema/index";
+import { db } from "../db.js";
+import { restaurants, type NewRestaurant, type Restaurant } from "../schema/index.js";
 
 const haversineFragment = (userLat: number, userLng: number) =>
   sql<number>`(
@@ -70,9 +70,14 @@ export const restaurantRepository = {
     const [updated] = await db
       .update(restaurants)
       .set(data)
-      .where(sql`${restaurants.id} = ${id}`)
+      .where(eq(restaurants.id, id))
       .returning();
     if (!updated) throw new Error("Restaurant not found");
     return updated;
+  },
+
+  async delete(id: string): Promise<void> {
+    const deleted = await db.delete(restaurants).where(eq(restaurants.id, id)).returning({ id: restaurants.id });
+    if (deleted.length === 0) throw new Error("Restaurant not found");
   },
 };

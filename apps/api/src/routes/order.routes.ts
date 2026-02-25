@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import * as orderController from "../controllers/order.controller.js";
 
-const router = Router();
+const router: Router = Router();
 
 router.use(authMiddleware);
 

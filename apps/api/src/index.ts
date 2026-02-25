@@ -11,6 +11,7 @@ import mealRoutes from "./routes/meal.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import feedbackRoutes from "./routes/feedback.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 
 const app = express();
 const port = Number(process.env.API_PORT) || 3001;
@@ -30,6 +31,7 @@ app.use("/api/meals", mealRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ error: "Not found", code: "NOT_FOUND" });

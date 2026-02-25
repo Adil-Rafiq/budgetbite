@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { listRestaurantsSchema, uuidSchema } from "../lib/validation.js";
 import { restaurantService } from "../services/restaurant.service.js";
 import type { AuthRequest } from "../middleware/auth.middleware.js";
-import { userRepository } from "@budgetbite/database";
+import { userRepository } from "@repo/database";
 
 export async function listRestaurants(req: AuthRequest, res: Response): Promise<void> {
   const query = listRestaurantsSchema.parse(req.query);

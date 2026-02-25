@@ -1,5 +1,5 @@
 import type { AnalyticsQuery } from "../lib/validation.js";
-import { orderRepository, budgetPlanRepository } from "@budgetbite/database";
+import { orderRepository, budgetPlanRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 
 export const analyticsService = {

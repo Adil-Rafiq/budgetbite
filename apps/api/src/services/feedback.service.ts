@@ -1,5 +1,5 @@
 import type { FeedbackInput } from "../lib/validation.js";
-import { feedbackRepository, orderRepository } from "@budgetbite/database";
+import { feedbackRepository, orderRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 
 export const feedbackService = {

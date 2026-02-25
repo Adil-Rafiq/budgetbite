@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response } from "express";
 import { ZodError } from "zod";
 
 export class AppError extends Error {
@@ -12,13 +12,14 @@ export class AppError extends Error {
   }
 }
 
-export function errorMiddleware(err: unknown, _req: Request, res: Response, _next: NextFunction): void {
+export function errorMiddleware(err: unknown, _req: Request, res: Response): void {
   if (err instanceof AppError) {
     res.status(err.statusCode).json({ error: err.message, code: err.code ?? undefined });
     return;
   }
   if (err instanceof ZodError) {
-    const message = err.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join("; ");
+    type Issue = ZodError["issues"][number];
+    const message = err.issues.map((e: Issue) => `${e.path.join(".")}: ${e.message}`).join("; ");
     res.status(400).json({ error: message, code: "VALIDATION_ERROR" });
     return;
   }

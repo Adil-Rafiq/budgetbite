@@ -86,7 +86,7 @@ You can wire dependencies in a small `src/container.ts` or `src/index.ts` (e.g. 
 ## What to avoid
 
 - **Putting business logic in controllers** — keep it in services so it can be reused and tested without HTTP.
-- **Controllers or services importing the DB or schema directly** — data access goes through `@budgetbite/database` repositories only.
+- **Controllers or services importing the DB or schema directly** — data access goes through `@repo/database` repositories only.
 - **Skipping the service layer** — even “simple” CRUD benefits from a service layer for validation, events, or future logic.
 
 ---
@@ -102,3 +102,68 @@ You can wire dependencies in a small `src/container.ts` or `src/index.ts` (e.g. 
 | **Middleware**          | Auth (attach user), global error handling               |
 
 This keeps the API consistent with your existing plan, works well with Neon + Drizzle and shared-types, and stays simple enough to extend (e.g. add a new “meal suggestion” or “budget alert” service) without refactoring the whole backend.
+
+---
+
+## Admin / Scraper API (restaurants & menus)
+
+For **adding/updating/deleting restaurants and menu items**, both the **scraper** (service-to-service) and a future **admin dashboard** (human user) should use the same API. This avoids duplicating schema or business logic.
+
+### 1. Route structure: prefix `/api/admin`
+
+Keep **read** endpoints public (or optionally authenticated) under existing paths; put **write** operations under a dedicated admin prefix so it's clear what is protected.
+
+| Method | Path | Purpose | Used by |
+|--------|------|---------|---------|
+| GET | `/api/restaurants` | List (existing) | App, admin |
+| GET | `/api/restaurants/:id` | Get one (existing) | App, admin |
+| GET | `/api/restaurants/:id/menu` | Get menu (existing) | App, admin |
+| **POST** | **`/api/admin/restaurants`** | Create restaurant | Scraper, admin UI |
+| **PATCH** | **`/api/admin/restaurants/:id`** | Update restaurant | Scraper, admin UI |
+| **DELETE** | **`/api/admin/restaurants/:id`** | Delete restaurant (cascades to menu) | Scraper, admin UI |
+| **POST** | **`/api/admin/restaurants/:id/menu-items`** | Create menu item(s) (body: one or array) | Scraper, admin UI |
+| **PATCH** | **`/api/admin/restaurants/:restaurantId/menu-items/:itemId`** | Update menu item | Scraper, admin UI |
+| **DELETE** | **`/api/admin/restaurants/:restaurantId/menu-items/:itemId`** | Delete menu item | Scraper, admin UI |
+
+- **Mount:** e.g. `app.use("/api/admin", adminOrScraperMiddleware, adminRoutes)` so every admin route is protected by the same guard.
+
+### 2. Authorization: two ways to access admin routes
+
+Only two callers should be allowed: the **scraper** (automated) and **admin users** (dashboard).
+
+| Caller | How they authenticate | How the API checks |
+|--------|----------------------|--------------------|
+| **Scraper** | API key in header, e.g. `X-API-Key: <ADMIN_API_KEY>` or `Authorization: Bearer <ADMIN_API_KEY>` | Env var `ADMIN_API_KEY`; if header matches, treat as trusted service and allow. |
+| **Admin dashboard** | User logs in → receives JWT (same auth as app). | JWT middleware + **role**: only users with `role === "admin"` can call admin routes. |
+
+So: **one middleware** (e.g. `requireAdminOrService`) that:
+
+1. If `X-API-Key` (or chosen header) equals `process.env.ADMIN_API_KEY` then `next()` (scraper).
+2. Else, run normal JWT auth; load user (or attach `role` to JWT payload); if `role === "admin"` then `next()`.
+3. Else respond with `403 Forbidden`.
+
+### 3. User schema: add `role`
+
+- Add a **`role`** field to `users` (e.g. `text`, default `'user'`, or enum `'user' | 'admin'`).
+- When issuing JWTs for login, include `role` in the payload (or look it up in middleware) so the admin middleware can allow/deny without an extra DB hit every time if you prefer to embed role in the token.
+- One (or a few) users are set to `admin` via seed or manual DB update; admin dashboard login uses the same `/api/auth/login` and then only admins can call `/api/admin/*`.
+
+### 4. Implementation layout (api)
+
+- **Middleware:** `middleware/admin.middleware.ts` — `requireAdminOrService(req, res, next)`: check API key first, then JWT + admin role.
+- **Routes:** `routes/admin.routes.ts` (or `admin/restaurants.routes.ts` + `admin/menu-items.routes.ts` under one router) — mount at `/api/admin`, use the admin middleware, then define POST/PATCH/DELETE for restaurants and menu items.
+- **Controllers:** e.g. `controllers/admin-restaurant.controller.ts`, `controllers/admin-menu.controller.ts` — parse body/params with Zod, call services, return JSON.
+- **Services:** extend or add `restaurant.service` / `menu.service` (or admin-specific) for create/update/delete; use existing `restaurantRepository` and `menuRepository`. Repositories may need a `delete` for restaurant (and possibly menu item) if not already present.
+- **Validation:** Zod schemas for create/update restaurant and create/update menu item in `lib/validation.ts` (or `lib/admin-validation.ts`).
+
+### 5. Summary
+
+| Piece | What to do |
+|-------|------------|
+| **Routes** | All write operations under `/api/admin/*`, guarded by one middleware. |
+| **Auth** | Scraper: API key. Admin UI: same login as app, but only `role === 'admin'` can access admin routes. |
+| **Schema** | Add `role` to `users`; default `'user'`, set some to `'admin'`. |
+| **Middleware** | `requireAdminOrService`: API key OR JWT with admin role. |
+| **Scraper / Admin** | Both call the same REST endpoints; no separate "scraper-only" or "admin-only" API. |
+
+This gives you a single, consistent structure for both the scraper and the future admin dashboard, with a clear place to add more admin-only endpoints later (e.g. managing users, feature flags) under the same prefix and middleware.

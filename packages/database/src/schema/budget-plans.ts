@@ -1,8 +1,8 @@
 import { sql } from "drizzle-orm";
 import { pgTable, uuid, check, decimal, integer, text, date, jsonb } from "drizzle-orm/pg-core";
 
-import { timestamps } from "./common/timestamps";
-import { users } from "./users";
+import { timestamps } from "./common/timestamps.js";
+import { users } from "./users.js";
 
 export const budgetPlans = pgTable(
   "budget_plans",

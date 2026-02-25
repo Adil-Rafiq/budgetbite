@@ -1,5 +1,11 @@
-import type { ListRestaurantsQuery } from "../lib/validation.js";
-import { restaurantRepository, menuRepository } from "@budgetbite/database";
+import type {
+  ListRestaurantsQuery,
+  CreateRestaurantInput,
+  UpdateRestaurantInput,
+  CreateMenuItemInput,
+  UpdateMenuItemInput,
+} from "../lib/validation.js";
+import { restaurantRepository, menuRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 
 export const restaurantService = {
@@ -28,14 +34,14 @@ export const restaurantService = {
   async getById(id: string) {
     const restaurant = await restaurantRepository.findById(id);
     if (!restaurant) throw new AppError(404, "Restaurant not found", "NOT_FOUND");
-    return {
-      ...restaurant,
-      latitude: Number(restaurant.latitude),
-      longitude: Number(restaurant.longitude),
-      deliveryFee: restaurant.deliveryFee != null ? Number(restaurant.deliveryFee) : null,
-      minimumOrder: restaurant.minimumOrder != null ? Number(restaurant.minimumOrder) : null,
-      rating: restaurant.rating != null ? Number(restaurant.rating) : null,
-    };
+    return this.toRestaurantResponse(restaurant);
+  },
+
+  /** For admin/scraper: get restaurant by externalId (e.g. after 409 on create). */
+  async getByExternalId(externalId: string) {
+    const restaurant = await restaurantRepository.findByExternalId(externalId);
+    if (!restaurant) throw new AppError(404, "Restaurant not found", "NOT_FOUND");
+    return this.toRestaurantResponse(restaurant);
   },
 
   async getMenu(restaurantId: string) {
@@ -46,5 +52,115 @@ export const restaurantService = {
       ...item,
       price: Number(item.price),
     }));
+  },
+
+  // Admin / scraper: create, update, delete restaurants and menu items
+  async createRestaurant(input: CreateRestaurantInput) {
+    const existing = await restaurantRepository.findByExternalId(input.externalId);
+    if (existing) throw new AppError(409, "Restaurant with this externalId already exists", "CONFLICT");
+    const restaurant = await restaurantRepository.create({
+      externalId: input.externalId,
+      name: input.name,
+      latitude: String(input.latitude),
+      longitude: String(input.longitude),
+      deliveryFee: input.deliveryFee != null ? String(input.deliveryFee) : null,
+      minimumOrder: input.minimumOrder != null ? String(input.minimumOrder) : null,
+      rating: input.rating != null ? String(input.rating) : null,
+      ratingCount: input.ratingCount ?? 0,
+    });
+    return this.toRestaurantResponse(restaurant);
+  },
+
+  async updateRestaurant(id: string, input: UpdateRestaurantInput) {
+    const existing = await restaurantRepository.findById(id);
+    if (!existing) throw new AppError(404, "Restaurant not found", "NOT_FOUND");
+    if (input.externalId !== undefined) {
+      const byExternal = await restaurantRepository.findByExternalId(input.externalId);
+      if (byExternal && byExternal.id !== id)
+        throw new AppError(409, "Another restaurant has this externalId", "CONFLICT");
+    }
+    const restaurant = await restaurantRepository.update(id, {
+      ...(input.externalId !== undefined && { externalId: input.externalId }),
+      ...(input.name !== undefined && { name: input.name }),
+      ...(input.latitude !== undefined && { latitude: String(input.latitude) }),
+      ...(input.longitude !== undefined && { longitude: String(input.longitude) }),
+      ...(input.deliveryFee !== undefined && { deliveryFee: String(input.deliveryFee) }),
+      ...(input.minimumOrder !== undefined && { minimumOrder: String(input.minimumOrder) }),
+      ...(input.rating !== undefined && { rating: String(input.rating) }),
+      ...(input.ratingCount !== undefined && { ratingCount: input.ratingCount }),
+    });
+    return this.toRestaurantResponse(restaurant);
+  },
+
+  async deleteRestaurant(id: string): Promise<void> {
+    const existing = await restaurantRepository.findById(id);
+    if (!existing) throw new AppError(404, "Restaurant not found", "NOT_FOUND");
+    await restaurantRepository.delete(id);
+  },
+
+  async createMenuItems(restaurantId: string, input: CreateMenuItemInput | CreateMenuItemInput[]) {
+    const restaurant = await restaurantRepository.findById(restaurantId);
+    if (!restaurant) throw new AppError(404, "Restaurant not found", "NOT_FOUND");
+    const items = Array.isArray(input) ? input : [input];
+    const created = await menuRepository.createMany(
+      items.map((item) => ({
+        restaurantId,
+        name: item.name,
+        description: item.description ?? null,
+        price: String(item.price),
+        imageUrl: item.imageUrl ?? null,
+      })),
+    );
+    return created.map((item) => ({ ...item, price: Number(item.price) }));
+  },
+
+  async updateMenuItem(restaurantId: string, itemId: string, input: UpdateMenuItemInput) {
+    const item = await menuRepository.findById(itemId);
+    if (!item) throw new AppError(404, "Menu item not found", "NOT_FOUND");
+    if (item.restaurantId !== restaurantId)
+      throw new AppError(400, "Menu item does not belong to this restaurant", "BAD_REQUEST");
+    const updated = await menuRepository.update(itemId, {
+      ...(input.name !== undefined && { name: input.name }),
+      ...(input.description !== undefined && { description: input.description }),
+      ...(input.price !== undefined && { price: String(input.price) }),
+      ...(input.imageUrl !== undefined && { imageUrl: input.imageUrl }),
+    });
+    return { ...updated, price: Number(updated.price) };
+  },
+
+  async deleteMenuItem(restaurantId: string, itemId: string): Promise<void> {
+    const item = await menuRepository.findById(itemId);
+    if (!item) throw new AppError(404, "Menu item not found", "NOT_FOUND");
+    if (item.restaurantId !== restaurantId)
+      throw new AppError(400, "Menu item does not belong to this restaurant", "BAD_REQUEST");
+    await menuRepository.delete(itemId);
+  },
+
+  toRestaurantResponse(restaurant: {
+    id: string;
+    externalId: string;
+    name: string;
+    latitude: string;
+    longitude: string;
+    deliveryFee: string | null;
+    minimumOrder: string | null;
+    rating: string | null;
+    ratingCount: number;
+    createdAt: Date;
+    updatedAt: Date;
+  }) {
+    return {
+      id: restaurant.id,
+      externalId: restaurant.externalId,
+      name: restaurant.name,
+      latitude: Number(restaurant.latitude),
+      longitude: Number(restaurant.longitude),
+      deliveryFee: restaurant.deliveryFee != null ? Number(restaurant.deliveryFee) : null,
+      minimumOrder: restaurant.minimumOrder != null ? Number(restaurant.minimumOrder) : null,
+      rating: restaurant.rating != null ? Number(restaurant.rating) : null,
+      ratingCount: restaurant.ratingCount,
+      createdAt: restaurant.createdAt,
+      updatedAt: restaurant.updatedAt,
+    };
   },
 };

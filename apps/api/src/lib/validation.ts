@@ -77,6 +77,42 @@ export const analyticsQuerySchema = z.object({
   budgetPlanId: uuidSchema.optional(),
 });
 
+// Admin: restaurants and menu items
+export const createRestaurantSchema = z.object({
+  externalId: z.string().min(1).max(200),
+  name: z.string().min(1).max(300),
+  latitude: z.coerce.number().min(-90).max(90),
+  longitude: z.coerce.number().min(-180).max(180),
+  deliveryFee: z.coerce.number().min(0).optional(),
+  minimumOrder: z.coerce.number().min(0).optional(),
+  rating: z.coerce.number().min(0).max(5).optional(),
+  ratingCount: z.coerce.number().int().min(0).optional(),
+});
+export const updateRestaurantSchema = createRestaurantSchema.partial();
+export const createMenuItemSchema = z.object({
+  name: z.string().min(1).max(300),
+  description: z.string().max(2000).optional(),
+  price: z.coerce.number().positive(),
+  imageUrl: z.string().url().max(2000).optional(),
+});
+export const createMenuItemsSchema = z.union([
+  createMenuItemSchema,
+  z.array(createMenuItemSchema).min(1),
+]);
+export const updateMenuItemSchema = createMenuItemSchema.partial();
+export const adminGetRestaurantByExternalIdSchema = z.object({
+  externalId: z.string().min(1).max(200),
+});
+
+// Admin: meal types
+export const createMealTypeSchema = z.object({
+  key: z.string().min(1).max(50).regex(/^[a-z0-9_-]+$/, "key must be lowercase letters, numbers, hyphen or underscore"),
+  label: z.string().min(1).max(200),
+  sortOrder: z.coerce.number().int().min(0).optional(),
+  active: z.boolean().optional(),
+});
+export const updateMealTypeSchema = createMealTypeSchema.partial();
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
@@ -87,3 +123,9 @@ export type RecordMealChoiceInput = z.infer<typeof recordMealChoiceSchema>;
 export type FeedbackInput = z.infer<typeof feedbackSchema>;
 export type GetSuggestionsQuery = z.infer<typeof getSuggestionsSchema>;
 export type AnalyticsQuery = z.infer<typeof analyticsQuerySchema>;
+export type CreateRestaurantInput = z.infer<typeof createRestaurantSchema>;
+export type UpdateRestaurantInput = z.infer<typeof updateRestaurantSchema>;
+export type CreateMenuItemInput = z.infer<typeof createMenuItemSchema>;
+export type UpdateMenuItemInput = z.infer<typeof updateMenuItemSchema>;
+export type CreateMealTypeInput = z.infer<typeof createMealTypeSchema>;
+export type UpdateMealTypeInput = z.infer<typeof updateMealTypeSchema>;

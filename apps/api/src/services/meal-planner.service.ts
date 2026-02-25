@@ -1,5 +1,5 @@
 import type { GetSuggestionsQuery } from "../lib/validation.js";
-import { budgetPlanRepository, mealPlanRepository, mealTypeRepository } from "@budgetbite/database";
+import { budgetPlanRepository, mealPlanRepository, mealTypeRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 
 export const mealPlannerService = {

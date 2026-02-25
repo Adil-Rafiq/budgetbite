@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
-import { db } from "../db";
-import { menuItems, type MenuItem, type NewMenuItem } from "../schema/index";
+import { db } from "../db.js";
+import { menuItems, type MenuItem, type NewMenuItem } from "../schema/index.js";
 
 export const menuRepository = {
   async findById(id: string): Promise<MenuItem | undefined> {
@@ -29,5 +29,10 @@ export const menuRepository = {
     const [updated] = await db.update(menuItems).set(data).where(eq(menuItems.id, id)).returning();
     if (!updated) throw new Error("MenuItem not found");
     return updated;
+  },
+
+  async delete(id: string): Promise<void> {
+    const deleted = await db.delete(menuItems).where(eq(menuItems.id, id)).returning({ id: menuItems.id });
+    if (deleted.length === 0) throw new Error("MenuItem not found");
   },
 };

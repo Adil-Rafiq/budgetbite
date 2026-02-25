@@ -1,4 +1,4 @@
 import "dotenv/config";
-export * from "./schema/index";
-export * from "./repositories/index";
-export { db, type Database } from "./db";
+export * from "./schema/index.js";
+export * from "./repositories/index.js";
+export { db, type Database } from "./db.js";

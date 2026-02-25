@@ -1,59 +1,38 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
 # Dependencies
 node_modules
-**/node_modules
+.pnp
+.pnp.js
 
-# Build outputs
-dist
-build
-.next
-out
-*.tsbuildinfo
-
-# Environment
+# Local env files
 .env
-.env*.local
-
-# Logs
-*.log
-npm-debug.log*
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode
-.idea
-*.swp
-*.swo
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Testing
 coverage
 
-# Database
-*.db
-*.sqlite
+# Turbo
+.turbo
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-env/
-venv/
-.scrapy/
-*.sqlite3
+# Vercel
+.vercel
 
-# Node / TypeScript
-node_modules/
-dist/
-build/
-*.log
+# Build Outputs
+.next/
+out/
+build
+dist
 
-# IDE / OS files
-.vscode/
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
 .DS_Store
-Thumbs.db
-
-# others
-project_structure.md
+*.pem

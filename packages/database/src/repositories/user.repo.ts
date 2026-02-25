@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
-import { db } from "../db";
-import { users, type NewUser, type User } from "../db";
+import { db } from "../db.js";
+import { users, type NewUser, type User } from "../schema/index.js";
 
 export const userRepository = {
   async findById(id: string): Promise<User | undefined> {

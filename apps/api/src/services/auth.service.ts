@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import type { RegisterInput, LoginInput } from "../lib/validation.js";
-import { userRepository } from "@budgetbite/database";
+import { userRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 
 const JWT_SECRET = process.env.JWT_SECRET ?? "";
@@ -21,12 +21,13 @@ export const authService = {
       firstName: input.firstName ?? null,
       lastName: input.lastName ?? null,
     });
-    const token = this.issueToken(user.id, user.email);
+    const token = this.issueToken(user.id, user.email, user.role);
     return { user: toUserResponse(user), token };
   },
 
   async login(input: LoginInput) {
     const user = await userRepository.findByEmail(input.email);
+    
     if (!user?.passwordHash) {
       throw new AppError(401, "Invalid email or password", "INVALID_CREDENTIALS");
     }
@@ -34,13 +35,13 @@ export const authService = {
     if (!ok) {
       throw new AppError(401, "Invalid email or password", "INVALID_CREDENTIALS");
     }
-    const token = this.issueToken(user.id, user.email);
+    const token = this.issueToken(user.id, user.email, user.role);
     return { user: toUserResponse(user), token };
   },
 
-  issueToken(sub: string, email?: string): string {
+  issueToken(sub: string, email?: string, role?: string): string {
     if (!JWT_SECRET) throw new AppError(503, "Auth not configured", "AUTH_NOT_CONFIGURED");
-    return jwt.sign({ sub, email }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+    return jwt.sign({ sub, email, role }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
   },
 };
 
@@ -51,6 +52,7 @@ function toUserResponse(u: {
   lastName: string | null;
   latitude: string | null;
   longitude: string | null;
+  role: string;
 }) {
   return {
     id: u.id,
@@ -59,5 +61,6 @@ function toUserResponse(u: {
     lastName: u.lastName,
     latitude: u.latitude != null ? Number(u.latitude) : null,
     longitude: u.longitude != null ? Number(u.longitude) : null,
+    role: u.role,
   };
 }
