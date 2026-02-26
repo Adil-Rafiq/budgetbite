@@ -1,17 +1,21 @@
-import { eq } from "drizzle-orm";
+import { eq } from 'drizzle-orm';
 
-import { db } from "../db";
-import { feedback, type Feedback, type NewFeedback } from "../schema/index";
+import { db } from '../db.js';
+import { feedback, type Feedback, type NewFeedback } from '../schema/index.js';
 
 export const feedbackRepository = {
   async findByMealChoiceId(mealChoiceId: string): Promise<Feedback | undefined> {
-    const [row] = await db.select().from(feedback).where(eq(feedback.mealChoiceId, mealChoiceId)).limit(1);
+    const [row] = await db
+      .select()
+      .from(feedback)
+      .where(eq(feedback.mealChoiceId, mealChoiceId))
+      .limit(1);
     return row;
   },
 
   async create(data: NewFeedback): Promise<Feedback> {
     const [inserted] = await db.insert(feedback).values(data).returning();
-    if (!inserted) throw new Error("Feedback insert failed");
+    if (!inserted) throw new Error('Feedback insert failed');
     return inserted;
   },
 
@@ -27,7 +31,7 @@ export const feedbackRepository = {
         })
         .where(eq(feedback.id, existing.id))
         .returning();
-      if (!updated) throw new Error("Feedback update failed");
+      if (!updated) throw new Error('Feedback update failed');
       return updated;
     }
     return this.create(data);

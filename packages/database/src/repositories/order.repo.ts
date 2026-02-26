@@ -1,7 +1,7 @@
-import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql } from 'drizzle-orm';
 
-import { db } from "../db";
-import { mealChoices, type MealChoice, type NewMealChoice } from "../schema/index";
+import { db } from '../db.js';
+import { mealChoices, type MealChoice, type NewMealChoice } from '../schema/index.js';
 
 export const orderRepository = {
   async findById(id: string): Promise<MealChoice | undefined> {
@@ -9,7 +9,11 @@ export const orderRepository = {
     return row;
   },
 
-  async listByUserAndPlan(userId: string, budgetPlanId: string, limit = 100): Promise<MealChoice[]> {
+  async listByUserAndPlan(
+    userId: string,
+    budgetPlanId: string,
+    limit = 100,
+  ): Promise<MealChoice[]> {
     return db
       .select()
       .from(mealChoices)
@@ -18,11 +22,21 @@ export const orderRepository = {
       .limit(limit);
   },
 
-  async listByUserInDateRange(userId: string, startDate: string, endDate: string): Promise<MealChoice[]> {
+  async listByUserInDateRange(
+    userId: string,
+    startDate: string,
+    endDate: string,
+  ): Promise<MealChoice[]> {
     return db
       .select()
       .from(mealChoices)
-      .where(and(eq(mealChoices.userId, userId), gte(mealChoices.slotDate, startDate), lte(mealChoices.slotDate, endDate)))
+      .where(
+        and(
+          eq(mealChoices.userId, userId),
+          gte(mealChoices.slotDate, startDate),
+          lte(mealChoices.slotDate, endDate),
+        ),
+      )
       .orderBy(desc(mealChoices.slotDate), desc(mealChoices.createdAt));
   },
 
@@ -33,12 +47,12 @@ export const orderRepository = {
       })
       .from(mealChoices)
       .where(eq(mealChoices.budgetPlanId, budgetPlanId));
-    return row?.total ?? "0";
+    return row?.total ?? '0';
   },
 
   async create(data: NewMealChoice): Promise<MealChoice> {
     const [inserted] = await db.insert(mealChoices).values(data).returning();
-    if (!inserted) throw new Error("MealChoice insert failed");
+    if (!inserted) throw new Error('MealChoice insert failed');
     return inserted;
   },
 };

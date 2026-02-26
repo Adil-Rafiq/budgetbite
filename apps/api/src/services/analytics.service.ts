@@ -1,6 +1,6 @@
-import type { AnalyticsQuery } from "../lib/validation.js";
-import { orderRepository, budgetPlanRepository } from "@budgetbite/database";
-import { AppError } from "../middleware/error.middleware.js";
+import type { AnalyticsQuery } from '@repo/shared';
+import { orderRepository, budgetPlanRepository } from '@repo/database';
+import { AppError } from '../middleware/error.middleware.js';
 
 export const analyticsService = {
   async getSpendingSummary(userId: string, query: AnalyticsQuery) {
@@ -9,8 +9,8 @@ export const analyticsService = {
 
     if (query.budgetPlanId) {
       const plan = await budgetPlanRepository.findById(query.budgetPlanId);
-      if (!plan) throw new AppError(404, "Budget plan not found", "NOT_FOUND");
-      if (plan.userId !== userId) throw new AppError(403, "Forbidden", "FORBIDDEN");
+      if (!plan) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
+      if (plan.userId !== userId) throw new AppError(403, 'Forbidden', 'FORBIDDEN');
       startDate = plan.startDate;
       endDate = plan.endDate;
     }
@@ -40,8 +40,8 @@ export const analyticsService = {
     let endDate = query.endDate;
     if (query.budgetPlanId) {
       const plan = await budgetPlanRepository.findById(query.budgetPlanId);
-      if (!plan) throw new AppError(404, "Budget plan not found", "NOT_FOUND");
-      if (plan.userId !== userId) throw new AppError(403, "Forbidden", "FORBIDDEN");
+      if (!plan) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
+      if (plan.userId !== userId) throw new AppError(403, 'Forbidden', 'FORBIDDEN');
       startDate = plan.startDate;
       endDate = plan.endDate;
     }

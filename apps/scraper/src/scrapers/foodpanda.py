@@ -77,8 +77,8 @@ class FoodpandaScraper(BaseScraper):
             slug=restaurant_slug,
             rating=rating,
             rating_count=rating_count,
-            minimum_order=delivery_fee,
-            delivery_fee=minimum_order,
+            minimum_order=minimum_order,
+            delivery_fee=delivery_fee,
             menu=menu,
         )
 

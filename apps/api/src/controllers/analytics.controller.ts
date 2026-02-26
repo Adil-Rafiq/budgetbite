@@ -1,7 +1,7 @@
-import type { Response } from "express";
-import { analyticsQuerySchema } from "../lib/validation.js";
-import { analyticsService } from "../services/analytics.service.js";
-import type { AuthRequest } from "../middleware/auth.middleware.js";
+import type { Response } from 'express';
+import { analyticsQuerySchema } from '@repo/shared';
+import { analyticsService } from '../services/analytics.service.js';
+import type { AuthRequest } from '../middleware/auth.middleware.js';
 
 export async function getSpendingSummary(req: AuthRequest, res: Response): Promise<void> {
   const userId = req.userId!;

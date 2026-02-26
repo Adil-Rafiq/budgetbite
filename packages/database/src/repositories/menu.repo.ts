@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { eq } from 'drizzle-orm';
 
-import { db } from "../db";
-import { menuItems, type MenuItem, type NewMenuItem } from "../schema/index";
+import { db } from '../db.js';
+import { menuItems, type MenuItem, type NewMenuItem } from '../schema/index.js';
 
 export const menuRepository = {
   async findById(id: string): Promise<MenuItem | undefined> {
@@ -10,12 +10,16 @@ export const menuRepository = {
   },
 
   async findByRestaurantId(restaurantId: string): Promise<MenuItem[]> {
-    return db.select().from(menuItems).where(eq(menuItems.restaurantId, restaurantId)).orderBy(menuItems.name);
+    return db
+      .select()
+      .from(menuItems)
+      .where(eq(menuItems.restaurantId, restaurantId))
+      .orderBy(menuItems.name);
   },
 
   async create(data: NewMenuItem): Promise<MenuItem> {
     const [inserted] = await db.insert(menuItems).values(data).returning();
-    if (!inserted) throw new Error("MenuItem insert failed");
+    if (!inserted) throw new Error('MenuItem insert failed');
     return inserted;
   },
 
@@ -27,7 +31,15 @@ export const menuRepository = {
 
   async update(id: string, data: Partial<NewMenuItem>): Promise<MenuItem> {
     const [updated] = await db.update(menuItems).set(data).where(eq(menuItems.id, id)).returning();
-    if (!updated) throw new Error("MenuItem not found");
+    if (!updated) throw new Error('MenuItem not found');
     return updated;
+  },
+
+  async delete(id: string): Promise<void> {
+    const deleted = await db
+      .delete(menuItems)
+      .where(eq(menuItems.id, id))
+      .returning({ id: menuItems.id });
+    if (deleted.length === 0) throw new Error('MenuItem not found');
   },
 };

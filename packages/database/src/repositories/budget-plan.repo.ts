@@ -1,7 +1,13 @@
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc } from 'drizzle-orm';
 
-import { db } from "../db";
-import { budgetPlans, budgetPlanMealTypes, type BudgetPlan, type NewBudgetPlan, type NewBudgetPlanMealType } from "../schema/index";
+import { db } from '../db.js';
+import {
+  budgetPlans,
+  budgetPlanMealTypes,
+  type BudgetPlan,
+  type NewBudgetPlan,
+  type NewBudgetPlanMealType,
+} from '../schema/index.js';
 
 export const budgetPlanRepository = {
   async findById(id: string): Promise<BudgetPlan | undefined> {
@@ -13,19 +19,24 @@ export const budgetPlanRepository = {
     const [row] = await db
       .select()
       .from(budgetPlans)
-      .where(and(eq(budgetPlans.userId, userId), eq(budgetPlans.status, "active")))
+      .where(and(eq(budgetPlans.userId, userId), eq(budgetPlans.status, 'active')))
       .orderBy(desc(budgetPlans.startDate))
       .limit(1);
     return row;
   },
 
   async listByUserId(userId: string, limit = 20): Promise<BudgetPlan[]> {
-    return db.select().from(budgetPlans).where(eq(budgetPlans.userId, userId)).orderBy(desc(budgetPlans.startDate)).limit(limit);
+    return db
+      .select()
+      .from(budgetPlans)
+      .where(eq(budgetPlans.userId, userId))
+      .orderBy(desc(budgetPlans.startDate))
+      .limit(limit);
   },
 
   async create(data: NewBudgetPlan, mealTypeIds?: string[]): Promise<BudgetPlan> {
     const [inserted] = await db.insert(budgetPlans).values(data).returning();
-    if (!inserted) throw new Error("BudgetPlan insert failed");
+    if (!inserted) throw new Error('BudgetPlan insert failed');
     if (mealTypeIds?.length) {
       const links: NewBudgetPlanMealType[] = mealTypeIds.map((mealTypeId, i) => ({
         budgetPlanId: inserted.id,
@@ -38,8 +49,12 @@ export const budgetPlanRepository = {
   },
 
   async update(id: string, data: Partial<NewBudgetPlan>): Promise<BudgetPlan> {
-    const [updated] = await db.update(budgetPlans).set(data).where(eq(budgetPlans.id, id)).returning();
-    if (!updated) throw new Error("BudgetPlan not found");
+    const [updated] = await db
+      .update(budgetPlans)
+      .set(data)
+      .where(eq(budgetPlans.id, id))
+      .returning();
+    if (!updated) throw new Error('BudgetPlan not found');
     return updated;
   },
 

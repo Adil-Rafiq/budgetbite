@@ -1,35 +1,22 @@
 {
   "name": "budgetbite",
-  "version": "1.0.0",
-  "private": "true",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "private": true,
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present",
-    "dev:web": "npm run dev --workspace=web",
-    "dev:api": "npm run dev --workspace=api",
-    "scrape": "npm run scrape --workspace=scraper",
-    "build": "npm run build --workspaces --if-present",
-    "db:generate": "npm run db:generate --workspace=@budgetbite/database",
-    "db:migrate": "npm run db:migrate --workspace=@budgetbite/database",
-    "db:studio": "npm run db:studio --workspace=@budgetbite/database"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@tsconfig/node22": "^22.0.5",
-    "@types/node": "^25.0.10",
-    "eslint": "^9.39.2",
-    "eslint-plugin-perfectionist": "^5.4.0",
-    "prettier": "^3.8.1",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.54.0"
+    "@repo/eslint-config": "workspace:*",
+    "eslint": "^9.39.1",
+    "prettier": "^3.7.4",
+    "turbo": "^2.8.10",
+    "typescript": "5.9.2"
   },
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^17.3.0",
-    "zod": "^3.25.0"
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=18"
   }
 }
