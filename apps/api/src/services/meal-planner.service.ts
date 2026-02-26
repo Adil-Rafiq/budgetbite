@@ -1,4 +1,4 @@
-import type { GetSuggestionsQuery } from "../lib/validation.js";
+import type { GetSuggestionsQuery } from "@repo/shared";
 import { budgetPlanRepository, mealPlanRepository, mealTypeRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 

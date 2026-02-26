@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import type { RegisterInput, LoginInput } from "../lib/validation.js";
+import type { RegisterInput, LoginInput } from "@repo/shared";
 import { userRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 

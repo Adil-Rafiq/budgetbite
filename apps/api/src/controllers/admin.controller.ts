@@ -8,7 +8,7 @@ import {
   adminGetRestaurantByExternalIdSchema,
   createMealTypeSchema,
   updateMealTypeSchema,
-} from "../lib/validation.js";
+} from "@repo/shared";
 import { restaurantService } from "../services/restaurant.service.js";
 import { mealTypeRepository } from "@repo/database";
 

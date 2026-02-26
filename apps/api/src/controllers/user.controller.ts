@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import { updateProfileSchema } from "../lib/validation.js";
+import { updateProfileSchema } from "@repo/shared";
 import { userService } from "../services/user.service.js";
 import type { AuthRequest } from "../middleware/auth.middleware.js";
 

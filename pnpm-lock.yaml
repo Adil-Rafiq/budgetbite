@@ -29,6 +29,9 @@ importers:
       '@repo/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@repo/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
@@ -170,6 +173,19 @@ importers:
       typescript-eslint:
         specifier: ^8.50.0
         version: 8.56.1(eslint@9.39.3)(typescript@5.9.2)
+
+  packages/shared:
+    dependencies:
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/typescript-config: {}
 

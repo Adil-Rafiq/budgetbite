@@ -15,7 +15,9 @@
     "lint": "eslint --max-warnings 0",
     "clean": "rm -rf dist"
   },
-  "dependencies": {},
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*"

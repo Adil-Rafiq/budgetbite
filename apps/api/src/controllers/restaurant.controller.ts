@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { listRestaurantsSchema, uuidSchema } from "../lib/validation.js";
+import { listRestaurantsSchema, uuidSchema } from "@repo/shared";
 import { restaurantService } from "../services/restaurant.service.js";
 import type { AuthRequest } from "../middleware/auth.middleware.js";
 import { userRepository } from "@repo/database";

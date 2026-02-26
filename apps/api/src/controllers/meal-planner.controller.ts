@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import { getSuggestionsSchema, uuidSchema } from "../lib/validation.js";
+import { getSuggestionsSchema, uuidSchema } from "@repo/shared";
 import { mealPlannerService } from "../services/meal-planner.service.js";
 import type { AuthRequest } from "../middleware/auth.middleware.js";
 

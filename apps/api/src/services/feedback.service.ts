@@ -1,4 +1,4 @@
-import type { FeedbackInput } from "../lib/validation.js";
+import type { FeedbackInput } from "@repo/shared";
 import { feedbackRepository, orderRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 

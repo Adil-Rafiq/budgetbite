@@ -1,4 +1,4 @@
-import type { CreateBudgetPlanInput, UpdateBudgetPlanInput } from "../lib/validation.js";
+import type { CreateBudgetPlanInput, UpdateBudgetPlanInput } from "@repo/shared";
 import { budgetPlanRepository, orderRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 

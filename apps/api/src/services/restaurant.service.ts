@@ -4,7 +4,7 @@ import type {
   UpdateRestaurantInput,
   CreateMenuItemInput,
   UpdateMenuItemInput,
-} from "../lib/validation.js";
+} from "@repo/shared";
 import { restaurantRepository, menuRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 

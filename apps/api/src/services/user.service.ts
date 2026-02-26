@@ -1,4 +1,4 @@
-import type { UpdateProfileInput } from "../lib/validation.js";
+import type { UpdateProfileInput } from "@repo/shared";
 import { userRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 

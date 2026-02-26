@@ -154,7 +154,7 @@ So: **one middleware** (e.g. `requireAdminOrService`) that:
 - **Routes:** `routes/admin.routes.ts` (or `admin/restaurants.routes.ts` + `admin/menu-items.routes.ts` under one router) — mount at `/api/admin`, use the admin middleware, then define POST/PATCH/DELETE for restaurants and menu items.
 - **Controllers:** e.g. `controllers/admin-restaurant.controller.ts`, `controllers/admin-menu.controller.ts` — parse body/params with Zod, call services, return JSON.
 - **Services:** extend or add `restaurant.service` / `menu.service` (or admin-specific) for create/update/delete; use existing `restaurantRepository` and `menuRepository`. Repositories may need a `delete` for restaurant (and possibly menu item) if not already present.
-- **Validation:** Zod schemas for create/update restaurant and create/update menu item in `lib/validation.ts` (or `lib/admin-validation.ts`).
+- **Validation:** Zod schemas live in `packages/shared/src/validation.ts` (import from `@repo/shared`) and API-specific helpers can go in `lib`.
 
 ### 5. Summary
 

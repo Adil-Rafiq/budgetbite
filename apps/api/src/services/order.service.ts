@@ -1,4 +1,4 @@
-import type { RecordMealChoiceInput } from "../lib/validation.js";
+import type { RecordMealChoiceInput } from "@repo/shared";
 import { budgetPlanRepository, orderRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 

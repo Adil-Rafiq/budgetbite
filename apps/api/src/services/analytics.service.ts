@@ -1,4 +1,4 @@
-import type { AnalyticsQuery } from "../lib/validation.js";
+import type { AnalyticsQuery } from "@repo/shared";
 import { orderRepository, budgetPlanRepository } from "@repo/database";
 import { AppError } from "../middleware/error.middleware.js";
 
