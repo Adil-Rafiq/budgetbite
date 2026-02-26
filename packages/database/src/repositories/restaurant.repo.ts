@@ -1,7 +1,7 @@
-import { sql, and, gte, eq } from "drizzle-orm";
+import { sql, and, gte, eq } from 'drizzle-orm';
 
-import { db } from "../db.js";
-import { restaurants, type NewRestaurant, type Restaurant } from "../schema/index.js";
+import { db } from '../db.js';
+import { restaurants, type NewRestaurant, type Restaurant } from '../schema/index.js';
 
 const haversineFragment = (userLat: number, userLng: number) =>
   sql<number>`(
@@ -28,24 +28,32 @@ export const restaurantRepository = {
   },
 
   async findByExternalId(externalId: string): Promise<Restaurant | undefined> {
-    const [row] = await db.select().from(restaurants).where(eq(restaurants.externalId, externalId)).limit(1);
+    const [row] = await db
+      .select()
+      .from(restaurants)
+      .where(eq(restaurants.externalId, externalId))
+      .limit(1);
     return row;
   },
 
-  async list(filters: ListRestaurantsFilters = {}): Promise<{ restaurant: Restaurant; distanceKm?: number }[]> {
+  async list(
+    filters: ListRestaurantsFilters = {},
+  ): Promise<{ restaurant: Restaurant; distanceKm?: number }[]> {
     const { maxDistanceKm, userLat, userLng, minRating, limit = 50, offset = 0 } = filters;
 
-    const distanceExpr = userLat != null && userLng != null ? haversineFragment(userLat, userLng) : null;
+    const distanceExpr =
+      userLat != null && userLng != null ? haversineFragment(userLat, userLng) : null;
     const conditions = [];
     if (minRating != null) conditions.push(gte(restaurants.rating, String(minRating)));
-    if (maxDistanceKm != null && distanceExpr) conditions.push(sql`${distanceExpr} <= ${maxDistanceKm}`);
+    if (maxDistanceKm != null && distanceExpr)
+      conditions.push(sql`${distanceExpr} <= ${maxDistanceKm}`);
 
     const orderBy = distanceExpr ? sql`${distanceExpr}` : restaurants.name;
 
     const base = db
       .select({
         restaurant: restaurants,
-        ...(distanceExpr && { distanceKm: sql<number>`${distanceExpr}`.as("distance_km") }),
+        ...(distanceExpr && { distanceKm: sql<number>`${distanceExpr}`.as('distance_km') }),
       })
       .from(restaurants);
     const result =
@@ -62,7 +70,7 @@ export const restaurantRepository = {
 
   async create(data: NewRestaurant): Promise<Restaurant> {
     const [inserted] = await db.insert(restaurants).values(data).returning();
-    if (!inserted) throw new Error("Restaurant insert failed");
+    if (!inserted) throw new Error('Restaurant insert failed');
     return inserted;
   },
 
@@ -72,12 +80,15 @@ export const restaurantRepository = {
       .set(data)
       .where(eq(restaurants.id, id))
       .returning();
-    if (!updated) throw new Error("Restaurant not found");
+    if (!updated) throw new Error('Restaurant not found');
     return updated;
   },
 
   async delete(id: string): Promise<void> {
-    const deleted = await db.delete(restaurants).where(eq(restaurants.id, id)).returning({ id: restaurants.id });
-    if (deleted.length === 0) throw new Error("Restaurant not found");
+    const deleted = await db
+      .delete(restaurants)
+      .where(eq(restaurants.id, id))
+      .returning({ id: restaurants.id });
+    if (deleted.length === 0) throw new Error('Restaurant not found');
   },
 };

@@ -80,9 +80,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -171,9 +169,7 @@
         "restaurants_external_id_unique": {
           "name": "restaurants_external_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "external_id"
-          ]
+          "columns": ["external_id"]
         }
       },
       "policies": {},
@@ -242,12 +238,8 @@
           "name": "menu_items_restaurant_id_restaurants_id_fk",
           "tableFrom": "menu_items",
           "tableTo": "restaurants",
-          "columnsFrom": [
-            "restaurant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["restaurant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -339,12 +331,8 @@
           "name": "budget_plans_user_id_users_id_fk",
           "tableFrom": "budget_plans",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -419,9 +407,7 @@
         "meal_types_key_unique": {
           "name": "meal_types_key_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "key"
-          ]
+          "columns": ["key"]
         }
       },
       "policies": {},
@@ -507,12 +493,8 @@
           "name": "budget_plan_meal_types_budget_plan_id_budget_plans_id_fk",
           "tableFrom": "budget_plan_meal_types",
           "tableTo": "budget_plans",
-          "columnsFrom": [
-            "budget_plan_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["budget_plan_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -520,12 +502,8 @@
           "name": "budget_plan_meal_types_meal_type_id_meal_types_id_fk",
           "tableFrom": "budget_plan_meal_types",
           "tableTo": "meal_types",
-          "columnsFrom": [
-            "meal_type_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["meal_type_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -567,12 +545,8 @@
           "name": "meal_plan_generations_budget_plan_id_budget_plans_id_fk",
           "tableFrom": "meal_plan_generations",
           "tableTo": "budget_plans",
-          "columnsFrom": [
-            "budget_plan_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["budget_plan_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -683,12 +657,8 @@
           "name": "meal_suggestions_generation_id_meal_plan_generations_id_fk",
           "tableFrom": "meal_suggestions",
           "tableTo": "meal_plan_generations",
-          "columnsFrom": [
-            "generation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["generation_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -696,12 +666,8 @@
           "name": "meal_suggestions_meal_type_id_meal_types_id_fk",
           "tableFrom": "meal_suggestions",
           "tableTo": "meal_types",
-          "columnsFrom": [
-            "meal_type_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["meal_type_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -709,12 +675,8 @@
           "name": "meal_suggestions_restaurant_id_restaurants_id_fk",
           "tableFrom": "meal_suggestions",
           "tableTo": "restaurants",
-          "columnsFrom": [
-            "restaurant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["restaurant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -722,12 +684,8 @@
           "name": "meal_suggestions_menu_item_id_menu_items_id_fk",
           "tableFrom": "meal_suggestions",
           "tableTo": "menu_items",
-          "columnsFrom": [
-            "menu_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["menu_item_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -816,12 +774,8 @@
           "name": "meal_choices_user_id_users_id_fk",
           "tableFrom": "meal_choices",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -829,12 +783,8 @@
           "name": "meal_choices_budget_plan_id_budget_plans_id_fk",
           "tableFrom": "meal_choices",
           "tableTo": "budget_plans",
-          "columnsFrom": [
-            "budget_plan_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["budget_plan_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -842,12 +792,8 @@
           "name": "meal_choices_meal_type_id_meal_types_id_fk",
           "tableFrom": "meal_choices",
           "tableTo": "meal_types",
-          "columnsFrom": [
-            "meal_type_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["meal_type_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -855,12 +801,8 @@
           "name": "meal_choices_suggestion_id_meal_suggestions_id_fk",
           "tableFrom": "meal_choices",
           "tableTo": "meal_suggestions",
-          "columnsFrom": [
-            "suggestion_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["suggestion_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -926,12 +868,8 @@
           "name": "feedback_meal_choice_id_meal_choices_id_fk",
           "tableFrom": "feedback",
           "tableTo": "meal_choices",
-          "columnsFrom": [
-            "meal_choice_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["meal_choice_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -939,12 +877,8 @@
           "name": "feedback_user_id_users_id_fk",
           "tableFrom": "feedback",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }

@@ -1,5 +1,5 @@
-import type { Request, Response } from "express";
-import { ZodError } from "zod";
+import type { Request, Response } from 'express';
+import { ZodError } from 'zod';
 
 export class AppError extends Error {
   constructor(
@@ -8,7 +8,7 @@ export class AppError extends Error {
     public readonly code?: string,
   ) {
     super(message);
-    this.name = "AppError";
+    this.name = 'AppError';
   }
 }
 
@@ -18,15 +18,15 @@ export function errorMiddleware(err: unknown, _req: Request, res: Response): voi
     return;
   }
   if (err instanceof ZodError) {
-    type Issue = ZodError["issues"][number];
-    const message = err.issues.map((e: Issue) => `${e.path.join(".")}: ${e.message}`).join("; ");
-    res.status(400).json({ error: message, code: "VALIDATION_ERROR" });
+    type Issue = ZodError['issues'][number];
+    const message = err.issues.map((e: Issue) => `${e.path.join('.')}: ${e.message}`).join('; ');
+    res.status(400).json({ error: message, code: 'VALIDATION_ERROR' });
     return;
   }
   if (err instanceof Error) {
     console.error(err);
-    res.status(500).json({ error: "Internal server error", code: "INTERNAL_ERROR" });
+    res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
     return;
   }
-  res.status(500).json({ error: "Internal server error", code: "INTERNAL_ERROR" });
+  res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
 }

@@ -1,6 +1,6 @@
-import type { Request, Response } from "express";
-import { registerSchema, loginSchema } from "@repo/shared";
-import { authService } from "../services/auth.service.js";
+import type { Request, Response } from 'express';
+import { registerSchema, loginSchema } from '@repo/shared';
+import { authService } from '../services/auth.service.js';
 
 export async function register(req: Request, res: Response): Promise<void> {
   const body = registerSchema.parse(req.body);

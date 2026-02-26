@@ -1,7 +1,7 @@
-import type { Response } from "express";
-import { recordMealChoiceSchema, uuidSchema } from "@repo/shared";
-import { orderService } from "../services/order.service.js";
-import type { AuthRequest } from "../middleware/auth.middleware.js";
+import type { Response } from 'express';
+import { recordMealChoiceSchema, uuidSchema } from '@repo/shared';
+import { orderService } from '../services/order.service.js';
+import type { AuthRequest } from '../middleware/auth.middleware.js';
 
 export async function recordChoice(req: AuthRequest, res: Response): Promise<void> {
   const userId = req.userId!;

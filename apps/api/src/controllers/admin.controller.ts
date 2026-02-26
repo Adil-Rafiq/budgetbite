@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { Request, Response } from 'express';
 import {
   uuidSchema,
   createRestaurantSchema,
@@ -8,9 +8,9 @@ import {
   adminGetRestaurantByExternalIdSchema,
   createMealTypeSchema,
   updateMealTypeSchema,
-} from "@repo/shared";
-import { restaurantService } from "../services/restaurant.service.js";
-import { mealTypeRepository } from "@repo/database";
+} from '@repo/shared';
+import { restaurantService } from '../services/restaurant.service.js';
+import { mealTypeRepository } from '@repo/database';
 
 /** GET /api/admin/restaurants?externalId=xxx — for scraper to resolve id after 409. */
 export async function getRestaurantByExternalId(req: Request, res: Response): Promise<void> {

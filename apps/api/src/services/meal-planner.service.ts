@@ -1,11 +1,11 @@
-import type { GetSuggestionsQuery } from "@repo/shared";
-import { budgetPlanRepository, mealPlanRepository, mealTypeRepository } from "@repo/database";
-import { AppError } from "../middleware/error.middleware.js";
+import type { GetSuggestionsQuery } from '@repo/shared';
+import { budgetPlanRepository, mealPlanRepository, mealTypeRepository } from '@repo/database';
+import { AppError } from '../middleware/error.middleware.js';
 
 export const mealPlannerService = {
   async getSuggestionsForDay(userId: string, query: GetSuggestionsQuery) {
     const activePlan = await budgetPlanRepository.findActiveByUserId(userId);
-    if (!activePlan) throw new AppError(400, "No active budget plan", "NO_ACTIVE_PLAN");
+    if (!activePlan) throw new AppError(400, 'No active budget plan', 'NO_ACTIVE_PLAN');
 
     const generationId = await mealPlanRepository.getLatestGenerationId(activePlan.id);
     if (!generationId) {
@@ -36,7 +36,8 @@ export const mealPlannerService = {
           menuItemId: o.menuItemId,
           menuItemName: o.menuItem?.name,
           description: o.menuItem?.description ?? undefined,
-          estimatedPrice: o.estimatedPrice != null ? Number(o.estimatedPrice) : Number(o.menuItem?.price),
+          estimatedPrice:
+            o.estimatedPrice != null ? Number(o.estimatedPrice) : Number(o.menuItem?.price),
           notes: o.notes ?? undefined,
         })),
       }));
@@ -52,8 +53,8 @@ export const mealPlannerService = {
 
   async generatePlan(userId: string, budgetPlanId: string) {
     const plan = await budgetPlanRepository.findById(budgetPlanId);
-    if (!plan) throw new AppError(404, "Budget plan not found", "NOT_FOUND");
-    if (plan.userId !== userId) throw new AppError(403, "Forbidden", "FORBIDDEN");
+    if (!plan) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
+    if (plan.userId !== userId) throw new AppError(403, 'Forbidden', 'FORBIDDEN');
 
     const generation = await mealPlanRepository.createGeneration(budgetPlanId);
     return {

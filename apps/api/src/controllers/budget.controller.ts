@@ -1,7 +1,12 @@
-import type { Response } from "express";
-import { createBudgetPlanSchema, updateBudgetPlanSchema, uuidSchema, paginationSchema } from "@repo/shared";
-import { budgetService } from "../services/budget.service.js";
-import type { AuthRequest } from "../middleware/auth.middleware.js";
+import type { Response } from 'express';
+import {
+  createBudgetPlanSchema,
+  updateBudgetPlanSchema,
+  uuidSchema,
+  paginationSchema,
+} from '@repo/shared';
+import { budgetService } from '../services/budget.service.js';
+import type { AuthRequest } from '../middleware/auth.middleware.js';
 
 export async function createPlan(req: AuthRequest, res: Response): Promise<void> {
   const userId = req.userId!;

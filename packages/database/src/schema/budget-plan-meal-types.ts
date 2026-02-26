@@ -1,23 +1,23 @@
-import { pgTable, uuid, integer, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, uuid, integer, uniqueIndex } from 'drizzle-orm/pg-core';
 
-import { budgetPlans } from "./budget-plans.js";
-import { mealTypes } from "./meal-types.js";
+import { budgetPlans } from './budget-plans.js';
+import { mealTypes } from './meal-types.js';
 
 export const budgetPlanMealTypes = pgTable(
-  "budget_plan_meal_types",
+  'budget_plan_meal_types',
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    budgetPlanId: uuid("budget_plan_id")
+    id: uuid('id').primaryKey().defaultRandom(),
+    budgetPlanId: uuid('budget_plan_id')
       .notNull()
-      .references(() => budgetPlans.id, { onDelete: "cascade" }),
-    mealTypeId: uuid("meal_type_id")
+      .references(() => budgetPlans.id, { onDelete: 'cascade' }),
+    mealTypeId: uuid('meal_type_id')
       .notNull()
-      .references(() => mealTypes.id, { onDelete: "restrict" }),
-    position: integer("position").notNull(),
+      .references(() => mealTypes.id, { onDelete: 'restrict' }),
+    position: integer('position').notNull(),
   },
   (table) => [
-    uniqueIndex("unique_budget_plan_position").on(table.budgetPlanId, table.position),
-    uniqueIndex("unique_budget_plan_meal_type").on(table.budgetPlanId, table.mealTypeId),
+    uniqueIndex('unique_budget_plan_position').on(table.budgetPlanId, table.position),
+    uniqueIndex('unique_budget_plan_meal_type').on(table.budgetPlanId, table.mealTypeId),
   ],
 );
 

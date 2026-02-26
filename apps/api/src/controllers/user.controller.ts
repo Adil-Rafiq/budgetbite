@@ -1,7 +1,7 @@
-import type { Response } from "express";
-import { updateProfileSchema } from "@repo/shared";
-import { userService } from "../services/user.service.js";
-import type { AuthRequest } from "../middleware/auth.middleware.js";
+import type { Response } from 'express';
+import { updateProfileSchema } from '@repo/shared';
+import { userService } from '../services/user.service.js';
+import type { AuthRequest } from '../middleware/auth.middleware.js';
 
 export async function getProfile(_req: AuthRequest, res: Response): Promise<void> {
   const userId = _req.userId!;

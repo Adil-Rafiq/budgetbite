@@ -1,6 +1,6 @@
-import type { CreateBudgetPlanInput, UpdateBudgetPlanInput } from "@repo/shared";
-import { budgetPlanRepository, orderRepository } from "@repo/database";
-import { AppError } from "../middleware/error.middleware.js";
+import type { CreateBudgetPlanInput, UpdateBudgetPlanInput } from '@repo/shared';
+import { budgetPlanRepository, orderRepository } from '@repo/database';
+import { AppError } from '../middleware/error.middleware.js';
 
 export const budgetService = {
   async create(userId: string, input: CreateBudgetPlanInput) {
@@ -13,7 +13,7 @@ export const budgetService = {
         endDate: input.endDate,
         mealsPerDay: input.mealsPerDay,
         notificationTimes: input.notificationTimes ?? null,
-        status: "active",
+        status: 'active',
       },
       input.mealTypeIds,
     );
@@ -35,8 +35,8 @@ export const budgetService = {
 
   async getById(userId: string, planId: string) {
     const plan = await budgetPlanRepository.findById(planId);
-    if (!plan) throw new AppError(404, "Budget plan not found", "NOT_FOUND");
-    if (plan.userId !== userId) throw new AppError(403, "Forbidden", "FORBIDDEN");
+    if (!plan) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
+    if (plan.userId !== userId) throw new AppError(403, 'Forbidden', 'FORBIDDEN');
     const spent = await orderRepository.getSpentTotalByPlan(plan.id);
     const mealTypeIds = await budgetPlanRepository.getMealTypeIds(plan.id);
     return {
@@ -54,8 +54,8 @@ export const budgetService = {
 
   async update(userId: string, planId: string, input: UpdateBudgetPlanInput) {
     const plan = await budgetPlanRepository.findById(planId);
-    if (!plan) throw new AppError(404, "Budget plan not found", "NOT_FOUND");
-    if (plan.userId !== userId) throw new AppError(403, "Forbidden", "FORBIDDEN");
+    if (!plan) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
+    if (plan.userId !== userId) throw new AppError(403, 'Forbidden', 'FORBIDDEN');
     const updated = await budgetPlanRepository.update(planId, {
       totalBudget: input.totalBudget != null ? String(input.totalBudget) : undefined,
       notificationTimes: input.notificationTimes ?? undefined,

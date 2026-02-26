@@ -158,16 +158,16 @@ No multi-tenant or B2B roles in scope for v1.
 
 Conceptual entities the API and DB must support:
 
-| Entity         | Purpose |
-|----------------|--------|
-| **User**       | Identity, profile (name, email, **lat/long** for residence), auth linkage |
-| **Restaurant** | Name, **latitude, longitude**, external id (e.g. Foodpanda), metadata (e.g. address for display). Proximity to user is computed from user lat/long and restaurant lat/long (in km). |
-| **Menu / MenuItem** | Items per restaurant: name, price, category, delivery fee, etc. |
-| **Budget plan** | User, plan type (weekly/monthly), total budget, start/end date, meals per day, meal types, notification preferences |
-| **Meal plan**   | Generated for a budget plan: suggested meals per slot (e.g. 3 options per slot) |
-| **Meal choice / Order** | User’s selection for a slot: chosen option or manual entry, actual amount spent, date/slot, link to suggestion if any |
-| **Feedback**    | User feedback on a chosen suggestion (rating/like/dislike, etc.) for AI learning |
-| **Analytics**   | Derived from orders and plans (spending per period, breakdown); can be computed on read or materialized |
+| Entity                  | Purpose                                                                                                                                                                             |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **User**                | Identity, profile (name, email, **lat/long** for residence), auth linkage                                                                                                           |
+| **Restaurant**          | Name, **latitude, longitude**, external id (e.g. Foodpanda), metadata (e.g. address for display). Proximity to user is computed from user lat/long and restaurant lat/long (in km). |
+| **Menu / MenuItem**     | Items per restaurant: name, price, category, delivery fee, etc.                                                                                                                     |
+| **Budget plan**         | User, plan type (weekly/monthly), total budget, start/end date, meals per day, meal types, notification preferences                                                                 |
+| **Meal plan**           | Generated for a budget plan: suggested meals per slot (e.g. 3 options per slot)                                                                                                     |
+| **Meal choice / Order** | User’s selection for a slot: chosen option or manual entry, actual amount spent, date/slot, link to suggestion if any                                                               |
+| **Feedback**            | User feedback on a chosen suggestion (rating/like/dislike, etc.) for AI learning                                                                                                    |
+| **Analytics**           | Derived from orders and plans (spending per period, breakdown); can be computed on read or materialized                                                                             |
 
 (Exact schema and table names can be defined in `packages/database` when building.)
 

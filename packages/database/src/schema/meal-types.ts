@@ -1,13 +1,13 @@
-import { pgTable, uuid, text, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, integer, boolean } from 'drizzle-orm/pg-core';
 
-import { timestamps } from "./common/timestamps.js";
+import { timestamps } from './common/timestamps.js';
 
-export const mealTypes = pgTable("meal_types", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  key: text("key").notNull().unique(),
-  label: text("label").notNull(),
-  sortOrder: integer("sort_order").notNull().default(0),
-  active: boolean("active").notNull().default(true),
+export const mealTypes = pgTable('meal_types', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  key: text('key').notNull().unique(),
+  label: text('label').notNull(),
+  sortOrder: integer('sort_order').notNull().default(0),
+  active: boolean('active').notNull().default(true),
 
   ...timestamps,
 });

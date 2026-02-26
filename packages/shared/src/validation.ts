@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const uuidSchema = z.string().uuid();
 
@@ -34,7 +34,7 @@ export const listRestaurantsSchema = paginationSchema.extend({
 });
 
 export const createBudgetPlanSchema = z.object({
-  planType: z.enum(["weekly", "monthly"]),
+  planType: z.enum(['weekly', 'monthly']),
   totalBudget: z.coerce.number().positive(),
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -46,7 +46,7 @@ export const createBudgetPlanSchema = z.object({
 export const updateBudgetPlanSchema = z.object({
   totalBudget: z.coerce.number().positive().optional(),
   notificationTimes: z.array(z.string().regex(/^\d{2}:\d{2}$/)).optional(),
-  status: z.enum(["active", "completed", "cancelled"]).optional(),
+  status: z.enum(['active', 'completed', 'cancelled']).optional(),
 });
 
 export const recordMealChoiceSchema = z.object({
@@ -106,7 +106,11 @@ export const adminGetRestaurantByExternalIdSchema = z.object({
 
 // Admin: meal types
 export const createMealTypeSchema = z.object({
-  key: z.string().min(1).max(50).regex(/^[a-z0-9_-]+$/, "key must be lowercase letters, numbers, hyphen or underscore"),
+  key: z
+    .string()
+    .min(1)
+    .max(50)
+    .regex(/^[a-z0-9_-]+$/, 'key must be lowercase letters, numbers, hyphen or underscore'),
   label: z.string().min(1).max(200),
   sortOrder: z.coerce.number().int().min(0).optional(),
   active: z.boolean().optional(),

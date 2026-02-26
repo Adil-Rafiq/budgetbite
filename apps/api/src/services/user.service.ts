@@ -1,11 +1,11 @@
-import type { UpdateProfileInput } from "@repo/shared";
-import { userRepository } from "@repo/database";
-import { AppError } from "../middleware/error.middleware.js";
+import type { UpdateProfileInput } from '@repo/shared';
+import { userRepository } from '@repo/database';
+import { AppError } from '../middleware/error.middleware.js';
 
 export const userService = {
   async getProfile(userId: string) {
     const user = await userRepository.findById(userId);
-    if (!user) throw new AppError(404, "User not found", "USER_NOT_FOUND");
+    if (!user) throw new AppError(404, 'User not found', 'USER_NOT_FOUND');
     return {
       id: user.id,
       email: user.email,
@@ -20,7 +20,7 @@ export const userService = {
 
   async updateProfile(userId: string, input: UpdateProfileInput) {
     const user = await userRepository.findById(userId);
-    if (!user) throw new AppError(404, "User not found", "USER_NOT_FOUND");
+    if (!user) throw new AppError(404, 'User not found', 'USER_NOT_FOUND');
     const updated = await userRepository.update(userId, {
       firstName: input.firstName ?? user.firstName,
       lastName: input.lastName ?? user.lastName,
