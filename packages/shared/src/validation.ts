@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const uuidSchema = z.string().uuid();
+export const uuidSchema = z.uuid();
 
 export const paginationSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
@@ -8,14 +8,14 @@ export const paginationSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8).max(128),
   firstName: z.string().min(1).max(100).optional(),
   lastName: z.string().min(1).max(100).optional(),
 });
 
 export const loginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(1),
 });
 
@@ -93,7 +93,7 @@ export const createMenuItemSchema = z.object({
   name: z.string().min(1).max(300),
   description: z.string().max(2000).optional(),
   price: z.coerce.number().positive(),
-  imageUrl: z.string().url().max(2000).optional(),
+  imageUrl: z.url().max(2000).optional(),
 });
 export const createMenuItemsSchema = z.union([
   createMenuItemSchema,
