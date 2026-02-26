@@ -14,8 +14,8 @@
     "build": "tsc",
     "lint": "eslint --max-warnings 0",
     "clean": "rm -rf dist",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
+    "db:generate": "tsx node_modules/drizzle-kit/bin.cjs generate",
+    "db:migrate": "tsx node_modules/drizzle-kit/bin.cjs migrate",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
@@ -27,6 +27,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/pg": "^8.16.0",
-    "drizzle-kit": "^0.31.9"
+    "drizzle-kit": "^0.31.9",
+    "tsx": "^4.21.0"
   }
 }
