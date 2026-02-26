@@ -16,7 +16,7 @@
     "clean": "rm -rf dist",
     "db:generate": "tsx node_modules/drizzle-kit/bin.cjs generate",
     "db:migrate": "tsx node_modules/drizzle-kit/bin.cjs migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "tsx node_modules/drizzle-kit/bin.cjs studio"
   },
   "dependencies": {
     "dotenv": "^17.3.1",
