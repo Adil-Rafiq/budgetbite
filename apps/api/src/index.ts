@@ -17,6 +17,7 @@ import adminRoutes from './routes/admin.routes.js';
 
 const app = express();
 const port = Number(process.env.API_PORT) || 3001;
+const baseUrl = process.env.API_URL || `http://localhost:${port}`;
 
 app.use(
   cors({
@@ -51,5 +52,13 @@ app.use((_req, res) => {
 app.use(errorMiddleware);
 
 app.listen(port, () => {
-  console.log(`BudgetBite API listening on ${process.env.API_URL ?? 'http://localhost'}:${port}`);
+  console.log(`
+🚀 API Server started
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Environment : ${process.env.NODE_ENV || 'development'}
+API URL     : ${baseUrl}
+Health      : ${baseUrl}/health
+Auth        : ${baseUrl}/api/auth
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  `);
 });
