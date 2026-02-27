@@ -8,6 +8,30 @@ export const auth = betterAuth({
     provider: 'pg',
     schema,
   }),
+  advanced: {
+    database: {
+      generateId: 'uuid',
+    },
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: ['user', 'admin'],
+        defaultValue: 'user',
+        required: true,
+        input: false,
+      },
+      latitude: {
+        type: 'number',
+        required: false,
+      },
+      longitude: {
+        type: 'number',
+        required: false,
+      },
+    },
+  },
+
   emailAndPassword: {
     enabled: true,
   },
