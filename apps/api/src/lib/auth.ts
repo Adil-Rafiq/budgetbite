@@ -1,10 +1,12 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { db } from '@repo/database';
+import * as schema from '@repo/database';
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, {
+  trustedOrigins: [process.env.WEB_URL || 'http://localhost:3000'],
+  database: drizzleAdapter(schema.db, {
     provider: 'pg',
+    schema,
   }),
   emailAndPassword: {
     enabled: true,
@@ -18,5 +20,5 @@ export const auth = betterAuth({
       clientId: process.env.GITHUB_CLIENT_ID as string,
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
     },
-  }, 
+  },
 });

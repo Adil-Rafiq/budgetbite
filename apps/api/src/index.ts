@@ -1,7 +1,9 @@
 import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
+import { toNodeHandler } from 'better-auth/node';
 
+import { auth } from './lib/auth.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
@@ -16,7 +18,17 @@ import adminRoutes from './routes/admin.routes.js';
 const app = express();
 const port = Number(process.env.API_PORT) || 3001;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.WEB_URL || 'http://localhost:3000',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }),
+);
+
+app.all('/api/auth/{*any}', toNodeHandler(auth));
+
 app.use(express.json());
 
 app.get('/health', (_req, res) => {
