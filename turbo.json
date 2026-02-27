@@ -4,6 +4,7 @@
   "globalEnv": [
     "API_PORT",
     "API_URL",
+    "WEB_URL",
     "JWT_SECRET",
     "ADMIN_API_KEY",
     "DATABASE_URL",
@@ -22,6 +23,7 @@
       "dependsOn": ["^check-types"]
     },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     }
