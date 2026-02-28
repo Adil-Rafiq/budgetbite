@@ -19,7 +19,10 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
   email: z.email().trim(),
-  password: z.string().min(1).max(128),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .max(128, 'Password must be less than 128 characters'),
 });
 
 export const updateProfileSchema = z.object({
