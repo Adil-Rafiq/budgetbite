@@ -9,9 +9,12 @@ export const paginationSchema = z.object({
 
 export const registerSchema = z.object({
   email: z.email(),
-  password: z.string().min(8).max(128),
-  firstName: z.string().min(1).max(100).optional(),
-  lastName: z.string().min(1).max(100).optional(),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .max(128, 'Password must be less than 128 characters'),
+  firstName: z.string().trim().min(1, 'First name is required').max(100, 'First name is too long'),
+  lastName: z.string().trim().min(1, 'Last name is required').max(100, 'Last name is too long'),
 });
 
 export const loginSchema = z.object({
