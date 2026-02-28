@@ -44,7 +44,7 @@ export default function RegisterPage() {
       if (error.status === 422) {
         toastOptions.action = (
           <ToastAction altText="Go to login" onClick={() => router.push('/login')}>
-            Already have an account?
+            Login
           </ToastAction>
         );
       }
