@@ -12,7 +12,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/hooks/use-toast';
+import { useToast, type Toast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -34,17 +35,26 @@ export default function RegisterPage() {
     });
 
     if (error) {
-      // TODO: show error toast
-      toast({
+      const toastOptions: Toast = {
         title: 'Registration failed',
         description: error.message,
         variant: 'destructive',
-      });
+      };
+
+      if (error.status === 422) {
+        toastOptions.action = (
+          <ToastAction altText="Go to login" onClick={() => router.push('/login')}>
+            Already have an account?
+          </ToastAction>
+        );
+      }
+
+      toast(toastOptions);
+
       console.error(error.message);
       return;
     }
 
-    // TODO: show success toast
     toast({
       title: 'Registration successful',
       description: 'Your account has been created. Redirecting to onboarding...',
