@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { UtensilsCrossed } from 'lucide-react';
 import { authClient, type AuthErrorCode } from '@/lib/auth-client';
-import { registerSchema, type RegisterInput } from '@repo/shared';
+import { loginSchema, type LoginInput } from '@repo/shared';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,7 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast, type Toast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -23,16 +23,36 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterInput>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: RegisterInput) => {
-    const { error } = await authClient.signUp.email({
+  const onSubmit = async (data: LoginInput) => {
+    const { error } = await authClient.signIn.email({
       email: data.email,
       password: data.password,
-      name: `${data.firstName ?? ''} ${data.lastName ?? ''}`.trim(),
     });
+
+    // if (error) {
+    //   switch (error.code as AuthErrorCode) {
+    //     case 'EMAIL_NOT_VERIFIED':
+    //       toast({
+    //         title: 'Email not verified',
+    //         description: 'Please check your inbox and verify your email before logging in.',
+    //         variant: 'destructive',
+    //       });
+    //       break;
+    //     default:
+    //       toast({
+    //         title: 'Login failed' + ` (${error.code})`,
+    //         description: error.message,
+    //         variant: 'destructive',
+    //       });
+    //   }
+
+    //   console.error(error.message);
+    //   return;
+    // }
 
     if (error) {
       const errorCode = error.code as AuthErrorCode;
@@ -43,15 +63,36 @@ export default function RegisterPage() {
       };
 
       switch (errorCode) {
-        case 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL':
+        case 'EMAIL_NOT_VERIFIED':
+          toastOptions.title = 'Email not verified';
           toastOptions.description =
-            'An account with this email already exists. Please use a different email or login.';
+            'Your account is not verified yet. Please verify your email before logging in.';
           toastOptions.action = (
-            <ToastAction altText="Go to login" onClick={() => router.push('/login')}>
-              Login
+            <ToastAction
+              altText="Go to login"
+              onClick={async () => {
+                await authClient.emailOtp.sendVerificationOtp({
+                  email: data.email,
+                  type: 'email-verification',
+                });
+
+                toast({
+                  title: 'OTP Sent',
+                  description: 'A new OTP has been sent to your email address.',
+                });
+
+                // router.push('/verify-email?email=' + encodeURIComponent(data.email));
+              }}
+            >
+              Request new OTP
             </ToastAction>
           );
           break;
+
+        default:
+          toastOptions.title = 'Login failed';
+          toastOptions.description =
+            error.message || 'Something went wrong while trying to log in.';
       }
 
       toast(toastOptions);
@@ -61,10 +102,10 @@ export default function RegisterPage() {
     }
 
     toast({
-      title: 'Registration successful',
-      description: 'Your account has been created. Redirecting to onboarding...',
+      title: 'Login successful',
+      description: 'Welcome back! Redirecting to dashboard...',
     });
-    router.push('/onboarding');
+    router.push('/dashboard');
   };
 
   const handleGoogleSignIn = async () => {
@@ -84,34 +125,17 @@ export default function RegisterPage() {
               <UtensilsCrossed className="w-5 h-5 text-primary-foreground" />
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-foreground">Create your account</h1>
-          <p className="text-muted-foreground text-sm mt-1">Start planning your meals today</p>
+          <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
+          <p className="text-muted-foreground text-sm mt-1">Sign in to your BudgetBite account</p>
         </div>
 
         <Card className="border-border">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg text-card-foreground">Sign up</CardTitle>
-            <CardDescription>Fill in your details to get started</CardDescription>
+            <CardTitle className="text-lg text-card-foreground">Sign in</CardTitle>
+            <CardDescription>Enter your credentials to continue</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="firstName">First name</Label>
-                  <Input id="firstName" placeholder="Ahmed" {...register('firstName')} />
-                  {errors.firstName && (
-                    <p className="text-destructive text-xs">{errors.firstName.message}</p>
-                  )}
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="lastName">Last name</Label>
-                  <Input id="lastName" placeholder="Khan" {...register('lastName')} />
-                  {errors.lastName && (
-                    <p className="text-destructive text-xs">{errors.lastName.message}</p>
-                  )}
-                </div>
-              </div>
-
               <div className="flex flex-col gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -124,11 +148,20 @@ export default function RegisterPage() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <button
+                    type="button"
+                    className="text-xs text-primary hover:underline"
+                    onClick={() => router.push('/forgot-password')}
+                  >
+                    Forgot password?
+                  </button>
+                </div>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Create a strong password"
+                  placeholder="Enter your password"
                   {...register('password')}
                 />
                 {errors.password && (
@@ -137,7 +170,7 @@ export default function RegisterPage() {
               </div>
 
               <Button type="submit" className="w-full mt-2" disabled={isSubmitting}>
-                {isSubmitting ? 'Creating account...' : 'Create account'}
+                {isSubmitting ? 'Signing in...' : 'Sign in'}
               </Button>
             </form>
 
@@ -181,9 +214,9 @@ export default function RegisterPage() {
         </Card>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Already have an account?{' '}
-          <Link href="/login" className="text-primary font-medium hover:underline">
-            Sign in
+          {"Don't have an account? "}
+          <Link href="/register" className="text-primary font-medium hover:underline">
+            Sign up
           </Link>
         </p>
       </div>
