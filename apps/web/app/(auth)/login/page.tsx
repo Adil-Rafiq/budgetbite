@@ -81,7 +81,7 @@ export default function LoginPage() {
                   description: 'A new OTP has been sent to your email address.',
                 });
 
-                // router.push('/verify-email?email=' + encodeURIComponent(data.email));
+                router.push('/verify-email?email=' + encodeURIComponent(data.email));
               }}
             >
               Request new OTP
