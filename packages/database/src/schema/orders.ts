@@ -3,13 +3,13 @@ import { date, decimal, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-co
 import { budgetPlans } from './budget-plans.js';
 import { mealSuggestions } from './meal-plans.js';
 import { mealTypes } from './meal-types.js';
-import { users } from './users.js';
+import { user } from './auth.js';
 
 export const mealChoices = pgTable('meal_choices', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id')
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => user.id, { onDelete: 'cascade' }),
   budgetPlanId: uuid('budget_plan_id')
     .notNull()
     .references(() => budgetPlans.id, { onDelete: 'cascade' }),

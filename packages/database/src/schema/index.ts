@@ -1,5 +1,5 @@
 export * from './auth.js';
-export * from './users.js';
+export * from './user-profile.js';
 export * from './restaurants.js';
 export * from './menu-items.js';
 export * from './budget-plans.js';

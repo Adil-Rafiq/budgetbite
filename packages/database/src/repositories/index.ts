@@ -1,4 +1,5 @@
 export { userRepository } from './user.repo.js';
+export { userProfileRepository } from './user-profile.repo.js';
 export { restaurantRepository, type ListRestaurantsFilters } from './restaurant.repo.js';
 export { menuRepository } from './menu.repo.js';
 export { budgetPlanRepository } from './budget-plan.repo.js';

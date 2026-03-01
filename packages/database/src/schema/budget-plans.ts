@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { pgTable, uuid, check, decimal, integer, text, date, jsonb } from 'drizzle-orm/pg-core';
 
 import { timestamps } from './common/timestamps.js';
-import { users } from './users.js';
+import { user } from './auth.js';
 
 export const budgetPlans = pgTable(
   'budget_plans',
@@ -10,7 +10,7 @@ export const budgetPlans = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     userId: uuid('user_id')
       .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
+      .references(() => user.id, { onDelete: 'cascade' }),
     planType: text('plan_type', { enum: ['weekly', 'monthly'] }).notNull(),
     totalBudget: decimal('total_budget', { precision: 12, scale: 2 }).notNull(),
     startDate: date('start_date', { mode: 'string' }).notNull(),
