@@ -84,11 +84,17 @@ export default function LoginPage() {
   };
 
   const handleGoogleSignIn = async () => {
-    await authClient.signIn.social({ provider: 'google' });
+    await authClient.signIn.social({
+      provider: 'google',
+      callbackURL: `${process.env.NEXT_PUBLIC_WEB_URL}/oauth-callback`,
+    });
   };
 
   const handleGithubSignIn = async () => {
-    await authClient.signIn.social({ provider: 'github' });
+    await authClient.signIn.social({
+      provider: 'github',
+      callbackURL: `${process.env.NEXT_PUBLIC_WEB_URL}/oauth-callback`,
+    });
   };
 
   return (
