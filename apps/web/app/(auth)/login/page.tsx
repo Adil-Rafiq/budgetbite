@@ -33,27 +33,6 @@ export default function LoginPage() {
       password: data.password,
     });
 
-    // if (error) {
-    //   switch (error.code as AuthErrorCode) {
-    //     case 'EMAIL_NOT_VERIFIED':
-    //       toast({
-    //         title: 'Email not verified',
-    //         description: 'Please check your inbox and verify your email before logging in.',
-    //         variant: 'destructive',
-    //       });
-    //       break;
-    //     default:
-    //       toast({
-    //         title: 'Login failed' + ` (${error.code})`,
-    //         description: error.message,
-    //         variant: 'destructive',
-    //       });
-    //   }
-
-    //   console.error(error.message);
-    //   return;
-    // }
-
     if (error) {
       const errorCode = error.code as AuthErrorCode;
       const toastOptions: Toast = {
