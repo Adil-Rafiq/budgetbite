@@ -7,6 +7,7 @@
 - [ ] Cleanup schemas, specifically remove `users` table
 - [ ] Remove JWT implementation
 - [ ] Insert tables relations
+- [ ] Integrate a logger
 - [ ] Onboarding page
 - [ ] Dashboard page
 - [ ] Budget plan creation
