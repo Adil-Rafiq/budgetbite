@@ -5,6 +5,7 @@
 ## Up Next
 
 - [ ] Cleanup schemas, specifically remove `users` table
+- [ ] Remove JWT implementation
 - [ ] Insert tables relations
 - [ ] Onboarding page
 - [ ] Dashboard page
