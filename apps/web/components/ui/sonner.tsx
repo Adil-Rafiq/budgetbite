@@ -9,7 +9,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group"
       gap={8}
       toastOptions={{
-        duration: 4000,
+        duration: 5000,
         classNames: {
           toast: [
             'group toast',
