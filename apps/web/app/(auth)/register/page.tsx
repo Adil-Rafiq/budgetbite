@@ -52,18 +52,33 @@ export default function RegisterPage() {
       }
 
       showToast(toastOptions);
+      return;
+    }
 
-      console.error(error.message);
+    // Send OTP after successful registration
+    const { error: otpError } = await authClient.emailOtp.sendVerificationOtp({
+      email: data.email,
+      type: 'email-verification',
+    });
+
+    if (otpError) {
+      showToast({
+        title: 'Could not send verification code',
+        description:
+          'Your account was created but we failed to send a verification email. Please try again from the login page.',
+        variant: 'warning',
+      });
+      router.push('/login');
       return;
     }
 
     showToast({
-      title: 'Registration successful',
-      description: 'Your account has been created. Redirecting to onboarding...',
+      title: 'Account created!',
+      description: 'A verification code has been sent to your email.',
       variant: 'success',
     });
 
-    router.push('/onboarding');
+    router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
   };
 
   const handleGoogleSignIn = async () => {
