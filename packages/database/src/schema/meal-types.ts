@@ -11,6 +11,3 @@ export const mealTypes = pgTable('meal_types', {
 
   ...timestamps,
 });
-
-export type MealType = typeof mealTypes.$inferSelect;
-export type NewMealType = typeof mealTypes.$inferInsert;

@@ -55,8 +55,3 @@ export const mealSuggestions = pgTable(
     check('valid_option_index', sql`${table.optionIndex} >= 0`),
   ],
 );
-
-export type MealPlanGeneration = typeof mealPlanGenerations.$inferSelect;
-export type NewMealPlanGeneration = typeof mealPlanGenerations.$inferInsert;
-export type MealSuggestion = typeof mealSuggestions.$inferSelect;
-export type NewMealSuggestion = typeof mealSuggestions.$inferInsert;

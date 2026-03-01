@@ -20,6 +20,3 @@ export const budgetPlanMealTypes = pgTable(
     uniqueIndex('unique_budget_plan_meal_type').on(table.budgetPlanId, table.mealTypeId),
   ],
 );
-
-export type BudgetPlanMealType = typeof budgetPlanMealTypes.$inferSelect;
-export type NewBudgetPlanMealType = typeof budgetPlanMealTypes.$inferInsert;

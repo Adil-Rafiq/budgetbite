@@ -16,6 +16,3 @@ export const feedback = pgTable('feedback', {
   comment: text('comment'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
-
-export type Feedback = typeof feedback.$inferSelect;
-export type NewFeedback = typeof feedback.$inferInsert;

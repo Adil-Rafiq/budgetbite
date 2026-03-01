@@ -10,7 +10,3 @@ export const userProfile = pgTable('user_profile', {
   longitude: doublePrecision('longitude'),
   ...timestamps,
 });
-
-export type UserProfile = typeof userProfile.$inferSelect;
-export type NewUserProfile = typeof userProfile.$inferInsert;
-export type UpdateUserProfile = Partial<Omit<NewUserProfile, 'userId'>>;

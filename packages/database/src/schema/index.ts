@@ -8,3 +8,4 @@ export * from './budget-plan-meal-types.js';
 export * from './meal-plans.js';
 export * from './orders.js';
 export * from './feedback.js';
+export * from './types/schema.types.js';

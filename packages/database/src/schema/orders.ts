@@ -25,6 +25,3 @@ export const mealChoices = pgTable('meal_choices', {
   restaurantName: text('restaurant_name'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
-
-export type MealChoice = typeof mealChoices.$inferSelect;
-export type NewMealChoice = typeof mealChoices.$inferInsert;

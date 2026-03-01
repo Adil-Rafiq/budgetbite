@@ -15,6 +15,3 @@ export const menuItems = pgTable('menu_items', {
 
   ...timestamps,
 });
-
-export type MenuItem = typeof menuItems.$inferSelect;
-export type NewMenuItem = typeof menuItems.$inferInsert;
