@@ -4,8 +4,6 @@
 
 ## Up Next
 
-- [ ] Cleanup schemas, specifically remove `users` table
-- [ ] Remove JWT implementation
 - [ ] Insert tables relations
 - [ ] Integrate a logger
 - [ ] Onboarding page
@@ -24,3 +22,5 @@
 - [x] Email OTP verification
 - [x] Google OAuth
 - [x] GitHub OAuth
+- [x] Cleanup schemas, specifically remove `users` table
+- [x] Remove JWT implementation

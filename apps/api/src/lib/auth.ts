@@ -22,15 +22,7 @@ export const auth = betterAuth({
         type: ['user', 'admin'] as const,
         defaultValue: 'user',
         required: true,
-        input: false,
-      },
-      latitude: {
-        type: 'number',
-        required: false,
-      },
-      longitude: {
-        type: 'number',
-        required: false,
+        input: false, // don't allow users to set this field directly
       },
     },
   },

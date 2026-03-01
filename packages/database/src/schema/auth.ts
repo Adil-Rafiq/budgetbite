@@ -4,7 +4,6 @@ import {
   text,
   timestamp,
   boolean,
-  integer,
   uuid,
   index,
 } from "drizzle-orm/pg-core";
@@ -25,8 +24,6 @@ export const user = pgTable("user", {
   role: text("role", { enum: ["user", "admin"] })
     .default("user")
     .notNull(),
-  latitude: integer("latitude"),
-  longitude: integer("longitude"),
 });
 
 export const session = pgTable(

@@ -11,37 +11,37 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
-import { budgetPlans } from './budget-plans.js';
-import { mealTypes } from './meal-types.js';
-import { menuItems } from './menu-items.js';
-import { restaurants } from './restaurants.js';
+import { budgetPlan } from './budget-plan.js';
+import { mealType } from './meal-type.js';
+import { menuItem } from './menu-item.js';
+import { restaurant } from './restaurant.js';
 
-export const mealPlanGenerations = pgTable('meal_plan_generations', {
+export const mealPlanGeneration = pgTable('meal_plan_generation', {
   id: uuid('id').primaryKey().defaultRandom(),
   budgetPlanId: uuid('budget_plan_id')
     .notNull()
-    .references(() => budgetPlans.id, { onDelete: 'cascade' }),
+    .references(() => budgetPlan.id, { onDelete: 'cascade' }),
   generatedAt: timestamp('generated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const mealSuggestions = pgTable(
-  'meal_suggestions',
+export const mealSuggestion = pgTable(
+  'meal_suggestion',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     generationId: uuid('generation_id')
       .notNull()
-      .references(() => mealPlanGenerations.id, { onDelete: 'cascade' }),
+      .references(() => mealPlanGeneration.id, { onDelete: 'cascade' }),
     slotDate: date('slot_date', { mode: 'string' }).notNull(),
     mealTypeId: uuid('meal_type_id')
       .notNull()
-      .references(() => mealTypes.id, { onDelete: 'restrict' }),
+      .references(() => mealType.id, { onDelete: 'restrict' }),
     optionIndex: integer('option_index').notNull(), // more the once choice for a single meal
     restaurantId: uuid('restaurant_id')
       .notNull()
-      .references(() => restaurants.id, { onDelete: 'cascade' }),
+      .references(() => restaurant.id, { onDelete: 'cascade' }),
     menuItemId: uuid('menu_item_id')
       .notNull()
-      .references(() => menuItems.id, { onDelete: 'cascade' }),
+      .references(() => menuItem.id, { onDelete: 'cascade' }),
     estimatedPrice: decimal('estimated_price', { precision: 10, scale: 2 }),
     notes: text('notes'),
   },
@@ -55,8 +55,3 @@ export const mealSuggestions = pgTable(
     check('valid_option_index', sql`${table.optionIndex} >= 0`),
   ],
 );
-
-export type MealPlanGeneration = typeof mealPlanGenerations.$inferSelect;
-export type NewMealPlanGeneration = typeof mealPlanGenerations.$inferInsert;
-export type MealSuggestion = typeof mealSuggestions.$inferSelect;
-export type NewMealSuggestion = typeof mealSuggestions.$inferInsert;

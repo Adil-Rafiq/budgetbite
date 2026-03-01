@@ -2,7 +2,7 @@ import { integer, decimal, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 import { timestamps } from './common/timestamps.js';
 
-export const restaurants = pgTable('restaurants', {
+export const restaurant = pgTable('restaurant', {
   id: uuid('id').primaryKey().defaultRandom(),
   externalId: text('external_id').notNull().unique(),
   name: text('name').notNull(),
@@ -15,6 +15,3 @@ export const restaurants = pgTable('restaurants', {
 
   ...timestamps,
 });
-
-export type Restaurant = typeof restaurants.$inferSelect;
-export type NewRestaurant = typeof restaurants.$inferInsert;
