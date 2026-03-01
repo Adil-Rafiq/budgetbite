@@ -1,13 +1,13 @@
 import { account, session, user, verification } from '../auth.js';
 import { userProfile } from '../user-profile.js';
-import { budgetPlanMealTypes } from '../budget-plan-meal-types.js';
-import { budgetPlans } from '../budget-plans.js';
+import { budgetPlanMealTypes } from '../budget-plan-meal-type.js';
+import { budgetPlans } from '../budget-plan.js';
 import { feedback } from '../feedback.js';
-import { mealSuggestions, mealPlanGenerations } from '../meal-plans.js';
-import { mealTypes } from '../meal-types.js';
-import { menuItems } from '../menu-items.js';
-import { mealChoices } from '../orders.js';
-import { restaurants } from '../restaurants.js';
+import { mealSuggestions, mealPlanGenerations } from '../meal-plan.js';
+import { mealTypes } from '../meal-type.js';
+import { menuItems } from '../menu-item.js';
+import { mealChoices } from '../order.js';
+import { restaurants } from '../restaurant.js';
 
 // Auth types
 export type User = typeof user.$inferSelect;

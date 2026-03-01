@@ -2,7 +2,7 @@ import { pgTable, uuid, text, integer, boolean } from 'drizzle-orm/pg-core';
 
 import { timestamps } from './common/timestamps.js';
 
-export const mealTypes = pgTable('meal_types', {
+export const mealType = pgTable('meal_type', {
   id: uuid('id').primaryKey().defaultRandom(),
   key: text('key').notNull().unique(),
   label: text('label').notNull(),

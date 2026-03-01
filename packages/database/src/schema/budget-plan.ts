@@ -4,8 +4,8 @@ import { pgTable, uuid, check, decimal, integer, text, date, jsonb } from 'drizz
 import { timestamps } from './common/timestamps.js';
 import { user } from './auth.js';
 
-export const budgetPlans = pgTable(
-  'budget_plans',
+export const budgetPlan = pgTable(
+  'budget_plan',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     userId: uuid('user_id')

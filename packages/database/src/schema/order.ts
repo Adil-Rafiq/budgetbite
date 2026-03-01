@@ -1,23 +1,23 @@
 import { date, decimal, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-import { budgetPlans } from './budget-plans.js';
-import { mealSuggestions } from './meal-plans.js';
-import { mealTypes } from './meal-types.js';
+import { budgetPlan } from './budget-plan.js';
+import { mealSuggestion } from './meal-plan.js';
+import { mealType } from './meal-type.js';
 import { user } from './auth.js';
 
-export const mealChoices = pgTable('meal_choices', {
+export const mealChoice = pgTable('meal_choice', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   budgetPlanId: uuid('budget_plan_id')
     .notNull()
-    .references(() => budgetPlans.id, { onDelete: 'cascade' }),
+    .references(() => budgetPlan.id, { onDelete: 'cascade' }),
   slotDate: date('slot_date', { mode: 'string' }).notNull(),
   mealTypeId: uuid('meal_type_id')
     .notNull()
-    .references(() => mealTypes.id, { onDelete: 'restrict' }),
-  suggestionId: uuid('suggestion_id').references(() => mealSuggestions.id, {
+    .references(() => mealType.id, { onDelete: 'restrict' }),
+  suggestionId: uuid('suggestion_id').references(() => mealSuggestion.id, {
     onDelete: 'set null',
   }),
   manualDescription: text('manual_description'),

@@ -1,18 +1,18 @@
 import { pgTable, uuid, integer, uniqueIndex } from 'drizzle-orm/pg-core';
 
-import { budgetPlans } from './budget-plans.js';
-import { mealTypes } from './meal-types.js';
+import { budgetPlan } from './budget-plan.js';
+import { mealType } from './meal-type.js';
 
-export const budgetPlanMealTypes = pgTable(
-  'budget_plan_meal_types',
+export const budgetPlanMealType = pgTable(
+  'budget_plan_meal_type',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     budgetPlanId: uuid('budget_plan_id')
       .notNull()
-      .references(() => budgetPlans.id, { onDelete: 'cascade' }),
+      .references(() => budgetPlan.id, { onDelete: 'cascade' }),
     mealTypeId: uuid('meal_type_id')
       .notNull()
-      .references(() => mealTypes.id, { onDelete: 'restrict' }),
+      .references(() => mealType.id, { onDelete: 'restrict' }),
     position: integer('position').notNull(),
   },
   (table) => [
