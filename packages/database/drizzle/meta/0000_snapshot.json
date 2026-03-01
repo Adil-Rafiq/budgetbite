@@ -1,5 +1,5 @@
 {
-  "id": "ad10828f-9d95-4d47-ba13-e437f6cd40d0",
+  "id": "aba99683-7a84-4669-865b-22c4513cf66e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -429,8 +429,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.restaurants": {
-      "name": "restaurants",
+    "public.restaurant": {
+      "name": "restaurant",
       "schema": "",
       "columns": {
         "id": {
@@ -508,8 +508,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "restaurants_external_id_unique": {
-          "name": "restaurants_external_id_unique",
+        "restaurant_external_id_unique": {
+          "name": "restaurant_external_id_unique",
           "nullsNotDistinct": false,
           "columns": [
             "external_id"
@@ -520,8 +520,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.menu_items": {
-      "name": "menu_items",
+    "public.menu_item": {
+      "name": "menu_item",
       "schema": "",
       "columns": {
         "id": {
@@ -578,10 +578,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "menu_items_restaurant_id_restaurants_id_fk": {
-          "name": "menu_items_restaurant_id_restaurants_id_fk",
-          "tableFrom": "menu_items",
-          "tableTo": "restaurants",
+        "menu_item_restaurant_id_restaurant_id_fk": {
+          "name": "menu_item_restaurant_id_restaurant_id_fk",
+          "tableFrom": "menu_item",
+          "tableTo": "restaurant",
           "columnsFrom": [
             "restaurant_id"
           ],
@@ -598,8 +598,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.budget_plans": {
-      "name": "budget_plans",
+    "public.budget_plan": {
+      "name": "budget_plan",
       "schema": "",
       "columns": {
         "id": {
@@ -675,9 +675,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "budget_plans_user_id_user_id_fk": {
-          "name": "budget_plans_user_id_user_id_fk",
-          "tableFrom": "budget_plans",
+        "budget_plan_user_id_user_id_fk": {
+          "name": "budget_plan_user_id_user_id_fk",
+          "tableFrom": "budget_plan",
           "tableTo": "user",
           "columnsFrom": [
             "user_id"
@@ -695,13 +695,13 @@
       "checkConstraints": {
         "budget_plans_notification_times_length": {
           "name": "budget_plans_notification_times_length",
-          "value": "(\"budget_plans\".\"notification_times\" IS NULL OR jsonb_array_length(\"budget_plans\".\"notification_times\") = \"budget_plans\".\"meals_per_day\")"
+          "value": "(\"budget_plan\".\"notification_times\" IS NULL OR jsonb_array_length(\"budget_plan\".\"notification_times\") = \"budget_plan\".\"meals_per_day\")"
         }
       },
       "isRLSEnabled": false
     },
-    "public.meal_types": {
-      "name": "meal_types",
+    "public.meal_type": {
+      "name": "meal_type",
       "schema": "",
       "columns": {
         "id": {
@@ -756,8 +756,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "meal_types_key_unique": {
-          "name": "meal_types_key_unique",
+        "meal_type_key_unique": {
+          "name": "meal_type_key_unique",
           "nullsNotDistinct": false,
           "columns": [
             "key"
@@ -768,8 +768,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.budget_plan_meal_types": {
-      "name": "budget_plan_meal_types",
+    "public.budget_plan_meal_type": {
+      "name": "budget_plan_meal_type",
       "schema": "",
       "columns": {
         "id": {
@@ -843,10 +843,10 @@
         }
       },
       "foreignKeys": {
-        "budget_plan_meal_types_budget_plan_id_budget_plans_id_fk": {
-          "name": "budget_plan_meal_types_budget_plan_id_budget_plans_id_fk",
-          "tableFrom": "budget_plan_meal_types",
-          "tableTo": "budget_plans",
+        "budget_plan_meal_type_budget_plan_id_budget_plan_id_fk": {
+          "name": "budget_plan_meal_type_budget_plan_id_budget_plan_id_fk",
+          "tableFrom": "budget_plan_meal_type",
+          "tableTo": "budget_plan",
           "columnsFrom": [
             "budget_plan_id"
           ],
@@ -856,10 +856,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "budget_plan_meal_types_meal_type_id_meal_types_id_fk": {
-          "name": "budget_plan_meal_types_meal_type_id_meal_types_id_fk",
-          "tableFrom": "budget_plan_meal_types",
-          "tableTo": "meal_types",
+        "budget_plan_meal_type_meal_type_id_meal_type_id_fk": {
+          "name": "budget_plan_meal_type_meal_type_id_meal_type_id_fk",
+          "tableFrom": "budget_plan_meal_type",
+          "tableTo": "meal_type",
           "columnsFrom": [
             "meal_type_id"
           ],
@@ -876,8 +876,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.meal_plan_generations": {
-      "name": "meal_plan_generations",
+    "public.meal_plan_generation": {
+      "name": "meal_plan_generation",
       "schema": "",
       "columns": {
         "id": {
@@ -903,10 +903,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "meal_plan_generations_budget_plan_id_budget_plans_id_fk": {
-          "name": "meal_plan_generations_budget_plan_id_budget_plans_id_fk",
-          "tableFrom": "meal_plan_generations",
-          "tableTo": "budget_plans",
+        "meal_plan_generation_budget_plan_id_budget_plan_id_fk": {
+          "name": "meal_plan_generation_budget_plan_id_budget_plan_id_fk",
+          "tableFrom": "meal_plan_generation",
+          "tableTo": "budget_plan",
           "columnsFrom": [
             "budget_plan_id"
           ],
@@ -923,8 +923,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.meal_suggestions": {
-      "name": "meal_suggestions",
+    "public.meal_suggestion": {
+      "name": "meal_suggestion",
       "schema": "",
       "columns": {
         "id": {
@@ -1019,10 +1019,10 @@
         }
       },
       "foreignKeys": {
-        "meal_suggestions_generation_id_meal_plan_generations_id_fk": {
-          "name": "meal_suggestions_generation_id_meal_plan_generations_id_fk",
-          "tableFrom": "meal_suggestions",
-          "tableTo": "meal_plan_generations",
+        "meal_suggestion_generation_id_meal_plan_generation_id_fk": {
+          "name": "meal_suggestion_generation_id_meal_plan_generation_id_fk",
+          "tableFrom": "meal_suggestion",
+          "tableTo": "meal_plan_generation",
           "columnsFrom": [
             "generation_id"
           ],
@@ -1032,10 +1032,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "meal_suggestions_meal_type_id_meal_types_id_fk": {
-          "name": "meal_suggestions_meal_type_id_meal_types_id_fk",
-          "tableFrom": "meal_suggestions",
-          "tableTo": "meal_types",
+        "meal_suggestion_meal_type_id_meal_type_id_fk": {
+          "name": "meal_suggestion_meal_type_id_meal_type_id_fk",
+          "tableFrom": "meal_suggestion",
+          "tableTo": "meal_type",
           "columnsFrom": [
             "meal_type_id"
           ],
@@ -1045,10 +1045,10 @@
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
-        "meal_suggestions_restaurant_id_restaurants_id_fk": {
-          "name": "meal_suggestions_restaurant_id_restaurants_id_fk",
-          "tableFrom": "meal_suggestions",
-          "tableTo": "restaurants",
+        "meal_suggestion_restaurant_id_restaurant_id_fk": {
+          "name": "meal_suggestion_restaurant_id_restaurant_id_fk",
+          "tableFrom": "meal_suggestion",
+          "tableTo": "restaurant",
           "columnsFrom": [
             "restaurant_id"
           ],
@@ -1058,10 +1058,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "meal_suggestions_menu_item_id_menu_items_id_fk": {
-          "name": "meal_suggestions_menu_item_id_menu_items_id_fk",
-          "tableFrom": "meal_suggestions",
-          "tableTo": "menu_items",
+        "meal_suggestion_menu_item_id_menu_item_id_fk": {
+          "name": "meal_suggestion_menu_item_id_menu_item_id_fk",
+          "tableFrom": "meal_suggestion",
+          "tableTo": "menu_item",
           "columnsFrom": [
             "menu_item_id"
           ],
@@ -1078,13 +1078,13 @@
       "checkConstraints": {
         "valid_option_index": {
           "name": "valid_option_index",
-          "value": "\"meal_suggestions\".\"option_index\" >= 0"
+          "value": "\"meal_suggestion\".\"option_index\" >= 0"
         }
       },
       "isRLSEnabled": false
     },
-    "public.meal_choices": {
-      "name": "meal_choices",
+    "public.meal_choice": {
+      "name": "meal_choice",
       "schema": "",
       "columns": {
         "id": {
@@ -1152,9 +1152,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "meal_choices_user_id_user_id_fk": {
-          "name": "meal_choices_user_id_user_id_fk",
-          "tableFrom": "meal_choices",
+        "meal_choice_user_id_user_id_fk": {
+          "name": "meal_choice_user_id_user_id_fk",
+          "tableFrom": "meal_choice",
           "tableTo": "user",
           "columnsFrom": [
             "user_id"
@@ -1165,10 +1165,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "meal_choices_budget_plan_id_budget_plans_id_fk": {
-          "name": "meal_choices_budget_plan_id_budget_plans_id_fk",
-          "tableFrom": "meal_choices",
-          "tableTo": "budget_plans",
+        "meal_choice_budget_plan_id_budget_plan_id_fk": {
+          "name": "meal_choice_budget_plan_id_budget_plan_id_fk",
+          "tableFrom": "meal_choice",
+          "tableTo": "budget_plan",
           "columnsFrom": [
             "budget_plan_id"
           ],
@@ -1178,10 +1178,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "meal_choices_meal_type_id_meal_types_id_fk": {
-          "name": "meal_choices_meal_type_id_meal_types_id_fk",
-          "tableFrom": "meal_choices",
-          "tableTo": "meal_types",
+        "meal_choice_meal_type_id_meal_type_id_fk": {
+          "name": "meal_choice_meal_type_id_meal_type_id_fk",
+          "tableFrom": "meal_choice",
+          "tableTo": "meal_type",
           "columnsFrom": [
             "meal_type_id"
           ],
@@ -1191,10 +1191,10 @@
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
-        "meal_choices_suggestion_id_meal_suggestions_id_fk": {
-          "name": "meal_choices_suggestion_id_meal_suggestions_id_fk",
-          "tableFrom": "meal_choices",
-          "tableTo": "meal_suggestions",
+        "meal_choice_suggestion_id_meal_suggestion_id_fk": {
+          "name": "meal_choice_suggestion_id_meal_suggestion_id_fk",
+          "tableFrom": "meal_choice",
+          "tableTo": "meal_suggestion",
           "columnsFrom": [
             "suggestion_id"
           ],
@@ -1262,10 +1262,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "feedback_meal_choice_id_meal_choices_id_fk": {
-          "name": "feedback_meal_choice_id_meal_choices_id_fk",
+        "feedback_meal_choice_id_meal_choice_id_fk": {
+          "name": "feedback_meal_choice_id_meal_choice_id_fk",
           "tableFrom": "feedback",
-          "tableTo": "meal_choices",
+          "tableTo": "meal_choice",
           "columnsFrom": [
             "meal_choice_id"
           ],
