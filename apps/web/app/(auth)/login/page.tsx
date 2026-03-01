@@ -12,12 +12,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { useToast, type Toast } from '@/hooks/use-toast';
-import { ToastAction } from '@/components/ui/toast';
+import { showToast, type ToastOptions } from '@/lib/toast';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { toast } = useToast();
 
   const {
     register,
@@ -35,10 +33,10 @@ export default function LoginPage() {
 
     if (error) {
       const errorCode = error.code as AuthErrorCode;
-      const toastOptions: Toast = {
+      const toastOptions: ToastOptions = {
         title: 'Registration failed',
         description: error.message,
-        variant: 'destructive',
+        variant: 'error',
       };
 
       switch (errorCode) {
@@ -46,26 +44,22 @@ export default function LoginPage() {
           toastOptions.title = 'Email not verified';
           toastOptions.description =
             'Your account is not verified yet. Please verify your email before logging in.';
-          toastOptions.action = (
-            <ToastAction
-              altText="Go to login"
-              onClick={async () => {
-                await authClient.emailOtp.sendVerificationOtp({
-                  email: data.email,
-                  type: 'email-verification',
-                });
+          toastOptions.action = {
+            label: 'Request new OTP',
+            onClick: async () => {
+              await authClient.emailOtp.sendVerificationOtp({
+                email: data.email,
+                type: 'email-verification',
+              });
 
-                toast({
-                  title: 'OTP Sent',
-                  description: 'A new OTP has been sent to your email address.',
-                });
+              showToast.success({
+                title: 'OTP Sent',
+                description: 'A new OTP has been sent to your email address.',
+              });
 
-                router.push('/verify-email?email=' + encodeURIComponent(data.email));
-              }}
-            >
-              Request new OTP
-            </ToastAction>
-          );
+              router.push('/verify-email?email=' + encodeURIComponent(data.email));
+            },
+          };
           break;
 
         default:
@@ -74,16 +68,18 @@ export default function LoginPage() {
             error.message || 'Something went wrong while trying to log in.';
       }
 
-      toast(toastOptions);
+      showToast(toastOptions);
 
       console.error(error.message);
       return;
     }
 
-    toast({
+    showToast({
       title: 'Login successful',
       description: 'Welcome back! Redirecting to dashboard...',
+      variant: 'success',
     });
+
     router.push('/dashboard');
   };
 

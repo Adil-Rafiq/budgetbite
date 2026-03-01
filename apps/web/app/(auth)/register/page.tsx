@@ -12,12 +12,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { useToast, type Toast } from '@/hooks/use-toast';
-import { ToastAction } from '@/components/ui/toast';
+import { showToast, type ToastOptions } from '@/lib/toast';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { toast } = useToast();
 
   const {
     register,
@@ -36,34 +34,35 @@ export default function RegisterPage() {
 
     if (error) {
       const errorCode = error.code as AuthErrorCode;
-      const toastOptions: Toast = {
+      const toastOptions: ToastOptions = {
         title: 'Registration failed',
         description: error.message,
-        variant: 'destructive',
+        variant: 'error',
       };
 
       switch (errorCode) {
         case 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL':
           toastOptions.description =
             'An account with this email already exists. Please use a different email or login.';
-          toastOptions.action = (
-            <ToastAction altText="Go to login" onClick={() => router.push('/login')}>
-              Login
-            </ToastAction>
-          );
+          toastOptions.action = {
+            label: 'Go to login',
+            onClick: () => router.push('/login'),
+          };
           break;
       }
 
-      toast(toastOptions);
+      showToast(toastOptions);
 
       console.error(error.message);
       return;
     }
 
-    toast({
+    showToast({
       title: 'Registration successful',
       description: 'Your account has been created. Redirecting to onboarding...',
+      variant: 'success',
     });
+
     router.push('/onboarding');
   };
 
