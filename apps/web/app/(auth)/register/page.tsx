@@ -12,12 +12,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { useToast, type Toast } from '@/hooks/use-toast';
-import { ToastAction } from '@/components/ui/toast';
+import { showToast, type ToastOptions } from '@/lib/toast';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { toast } = useToast();
 
   const {
     register,
@@ -36,43 +34,65 @@ export default function RegisterPage() {
 
     if (error) {
       const errorCode = error.code as AuthErrorCode;
-      const toastOptions: Toast = {
+      const toastOptions: ToastOptions = {
         title: 'Registration failed',
         description: error.message,
-        variant: 'destructive',
+        variant: 'error',
       };
 
       switch (errorCode) {
         case 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL':
           toastOptions.description =
             'An account with this email already exists. Please use a different email or login.';
-          toastOptions.action = (
-            <ToastAction altText="Go to login" onClick={() => router.push('/login')}>
-              Login
-            </ToastAction>
-          );
+          toastOptions.action = {
+            label: 'Go to login',
+            onClick: () => router.push('/login'),
+          };
           break;
       }
 
-      toast(toastOptions);
-
-      console.error(error.message);
+      showToast(toastOptions);
       return;
     }
 
-    toast({
-      title: 'Registration successful',
-      description: 'Your account has been created. Redirecting to onboarding...',
+    // Send OTP after successful registration
+    const { error: otpError } = await authClient.emailOtp.sendVerificationOtp({
+      email: data.email,
+      type: 'email-verification',
     });
-    router.push('/onboarding');
+
+    if (otpError) {
+      showToast({
+        title: 'Could not send verification code',
+        description:
+          'Your account was created but we failed to send a verification email. Please try again from the login page.',
+        variant: 'warning',
+      });
+      router.push('/login');
+      return;
+    }
+
+    showToast({
+      title: 'Account created!',
+      description: 'A verification code has been sent to your email.',
+      variant: 'success',
+    });
+
+    router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
   };
 
   const handleGoogleSignIn = async () => {
-    await authClient.signIn.social({ provider: 'google' });
+    await authClient.signIn.social({
+      provider: 'google',
+      callbackURL: `${process.env.NEXT_PUBLIC_WEB_URL}/oauth-callback`,
+    });
   };
 
   const handleGithubSignIn = async () => {
-    await authClient.signIn.social({ provider: 'github' });
+    await authClient.signIn.social({
+      provider: 'github',
+      callbackURL: `${process.env.NEXT_PUBLIC_WEB_URL}/oauth-callback`,
+    });
   };
 
   return (
