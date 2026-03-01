@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 
 import { db } from '../db.js';
-import { userProfile, type UserProfile, type UpdateUserProfile } from '../schema/user-profile.js';
+import { userProfile, type UserProfile, type UpdateUserProfile } from '../schema/index.js';
 
 export const userProfileRepository = {
   async findByUserId(userId: string): Promise<UserProfile | undefined> {

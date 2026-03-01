@@ -1,13 +1,13 @@
 import { account, session, user, verification } from '../auth.js';
 import { userProfile } from '../user-profile.js';
-import { budgetPlanMealTypes } from '../budget-plan-meal-type.js';
-import { budgetPlans } from '../budget-plan.js';
+import { budgetPlanMealType } from '../budget-plan-meal-type.js';
+import { budgetPlan } from '../budget-plan.js';
 import { feedback } from '../feedback.js';
-import { mealSuggestions, mealPlanGenerations } from '../meal-plan.js';
-import { mealTypes } from '../meal-type.js';
-import { menuItems } from '../menu-item.js';
-import { mealChoices } from '../order.js';
-import { restaurants } from '../restaurant.js';
+import { mealSuggestion, mealPlanGeneration } from '../meal-plan.js';
+import { mealType } from '../meal-type.js';
+import { menuItem } from '../menu-item.js';
+import { mealChoice } from '../order.js';
+import { restaurant } from '../restaurant.js';
 
 // Auth types
 export type User = typeof user.$inferSelect;
@@ -24,13 +24,13 @@ export type NewUserProfile = typeof userProfile.$inferInsert;
 export type UpdateUserProfile = Partial<Omit<NewUserProfile, 'userId'>>;
 
 // Budget plan meal types
-export type BudgetPlanMealType = typeof budgetPlanMealTypes.$inferSelect;
-export type NewBudgetPlanMealType = typeof budgetPlanMealTypes.$inferInsert;
+export type BudgetPlanMealType = typeof budgetPlanMealType.$inferSelect;
+export type NewBudgetPlanMealType = typeof budgetPlanMealType.$inferInsert;
 export type UpdateBudgetPlanMealType = Partial<Omit<NewBudgetPlanMealType, 'id'>>;
 
 // Budget plan types
-export type BudgetPlan = typeof budgetPlans.$inferSelect;
-export type NewBudgetPlan = typeof budgetPlans.$inferInsert;
+export type BudgetPlan = typeof budgetPlan.$inferSelect;
+export type NewBudgetPlan = typeof budgetPlan.$inferInsert;
 export type UpdateBudgetPlan = Partial<Omit<NewBudgetPlan, 'id'>>;
 
 // Feedback types
@@ -39,31 +39,31 @@ export type NewFeedback = typeof feedback.$inferInsert;
 export type UpdateFeedback = Partial<Omit<NewFeedback, 'id'>>;
 
 // Meal plan generation types
-export type MealPlanGeneration = typeof mealPlanGenerations.$inferSelect;
-export type NewMealPlanGeneration = typeof mealPlanGenerations.$inferInsert;
+export type MealPlanGeneration = typeof mealPlanGeneration.$inferSelect;
+export type NewMealPlanGeneration = typeof mealPlanGeneration.$inferInsert;
 export type UpdateMealPlanGeneration = Partial<Omit<NewMealPlanGeneration, 'id'>>;
 
 // Meal suggestion types
-export type MealSuggestion = typeof mealSuggestions.$inferSelect;
-export type NewMealSuggestion = typeof mealSuggestions.$inferInsert;
+export type MealSuggestion = typeof mealSuggestion.$inferSelect;
+export type NewMealSuggestion = typeof mealSuggestion.$inferInsert;
 export type UpdateMealSuggestion = Partial<Omit<NewMealSuggestion, 'id'>>;
 
 // Meal type types
-export type MealType = typeof mealTypes.$inferSelect;
-export type NewMealType = typeof mealTypes.$inferInsert;
+export type MealType = typeof mealType.$inferSelect;
+export type NewMealType = typeof mealType.$inferInsert;
 export type UpdateMealType = Partial<Omit<NewMealType, 'id'>>;
 
 // Menu item types
-export type MenuItem = typeof menuItems.$inferSelect;
-export type NewMenuItem = typeof menuItems.$inferInsert;
+export type MenuItem = typeof menuItem.$inferSelect;
+export type NewMenuItem = typeof menuItem.$inferInsert;
 export type UpdateMenuItem = Partial<Omit<NewMenuItem, 'id'>>;
 
 // Meal choice types
-export type MealChoice = typeof mealChoices.$inferSelect;
-export type NewMealChoice = typeof mealChoices.$inferInsert;
+export type MealChoice = typeof mealChoice.$inferSelect;
+export type NewMealChoice = typeof mealChoice.$inferInsert;
 export type UpdateMealChoice = Partial<Omit<NewMealChoice, 'id'>>;
 
 // Restaurant types
-export type Restaurant = typeof restaurants.$inferSelect;
-export type NewRestaurant = typeof restaurants.$inferInsert;
+export type Restaurant = typeof restaurant.$inferSelect;
+export type NewRestaurant = typeof restaurant.$inferInsert;
 export type UpdateRestaurant = Partial<Omit<NewRestaurant, 'id'>>;

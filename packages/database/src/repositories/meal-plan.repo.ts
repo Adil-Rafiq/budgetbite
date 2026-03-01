@@ -2,18 +2,18 @@ import { eq, and, asc } from 'drizzle-orm';
 
 import { db } from '../db.js';
 import {
-  mealPlanGenerations,
-  mealSuggestions,
-  menuItems,
-  restaurants,
-  mealTypes,
+  mealPlanGeneration,
+  mealSuggestion,
+  menuItem,
+  restaurant,
+  mealType,
   type MealPlanGeneration,
   type MealSuggestion,
 } from '../schema/index.js';
 
 export const mealPlanRepository = {
   async createGeneration(budgetPlanId: string): Promise<MealPlanGeneration> {
-    const [inserted] = await db.insert(mealPlanGenerations).values({ budgetPlanId }).returning();
+    const [inserted] = await db.insert(mealPlanGeneration).values({ budgetPlanId }).returning();
 
     if (!inserted) throw new Error('MealPlanGeneration insert failed');
     return inserted;
@@ -21,10 +21,10 @@ export const mealPlanRepository = {
 
   async getLatestGenerationId(budgetPlanId: string): Promise<string | undefined> {
     const [row] = await db
-      .select({ id: mealPlanGenerations.id })
-      .from(mealPlanGenerations)
-      .where(eq(mealPlanGenerations.budgetPlanId, budgetPlanId))
-      .orderBy(mealPlanGenerations.generatedAt)
+      .select({ id: mealPlanGeneration.id })
+      .from(mealPlanGeneration)
+      .where(eq(mealPlanGeneration.budgetPlanId, budgetPlanId))
+      .orderBy(mealPlanGeneration.generatedAt)
       .limit(1);
     return row?.id;
   },
@@ -42,42 +42,42 @@ export const mealPlanRepository = {
   > {
     return db
       .select({
-        id: mealSuggestions.id,
-        generationId: mealSuggestions.generationId,
-        slotDate: mealSuggestions.slotDate,
-        mealTypeId: mealSuggestions.mealTypeId,
-        optionIndex: mealSuggestions.optionIndex,
-        restaurantId: mealSuggestions.restaurantId,
-        menuItemId: mealSuggestions.menuItemId,
-        estimatedPrice: mealSuggestions.estimatedPrice,
-        notes: mealSuggestions.notes,
+        id: mealSuggestion.id,
+        generationId: mealSuggestion.generationId,
+        slotDate: mealSuggestion.slotDate,
+        mealTypeId: mealSuggestion.mealTypeId,
+        optionIndex: mealSuggestion.optionIndex,
+        restaurantId: mealSuggestion.restaurantId,
+        menuItemId: mealSuggestion.menuItemId,
+        estimatedPrice: mealSuggestion.estimatedPrice,
+        notes: mealSuggestion.notes,
         restaurant: {
-          id: restaurants.id,
-          name: restaurants.name,
+          id: restaurant.id,
+          name: restaurant.name,
         },
         menuItem: {
-          id: menuItems.id,
-          name: menuItems.name,
-          price: menuItems.price,
-          description: menuItems.description,
+          id: menuItem.id,
+          name: menuItem.name,
+          price: menuItem.price,
+          description: menuItem.description,
         },
         mealType: {
-          key: mealTypes.key,
-          label: mealTypes.label,
+          key: mealType.key,
+          label: mealType.label,
         },
       })
-      .from(mealSuggestions)
-      .innerJoin(restaurants, eq(mealSuggestions.restaurantId, restaurants.id))
-      .innerJoin(menuItems, eq(mealSuggestions.menuItemId, menuItems.id))
-      .innerJoin(mealTypes, eq(mealSuggestions.mealTypeId, mealTypes.id))
+      .from(mealSuggestion)
+      .innerJoin(restaurant, eq(mealSuggestion.restaurantId, restaurant.id))
+      .innerJoin(menuItem, eq(mealSuggestion.menuItemId, menuItem.id))
+      .innerJoin(mealType, eq(mealSuggestion.mealTypeId, mealType.id))
       .where(
         and(
-          eq(mealSuggestions.generationId, generationId),
-          eq(mealSuggestions.slotDate, slotDate),
-          eq(mealSuggestions.mealTypeId, mealTypeId),
+          eq(mealSuggestion.generationId, generationId),
+          eq(mealSuggestion.slotDate, slotDate),
+          eq(mealSuggestion.mealTypeId, mealTypeId),
         ),
       )
-      .orderBy(asc(mealSuggestions.optionIndex)) as Promise<
+      .orderBy(asc(mealSuggestion.optionIndex)) as Promise<
       (MealSuggestion & {
         restaurant: { id: string; name: string };
         menuItem: { id: string; name: string; price: string; description: string | null };
@@ -98,38 +98,38 @@ export const mealPlanRepository = {
   > {
     const rows = await db
       .select({
-        id: mealSuggestions.id,
-        generationId: mealSuggestions.generationId,
-        slotDate: mealSuggestions.slotDate,
-        mealTypeId: mealSuggestions.mealTypeId,
-        optionIndex: mealSuggestions.optionIndex,
-        restaurantId: mealSuggestions.restaurantId,
-        menuItemId: mealSuggestions.menuItemId,
-        estimatedPrice: mealSuggestions.estimatedPrice,
-        notes: mealSuggestions.notes,
+        id: mealSuggestion.id,
+        generationId: mealSuggestion.generationId,
+        slotDate: mealSuggestion.slotDate,
+        mealTypeId: mealSuggestion.mealTypeId,
+        optionIndex: mealSuggestion.optionIndex,
+        restaurantId: mealSuggestion.restaurantId,
+        menuItemId: mealSuggestion.menuItemId,
+        estimatedPrice: mealSuggestion.estimatedPrice,
+        notes: mealSuggestion.notes,
         restaurant: {
-          id: restaurants.id,
-          name: restaurants.name,
+          id: restaurant.id,
+          name: restaurant.name,
         },
         menuItem: {
-          id: menuItems.id,
-          name: menuItems.name,
-          price: menuItems.price,
-          description: menuItems.description,
+          id: menuItem.id,
+          name: menuItem.name,
+          price: menuItem.price,
+          description: menuItem.description,
         },
         mealType: {
-          key: mealTypes.key,
-          label: mealTypes.label,
+          key: mealType.key,
+          label: mealType.label,
         },
       })
-      .from(mealSuggestions)
-      .innerJoin(restaurants, eq(mealSuggestions.restaurantId, restaurants.id))
-      .innerJoin(menuItems, eq(mealSuggestions.menuItemId, menuItems.id))
-      .innerJoin(mealTypes, eq(mealSuggestions.mealTypeId, mealTypes.id))
+      .from(mealSuggestion)
+      .innerJoin(restaurant, eq(mealSuggestion.restaurantId, restaurant.id))
+      .innerJoin(menuItem, eq(mealSuggestion.menuItemId, menuItem.id))
+      .innerJoin(mealType, eq(mealSuggestion.mealTypeId, mealType.id))
       .where(
-        and(eq(mealSuggestions.generationId, generationId), eq(mealSuggestions.slotDate, slotDate)),
+        and(eq(mealSuggestion.generationId, generationId), eq(mealSuggestion.slotDate, slotDate)),
       )
-      .orderBy(asc(mealSuggestions.mealTypeId), asc(mealSuggestions.optionIndex));
+      .orderBy(asc(mealSuggestion.mealTypeId), asc(mealSuggestion.optionIndex));
     return rows as (MealSuggestion & {
       restaurant: { id: string; name: string };
       menuItem: { id: string; name: string; price: string; description: string | null };

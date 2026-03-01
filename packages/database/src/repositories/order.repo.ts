@@ -1,11 +1,11 @@
 import { eq, and, gte, lte, desc, sql } from 'drizzle-orm';
 
 import { db } from '../db.js';
-import { mealChoices, type MealChoice, type NewMealChoice } from '../schema/index.js';
+import { mealChoice, type MealChoice, type NewMealChoice } from '../schema/index.js';
 
 export const orderRepository = {
   async findById(id: string): Promise<MealChoice | undefined> {
-    const [row] = await db.select().from(mealChoices).where(eq(mealChoices.id, id)).limit(1);
+    const [row] = await db.select().from(mealChoice).where(eq(mealChoice.id, id)).limit(1);
     return row;
   },
 
@@ -16,9 +16,9 @@ export const orderRepository = {
   ): Promise<MealChoice[]> {
     return db
       .select()
-      .from(mealChoices)
-      .where(and(eq(mealChoices.userId, userId), eq(mealChoices.budgetPlanId, budgetPlanId)))
-      .orderBy(desc(mealChoices.slotDate), desc(mealChoices.createdAt))
+      .from(mealChoice)
+      .where(and(eq(mealChoice.userId, userId), eq(mealChoice.budgetPlanId, budgetPlanId)))
+      .orderBy(desc(mealChoice.slotDate), desc(mealChoice.createdAt))
       .limit(limit);
   },
 
@@ -29,29 +29,29 @@ export const orderRepository = {
   ): Promise<MealChoice[]> {
     return db
       .select()
-      .from(mealChoices)
+      .from(mealChoice)
       .where(
         and(
-          eq(mealChoices.userId, userId),
-          gte(mealChoices.slotDate, startDate),
-          lte(mealChoices.slotDate, endDate),
+          eq(mealChoice.userId, userId),
+          gte(mealChoice.slotDate, startDate),
+          lte(mealChoice.slotDate, endDate),
         ),
       )
-      .orderBy(desc(mealChoices.slotDate), desc(mealChoices.createdAt));
+      .orderBy(desc(mealChoice.slotDate), desc(mealChoice.createdAt));
   },
 
   async getSpentTotalByPlan(budgetPlanId: string): Promise<string> {
     const [row] = await db
       .select({
-        total: sql<string>`coalesce(sum(${mealChoices.actualAmountSpent}::numeric), 0)`,
+        total: sql<string>`coalesce(sum(${mealChoice.actualAmountSpent}::numeric), 0)`,
       })
-      .from(mealChoices)
-      .where(eq(mealChoices.budgetPlanId, budgetPlanId));
+      .from(mealChoice)
+      .where(eq(mealChoice.budgetPlanId, budgetPlanId));
     return row?.total ?? '0';
   },
 
   async create(data: NewMealChoice): Promise<MealChoice> {
-    const [inserted] = await db.insert(mealChoices).values(data).returning();
+    const [inserted] = await db.insert(mealChoice).values(data).returning();
     if (!inserted) throw new Error('MealChoice insert failed');
     return inserted;
   },
