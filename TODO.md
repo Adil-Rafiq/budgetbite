@@ -4,11 +4,12 @@
 
 ## Up Next
 
-- [ ] Insert tables relations
 - [ ] Integrate a logger
 - [ ] Onboarding page
 - [ ] Dashboard page
 - [ ] Budget plan creation
+- [ ] The users can add restaurants of their choice with the approval of admin
+- [ ] At a time only up to certain number of approval requests for restaurants will be allowed per user
 
 ## Backlog
 
@@ -24,3 +25,4 @@
 - [x] GitHub OAuth
 - [x] Cleanup schemas, specifically remove `users` table
 - [x] Remove JWT implementation
+- [x] Insert tables relations
