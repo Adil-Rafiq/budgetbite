@@ -6,7 +6,6 @@ const authRoutes = ['/login', '/register', '/verify-email']; // redirect to dash
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  console.log('Pathname: ', pathname);
 
   // check session cookie
   const sessionCookie = req.cookies.get('better-auth.session_token')?.value;
