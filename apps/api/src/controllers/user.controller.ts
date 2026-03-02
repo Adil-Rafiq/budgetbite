@@ -1,17 +1,15 @@
 import type { Response } from 'express';
-import { updateProfileSchema } from '@repo/shared';
-import { userService } from '../services/user.service.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
+import { userService } from '../services/user.service.js';
+import { updateUserProfileSchema } from '@repo/shared';
 
-export async function getProfile(_req: AuthRequest, res: Response): Promise<void> {
-  const userId = _req.userId!;
-  const profile = await userService.getProfile(userId);
-  res.json(profile);
-}
+export const getMe = async (req: AuthRequest, res: Response) => {
+  const user = await userService.getMe(req.userId!);
+  res.json(user);
+};
 
-export async function updateProfile(req: AuthRequest, res: Response): Promise<void> {
-  const userId = req.userId!;
-  const body = updateProfileSchema.parse(req.body);
-  const profile = await userService.updateProfile(userId, body);
+export const updateProfile = async (req: AuthRequest, res: Response) => {
+  const body = updateUserProfileSchema.parse(req.body);
+  const profile = await userService.updateUserProfile(req.userId!, body);
   res.json(profile);
-}
+};
