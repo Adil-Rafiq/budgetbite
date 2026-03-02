@@ -6,7 +6,10 @@ const router: Router = Router();
 
 router.use(authMiddleware);
 
-router.get('/profile', userController.getProfile);
-router.patch('/profile', userController.updateProfile);
+// Returns current authenticated user combined with their user-profile
+router.get('/me', userController.getMe);
+
+// Creates or updates user's profile
+router.put('/me/profile', userController.updateProfile);
 
 export default router;

@@ -26,7 +26,7 @@ export default function OAuthCallbackPage() {
     };
 
     checkOnboarding();
-  }, []);
+  }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">

@@ -25,9 +25,7 @@ export const loginSchema = z.object({
     .max(128, 'Password must be less than 128 characters'),
 });
 
-export const updateProfileSchema = z.object({
-  firstName: z.string().min(1).max(100).optional(),
-  lastName: z.string().min(1).max(100).optional(),
+export const updateUserProfileSchema = z.object({
   latitude: z.coerce.number().min(-90).max(90).optional(),
   longitude: z.coerce.number().min(-180).max(180).optional(),
 });
@@ -125,7 +123,7 @@ export const updateMealTypeSchema = createMealTypeSchema.partial();
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
-export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type UpdateUserProfileInput = z.infer<typeof updateUserProfileSchema>;
 export type ListRestaurantsQuery = z.infer<typeof listRestaurantsSchema>;
 export type CreateBudgetPlanInput = z.infer<typeof createBudgetPlanSchema>;
 export type UpdateBudgetPlanInput = z.infer<typeof updateBudgetPlanSchema>;
