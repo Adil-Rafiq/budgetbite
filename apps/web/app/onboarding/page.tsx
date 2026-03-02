@@ -25,6 +25,9 @@ export default function OnboardingPage() {
   const [notificationTimes, setNotificationTimes] = useState(["08:00", "13:00", "20:00"])
 
   const progress = ((currentStep + 1) / steps.length) * 100
+   const currentStepData = steps[currentStep];
+  if (!currentStepData) return null;
+  const StepIcon = currentStepData.icon;  
 
   const toggleMealType = (type: string) => {
     setMealTypes((prev) =>
@@ -62,7 +65,6 @@ export default function OnboardingPage() {
           <CardHeader>
             <div className="flex items-center gap-3">
               {(() => {
-                const StepIcon = steps[currentStep].icon
                 return (
                   <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
                     <StepIcon className="w-5 h-5 text-primary" />
@@ -70,8 +72,8 @@ export default function OnboardingPage() {
                 )
               })()}
               <div>
-                <CardTitle className="text-lg text-card-foreground">{steps[currentStep].title}</CardTitle>
-                <CardDescription>{steps[currentStep].description}</CardDescription>
+                <CardTitle className="text-lg text-card-foreground">{currentStepData.title}</CardTitle>
+                <CardDescription>{currentStepData.description}</CardDescription>
               </div>
             </div>
           </CardHeader>
