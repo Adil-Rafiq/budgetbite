@@ -4,7 +4,6 @@
 
 ## Up Next
 
-- [ ] Insert tables relations
 - [ ] Integrate a logger
 - [ ] Onboarding page
 - [ ] Dashboard page
@@ -26,3 +25,4 @@
 - [x] GitHub OAuth
 - [x] Cleanup schemas, specifically remove `users` table
 - [x] Remove JWT implementation
+- [x] Insert tables relations
