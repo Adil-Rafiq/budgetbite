@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const publicRoutes = ['/', '/login', '/register', 'verify-email'];
+const exactPublicRoutes = ['/'];
+const prefixPublicRoutes = ['/login', '/register', '/verify-email'];
 const authRoutes = ['/login', '/register', '/verify-email']; // redirect to dashboard if already logged in
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  console.log('Pathname: ', pathname);
 
   // check session cookie
   const sessionCookie = req.cookies.get('better-auth.session_token')?.value;
   const isAuthenticated = !!sessionCookie;
 
-  const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
+  const isPublicRoute =
+    exactPublicRoutes.includes(pathname) ||
+    prefixPublicRoutes.some((route) => pathname.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
 
   // already logged in but trying to access auth pages, redirect to dashboard
