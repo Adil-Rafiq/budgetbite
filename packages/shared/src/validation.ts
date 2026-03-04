@@ -25,9 +25,32 @@ export const loginSchema = z.object({
     .max(128, 'Password must be less than 128 characters'),
 });
 
+export const userSchema = z.object({
+  id: z.uuid(),
+  name: z.string().min(1),
+  email: z.email(),
+  emailVerified: z.boolean(),
+  image: z.url().nullable().optional(),
+  role: z.enum(['user', 'admin']),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export const userProfileSchema = z.object({
+  userId: z.uuid(),
+  latitude: z.coerce.number().min(-90).max(90).optional(),
+  longitude: z.coerce.number().min(-180).max(180).optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
 export const updateUserProfileSchema = z.object({
   latitude: z.coerce.number().min(-90).max(90).optional(),
   longitude: z.coerce.number().min(-180).max(180).optional(),
+});
+
+export const userWithProfileSchema = userSchema.extend({
+  profile: userProfileSchema.nullable().optional(),
 });
 
 export const listRestaurantsSchema = paginationSchema.extend({
@@ -123,7 +146,10 @@ export const updateMealTypeSchema = createMealTypeSchema.partial();
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type User = z.infer<typeof userSchema>;
+export type UserProfile = z.infer<typeof userProfileSchema>;
 export type UpdateUserProfileInput = z.infer<typeof updateUserProfileSchema>;
+export type UserWithProfile = z.infer<typeof userWithProfileSchema>;
 export type ListRestaurantsQuery = z.infer<typeof listRestaurantsSchema>;
 export type CreateBudgetPlanInput = z.infer<typeof createBudgetPlanSchema>;
 export type UpdateBudgetPlanInput = z.infer<typeof updateBudgetPlanSchema>;

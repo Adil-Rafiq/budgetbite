@@ -1,3 +1,4 @@
+// this code from tanstack official docs
 import { QueryClient, defaultShouldDehydrateQuery, isServer } from '@tanstack/react-query';
 
 function makeQueryClient() {
