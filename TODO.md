@@ -10,6 +10,7 @@
 - [ ] Budget plan creation
 - [ ] The users can add restaurants of their choice with the approval of admin
 - [ ] At a time only up to certain number of approval requests for restaurants will be allowed per user
+- [ ] Add rate limiting
 
 ## Backlog
 
