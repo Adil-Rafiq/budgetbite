@@ -1,7 +1,7 @@
 'use client';
 
 import { UseFormReturn } from 'react-hook-form';
-import { MapPin } from 'lucide-react';
+import { Loader2, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { UpdateUserProfileInput } from '@repo/shared';
@@ -49,7 +49,17 @@ export const LocationStep = ({ form }: LocationStepProps) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <Button onClick={handleDetectLocation} variant="secondary" disabled={loadingLocation}>
+      <Button
+        onClick={handleDetectLocation}
+        variant="secondary"
+        disabled={loadingLocation}
+        className="flex items-center gap-2"
+      >
+        {loadingLocation ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <MapPin className="w-4 h-4" />
+        )}
         {loadingLocation ? 'Detecting...' : 'Use My Current Location'}
       </Button>
       <div className="flex flex-col gap-2">
