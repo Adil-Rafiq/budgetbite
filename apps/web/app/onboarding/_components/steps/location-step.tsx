@@ -31,14 +31,17 @@ export const LocationStep = ({ form }: LocationStepProps) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        form.setValue('latitude', latitude);
-        form.setValue('longitude', longitude);
+        form.setValue('latitude', Number(latitude.toFixed(4)));
+        form.setValue('longitude', Number(longitude.toFixed(4)));
         setLoadingLocation(false);
         showToast.success({ title: 'Location detected!' });
       },
       (err) => {
         setLoadingLocation(false);
-        showToast.error({ title: 'Failed to get location', description: err.message });
+        showToast.error({
+          title: 'Failed to get location',
+          description: err.message || 'Please check your browser permissions or try manually',
+        });
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
@@ -46,8 +49,8 @@ export const LocationStep = ({ form }: LocationStepProps) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <Button onClick={handleDetectLocation} variant={'secondary'}>
-        Use My Current Location
+      <Button onClick={handleDetectLocation} variant="secondary" disabled={loadingLocation}>
+        {loadingLocation ? 'Detecting...' : 'Use My Current Location'}
       </Button>
       <div className="flex flex-col gap-2">
         <Label htmlFor="latitude">Latitude</Label>
