@@ -62,6 +62,7 @@ export const LocationStep = ({ form }: LocationStepProps) => {
         )}
         {loadingLocation ? 'Detecting...' : 'Use My Current Location'}
       </Button>
+      
       <div className="flex flex-col gap-2">
         <Label htmlFor="latitude">Latitude</Label>
         <Input
