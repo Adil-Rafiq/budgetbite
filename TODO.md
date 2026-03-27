@@ -4,6 +4,7 @@
 
 ## Up Next
 
+- [ ] There's a mismatch between web and api better-auth setup
 - [ ] Integrate a logger
 - [ ] Onboarding page
 - [ ] Dashboard page
