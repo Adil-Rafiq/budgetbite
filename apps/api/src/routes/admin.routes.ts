@@ -9,7 +9,7 @@ router.use(requireAdminOrService);
 // GET /restaurants?limit=20&offset=0&userLat=24.86&userLng=67.00&maxDistanceKm=5&minRating=4.0
 router.get('/restaurants', adminController.listRestaurants);
 // GET /restaurants/:id
-router.get('/restaurants:id', adminController.getRestaurantById);
+router.get('/restaurants/:id', adminController.getRestaurantById);
 // GET /restaurants/external/:externalId
 router.get('/restaurants/external/:externalId', adminController.getRestaurantByExternalId);
 router.post('/restaurants', adminController.createRestaurant);
