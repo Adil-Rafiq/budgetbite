@@ -2,6 +2,9 @@
 
 from playwright.sync_api import sync_playwright, Page, Browser
 from seleniumbase import sb_cdp
+from playsound3 import playsound
+import os
+import threading
 
 class BrowserManager:
     """Manages browser instance and CDP connection."""
@@ -46,6 +49,19 @@ class BrowserManager:
         """Pause execution for manual CAPTCHA solving."""
         if self.is_captcha_present():
             print("[CAPTCHA] Manual solve required. Solve it and click Resume ▶")
+            
+            # Alert the user
+            sound_path = os.path.join(os.path.dirname(__file__), "../sounds/alert.mp3")
+            sound_path = os.path.abspath(sound_path)
+            try:
+                threading.Thread(
+                    target=playsound,
+                    args=(sound_path,),
+                    daemon=True
+                ).start()
+            except Exception as e:
+                print(f"[WARNING] Could not play alert sound: {e}")
+
             self.page.pause()
 
     def close(self):
