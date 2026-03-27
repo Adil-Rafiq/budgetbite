@@ -1,2 +1,4 @@
 playwright
 seleniumbase
+python-dotenv>=1.0.0
+playsound3
