@@ -8,14 +8,26 @@ import {
   adminGetRestaurantByExternalIdSchema,
   createMealTypeSchema,
   updateMealTypeSchema,
+  listRestaurantsSchema,
 } from '@repo/shared';
 import { restaurantService } from '../services/restaurant.service.js';
 import { mealTypeRepository } from '@repo/database';
 
-/** GET /api/admin/restaurants?externalId=xxx — for scraper to resolve id after 409. */
+export async function listRestaurants(req: Request, res: Response): Promise<void> {
+  const query = listRestaurantsSchema.parse(req.query);
+  const restaurants = await restaurantService.list(query);
+  res.json(restaurants);
+}
+
+export async function getRestaurantById(req: Request, res: Response): Promise<void> {
+  const id = uuidSchema.parse(req.params.id);
+  const restaurant = await restaurantService.getById(id);
+  res.json(restaurant);
+}
+
 export async function getRestaurantByExternalId(req: Request, res: Response): Promise<void> {
-  const query = adminGetRestaurantByExternalIdSchema.parse(req.query);
-  const restaurant = await restaurantService.getByExternalId(query.externalId);
+  const { externalId } = adminGetRestaurantByExternalIdSchema.parse(req.params);
+  const restaurant = await restaurantService.getByExternalId(externalId);
   res.json(restaurant);
 }
 
