@@ -17,7 +17,7 @@ class FoodpandaScraper(BaseScraper):
 
     def _build_home_url(self) -> str:
         """Build homepage URL with location parameters."""
-        return f"{self.base_url}/restaurants/new?lng={self.lng}&lat={self.lat}&vertical=restaurants"
+        return f"{self.base_url}/?lat={self.lat}&lng={self.lng}"
 
     def scrape_restaurant_links(self) -> List[str]:
         """Scrape all restaurant links from homepage."""
@@ -27,7 +27,14 @@ class FoodpandaScraper(BaseScraper):
         print(f"[INFO] Loading homepage: {home_url}")
         
         page.goto(home_url, wait_until="domcontentloaded")
+
+        # Wait for URL to contain lat/lng params — if redirected, navigate again
+        if "lat=" not in page.url:
+            print(f"[WARN] Redirected to {page.url}, retrying with params...")
+            page.goto(home_url, wait_until="networkidle")
         
+        print(f"[INFO] Final URL: {page.url}")
+            
         # Scroll to load all restaurants
         self.scroll_to_bottom()
         
