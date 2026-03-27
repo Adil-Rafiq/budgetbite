@@ -100,7 +100,7 @@ def ensure_restaurant_id(restaurant: Restaurant, lat: float, lng: float) -> str:
         return body["id"]
     if status == 409:
         # Already exists: fetch by externalId
-        url_get = f"{base}/api/admin/restaurants?externalId={urllib.parse.quote(restaurant['vendor_id'], safe='')}"
+        url_get = f"{base}/api/admin/restaurants/external/{urllib.parse.quote(restaurant['vendor_id'], safe='')}"
         status2, body2 = _request("GET", url_get)
         if status2 == 200 and isinstance(body2, dict) and "id" in body2:
             return body2["id"]

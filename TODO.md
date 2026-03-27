@@ -5,6 +5,7 @@
 ## Up Next
 
 - [ ] There's a mismatch between web and api better-auth setup
+- [ ] After log-in the user should go to /onboarding if their profile is not set yet
 - [ ] Integrate a logger
 - [ ] Onboarding page
 - [ ] Dashboard page

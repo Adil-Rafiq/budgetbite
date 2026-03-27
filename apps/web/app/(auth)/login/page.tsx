@@ -34,7 +34,7 @@ export default function LoginPage() {
     if (error) {
       const errorCode = error.code as AuthErrorCode;
       const toastOptions: ToastOptions = {
-        title: 'Registration failed',
+        title: 'Login failed',
         description: error.message,
         variant: 'error',
       };
