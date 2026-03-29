@@ -4,7 +4,8 @@
 
 ## Up Next
 
-- [ ] Write the failed restaurants to a log file so that they can be added one by one or manually
+- [ ] We are repeating restaurant's menu items
+- [ ] In scraper, write the failed restaurants to a log file so that they can be added one by one or manually
 - [ ] There's a mismatch between web and api better-auth setup
 - [ ] After log-in the user should go to /onboarding if their profile is not set yet
 - [ ] Integrate a logger
@@ -17,6 +18,7 @@
 
 ## Backlog
 
+- [ ] Integrate [Three Js](#threejs.org) and [GSAP](#gsap.com). [GSAP](#gsap.com) has a cool [design](#planetono.space)
 - [ ] Meal suggestions
 - [ ] Analytics page
 - [ ] Push notifications
