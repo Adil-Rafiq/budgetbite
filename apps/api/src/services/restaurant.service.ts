@@ -103,8 +103,10 @@ export const restaurantService = {
     const restaurant = await restaurantRepository.findById(restaurantId);
     if (!restaurant) throw new AppError(404, 'Restaurant not found', 'NOT_FOUND');
     const items = Array.isArray(input) ? input : [input];
+    // remove duplicates first
+    const dedupedItems = this.dedupeMenuItems(restaurant.id, items);
     const created = await menuRepository.createMany(
-      items.map((item) => ({
+      dedupedItems.map((item) => ({
         restaurantId,
         name: item.name,
         description: item.description ?? null,
@@ -163,5 +165,19 @@ export const restaurantService = {
       createdAt: restaurant.createdAt,
       updatedAt: restaurant.updatedAt,
     };
+  },
+
+  dedupeMenuItems(restaurantId: string, items: CreateMenuItemInput[]) {
+    const map = new Map<string, CreateMenuItemInput>();
+
+    for (const item of items) {
+      const key = `${restaurantId}-${item.name.trim().toLowerCase()}`;
+      map.set(key, {
+        ...item,
+        name: item.name.trim(),
+      });
+    }
+
+    return Array.from(map.values());
   },
 };
