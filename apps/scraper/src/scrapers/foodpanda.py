@@ -43,6 +43,7 @@ class FoodpandaScraper(BaseScraper):
         absolute_links = [
             link if link.startswith('http') else f"{self.base_url}{link}"
             for link in links
+            if '/restaurant/' in link
         ]
         
         print(f"[INFO] Found {len(absolute_links)} restaurant links")

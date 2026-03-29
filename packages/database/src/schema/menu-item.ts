@@ -1,4 +1,4 @@
-import { decimal, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { decimal, pgTable, text, unique, uuid } from 'drizzle-orm/pg-core';
 
 import { timestamps } from './common/timestamps.js';
 import { restaurant } from './restaurant.js';
@@ -17,5 +17,5 @@ export const menuItem = pgTable(
 
     ...timestamps,
   },
-  (table) => [uniqueIndex('menu_item_restaurant_name_idx').on(table.restaurantId, table.name)],
+  (table) => [unique('unique_restaurant_item').on(table.restaurantId, table.name)],
 );

@@ -7,7 +7,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "db:generate": "bash ./db-migrate.sh generate",
+    "db:generate": "bash ./scripts/db-migrate.sh generate",
     "db:migrate": "bash ./scripts/db-migrate.sh migrate"
   },
   "devDependencies": {

@@ -29,7 +29,7 @@ export const menuRepository = {
 
   async createMany(data: NewMenuItem[]): Promise<MenuItem[]> {
     if (data.length === 0) return [];
-    return db
+    const inserted = await db
       .insert(menuItem)
       .values(data)
       .onConflictDoUpdate({
@@ -42,6 +42,8 @@ export const menuRepository = {
         },
       })
       .returning();
+
+    return inserted;
   },
 
   async update(id: string, data: Partial<NewMenuItem>): Promise<MenuItem> {
