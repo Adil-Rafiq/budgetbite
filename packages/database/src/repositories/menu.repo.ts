@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 import { db } from '../db.js';
 import { menuItem, type MenuItem, type NewMenuItem } from '../schema/index.js';
@@ -18,15 +18,30 @@ export const menuRepository = {
   },
 
   async create(data: NewMenuItem): Promise<MenuItem> {
-    const [inserted] = await db.insert(menuItem).values(data).returning();
+    const [inserted] = await db
+      .insert(menuItem)
+      .values(data)
+      .onConflictDoNothing() // silently skips duplicates
+      .returning();
     if (!inserted) throw new Error('MenuItem insert failed');
     return inserted;
   },
 
   async createMany(data: NewMenuItem[]): Promise<MenuItem[]> {
     if (data.length === 0) return [];
-    const inserted = await db.insert(menuItem).values(data).returning();
-    return inserted;
+    return db
+      .insert(menuItem)
+      .values(data)
+      .onConflictDoUpdate({
+        target: [menuItem.restaurantId, menuItem.name],
+        set: {
+          price: sql`excluded.price`,
+          description: sql`excluded.description`,
+          imageUrl: sql`excluded.image_url`,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
   },
 
   async update(id: string, data: Partial<NewMenuItem>): Promise<MenuItem> {

@@ -4,6 +4,7 @@
 
 ## Up Next
 
+- [ ] We are repeating restaurant's menu items
 - [ ] In scraper, write the failed restaurants to a log file so that they can be added one by one or manually
 - [ ] There's a mismatch between web and api better-auth setup
 - [ ] After log-in the user should go to /onboarding if their profile is not set yet
