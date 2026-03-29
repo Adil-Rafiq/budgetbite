@@ -1,4 +1,4 @@
-export * from './auth.js';
+export { user, session, account, verification } from './auth.js';
 export * from './user-profile.js';
 export * from './restaurant.js';
 export * from './menu-item.js';
