@@ -21,6 +21,7 @@
 - [ ] Meal suggestions
 - [ ] Analytics page
 - [ ] Push notifications
+- [ ] Calories statistics / Diet Planning 
 
 ## Done
 
