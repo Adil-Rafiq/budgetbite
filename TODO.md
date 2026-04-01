@@ -4,6 +4,8 @@
 
 ## Up Next
 
+- [ ] Convert queries that use complex joins to use `relations` instead
+- [ ] Remove any `try-catch` from the AI related code. Use `AppError` instead
 - [ ] In scraper, write the failed restaurants to a log file so that they can be added one by one or manually
 - [ ] There's a mismatch between web and api better-auth setup
 - [ ] After log-in the user should go to /onboarding if their profile is not set yet
