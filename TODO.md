@@ -4,6 +4,7 @@
 
 ## Up Next
 
+- [ ] IMPORTANT: Generate meal plan for a window of days instead of the whole plan
 - [ ] Convert queries that use complex joins to use `relations` instead
 - [ ] Remove any `try-catch` from the AI related code. Use `AppError` instead
 - [ ] In scraper, write the failed restaurants to a log file so that they can be added one by one or manually
@@ -23,7 +24,7 @@
 - [ ] Meal suggestions
 - [ ] Analytics page
 - [ ] Push notifications
-- [ ] Calories statistics / Diet Planning 
+- [ ] Calories statistics / Diet Planning
 
 ## Done
 
