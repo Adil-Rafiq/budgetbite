@@ -4,6 +4,11 @@ import { pgTable, uuid, check, decimal, integer, text, date, jsonb } from 'drizz
 import { timestamps } from './common/timestamps.js';
 import { user } from './auth.js';
 
+/**
+ * This table represents a user's budget plan for meals. It includes details about the type of plan (weekly or monthly),
+ * the total budget allocated, the date range for the plan, the number of meals per day, and notification times.
+ * The status column indicates whether the plan is active, completed, or cancelled.
+ */
 export const budgetPlan = pgTable(
   'budget_plan',
   {
