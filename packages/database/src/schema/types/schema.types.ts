@@ -8,6 +8,8 @@ import { mealType } from '../meal-type.js';
 import { menuItem } from '../menu-item.js';
 import { mealChoice } from '../order.js';
 import { restaurant } from '../restaurant.js';
+import { planContext } from '../plan-context.js';
+import { userPreferences } from '../user-preferences.js';
 
 // Auth types
 export type User = typeof user.$inferSelect;
@@ -67,3 +69,13 @@ export type UpdateMealChoice = Partial<Omit<NewMealChoice, 'id'>>;
 export type Restaurant = typeof restaurant.$inferSelect;
 export type NewRestaurant = typeof restaurant.$inferInsert;
 export type UpdateRestaurant = Partial<Omit<NewRestaurant, 'id'>>;
+
+// Plan context types
+export type PlanContext = typeof planContext.$inferSelect;
+export type NewPlanContext = typeof planContext.$inferInsert;
+export type UpdatePlanContext = Partial<Omit<NewPlanContext, 'budgetPlanId'>>;
+
+// User preferences types
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type NewUserPreferences = typeof userPreferences.$inferInsert;
+export type UpdateUserPreferences = Partial<Omit<NewUserPreferences, 'userId'>>;

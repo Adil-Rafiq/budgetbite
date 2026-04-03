@@ -36,6 +36,11 @@ export const restaurantRepository = {
     return row;
   },
 
+  async findByName(name: string): Promise<Restaurant | undefined> {
+    const [row] = await db.select().from(restaurant).where(eq(restaurant.name, name)).limit(1);
+    return row;
+  },
+
   async list(
     filters: ListRestaurantsFilters = {},
   ): Promise<{ restaurant: Restaurant; distanceKm?: number }[]> {

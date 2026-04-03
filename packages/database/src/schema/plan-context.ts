@@ -11,7 +11,7 @@ export const planContext = pgTable('plan_context', {
     .primaryKey()
     .references(() => budgetPlan.id, { onDelete: 'cascade' }),
 
-  /** Total budget as set in the plan (mirrors budgetPlan.totalBudget for denormalised reads) */
+  /** Total budget as set in the plan (mirrors budgetPlan.totalBudget for denormaliz ed reads) */
   totalBudget: decimal('total_budget', { precision: 12, scale: 2 }).notNull(),
 
   /** Sum of all actualAmountSpent across all mealChoices for this plan */
@@ -49,6 +49,3 @@ export const planContext = pgTable('plan_context', {
 
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
-
-export type PlanContext = typeof planContext.$inferSelect;
-export type InsertPlanContext = typeof planContext.$inferInsert;

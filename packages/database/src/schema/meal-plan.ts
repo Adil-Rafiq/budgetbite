@@ -17,8 +17,8 @@ import { menuItem } from './menu-item.js';
 import { restaurant } from './restaurant.js';
 
 /**
- * Tracks a single meal plan generation for a budget plan.
- * Enables multiple independent suggestion sets without modifying the original budget plan.
+ * Represents a single generation of meal suggestions for a specific budget plan.
+ * Allows multiple independent generations to coexist without altering the original plan.
  */
 export const mealPlanGeneration = pgTable('meal_plan_generation', {
   id: uuid('id').primaryKey().defaultRandom(),

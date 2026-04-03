@@ -1,7 +1,9 @@
 import { relations } from 'drizzle-orm';
 import { user, session, account } from './auth.js';
 import { userProfile } from './user-profile.js';
+import { userPreferences } from './user-preferences.js';
 import { budgetPlan } from './budget-plan.js';
+import { planContext } from './plan-context.js';
 import { mealType } from './meal-type.js';
 import { restaurant } from './restaurant.js';
 import { menuItem } from './menu-item.js';
@@ -149,5 +151,21 @@ export const budgetPlanMealTypeRelations = relations(budgetPlanMealType, ({ one 
   mealType: one(mealType, {
     fields: [budgetPlanMealType.mealTypeId],
     references: [mealType.id],
+  }),
+}));
+
+// Plan Context Relations
+export const planContextRelations = relations(planContext, ({ one }) => ({
+  budgetPlan: one(budgetPlan, {
+    fields: [planContext.budgetPlanId],
+    references: [budgetPlan.id],
+  }),
+}));
+
+// User Preferences Relations
+export const userPreferencesRelations = relations(userPreferences, ({ one }) => ({
+  user: one(user, {
+    fields: [userPreferences.userId],
+    references: [user.id],
   }),
 }));

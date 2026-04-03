@@ -9,4 +9,6 @@ export * from './meal-plan.js';
 export * from './order.js';
 export * from './feedback.js';
 export * from './relations.js';
+export * from './plan-context.js';
+export * from './user-preferences.js';
 export * from './types/schema.types.js';

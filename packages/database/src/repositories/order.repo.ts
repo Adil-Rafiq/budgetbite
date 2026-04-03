@@ -55,4 +55,78 @@ export const orderRepository = {
     if (!inserted) throw new Error('MealChoice insert failed');
     return inserted;
   },
+
+  // ─── AI methods ────────────────────────────────────────────────────────────
+
+  /**
+   * Count how many meal choices have been confirmed for a plan.
+   * Used by BudgetService to recompute mealsConsumed accurately from DB.
+   */
+  async getConsumedCount(budgetPlanId: string): Promise<number> {
+    const [row] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(mealChoice)
+      .where(eq(mealChoice.budgetPlanId, budgetPlanId));
+    return row?.count ?? 0;
+  },
+
+  /**
+   * Get the set of slotDates that already have a confirmed choice,
+   * from today onwards. Used by ContextBuilderService to compute remainingDates.
+   */
+  async getConfirmedDatesFromToday(budgetPlanId: string): Promise<Set<string>> {
+    const today = new Date().toISOString().split('T')[0]!;
+    const rows = await db
+      .selectDistinct({ slotDate: mealChoice.slotDate })
+      .from(mealChoice)
+      .where(and(eq(mealChoice.budgetPlanId, budgetPlanId), gte(mealChoice.slotDate, today)));
+    return new Set(rows.map((r) => r.slotDate));
+  },
+
+  /**
+   * Get a single choice with its mealType label.
+   * Used by MealPlannerService to build the trigger summary for replanning.
+   */
+  async findByIdWithMealType(
+    id: string,
+  ): Promise<(MealChoice & { mealTypeLabel: string }) | undefined> {
+    const row = await db.query.mealChoice.findFirst({
+      where: (mc, { eq }) => eq(mc.id, id),
+      columns: {
+        id: true,
+        userId: true,
+        budgetPlanId: true,
+        slotDate: true,
+        mealTypeId: true,
+        suggestionId: true,
+        manualDescription: true,
+        actualAmountSpent: true,
+        restaurantName: true,
+        createdAt: true,
+      },
+      with: {
+        mealType: {
+          columns: {
+            label: true,
+          },
+        },
+      },
+    });
+
+    if (!row) return undefined;
+
+    return {
+      id: row.id,
+      userId: row.userId,
+      budgetPlanId: row.budgetPlanId,
+      slotDate: row.slotDate,
+      mealTypeId: row.mealTypeId,
+      suggestionId: row.suggestionId,
+      manualDescription: row.manualDescription,
+      actualAmountSpent: row.actualAmountSpent,
+      restaurantName: row.restaurantName,
+      createdAt: row.createdAt,
+      mealTypeLabel: row.mealType.label,
+    };
+  },
 };
