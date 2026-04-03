@@ -119,7 +119,6 @@ export interface ReplanInput {
 }
 
 export interface ProcessFeedbackInput {
-  userId: string;
   mealChoiceId: string;
   rating: number | null;
   liked: boolean | null;

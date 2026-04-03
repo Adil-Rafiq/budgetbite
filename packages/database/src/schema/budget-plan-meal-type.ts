@@ -3,6 +3,11 @@ import { pgTable, uuid, integer, uniqueIndex } from 'drizzle-orm/pg-core';
 import { budgetPlan } from './budget-plan.js';
 import { mealType } from './meal-type.js';
 
+/**
+ * This table represents the many-to-many relationship between budget plans and meal types.
+ * It allows us to associate multiple meal types with a single budget plan, and vice versa.
+ * The `position` column is used to maintain the order of meal types within a budget plan.
+ */
 export const budgetPlanMealType = pgTable(
   'budget_plan_meal_type',
   {
