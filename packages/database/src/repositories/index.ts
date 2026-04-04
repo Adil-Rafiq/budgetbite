@@ -7,3 +7,5 @@ export { mealPlanRepository } from './meal-plan.repo.js';
 export { orderRepository } from './order.repo.js';
 export { feedbackRepository } from './feedback.repo.js';
 export { mealTypeRepository } from './meal-type.repo.js';
+export { planContextRepository } from './plan-context.repo.js';
+export { userPreferencesRepository } from './user-preferences.repo.js';

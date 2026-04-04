@@ -38,7 +38,10 @@ export const userPreferences = pgTable('user_preferences', {
   /**
    * Rolling summary of the last N feedback entries for LLM context.
    * Stored as pre-formatted text to avoid re-querying feedback table on every LLM call.
-   * Max ~2000 chars. Older entries get summarised and dropped.
+   * Max ~2000 chars. Older entries get summarized and dropped.
+   * Updated whenever the user submits feedback.
+   * This is NOT the source of truth — raw feedback lives in the feedback table.
+   * This is an LLM-optimized compressed memory.
    */
   feedbackSummary: text('feedback_summary'),
 
@@ -53,6 +56,3 @@ export const userPreferences = pgTable('user_preferences', {
 
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
-
-export type UserPreferences = typeof userPreferences.$inferSelect;
-export type InsertUserPreferences = typeof userPreferences.$inferInsert;

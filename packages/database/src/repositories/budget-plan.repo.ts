@@ -4,6 +4,7 @@ import { db } from '../db.js';
 import {
   budgetPlan,
   budgetPlanMealType,
+  mealType,
   type BudgetPlan,
   type NewBudgetPlan,
   type NewBudgetPlanMealType,
@@ -65,5 +66,27 @@ export const budgetPlanRepository = {
       .where(eq(budgetPlanMealType.budgetPlanId, budgetPlanId))
       .orderBy(budgetPlanMealType.position);
     return rows.map((r) => r.mealTypeId);
+  },
+
+  // ─── AI method ─────────────────────────────────────────────────────────────
+
+  /**
+   * Get meal types for a plan with full details (key, label, sortOrder).
+   * Used by ContextBuilderService to populate PlanMetaContext.mealTypes.
+   */
+  async getMealTypesWithDetails(
+    budgetPlanId: string,
+  ): Promise<{ key: string; label: string; sortOrder: number }[]> {
+    const rows = await db
+      .select({
+        key: mealType.key,
+        label: mealType.label,
+        sortOrder: mealType.sortOrder,
+      })
+      .from(budgetPlanMealType)
+      .innerJoin(mealType, eq(budgetPlanMealType.mealTypeId, mealType.id))
+      .where(eq(budgetPlanMealType.budgetPlanId, budgetPlanId))
+      .orderBy(budgetPlanMealType.position);
+    return rows;
   },
 };

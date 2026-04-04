@@ -3,6 +3,9 @@ import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg
 import { mealChoice } from './order.js';
 import { user } from './auth.js';
 
+/**
+ * Stores user feedback for a meal choice after it has been selected.
+ */
 export const feedback = pgTable('feedback', {
   id: uuid('id').primaryKey().defaultRandom(),
   mealChoiceId: uuid('meal_choice_id')
