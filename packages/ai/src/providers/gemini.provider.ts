@@ -1,0 +1,50 @@
+import { GoogleGenAI } from '@google/genai';
+import type { LLMMessage, LLMRequestOptions, LLMResponse } from '@repo/shared';
+import { BaseLLMProvider } from './base.provider.js';
+
+export class GeminiProvider extends BaseLLMProvider {
+  readonly name = 'google';
+  readonly defaultModel = process.env.AI_MODEL_NAME ?? 'gemini-2.0-flash';
+
+  private client: GoogleGenAI;
+
+  constructor(apiKey?: string) {
+    super();
+    this.client = new GoogleGenAI({
+      apiKey: apiKey ?? process.env.AI_API_KEY,
+    });
+  }
+
+  async complete(messages: LLMMessage[], options: LLMRequestOptions = {}): Promise<LLMResponse> {
+    const history = messages.slice(0, -1).map((m) => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }],
+    }));
+
+    const lastMessage = messages[messages.length - 1];
+    if (!lastMessage) throw new Error('No messages provided');
+
+    const chat = this.client.chats.create({
+      model: options.model ?? this.defaultModel,
+      history,
+      config: {
+        temperature: options.temperature ?? 0.3,
+        maxOutputTokens: options.maxTokens ?? 16000,
+        ...(options.systemPrompt ? { systemInstruction: options.systemPrompt } : {}),
+        thinkingConfig: {
+          thinkingBudget: 0,
+        },
+      },
+    });
+
+    const result = await chat.sendMessage({ message: lastMessage.content });
+
+    return {
+      text: result.text ?? '',
+      inputTokens: result.usageMetadata?.promptTokenCount,
+      outputTokens: result.usageMetadata?.candidatesTokenCount,
+      model: options.model ?? this.defaultModel,
+      provider: this.name,
+    };
+  }
+}
