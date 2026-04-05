@@ -7,6 +7,7 @@ import {
   mealType,
   type BudgetPlan,
   type NewBudgetPlan,
+  type UpdateBudgetPlan,
   type NewBudgetPlanMealType,
 } from '../schema/index.js';
 
@@ -49,7 +50,7 @@ export const budgetPlanRepository = {
     return inserted;
   },
 
-  async update(id: string, data: Partial<NewBudgetPlan>): Promise<BudgetPlan> {
+  async update(id: string, data: UpdateBudgetPlan): Promise<BudgetPlan> {
     const [updated] = await db
       .update(budgetPlan)
       .set(data)
