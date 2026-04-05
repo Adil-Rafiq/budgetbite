@@ -33,7 +33,9 @@ export type UpdateBudgetPlanMealType = Partial<Omit<NewBudgetPlanMealType, 'id'>
 // Budget plan types
 export type BudgetPlan = typeof budgetPlan.$inferSelect;
 export type NewBudgetPlan = typeof budgetPlan.$inferInsert;
-export type UpdateBudgetPlan = Partial<Omit<NewBudgetPlan, 'id'>>;
+export type UpdateBudgetPlan = Partial<
+  Omit<NewBudgetPlan, 'id' | 'createdAt' | 'updatedAt' | 'userId'>
+>;
 
 // Feedback types
 export type Feedback = typeof feedback.$inferSelect;
