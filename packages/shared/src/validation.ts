@@ -60,15 +60,39 @@ export const listRestaurantsSchema = paginationSchema.extend({
   minRating: z.coerce.number().min(0).max(5).optional(),
 });
 
-export const createBudgetPlanSchema = z.object({
+export const budgetPlanSchema = z.object({
+  id: z.uuid(),
+  userId: z.uuid(),
   planType: z.enum(['weekly', 'monthly']),
   totalBudget: z.coerce.number().positive(),
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   mealsPerDay: z.coerce.number().int().min(1).max(5),
-  mealTypeIds: z.array(uuidSchema).min(1).optional(),
+  mealTypeIds: z.array(uuidSchema).min(1),
   notificationTimes: z.array(z.string().regex(/^\d{2}:\d{2}$/)).optional(),
+  status: z.enum(['active', 'completed', 'cancelled']),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
+
+export const createBudgetPlanSchema = z
+  .object({
+    planType: z.enum(['weekly', 'monthly']),
+    totalBudget: z.coerce.number().positive(),
+    startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    mealsPerDay: z.coerce.number().int().min(1).max(5),
+    mealTypeIds: z.array(uuidSchema).min(1),
+    notificationTimes: z.array(z.string().regex(/^\d{2}:\d{2}$/)).optional(),
+  })
+  .refine((data) => data.mealTypeIds.length === data.mealsPerDay, {
+    message: 'mealTypeIds length must match mealsPerDay',
+    path: ['mealTypeIds'],
+  })
+  .refine((data) => data.startDate < data.endDate, {
+    message: 'endDate must be after startDate',
+    path: ['endDate'],
+  });
 
 export const updateBudgetPlanSchema = z.object({
   totalBudget: z.coerce.number().positive().optional(),
@@ -151,6 +175,7 @@ export type UserProfile = z.infer<typeof userProfileSchema>;
 export type UpdateUserProfileInput = z.infer<typeof updateUserProfileSchema>;
 export type UserWithProfile = z.infer<typeof userWithProfileSchema>;
 export type ListRestaurantsQuery = z.infer<typeof listRestaurantsSchema>;
+export type BudgetPlan = z.infer<typeof budgetPlanSchema>;
 export type CreateBudgetPlanInput = z.infer<typeof createBudgetPlanSchema>;
 export type UpdateBudgetPlanInput = z.infer<typeof updateBudgetPlanSchema>;
 export type RecordMealChoiceInput = z.infer<typeof recordMealChoiceSchema>;
