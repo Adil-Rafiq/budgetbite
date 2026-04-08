@@ -23,7 +23,7 @@
 - [ ] Integrate [Three Js](#threejs.org) and [GSAP](#gsap.com). [GSAP](#gsap.com) has a cool [design](#planetono.space)
 - [ ] Meal suggestions
 - [ ] Analytics page
-- [ ] Push notifications
+- [ ] Push notifications - can leverage pubsub model using pg triggers. See [video](#https://www.youtube.com/watch?v=4-Z_I4SwgJQ)
 - [ ] Calories statistics / Diet Planning
 
 ## Done
