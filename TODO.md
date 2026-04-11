@@ -4,6 +4,7 @@
 
 ## Up Next
 
+- [ ] Add `xstate` in onboarding steps in web
 - [ ] Add logic checks in services
 - [ ] Convert queries that use complex joins to use `relations` instead
 - [ ] Remove any `try-catch` from the AI related code. Use `AppError` instead
