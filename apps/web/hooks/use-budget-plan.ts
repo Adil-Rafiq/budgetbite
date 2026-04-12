@@ -24,10 +24,14 @@ export const useActiveBudgetPlan = () =>
   });
 
 // create a new budget plan
+export type CreateBudgetPlanInput = Omit<
+  Parameters<typeof budgetPlanApi.create>[0],
+  'id' | 'createdAt' | 'updatedAt'
+>;
 export const useCreateBudgetPlan = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: Parameters<typeof budgetPlanApi.create>[0]) => budgetPlanApi.create(input),
+    mutationFn: (input: CreateBudgetPlanInput) => budgetPlanApi.create(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgetPlans'] });
       queryClient.invalidateQueries({ queryKey: ['activeBudgetPlan'] });
