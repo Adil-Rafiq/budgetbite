@@ -4,6 +4,7 @@
 
 ## Up Next
 
+- [ ] Add `xstate` in onboarding steps in web
 - [ ] Add logic checks in services
 - [ ] Convert queries that use complex joins to use `relations` instead
 - [ ] Remove any `try-catch` from the AI related code. Use `AppError` instead
@@ -23,7 +24,7 @@
 - [ ] Integrate [Three Js](#threejs.org) and [GSAP](#gsap.com). [GSAP](#gsap.com) has a cool [design](#planetono.space)
 - [ ] Meal suggestions
 - [ ] Analytics page
-- [ ] Push notifications
+- [ ] Push notifications - can leverage pubsub model using pg triggers. See [video](#https://www.youtube.com/watch?v=4-Z_I4SwgJQ)
 - [ ] Calories statistics / Diet Planning
 
 ## Done
