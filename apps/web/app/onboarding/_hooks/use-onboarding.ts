@@ -7,7 +7,6 @@ import { useCreateBudgetPlan } from '@/hooks/use-budget-plan';
 import { useListActiveMealTypes } from '@/hooks/use-meal-type';
 import { showToast } from '@/lib/toast';
 import { ONBOARDING_STEPS } from '@/app/onboarding/constants';
-import { useSaveNotificationPreferences } from '@/app/onboarding/_hooks/use-save-notification-preferences';
 import { onboardingMachine } from '@/app/onboarding/_machines/onboarding.machine';
 import { useLocationStep } from '@/app/onboarding/_hooks/use-location-step';
 import { useBudgetStep } from '@/app/onboarding/_hooks/use-budget-step';
@@ -44,7 +43,6 @@ export const useOnboarding = () => {
   const { data: session } = useUser();
   const { mutateAsync: updateProfile } = useUpdateProfile();
   const { mutateAsync: createBudgetPlan } = useCreateBudgetPlan();
-  const { mutateAsync: saveNotificationPreferences } = useSaveNotificationPreferences();
   const { data: activeMealTypes = [] } = useListActiveMealTypes();
 
   // ─── Step hooks ─────────────────────────────────────────────────────────
@@ -109,8 +107,6 @@ export const useOnboarding = () => {
             ...getPlanDateRange(budget.planType),
             notificationTimes: notificationSlots.map((slot) => slot.time),
           });
-
-          await saveNotificationPreferences({ notificationSlots });
 
           send({ type: 'FINISH_SUBMIT_SUCCESS' });
           showToast.success({ title: 'Setup complete!', description: 'Welcome to BudgetBite.' });
