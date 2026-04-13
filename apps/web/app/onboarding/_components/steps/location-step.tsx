@@ -1,68 +1,32 @@
 'use client';
 
-import { UseFormReturn } from 'react-hook-form';
 import { Loader2, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { UpdateUserProfileInput } from '@repo/shared';
-import { showToast } from '@/lib/toast';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-context';
 
-interface LocationStepProps {
-  form: UseFormReturn<UpdateUserProfileInput>;
-}
-
-export const LocationStep = ({ form }: LocationStepProps) => {
-  const {
-    register,
-    formState: { errors },
-  } = form;
-
-  const [loadingLocation, setLoadingLocation] = useState(false);
-
-  const handleDetectLocation = () => {
-    if (!navigator.geolocation) {
-      showToast.error({ title: 'Geolocation not supported' });
-      return;
-    }
-
-    setLoadingLocation(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        form.setValue('latitude', Number(latitude.toFixed(4)));
-        form.setValue('longitude', Number(longitude.toFixed(4)));
-        setLoadingLocation(false);
-        showToast.success({ title: 'Location detected!' });
-      },
-      (err) => {
-        setLoadingLocation(false);
-        showToast.error({
-          title: 'Failed to get location',
-          description: err.message || 'Please check your browser permissions or try manually',
-        });
-      },
-      { enableHighAccuracy: true, timeout: 10000 },
-    );
-  };
+export const LocationStep = () => {
+  const { steps } = useOnboardingContext();
+  const { values, actions, errors, state } = steps.location;
 
   return (
     <div className="flex flex-col gap-4">
       <Button
-        onClick={handleDetectLocation}
+        type="button"
+        onClick={actions.detectLocation}
         variant="secondary"
-        disabled={loadingLocation}
+        disabled={state.isDetectingLocation}
         className="flex items-center gap-2"
       >
-        {loadingLocation ? (
+        {state.isDetectingLocation ? (
           <Loader2 className="w-4 h-4 animate-spin" />
         ) : (
           <MapPin className="w-4 h-4" />
         )}
-        {loadingLocation ? 'Detecting...' : 'Use My Current Location'}
+        {state.isDetectingLocation ? 'Detecting...' : 'Use My Current Location'}
       </Button>
-      
+
       <div className="flex flex-col gap-2">
         <Label htmlFor="latitude">Latitude</Label>
         <Input
@@ -70,10 +34,11 @@ export const LocationStep = ({ form }: LocationStepProps) => {
           type="number"
           step="0.0001"
           placeholder="24.8607"
-          disabled={loadingLocation}
-          {...register('latitude', { valueAsNumber: true })}
+          disabled={state.isDetectingLocation}
+          value={values.latitude ?? ''}
+          onChange={(event) => actions.setLatitude(Number(event.target.value))}
         />
-        {errors.latitude && <p className="text-destructive text-xs">{errors.latitude.message}</p>}
+        {errors.latitude ? <p className="text-destructive text-xs">{errors.latitude}</p> : null}
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="longitude">Longitude</Label>
@@ -82,10 +47,11 @@ export const LocationStep = ({ form }: LocationStepProps) => {
           type="number"
           step="0.0001"
           placeholder="67.0011"
-          disabled={loadingLocation}
-          {...register('longitude', { valueAsNumber: true })}
+          disabled={state.isDetectingLocation}
+          value={values.longitude ?? ''}
+          onChange={(event) => actions.setLongitude(Number(event.target.value))}
         />
-        {errors.longitude && <p className="text-destructive text-xs">{errors.longitude.message}</p>}
+        {errors.longitude ? <p className="text-destructive text-xs">{errors.longitude}</p> : null}
       </div>
       <div className="rounded-lg bg-secondary p-4 text-sm text-muted-foreground">
         <MapPin className="w-4 h-4 inline mr-1" />
