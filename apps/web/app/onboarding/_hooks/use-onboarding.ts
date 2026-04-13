@@ -25,11 +25,16 @@ const getPlanDateRange = (planType: BudgetPlanPreferencesInput['planType']) => {
     endDate.setMonth(endDate.getMonth() + 1);
   }
 
-  const toDateString = (d: Date) => d.toISOString().split('T')[0] ?? d.toISOString();
+  const toLocalDateString = (d: Date): string => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   return {
-    startDate: toDateString(startDate),
-    endDate: toDateString(endDate),
+    startDate: toLocalDateString(startDate),
+    endDate: toLocalDateString(endDate),
   };
 };
 
