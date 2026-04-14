@@ -1,11 +1,20 @@
 import { z } from 'zod';
 
+/**
+ * This file defines all the Zod schemas for validating inputs and outputs across the application.
+ * API input schemas + API response schemas + shared types
+ */
+
+// ─── Common reusable schemas ──────────────────────────────────────────────────────────
+
 export const uuidSchema = z.uuid();
 
 export const paginationSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
   offset: z.coerce.number().int().min(0).default(0),
 });
+
+// ──────────────────────────────────────────────────────────────────────────────────────
 
 export const registerSchema = z.object({
   email: z.email(),
@@ -155,6 +164,17 @@ export const adminGetRestaurantByExternalIdSchema = z.object({
   externalId: z.string().min(1).max(200),
 });
 
+// meal types
+export const mealTypeSchema = z.object({
+  id: uuidSchema,
+  key: z.string().min(1).max(50),
+  label: z.string().min(1).max(200),
+  sortOrder: z.coerce.number().int().min(0),
+  active: z.boolean(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
 // Admin: meal types
 export const createMealTypeSchema = z.object({
   key: z
@@ -186,5 +206,6 @@ export type CreateRestaurantInput = z.infer<typeof createRestaurantSchema>;
 export type UpdateRestaurantInput = z.infer<typeof updateRestaurantSchema>;
 export type CreateMenuItemInput = z.infer<typeof createMenuItemSchema>;
 export type UpdateMenuItemInput = z.infer<typeof updateMenuItemSchema>;
+export type MealType = z.infer<typeof mealTypeSchema>;
 export type CreateMealTypeInput = z.infer<typeof createMealTypeSchema>;
 export type UpdateMealTypeInput = z.infer<typeof updateMealTypeSchema>;
