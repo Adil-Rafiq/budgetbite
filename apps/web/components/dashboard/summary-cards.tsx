@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Wallet, TrendingDown, PiggyBank, CalendarDays, AlertCircle } from 'lucide-react';
-import { useActiveBudgetPlan, useBudgetPlanContext } from '@/hooks/use-budget-plan';
+import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -77,17 +77,14 @@ export function SummaryCards() {
   const { data: planData, isLoading: isPlanLoading, error: planError } = useActiveBudgetPlan();
   const { plan: activePlan, budgetState: ctx } = planData ?? {};
 
-  if (planError) {
+  if (isPlanLoading) return <SummaryCardsSkeleton />;
+
+  if (planError)
     return <SummaryCardsError message={`Failed to load budget plan: ${planError.message}`} />;
-  }
 
-  if (isPlanLoading) {
-    return <SummaryCardsSkeleton />;
-  }
+  if (!activePlan) return <NoPlanMessage />; // data === null, no error
 
-  if (!activePlan) return <NoPlanMessage />;
-
-  if (!ctx) return <SummaryCardsSkeleton />;
+  if (!ctx) return <SummaryCardsSkeleton />; // shouldn't happen, safety net
 
   const daysLeft = getDaysLeft(activePlan.endDate);
   const health = getSpendingHealth(ctx.amountSpent, ctx.totalBudget);
