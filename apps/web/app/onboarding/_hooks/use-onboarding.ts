@@ -12,6 +12,7 @@ import { useLocationStep } from '@/app/onboarding/_hooks/use-location-step';
 import { useBudgetStep } from '@/app/onboarding/_hooks/use-budget-step';
 import { useNotificationStep } from '@/app/onboarding/_hooks/use-notification-step';
 import type { BudgetPlanPreferencesInput } from '@/app/onboarding/types';
+import { getErrorMessage } from '@/lib/api/errors';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -84,7 +85,7 @@ export const useOnboarding = () => {
       send({ type: 'LOCATION_SUBMIT_FAILURE' });
       showToast.error({
         title: 'Failed to save location',
-        description: err instanceof Error ? err.message : 'Something went wrong',
+        description: getErrorMessage(err, 'Something went wrong'),
       });
     }
   });
@@ -120,7 +121,7 @@ export const useOnboarding = () => {
           send({ type: 'FINISH_SUBMIT_FAILURE' });
           showToast.error({
             title: 'Failed to finish onboarding',
-            description: err instanceof Error ? err.message : 'Please try again.',
+            description: getErrorMessage(err, 'Something went wrong. Please try again.'),
           });
         }
       })();
