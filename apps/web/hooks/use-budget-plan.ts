@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { budgetPlanApi } from '@/lib/api/budget-plan.api';
+import { budgetPlanApi } from '@/lib/api/endpoints/budget-plan';
 import { orNull } from '@/lib/api/utils';
 
 // list of all budget plans
