@@ -1,4 +1,4 @@
-import { userApi } from '@/lib/api/user.api';
+import { userApi } from '@/lib/api/endpoints/user';
 import { UpdateUserProfileInput } from '@repo/shared';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 

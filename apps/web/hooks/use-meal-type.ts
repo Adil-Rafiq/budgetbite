@@ -1,4 +1,4 @@
-import { mealTypeApi } from '@/lib/api/meal-type.api';
+import { mealTypeApi } from '@/lib/api/endpoints/meal-type';
 import { useQuery } from '@tanstack/react-query';
 
 export const useListActiveMealTypes = () => {
