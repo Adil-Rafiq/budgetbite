@@ -1,11 +1,10 @@
 import type { Response } from 'express';
-import { feedbackSchema } from '@repo/shared';
+import type { FeedbackInput } from '@repo/shared';
+
 import { feedbackService } from '../services/feedback.service.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
 
 export async function submitFeedback(req: AuthRequest, res: Response): Promise<void> {
-  const userId = req.userId!;
-  const body = feedbackSchema.parse(req.body);
-  const result = await feedbackService.submit(userId, body);
+  const result = await feedbackService.submit(req.userId!, req.body as FeedbackInput);
   res.status(201).json(result);
 }
