@@ -115,7 +115,11 @@ export default function RegisterPage() {
             <CardDescription>Fill in your details to get started</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              autoComplete="on"
+              className="flex flex-col gap-4"
+            >
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="firstName">First name</Label>
@@ -139,6 +143,7 @@ export default function RegisterPage() {
                   id="email"
                   type="email"
                   placeholder="ahmed@example.com"
+                  autoComplete="email"
                   {...register('email')}
                 />
                 {errors.email && <p className="text-destructive text-xs">{errors.email.message}</p>}
@@ -152,6 +157,7 @@ export default function RegisterPage() {
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Create a strong password"
+                    autoComplete="new-password"
                     className="pr-10"
                     {...register('password')}
                   />

@@ -118,13 +118,18 @@ export default function LoginPage() {
             <CardDescription>Enter your credentials to continue</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              autoComplete="on"
+              className="flex flex-col gap-4"
+            >
               <div className="flex flex-col gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="ahmed@example.com"
+                  autoComplete="email"
                   {...register('email')}
                 />
                 {errors.email && <p className="text-destructive text-xs">{errors.email.message}</p>}
@@ -146,6 +151,7 @@ export default function LoginPage() {
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Enter your password"
+                    autoComplete="current-password"
                     className="pr-10"
                     {...register('password')}
                   />
