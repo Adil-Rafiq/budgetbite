@@ -1,15 +1,25 @@
 import { Router } from 'express';
+import { updateUserProfileSchema } from '@repo/shared';
+
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { asyncHandler } from '../lib/async-handler.js';
 import * as userController from '../controllers/user.controller.js';
 
 const router: Router = Router();
 
 router.use(authMiddleware);
 
-// Returns current authenticated user combined with their user-profile
-router.get('/me', userController.getMe);
+// FRONTEND: /api/users/me and /api/users/me/profile are the same paths the
+// frontend already calls — do not rename without a paired FE change.
+/** Get the authenticated user merged with their user_profile. Returns UserWithProfile. */
+router.get('/me', asyncHandler(userController.getMe));
 
-// Creates or updates user's profile
-router.put('/me/profile', userController.updateProfile);
+/** Upsert the caller's user_profile (latitude / longitude). Returns UserProfile. */
+router.put(
+  '/me/profile',
+  validate({ body: updateUserProfileSchema }),
+  asyncHandler(userController.updateProfile),
+);
 
 export default router;
