@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 
 export class AppError extends Error {
@@ -6,27 +6,36 @@ export class AppError extends Error {
     public readonly statusCode: number,
     message: string,
     public readonly code?: string,
+    options?: ErrorOptions, // accepts { cause }
   ) {
-    super(message);
+    super(message, options);
     this.name = 'AppError';
   }
 }
 
-export function errorMiddleware(err: unknown, _req: Request, res: Response): void {
+export function errorMiddleware(
+  err: unknown,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+): void {
   if (err instanceof AppError) {
-    res.status(err.statusCode).json({ error: err.message, code: err.code ?? undefined });
+    if (err.statusCode >= 500) console.error('[AppError 5xx]', err);
+
+    res.status(err.statusCode).json({
+      error: err.message,
+      ...(err.code && { code: err.code }),
+    });
     return;
   }
+
   if (err instanceof ZodError) {
-    type Issue = ZodError['issues'][number];
-    const message = err.issues.map((e: Issue) => `${e.path.join('.')}: ${e.message}`).join('; ');
+    const message = err.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
     res.status(400).json({ error: message, code: 'VALIDATION_ERROR' });
     return;
   }
-  if (err instanceof Error) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
-    return;
-  }
+
+  // Log unexpected errors, but never leak internals to the client
+  console.error('[Unhandled error]', err);
   res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
 }
