@@ -1,4 +1,4 @@
-import type { AnalyticsQuery } from '@repo/shared';
+import type { AnalyticsQuery, PaginationMeta } from '@repo/shared';
 import { orderRepository, budgetPlanRepository } from '@repo/database';
 import { AppError } from '../middleware/error.middleware.js';
 
@@ -46,7 +46,7 @@ export const analyticsService = {
       endDate = plan.endDate;
     }
     const choices = await orderRepository.listByUserInDateRange(userId, startDate, endDate);
-    return choices.map((c) => ({
+    const data = choices.map((c) => ({
       id: c.id,
       slotDate: c.slotDate,
       mealTypeId: c.mealTypeId,
@@ -55,5 +55,7 @@ export const analyticsService = {
       manualDescription: c.manualDescription,
       createdAt: c.createdAt,
     }));
+    const meta: PaginationMeta = { total: data.length, limit: data.length, offset: 0 };
+    return { data, meta };
   },
 };

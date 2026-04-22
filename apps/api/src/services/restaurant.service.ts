@@ -5,13 +5,23 @@ import type {
   CreateMenuItemInput,
   UpdateMenuItemInput,
 } from '@repo/shared';
-import { restaurantRepository, menuRepository } from '@repo/database';
+import { restaurantRepository, menuRepository, userRepository } from '@repo/database';
 import { AppError } from '../middleware/error.middleware.js';
 
 export const restaurantService = {
-  async list(query: ListRestaurantsQuery, userLat?: number, userLng?: number) {
-    const lat = query.userLat ?? userLat;
-    const lng = query.userLng ?? userLng;
+  async list(query: ListRestaurantsQuery, userId?: string) {
+    let lat = query.userLat;
+    let lng = query.userLng;
+    // If the caller is logged in and didn't pass coords, pull them from the
+    // user's profile (single place that knows user coords — controllers stay
+    // out of data access).
+    if (userId && (lat == null || lng == null)) {
+      const profile = await userRepository.findProfileByUserId(userId);
+      if (profile?.latitude != null && profile?.longitude != null) {
+        lat = lat ?? Number(profile.latitude);
+        lng = lng ?? Number(profile.longitude);
+      }
+    }
     const results = await restaurantRepository.list({
       limit: query.limit,
       offset: query.offset,

@@ -1,32 +1,27 @@
 import type { Request, Response } from 'express';
-import { listRestaurantsSchema, uuidSchema } from '@repo/shared';
+import type { ListRestaurantsQuery } from '@repo/shared';
+
 import { restaurantService } from '../services/restaurant.service.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
-import { userRepository } from '@repo/database';
+
+type IdParams = { id: string };
 
 export async function listRestaurants(req: AuthRequest, res: Response): Promise<void> {
-  const query = listRestaurantsSchema.parse(req.query);
-  let userLat: number | undefined;
-  let userLng: number | undefined;
-  if (req.userId) {
-    const user = await userRepository.findById(req.userId);
-    if (user?.latitude != null && user?.longitude != null) {
-      userLat = Number(user.latitude);
-      userLng = Number(user.longitude);
-    }
-  }
-  const list = await restaurantService.list(query, userLat, userLng);
+  const list = await restaurantService.list(
+    req.query as unknown as ListRestaurantsQuery,
+    req.userId,
+  );
   res.json(list);
 }
 
 export async function getRestaurant(req: Request, res: Response): Promise<void> {
-  const id = uuidSchema.parse(req.params.id);
+  const { id } = req.params as IdParams;
   const restaurant = await restaurantService.getById(id);
   res.json(restaurant);
 }
 
 export async function getMenu(req: Request, res: Response): Promise<void> {
-  const restaurantId = uuidSchema.parse(req.params.id);
-  const menu = await restaurantService.getMenu(restaurantId);
+  const { id } = req.params as IdParams;
+  const menu = await restaurantService.getMenu(id);
   res.json(menu);
 }

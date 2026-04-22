@@ -5,11 +5,12 @@ import { toNodeHandler } from 'better-auth/node';
 
 import { auth } from './lib/auth.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
+
 import userRoutes from './routes/user.routes.js';
 import restaurantRoutes from './routes/restaurant.routes.js';
-import budgetRoutes from './routes/budget.routes.js';
-import mealRoutes from './routes/meal.routes.js';
-import orderRoutes from './routes/order.routes.js';
+import budgetPlanRoutes from './routes/budget-plan.routes.js';
+import mealPlanRoutes from './routes/meal-plan.routes.js';
+import mealTypeRoutes from './routes/meal-type.routes.js';
 import feedbackRoutes from './routes/feedback.routes.js';
 import analyticsRoutes from './routes/analytics.routes.js';
 import adminRoutes from './routes/admin.routes.js';
@@ -37,9 +38,9 @@ app.get('/health', (_req, res) => {
 
 app.use('/api/users', userRoutes);
 app.use('/api/restaurants', restaurantRoutes);
-app.use('/api/budget', budgetRoutes);
-app.use('/api/meals', mealRoutes);
-app.use('/api/orders', orderRoutes);
+app.use('/api/budget-plans', budgetPlanRoutes);
+app.use('/api/meal-plans', mealPlanRoutes);
+app.use('/api/meal-types', mealTypeRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/admin', adminRoutes);
