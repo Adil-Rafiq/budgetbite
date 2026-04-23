@@ -72,20 +72,21 @@ function PlansListEmpty() {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function PlansList() {
-  const { data: plans, isLoading, error } = useBudgetPlans({ limit: 10, offset: 0 });
+  const { data: plansWithMeta, isLoading, error } = useBudgetPlans({ limit: 10, offset: 0 });
 
   if (isLoading) return <PlansListSkeleton />;
 
   if (error) return <PlansListError message={`Failed to load budget plan: ${error.message}`} />;
 
-  if (!plans?.length) return <PlansListEmpty />;
+  if (!plansWithMeta || !plansWithMeta.data?.length) return <PlansListEmpty />;
+
+  // TODO: Implement pagination using the `meta`
+  const { data: plans, meta } = plansWithMeta;
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {plans.map((plan) => {
-        // `spent` doesn't exist on the type — derive it or default to 0
-        // Replace with real field once available e.g. plan.amountSpent
-        const spent = 0;
+        const spent = plan.spentAmount;
         const spentPercent = Math.round((spent / plan.totalBudget) * 100);
         const remaining = plan.totalBudget - spent;
 
@@ -140,19 +141,15 @@ export default function PlansList() {
                   </div>
                 ))}
               </div>
-              
-              {/* FIXME: fix the query to return meal types with each budget plan */}
+
               {/* Meal type badges */}
-              {/* <div className="flex flex-wrap gap-1.5">
-                {plan.mealTypeIds.map((id) => (
-                  <Badge key={id} variant="outline" className="text-xs capitalize">
-                    {id}
+              <div className="flex flex-wrap gap-1.5">
+                {plan.mealTypes.map((mt) => (
+                  <Badge key={mt.id} variant="outline" className="text-xs capitalize">
+                    {mt.label}
                   </Badge>
                 ))}
-                <Badge variant="outline" className="text-xs">
-                  {plan.mealsPerDay} meals/day
-                </Badge>
-              </div> */}
+              </div>
             </CardContent>
           </Card>
         );
