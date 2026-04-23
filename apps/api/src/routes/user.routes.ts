@@ -10,8 +10,6 @@ const router: Router = Router();
 
 router.use(authMiddleware);
 
-// FRONTEND: /api/users/me and /api/users/me/profile are the same paths the
-// frontend already calls — do not rename without a paired FE change.
 /** Get the authenticated user merged with their user_profile. Returns UserWithProfile. */
 router.get('/me', asyncHandler(userController.getMe));
 
