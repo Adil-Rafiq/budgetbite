@@ -18,3 +18,11 @@ if (!connectionString) {
 const pool = new Pool({ connectionString });
 export const db = drizzle(pool, { schema });
 export type Database = typeof db;
+
+/**
+ * Transaction handle passed to `db.transaction(async (tx) => ...)`.
+ * Repos accept `tx?: DbOrTx` so services can stitch multiple writes
+ * into a single transaction.
+ */
+export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+export type DbOrTx = Database | Transaction;
