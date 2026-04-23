@@ -82,9 +82,9 @@ export function SummaryCards() {
   if (planError)
     return <SummaryCardsError message={`Failed to load budget plan: ${planError.message}`} />;
 
-  if (!activePlan) return <NoPlanMessage />; // data === null, no error
+  if (!activePlan) return <NoPlanMessage />;
 
-  if (!ctx) return <SummaryCardsSkeleton />; // shouldn't happen, safety net
+  if (!ctx) return <SummaryCardsSkeleton />;
 
   const daysLeft = getDaysLeft(activePlan.endDate);
   const health = getSpendingHealth(ctx.amountSpent, ctx.totalBudget);
