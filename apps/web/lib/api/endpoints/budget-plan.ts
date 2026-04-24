@@ -7,17 +7,14 @@ import type {
   ActiveBudgetPlanResponse,
   BudgetPlanDetail,
   BudgetStateContext,
-  PaginationMeta,
+  Paginated,
 } from '@repo/shared';
-
-export type BudgetPlansWithMeta = {
-  data: BudgetPlanResponse[];
-  meta: PaginationMeta;
-};
 
 export const budgetPlanApi = {
   list: (params: ListBudgetPlansQuery) =>
-    apiClient.get('api/budget-plans', { searchParams: params }).json<BudgetPlansWithMeta>(),
+    apiClient
+      .get('api/budget-plans', { searchParams: params })
+      .json<Paginated<BudgetPlanResponse>>(),
   getById: (id: string) => apiClient.get(`api/budget-plans/${id}`).json<BudgetPlanDetail>(),
   getActive: () => apiClient.get('api/budget-plans/active').json<ActiveBudgetPlanResponse>(),
   create: (input: CreateBudgetPlanInput): Promise<BudgetPlanResponse> =>

@@ -45,7 +45,7 @@ export const preferenceService = {
       }
 
       // 4. Get current preference profile
-      const currentPrefs = await userPreferencesRepository.findByUserId(input.userId);
+      const currentPrefs = await userPreferencesRepository.findByUserId(userId);
 
       // 5. Extract preference signals via LLM
       const response = await llm.complete(
@@ -81,7 +81,7 @@ export const preferenceService = {
       const mergeUnique = (a: string[], b: string[]): string[] => [...new Set([...a, ...b])];
 
       await userPreferencesRepository.upsert({
-        userId: input.userId,
+        userId,
         dislikedRestaurantIds,
         preferredCuisineTags: mergeUnique(
           currentPrefs?.preferredCuisineTags ?? [],

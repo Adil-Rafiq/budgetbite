@@ -1,4 +1,4 @@
-import type { MealChoiceResponse, PaginationMeta, RecordMealChoiceInput } from '@repo/shared';
+import type { MealChoiceResponse, Paginated, RecordMealChoiceInput } from '@repo/shared';
 import { toNumber } from '@repo/shared';
 import { budgetPlanRepository, db, orderRepository, planContextRepository } from '@repo/database';
 
@@ -89,7 +89,7 @@ export const mealChoiceService = {
     userId: string,
     budgetPlanId: string,
     opts: { limit: number; offset: number },
-  ): Promise<{ data: MealChoiceResponse[]; meta: PaginationMeta }> {
+  ): Promise<Paginated<MealChoiceResponse>> {
     await loadOwnedActive(userId, budgetPlanId);
     const [rows, total] = await Promise.all([
       orderRepository.listByUserAndPlanWithPagination(userId, budgetPlanId, opts),
