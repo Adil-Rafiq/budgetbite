@@ -4,9 +4,7 @@
 
 ## Up Next
 
-- [ ] Add `xstate` in onboarding steps in web
 - [ ] Add logic checks in services
-- [ ] Convert queries that use complex joins to use `relations` instead
 - [ ] Remove any `try-catch` from the AI related code. Use `AppError` instead
 - [ ] In scraper, write the failed restaurants to a log file so that they can be added one by one or manually
 - [ ] There's a mismatch between web and api better-auth setup
@@ -18,6 +16,7 @@
 - [ ] The users can add restaurants of their choice with the approval of admin
 - [ ] At a time only up to certain number of approval requests for restaurants will be allowed per user
 - [ ] Add rate limiting
+- [ ] Remove any unused component/code specially from web/components/ui
 
 ## Backlog
 
@@ -38,3 +37,5 @@
 - [x] Insert tables relations
 - [x] In scraper, add a sound effect when a captcha needs to be solved manually
 - [x] We are repeating restaurant's menu items
+- [x] Add `xstate` in onboarding steps in web
+- [x] Convert queries that use complex joins to use `relations` instead
