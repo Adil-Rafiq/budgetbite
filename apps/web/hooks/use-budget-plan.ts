@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { budgetPlanApi } from '@/lib/api/endpoints/budget-plan';
 import { orNull } from '@/lib/api/utils';
+import { CreateBudgetPlanInput } from '@repo/shared';
 
 // list of all budget plans
 export const useBudgetPlans = (params: Parameters<typeof budgetPlanApi.list>[0]) =>
@@ -25,10 +26,6 @@ export const useActiveBudgetPlan = () =>
   });
 
 // create a new budget plan
-export type CreateBudgetPlanInput = Omit<
-  Parameters<typeof budgetPlanApi.create>[0],
-  'id' | 'createdAt' | 'updatedAt'
->;
 export const useCreateBudgetPlan = () => {
   const queryClient = useQueryClient();
   return useMutation({
