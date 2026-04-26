@@ -2,6 +2,8 @@
  * Shared AI types used across the api and ai packages.
  */
 
+import type { BudgetStateContext } from '../schemas/budget-state.js';
+
 // ─── LLM Provider Abstraction ────────────────────────────────────────────────
 
 export type LLMMessage = { role: 'user'; content: string } | { role: 'assistant'; content: string };
@@ -52,16 +54,7 @@ export interface UserPreferencesContext {
   priceSensitivity: 'budget' | 'mid' | 'premium';
 }
 
-export interface BudgetStateContext {
-  totalBudget: number;
-  amountSpent: number;
-  amountRemaining: number;
-  totalMeals: number;
-  mealsConsumed: number;
-  mealsRemaining: number;
-  avgBudgetPerRemainingMeal: number;
-  cumulativeVariance: number;
-}
+export type { BudgetStateContext };
 
 export interface PlanMetaContext {
   budgetPlanId: string;
