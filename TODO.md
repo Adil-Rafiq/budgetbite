@@ -4,6 +4,7 @@
 
 ## Up Next
 
+- [ ] Fix budget generating suggestions for a generation
 - [ ] Add logic checks in services
 - [ ] Remove any `try-catch` from the AI related code. Use `AppError` instead
 - [ ] In scraper, write the failed restaurants to a log file so that they can be added one by one or manually
