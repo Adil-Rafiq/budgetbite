@@ -1,6 +1,6 @@
 import { eq, and, gte, lte, desc, sql } from 'drizzle-orm';
 
-import { db } from '../db.js';
+import { db, type DbOrTx } from '../db.js';
 import { mealChoice, type MealChoice, type NewMealChoice } from '../schema/index.js';
 
 export const orderRepository = {
@@ -50,10 +50,33 @@ export const orderRepository = {
     return row?.total ?? '0';
   },
 
-  async create(data: NewMealChoice): Promise<MealChoice> {
-    const [inserted] = await db.insert(mealChoice).values(data).returning();
+  async create(data: NewMealChoice, tx?: DbOrTx): Promise<MealChoice> {
+    const exec = tx ?? db;
+    const [inserted] = await exec.insert(mealChoice).values(data).returning();
     if (!inserted) throw new Error('MealChoice insert failed');
     return inserted;
+  },
+
+  async listByUserAndPlanWithPagination(
+    userId: string,
+    budgetPlanId: string,
+    opts: { limit: number; offset: number },
+  ): Promise<MealChoice[]> {
+    return db
+      .select()
+      .from(mealChoice)
+      .where(and(eq(mealChoice.userId, userId), eq(mealChoice.budgetPlanId, budgetPlanId)))
+      .orderBy(desc(mealChoice.slotDate), desc(mealChoice.createdAt))
+      .limit(opts.limit)
+      .offset(opts.offset);
+  },
+
+  async countByPlan(userId: string, budgetPlanId: string): Promise<number> {
+    const [row] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(mealChoice)
+      .where(and(eq(mealChoice.userId, userId), eq(mealChoice.budgetPlanId, budgetPlanId)));
+    return row?.count ?? 0;
   },
 
   // ─── AI methods ────────────────────────────────────────────────────────────
