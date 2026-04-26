@@ -19,6 +19,17 @@ export const config = [
     },
     rules: {
       'turbo/no-undeclared-env-vars': 'warn',
+      // Allow underscore-prefixed unused variables (a common TS convention for
+      // deliberately-unused callback / rest args, e.g. Express error middleware).
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+        },
+      ],
     },
   },
   {

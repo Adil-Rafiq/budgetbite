@@ -1,4 +1,4 @@
-import type { MealChoiceResponse, PaginationMeta, RecordMealChoiceInput } from '@repo/shared';
+import type { MealChoiceResponse, Paginated, RecordMealChoiceInput } from '@repo/shared';
 import { toNumber } from '@repo/shared';
 import { budgetPlanRepository, db, orderRepository, planContextRepository } from '@repo/database';
 
@@ -89,8 +89,9 @@ export const mealChoiceService = {
     userId: string,
     budgetPlanId: string,
     opts: { limit: number; offset: number },
-  ): Promise<{ data: MealChoiceResponse[]; meta: PaginationMeta }> {
-    await loadOwnedActive(userId, budgetPlanId);
+  ): Promise<Paginated<MealChoiceResponse>> {
+    // FIXME: verify the budgetPlanId belongs to the current user
+    // FIXME: right now the query does not return the meal name, only the restaurant name is returned
     const [rows, total] = await Promise.all([
       orderRepository.listByUserAndPlanWithPagination(userId, budgetPlanId, opts),
       orderRepository.countByPlan(userId, budgetPlanId),

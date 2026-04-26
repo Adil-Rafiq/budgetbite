@@ -5,7 +5,7 @@ import type {
   BudgetStateContext,
   CreateBudgetPlanInput,
   ListBudgetPlansQuery,
-  PaginationMeta,
+  Paginated,
   UpdateBudgetPlanInput,
 } from '@repo/shared';
 import { toNumber } from '@repo/shared';
@@ -139,10 +139,7 @@ export const budgetPlanService = {
     return toBudgetPlanResponse(created);
   },
 
-  async list(
-    userId: string,
-    query: ListBudgetPlansQuery,
-  ): Promise<{ data: BudgetPlanResponse[]; meta: PaginationMeta }> {
+  async list(userId: string, query: ListBudgetPlansQuery): Promise<Paginated<BudgetPlanResponse>> {
     const [rows, total] = await Promise.all([
       budgetPlanRepository.listByUserIdWithRelations(userId, {
         limit: query.limit,

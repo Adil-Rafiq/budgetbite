@@ -38,11 +38,7 @@ router.get(
 router.get('/active', asyncHandler(budgetPlanController.getActivePlan));
 
 /** Get full detail for one plan (context + mealTypes + latestGeneration). Returns BudgetPlanDetail. */
-router.get(
-  '/:id',
-  validate({ params: idParams }),
-  asyncHandler(budgetPlanController.getPlanById),
-);
+router.get('/:id', validate({ params: idParams }), asyncHandler(budgetPlanController.getPlanById));
 
 /** Patch plan metadata (totalBudget / notificationTimes / status). Returns BudgetPlanResponse. */
 router.patch(
@@ -64,6 +60,8 @@ router.get(
   validate({ params: idParams, query: paginationSchema }),
   asyncHandler(budgetPlanController.listChoices),
 );
+
+// TODO: Create a choices endpoint that returns choices of the day or if given specific date then returns that day's choices
 
 /** Record a confirmed meal choice and atomically update plan_context. Returns MealChoiceResponse. */
 router.post(

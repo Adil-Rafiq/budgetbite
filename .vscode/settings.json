@@ -8,5 +8,7 @@
     "**/.turbo": true,
     "**/build": true,
     "**/.pnpm-store": true
-  }
+  },
+  "editor.fontFamily": "Fira Code",
+  "editor.fontLigatures": true
 }

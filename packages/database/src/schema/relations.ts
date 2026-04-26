@@ -52,6 +52,10 @@ export const budgetPlanRelations = relations(budgetPlan, ({ one, many }) => ({
     fields: [budgetPlan.userId],
     references: [user.id],
   }),
+  planContext: one(planContext, {
+    fields: [budgetPlan.id],
+    references: [planContext.budgetPlanId],
+  }),
   budgetPlanMealTypes: many(budgetPlanMealType),
   mealGenerations: many(mealPlanGeneration),
   mealChoices: many(mealChoice),

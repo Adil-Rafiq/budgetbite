@@ -1,25 +1,25 @@
 import { apiClient } from '@/lib/api/client';
 import type {
-  BudgetPlan,
+  ListBudgetPlansQuery,
+  BudgetPlanResponse,
   CreateBudgetPlanInput,
   UpdateBudgetPlanInput,
-  ListRestaurantsQuery,
+  ActiveBudgetPlanResponse,
+  BudgetPlanDetail,
   BudgetStateContext,
+  Paginated,
 } from '@repo/shared';
 
-type ActiveBudgetPlan = {
-  plan: BudgetPlan;
-  budgetState: BudgetStateContext;
-};
-
 export const budgetPlanApi = {
-  list: (params: ListRestaurantsQuery) =>
-    apiClient.get('api/budget-plans', { searchParams: params }).json<BudgetPlan[]>(),
-  getById: (id: string) => apiClient.get(`api/budget-plans/${id}`).json<BudgetPlan>(),
-  getActive: () => apiClient.get('api/budget-plans/active').json<ActiveBudgetPlan>(),
-  create: (input: CreateBudgetPlanInput): Promise<BudgetPlan> =>
+  list: (params: ListBudgetPlansQuery) =>
+    apiClient
+      .get('api/budget-plans', { searchParams: params })
+      .json<Paginated<BudgetPlanResponse>>(),
+  getById: (id: string) => apiClient.get(`api/budget-plans/${id}`).json<BudgetPlanDetail>(),
+  getActive: () => apiClient.get('api/budget-plans/active').json<ActiveBudgetPlanResponse>(),
+  create: (input: CreateBudgetPlanInput): Promise<BudgetPlanResponse> =>
     apiClient.post('api/budget-plans', { json: input }).json(),
-  update: (id: string, input: UpdateBudgetPlanInput): Promise<BudgetPlan> =>
+  update: (id: string, input: UpdateBudgetPlanInput): Promise<BudgetPlanResponse> =>
     apiClient.patch(`api/budget-plans/${id}`, { json: input }).json(),
   getContext: (id: string): Promise<BudgetStateContext> =>
     apiClient.get(`api/budget-plans/${id}/context`).json(),

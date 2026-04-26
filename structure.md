@@ -1,177 +1,365 @@
-budgetbite/
-├── apps/
-│ ├── web/ # Next.js frontend (DEPLOY)
-│ │ ├── src/
-│ │ │ ├── app/
-│ │ │ │ ├── page.tsx
-│ │ │ │ ├── dashboard/
-│ │ │ │ ├── meals/
-│ │ │ │ └── layout.tsx
-│ │ │ ├── components/
-│ │ │ │ ├── ui/
-│ │ │ │ ├── meal-card.tsx
-│ │ │ │ └── budget-tracker.tsx
-│ │ │ ├── lib/
-│ │ │ └── types/
-│ │ ├── public/
-│ │ ├── package.json
-│ │ ├── next.config.js
-│ │ └── tsconfig.json
-│ │
-│ ├── api/ # Backend API (DEPLOY)
-│ │ ├── src/
-│ │ │ ├── routes/
-│ │ │ │ ├── auth.routes.ts
-│ │ │ │ ├── meal.routes.ts
-│ │ │ │ ├── order.routes.ts
-│ │ │ │ └── budget.routes.ts
-│ │ │ ├── controllers/
-│ │ │ │ ├── meal.controller.ts
-│ │ │ │ └── order.controller.ts
-│ │ │ ├── services/
-│ │ │ │ ├── meal-planner.service.ts
-│ │ │ │ ├── budget.service.ts
-│ │ │ │ └── order.service.ts
-│ │ │ ├── middleware/
-│ │ │ │ ├── auth.middleware.ts
-│ │ │ │ └── error.middleware.ts
-│ │ │ └── index.ts
-│ │ ├── package.json
-│ │ └── tsconfig.json
-│ │
-│ └── scraper/ # Python scraping service (RUN LOCALLY)
-│ ├── src/
-│ │ ├── main.py # Entry: FoodpandaScraper init → scrape() → JSON output
-│ │ ├── config.py # ScraperConfig (base_url, lat/lng, scroll/rate limits)
-│ │ ├── core/
-│ │ │ └── browser.py # BrowserManager: Playwright + SeleniumBase CDP, captcha handling
-│ │ ├── models/
-│ │ │ └── restaurant.py # TypedDicts: Restaurant, MenuItem, MenuItemVariation
-│ │ ├── scrapers/
-│ │ │ ├── base.py # BaseScraper (ABC): init, scroll_to_bottom, handle_captcha, close
-│ │ │ └── foodpanda.py # FoodpandaScraper: home URL, restaurant links, per-restaurant scrape
-│ │ └── parsers/
-│ │ └── foodpanda.py # FoodpandaParser: vendor_id, restaurant_links, menu items (testids)
-│ ├── requirements.txt # playwright, seleniumbase
-│ └── (no package.json – Python)
-│
-├── packages/
-│ ├── database/ # Shared database (Neon)
-│ │ ├── src/
-│ │ │ ├── schema/
-│ │ │ │ ├── users.ts
-│ │ │ │ ├── restaurants.ts
-│ │ │ │ ├── menu-items.ts
-│ │ │ │ ├── meal-plans.ts
-│ │ │ │ └── orders.ts
-│ │ │ ├── repositories/
-│ │ │ │ ├── restaurant.repo.ts
-│ │ │ │ ├── menu.repo.ts
-│ │ │ │ └── order.repo.ts
-│ │ │ ├── migrations/
-│ │ │ └── index.ts
-│ │ ├── drizzle.config.ts
-│ │ ├── package.json
-│ │ └── tsconfig.json
-│ │
-│ ├── shared-types/ # Shared TypeScript types
-│ │ ├── src/
-│ │ │ ├── restaurant.types.ts
-│ │ │ ├── order.types.ts
-│ │ │ ├── meal.types.ts
-│ │ │ └── user.types.ts
-│ │ ├── package.json
-│ │ └── tsconfig.json
-│ │
-│ └── utils/ # Shared utilities
-│ ├── src/
-│ │ ├── date.utils.ts
-│ │ ├── currency.utils.ts
-│ │ └── validation.ts
-│ ├── package.json
-│ └── tsconfig.json
-│
-├── scraper-service/ # TypeScript scraper (standalone, single-restaurant)
-│ ├── src/
-│ │ ├── index.ts # Runs FoodPandaScraper.scrapeRestaurant(url) → console.log
-│ │ ├── scrapers/
-│ │ │ ├── base.scraper.ts # BaseScraper: Playwright chromium.launch, init/close
-│ │ │ └── foodpanda.scraper.ts # FoodPandaScraper: goto URL, scroll, parseRestaurant + parseMenu(html)
-│ │ └── parsers/
-│ │ ├── index.ts
-│ │ ├── restaurant.parser.ts # parseRestaurant(html): cheerio, name/rating/address
-│ │ └── menu.parser.ts # parseMenu(html): cheerio, product-tile → name/price
-│ ├── package.json
-│ └── tsconfig.json
-│
-├── .github/
-│ └── workflows/
-│ ├── deploy-web.yml
-│ └── deploy-api.yml
-│
-├── package.json # Root package.json
-├── tsconfig.json # Base TS config
-├── .eslintrc.js
-├── .prettierrc
-├── .prettierignore
-├── .gitignore
-├── .env.example
-├── .env # DATABASE_URL points to Neon
-└── README.md
+# Project Structure: budgetbite
 
----
+> Generated on 2026-04-11 01:13:34  
+> Root: `/c/Users/muhad/OneDrive/Desktop/New folder/budgetbite`  
+> Max depth: 6
 
-## Scraper implementation (Python – `apps/scraper`)
+## Directory Tree
 
-The main scraper is implemented in **Python** under `apps/scraper`. It targets **Foodpanda** and uses **Playwright** with **SeleniumBase CDP** for browser control and captcha handling.
+```
+(tree not installed – using find fallback)
 
-### Flow
+/.env.example
+/.gitignore
+/.npmrc
+/.prettierignore
+/.prettierrc
+/.turbo
+/.vscode
+/.vscode/settings.json
+/apps
+/apps/api
+/apps/api/.env
+/apps/api/.turbo
+/apps/api/.turbo/turbo-build.log
+/apps/api/.turbo/turbo-lint.log
+/apps/api/DESIGN.md
+/apps/api/eslint.config.js
+/apps/api/package.json
+/apps/api/REQUIREMENTS.md
+/apps/api/src
+/apps/api/src/controllers
+/apps/api/src/controllers/admin.controller.ts
+/apps/api/src/controllers/analytics.controller.ts
+/apps/api/src/controllers/budget-plan.controller.ts
+/apps/api/src/controllers/feedback.controller.ts
+/apps/api/src/controllers/meal-plan.controller.ts
+/apps/api/src/controllers/meal-type.controller.ts
+/apps/api/src/controllers/order.controller.ts
+/apps/api/src/controllers/restaurant.controller.ts
+/apps/api/src/controllers/user.controller.ts
+/apps/api/src/index.ts
+/apps/api/src/lib
+/apps/api/src/lib/auth.ts
+/apps/api/src/lib/email
+/apps/api/src/lib/email/email.client.ts
+/apps/api/src/lib/email/email.service.ts
+/apps/api/src/lib/email/templates
+/apps/api/src/lib/llm.ts
+/apps/api/src/middleware
+/apps/api/src/middleware/admin.middleware.ts
+/apps/api/src/middleware/auth.middleware.ts
+/apps/api/src/middleware/error.middleware.ts
+/apps/api/src/routes
+/apps/api/src/routes/admin.routes.ts
+/apps/api/src/routes/analytics.routes.ts
+/apps/api/src/routes/budget-plan.routes.ts
+/apps/api/src/routes/feedback.routes.ts
+/apps/api/src/routes/meal-plan.routes.ts
+/apps/api/src/routes/order.routes.ts
+/apps/api/src/routes/restaurant.routes.ts
+/apps/api/src/routes/user.routes.ts
+/apps/api/src/services
+/apps/api/src/services/analytics.service.ts
+/apps/api/src/services/budget-plan.service.ts
+/apps/api/src/services/context-builder.service.ts
+/apps/api/src/services/feedback.service.ts
+/apps/api/src/services/meal-plan.service.ts
+/apps/api/src/services/order.service.ts
+/apps/api/src/services/preference.service.ts
+/apps/api/src/services/restaurant.service.ts
+/apps/api/src/services/user.service.ts
+/apps/api/tsconfig.json
+/apps/scraper
+/apps/scraper/.env
+/apps/scraper/recommended-scraping-fields.txt
+/apps/scraper/requirements.txt
+/apps/scraper/src
+/apps/scraper/src/__init__.py
+/apps/scraper/src/config.py
+/apps/scraper/src/core
+/apps/scraper/src/core/__init__.py
+/apps/scraper/src/core/browser.py
+/apps/scraper/src/downloaded_files
+/apps/scraper/src/main.py
+/apps/scraper/src/models
+/apps/scraper/src/models/__init__.py
+/apps/scraper/src/models/restaurant.py
+/apps/scraper/src/parsers
+/apps/scraper/src/parsers/__init__.py
+/apps/scraper/src/parsers/foodpanda.py
+/apps/scraper/src/scrapers
+/apps/scraper/src/scrapers/__init__.py
+/apps/scraper/src/scrapers/base.py
+/apps/scraper/src/scrapers/foodpanda.py
+/apps/scraper/src/sounds
+/apps/scraper/src/sounds/alert.mp3
+/apps/scraper/src/upload.py
+/apps/web
+/apps/web/.env.local
+/apps/web/.gitignore
+/apps/web/.turbo
+/apps/web/.turbo/turbo-build.log
+/apps/web/.turbo/turbo-check-types.log
+/apps/web/.turbo/turbo-lint.log
+/apps/web/app
+/apps/web/app/(auth)
+/apps/web/app/(auth)/login
+/apps/web/app/(auth)/login/page.tsx
+/apps/web/app/(auth)/oauth-callback
+/apps/web/app/(auth)/oauth-callback/page.tsx
+/apps/web/app/(auth)/register
+/apps/web/app/(auth)/register/page.tsx
+/apps/web/app/(auth)/verify-email
+/apps/web/app/(auth)/verify-email/page.tsx
+/apps/web/app/analytics
+/apps/web/app/analytics/layout.tsx
+/apps/web/app/analytics/page.tsx
+/apps/web/app/dashboard
+/apps/web/app/dashboard/layout.tsx
+/apps/web/app/dashboard/page.tsx
+/apps/web/app/globals.css
+/apps/web/app/layout.tsx
+/apps/web/app/onboarding
+/apps/web/app/onboarding/_components
+/apps/web/app/onboarding/_components/onboarding-shell.tsx
+/apps/web/app/onboarding/_components/steps
+/apps/web/app/onboarding/_hooks
+/apps/web/app/onboarding/_hooks/use-onboarding.ts
+/apps/web/app/onboarding/constants.ts
+/apps/web/app/onboarding/page.tsx
+/apps/web/app/page.tsx
+/apps/web/app/plans
+/apps/web/app/plans/layout.tsx
+/apps/web/app/plans/page.tsx
+/apps/web/app/profile
+/apps/web/app/profile/layout.tsx
+/apps/web/app/profile/page.tsx
+/apps/web/app/providers.tsx
+/apps/web/components
+/apps/web/components.json
+/apps/web/components/app-header.tsx
+/apps/web/components/app-shell.tsx
+/apps/web/components/app-sidebar.tsx
+/apps/web/components/dashboard
+/apps/web/components/dashboard/meal-slots.tsx
+/apps/web/components/dashboard/recent-activity.tsx
+/apps/web/components/dashboard/summary-cards.tsx
+/apps/web/components/landing
+/apps/web/components/landing/features.tsx
+/apps/web/components/landing/footer.tsx
+/apps/web/components/landing/hero.tsx
+/apps/web/components/landing/navbar.tsx
+/apps/web/components/mobile-nav.tsx
+/apps/web/components/theme-provider.tsx
+/apps/web/components/ui
+/apps/web/components/ui/accordion.tsx
+/apps/web/components/ui/alert.tsx
+/apps/web/components/ui/alert-dialog.tsx
+/apps/web/components/ui/aspect-ratio.tsx
+/apps/web/components/ui/avatar.tsx
+/apps/web/components/ui/badge.tsx
+/apps/web/components/ui/breadcrumb.tsx
+/apps/web/components/ui/button.tsx
+/apps/web/components/ui/button-group.tsx
+/apps/web/components/ui/calendar.tsx
+/apps/web/components/ui/card.tsx
+/apps/web/components/ui/carousel.tsx
+/apps/web/components/ui/chart.tsx
+/apps/web/components/ui/checkbox.tsx
+/apps/web/components/ui/collapsible.tsx
+/apps/web/components/ui/command.tsx
+/apps/web/components/ui/context-menu.tsx
+/apps/web/components/ui/dialog.tsx
+/apps/web/components/ui/drawer.tsx
+/apps/web/components/ui/dropdown-menu.tsx
+/apps/web/components/ui/empty.tsx
+/apps/web/components/ui/field.tsx
+/apps/web/components/ui/form.tsx
+/apps/web/components/ui/hover-card.tsx
+/apps/web/components/ui/input.tsx
+/apps/web/components/ui/input-group.tsx
+/apps/web/components/ui/input-otp.tsx
+/apps/web/components/ui/item.tsx
+/apps/web/components/ui/kbd.tsx
+/apps/web/components/ui/label.tsx
+/apps/web/components/ui/menubar.tsx
+/apps/web/components/ui/navigation-menu.tsx
+/apps/web/components/ui/pagination.tsx
+/apps/web/components/ui/popover.tsx
+/apps/web/components/ui/progress.tsx
+/apps/web/components/ui/radio-group.tsx
+/apps/web/components/ui/resizable.tsx
+/apps/web/components/ui/scroll-area.tsx
+/apps/web/components/ui/select.tsx
+/apps/web/components/ui/separator.tsx
+/apps/web/components/ui/sheet.tsx
+/apps/web/components/ui/sidebar.tsx
+/apps/web/components/ui/skeleton.tsx
+/apps/web/components/ui/slider.tsx
+/apps/web/components/ui/sonner.tsx
+/apps/web/components/ui/spinner.tsx
+/apps/web/components/ui/switch.tsx
+/apps/web/components/ui/table.tsx
+/apps/web/components/ui/tabs.tsx
+/apps/web/components/ui/textarea.tsx
+/apps/web/components/ui/toast.tsx
+/apps/web/components/ui/toaster.tsx
+/apps/web/components/ui/toggle.tsx
+/apps/web/components/ui/toggle-group.tsx
+/apps/web/components/ui/tooltip.tsx
+/apps/web/components/ui/use-mobile.tsx
+/apps/web/components/ui/use-toast.ts
+/apps/web/eslint.config.js
+/apps/web/hooks
+/apps/web/hooks/use-budget-plan.ts
+/apps/web/hooks/use-mobile.ts
+/apps/web/hooks/use-user.ts
+/apps/web/lib
+/apps/web/lib/api
+/apps/web/lib/api/budget-plan.api.ts
+/apps/web/lib/api/client.ts
+/apps/web/lib/api/user.api.ts
+/apps/web/lib/auth-client.ts
+/apps/web/lib/get-query-client.ts
+/apps/web/lib/mock-data.ts
+/apps/web/lib/toast.ts
+/apps/web/lib/utils.ts
+/apps/web/next.config.js
+/apps/web/next-env.d.ts
+/apps/web/package.json
+/apps/web/postcss.config.mjs
+/apps/web/proxy.ts
+/apps/web/public
+/apps/web/public/apple-icon.png
+/apps/web/public/icon.svg
+/apps/web/public/icon-dark-32x32.png
+/apps/web/public/icon-light-32x32.png
+/apps/web/public/placeholder.jpg
+/apps/web/public/placeholder.svg
+/apps/web/public/placeholder-logo.png
+/apps/web/public/placeholder-logo.svg
+/apps/web/public/placeholder-user.jpg
+/apps/web/styles
+/apps/web/styles/global.css
+/apps/web/tsconfig.json
+/eslint.config.js
+/package.json
+/packages
+/packages/ai
+/packages/ai/.turbo
+/packages/ai/.turbo/turbo-build.log
+/packages/ai/package.json
+/packages/ai/src
+/packages/ai/src/prompts
+/packages/ai/src/prompts/meal-planner.prompts.ts
+/packages/ai/src/providers
+/packages/ai/src/providers/base.provider.ts
+/packages/ai/src/providers/claude.provider.ts
+/packages/ai/src/providers/gemini.provider.ts
+/packages/ai/src/providers/index.ts
+/packages/ai/src/providers/openai.provider.ts
+/packages/ai/tsconfig.json
+/packages/database
+/packages/database/.env
+/packages/database/.turbo
+/packages/database/.turbo/turbo-build.log
+/packages/database/.turbo/turbo-lint.log
+/packages/database/drizzle
+/packages/database/drizzle.config.ts
+/packages/database/drizzle/0000_cool_rockslide.sql
+/packages/database/drizzle/0001_greedy_namora.sql
+/packages/database/drizzle/0002_gifted_shiva.sql
+/packages/database/drizzle/meta
+/packages/database/drizzle/meta/_journal.json
+/packages/database/drizzle/meta/0000_snapshot.json
+/packages/database/drizzle/meta/0001_snapshot.json
+/packages/database/drizzle/meta/0002_snapshot.json
+/packages/database/eslint.config.js
+/packages/database/package.json
+/packages/database/src
+/packages/database/src/db.ts
+/packages/database/src/index.ts
+/packages/database/src/repositories
+/packages/database/src/repositories/budget-plan.repo.ts
+/packages/database/src/repositories/feedback.repo.ts
+/packages/database/src/repositories/index.ts
+/packages/database/src/repositories/meal-plan.repo.ts
+/packages/database/src/repositories/meal-type.repo.ts
+/packages/database/src/repositories/menu.repo.ts
+/packages/database/src/repositories/order.repo.ts
+/packages/database/src/repositories/plan-context.repo.ts
+/packages/database/src/repositories/restaurant.repo.ts
+/packages/database/src/repositories/user.repo.ts
+/packages/database/src/repositories/user-preferences.repo.ts
+/packages/database/src/repositories/user-profile.repo.ts
+/packages/database/src/schema
+/packages/database/src/schema/auth.ts
+/packages/database/src/schema/budget-plan.ts
+/packages/database/src/schema/budget-plan-meal-type.ts
+/packages/database/src/schema/common
+/packages/database/src/schema/common/timestamps.ts
+/packages/database/src/schema/feedback.ts
+/packages/database/src/schema/index.ts
+/packages/database/src/schema/meal-plan.ts
+/packages/database/src/schema/meal-type.ts
+/packages/database/src/schema/menu-item.ts
+/packages/database/src/schema/order.ts
+/packages/database/src/schema/plan-context.ts
+/packages/database/src/schema/relations.ts
+/packages/database/src/schema/restaurant.ts
+/packages/database/src/schema/types
+/packages/database/src/schema/types/schema.types.ts
+/packages/database/src/schema/user-preferences.ts
+/packages/database/src/schema/user-profile.ts
+/packages/database/tsconfig.json
+/packages/eslint-config
+/packages/eslint-config/base.js
+/packages/eslint-config/next.js
+/packages/eslint-config/package.json
+/packages/eslint-config/react-internal.js
+/packages/eslint-config/README.md
+/packages/shared
+/packages/shared/.turbo
+/packages/shared/.turbo/turbo-build.log
+/packages/shared/.turbo/turbo-lint.log
+/packages/shared/eslint.config.js
+/packages/shared/package.json
+/packages/shared/src
+/packages/shared/src/index.ts
+/packages/shared/src/types
+/packages/shared/src/types/ai.types.ts
+/packages/shared/src/types/index.ts
+/packages/shared/src/validation.ts
+/packages/shared/tsconfig.json
+/packages/typescript-config
+/packages/typescript-config/base.json
+/packages/typescript-config/nextjs.json
+/packages/typescript-config/package.json
+/packages/typescript-config/react-library.json
+/packages/ui
+/packages/ui/.turbo
+/packages/ui/.turbo/turbo-check-types.log
+/packages/ui/.turbo/turbo-lint.log
+/packages/ui/eslint.config.mjs
+/packages/ui/package.json
+/packages/ui/src
+/packages/ui/src/button.tsx
+/packages/ui/src/card.tsx
+/packages/ui/src/code.tsx
+/packages/ui/tsconfig.json
+/pnpm-lock.yaml
+/pnpm-workspace.yaml
+/README.md
+/scripts
+/scripts/db-migrate.sh
+/scripts/gen_tree.sh
+/structure.md
+/TECH-STACK.md
+/TODO.md
+/turbo.json
+```
 
-1. **Entry** (`main.py`)
-   - Reads `config` (base URL, Lahore lat/lng, limits).
-   - Instantiates `FoodpandaScraper`, calls `init()` then `scrape()`.
-   - Prints count and JSON of scraped restaurants; `close()` in a `finally` block.
-   - Database persistence is left as TODO.
+## Notes
 
-2. **Browser** (`core/browser.py`)
-   - `BrowserManager` starts SeleniumBase Chrome and connects Playwright via CDP.
-   - Exposes `page`, `connect(endpoint_url)`, `solve_captcha()`, `is_captcha_present()`, `wait_for_manual_captcha()`, `delay(seconds)`, `close()`.
-
-3. **Base scraper** (`scrapers/base.py`)
-   - `BaseScraper` (ABC) holds `BrowserManager` and `config`.
-   - `init()` connects the browser; `scroll_to_bottom()` uses mouse wheel and configurable step/delay; `handle_captcha()` runs solve + delay + optional manual pause; `close()` cleans up.
-   - Subclasses implement `scrape()`.
-
-4. **Foodpanda scraper** (`scrapers/foodpanda.py`)
-   - `FoodpandaScraper(base_url, lat, lng)` uses `FoodpandaParser`.
-   - `_build_home_url()` builds the listing URL with location.
-   - `scrape_restaurant_links()`: goto home → `scroll_to_bottom()` → parser gets all `/restaurant/` links (absolute).
-   - `scrape_restaurant(url)`: goto url → delay → `handle_captcha()` → parser extracts `vendor_id` and `parse_menu_items(page)`; returns a `Restaurant` (menu filled; name/rating/cuisine etc. stubbed).
-   - `scrape()`: gets links, optionally limits by `config.max_restaurants`, then scrapes each link with `request_delay` between requests; returns list of `Restaurant`.
-
-5. **Parser** (`parsers/foodpanda.py`)
-   - `FoodpandaParser`: `extract_vendor_id(url)` (path segment after `restaurant`); `parse_restaurant_links(page)` via XPath `//a[contains(@href, '/restaurant/')]`; `parse_menu_item(product, index)` and `parse_menu_items(page)` using Playwright `get_by_test_id("menu-product-name")`, `menu-product-description`, `menu-product-price` and numeric parsing (Rs. / discounts); returns `MenuItem` list.
-
-6. **Models** (`models/restaurant.py`)
-   - TypedDicts: `MenuItemVariation`, `MenuItem` (foodpanda_id, name, description, price, original_price, variations, category, image_url, is_available), `Restaurant` (url, vendor_id, name, rating, rating_count, cuisine_types, delivery_time, minimum_order, delivery_fee, menu).
-
-### Config (`config.py`)
-
-- `ScraperConfig`: `base_url`, `lahore_lat` / `lahore_lng`, `scroll_step` / `scroll_delay`, `page_load_delay`, `captcha_wait_delay`, `request_delay`, `max_restaurants` (e.g. 2 or None for all). Singleton `config` is used across the app.
-
-### Dependencies
-
-- `requirements.txt`: **playwright**, **seleniumbase**.
-
----
-
-## Scraper-service (TypeScript – `scraper-service/`)
-
-A separate **TypeScript** scraper lives at repo root in `scraper-service/`. It uses **Playwright** and **Cheerio** to scrape a **single** Foodpanda restaurant URL.
-
-- **Entry** (`index.ts`): Creates `FoodPandaScraper`, `init()`, then `scrapeRestaurant(singleUrl)`, logs result, `close()`.
-- **Base** (`scrapers/base.scraper.ts`): Launches Chromium (headed, slowMo), new context/page; `init()` / `close()`.
-- **FoodPanda** (`scrapers/foodpanda.scraper.ts`): `scrapeRestaurant(url)` → goto → wheel scroll → `page.content()` → `parseRestaurant(html)` and `parseMenu(html)`.
-- **Parsers**: `restaurant.parser.ts` (Cheerio: h1, .rating, .vendor-location); `menu.parser.ts` (Cheerio: .product-tile, data-testid menu-product-name / menu-product-price).
-
-Use this for quick single-page runs; use `apps/scraper` for full listing + multi-restaurant and captcha handling.
+<!-- Add any context about the project here before pasting to an AI chat -->
