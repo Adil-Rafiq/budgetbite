@@ -10,7 +10,9 @@ export class OpenAIProvider extends BaseLLMProvider {
 
   constructor(apiKey?: string) {
     super();
-    this.client = new OpenAI({ apiKey: apiKey ?? process.env.OPENAI_API_KEY });
+    this.client = new OpenAI({
+      apiKey: apiKey ?? process.env.AI_API_KEY ?? process.env.OPENAI_API_KEY,
+    });
   }
 
   async complete(messages: LLMMessage[], options: LLMRequestOptions = {}): Promise<LLMResponse> {

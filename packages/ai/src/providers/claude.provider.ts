@@ -10,7 +10,9 @@ export class ClaudeProvider extends BaseLLMProvider {
 
   constructor(apiKey?: string) {
     super();
-    this.client = new Anthropic({ apiKey: apiKey ?? process.env.ANTHROPIC_API_KEY });
+    this.client = new Anthropic({
+      apiKey: apiKey ?? process.env.AI_API_KEY ?? process.env.ANTHROPIC_API_KEY,
+    });
   }
 
   async complete(messages: LLMMessage[], options: LLMRequestOptions = {}): Promise<LLMResponse> {
