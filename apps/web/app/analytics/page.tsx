@@ -182,14 +182,14 @@ export default function AnalyticsPage() {
                 type="date"
                 value={range.startDate}
                 onChange={(e) => setCustomStart(e.target.value)}
-                className="w-[140px] h-8 text-xs"
+                className="w-35 h-8 text-xs"
               />
               <span className="text-xs text-muted-foreground">to</span>
               <Input
                 type="date"
                 value={range.endDate}
                 onChange={(e) => setCustomEnd(e.target.value)}
-                className="w-[140px] h-8 text-xs"
+                className="w-35 h-8 text-xs"
               />
             </div>
           ) : (
