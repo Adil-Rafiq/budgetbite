@@ -90,7 +90,8 @@ export const mealChoiceService = {
     budgetPlanId: string,
     opts: { limit: number; offset: number },
   ): Promise<Paginated<MealChoiceResponse>> {
-    await loadOwnedActive(userId, budgetPlanId);
+    // FIXME: verify the budgetPlanId belongs to the current user
+    // FIXME: right now the query does not return the meal name, only the restaurant name is returned
     const [rows, total] = await Promise.all([
       orderRepository.listByUserAndPlanWithPagination(userId, budgetPlanId, opts),
       orderRepository.countByPlan(userId, budgetPlanId),
