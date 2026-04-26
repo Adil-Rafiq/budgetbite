@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle, CalendarDays } from 'lucide-react';
+import { AlertCircle, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useBudgetPlans } from '@/hooks/use-budget-plan';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -71,89 +73,131 @@ function PlansListEmpty() {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
+const PAGE_SIZE = 10;
+
 export default function PlansList() {
-  const { data: plansWithMeta, isLoading, error } = useBudgetPlans({ limit: 10, offset: 0 });
+  const [page, setPage] = useState(0);
+  const {
+    data: plansWithMeta,
+    isLoading,
+    isFetching,
+    error,
+  } = useBudgetPlans({ limit: PAGE_SIZE, offset: page * PAGE_SIZE });
 
   if (isLoading) return <PlansListSkeleton />;
 
   if (error) return <PlansListError message={`Failed to load budget plan: ${error.message}`} />;
 
-  if (!plansWithMeta || !plansWithMeta.data?.length) return <PlansListEmpty />;
+  if (!plansWithMeta || !plansWithMeta.data?.length) return page === 0 ? <PlansListEmpty /> : null;
 
-  // TODO: Implement pagination using the `meta`
   const { data: plans, meta } = plansWithMeta;
+  const totalPages = Math.max(1, Math.ceil(meta.total / PAGE_SIZE));
+  const hasPrev = page > 0;
+  const hasNext = page + 1 < totalPages;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      {plans.map((plan) => {
-        const spent = plan.spentAmount;
-        const spentPercent = Math.round((spent / plan.totalBudget) * 100);
-        const remaining = plan.totalBudget - spent;
+    <div className="flex flex-col gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
+        {plans.map((plan) => {
+          const spent = plan.spentAmount;
+          const spentPercent = Math.round((spent / plan.totalBudget) * 100);
+          const remaining = plan.totalBudget - spent;
 
-        return (
-          <Card key={plan.id} className="border-border">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base capitalize text-card-foreground">
-                  {plan.planType} Plan
-                </CardTitle>
-                <Badge variant="secondary" className={statusStyles[plan.status]}>
-                  {plan.status}
-                </Badge>
-              </div>
-            </CardHeader>
+          return (
+            <Card key={plan.id} className="border-border">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base capitalize text-card-foreground">
+                    {plan.planType} Plan
+                  </CardTitle>
+                  <Badge variant="secondary" className={statusStyles[plan.status]}>
+                    {plan.status}
+                  </Badge>
+                </div>
+              </CardHeader>
 
-            <CardContent className="flex flex-col gap-4">
-              {/* Date range */}
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CalendarDays className="w-4 h-4 shrink-0" />
-                <span>
-                  {formatDate(plan.startDate, { month: 'short', day: 'numeric' })}
-                  {' – '}
-                  {formatDate(plan.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}
-                </span>
-              </div>
-
-              {/* Spend progress */}
-              <div>
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-muted-foreground">PKR {spent.toLocaleString()} spent</span>
-                  <span className="font-semibold text-card-foreground">
-                    PKR {plan.totalBudget.toLocaleString()}
+              <CardContent className="flex flex-col gap-4">
+                {/* Date range */}
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <CalendarDays className="w-4 h-4 shrink-0" />
+                  <span>
+                    {formatDate(plan.startDate, { month: 'short', day: 'numeric' })}
+                    {' – '}
+                    {formatDate(plan.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
-                <Progress value={spentPercent} className="h-2" />
-              </div>
 
-              {/* Stats grid */}
-              <div className="grid grid-cols-3 gap-3 text-center">
-                {[
-                  { label: 'Budget', value: `${(plan.totalBudget / 1000).toFixed(0)}k` },
-                  { label: 'Spent', value: `${(spent / 1000).toFixed(1)}k` },
-                  {
-                    label: 'Left',
-                    value: remaining > 0 ? `${(remaining / 1000).toFixed(1)}k` : '0',
-                  },
-                ].map(({ label, value }) => (
-                  <div key={label} className="rounded-lg bg-secondary p-2">
-                    <p className="text-xs text-muted-foreground">{label}</p>
-                    <p className="text-sm font-bold text-card-foreground">{value}</p>
+                {/* Spend progress */}
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">
+                      PKR {spent.toLocaleString()} spent
+                    </span>
+                    <span className="font-semibold text-card-foreground">
+                      PKR {plan.totalBudget.toLocaleString()}
+                    </span>
                   </div>
-                ))}
-              </div>
+                  <Progress value={spentPercent} className="h-2" />
+                </div>
 
-              {/* Meal type badges */}
-              <div className="flex flex-wrap gap-1.5">
-                {plan.mealTypes.map((mt) => (
-                  <Badge key={mt.id} variant="outline" className="text-xs capitalize">
-                    {mt.label}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+                {/* Stats grid */}
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  {[
+                    { label: 'Budget', value: `${(plan.totalBudget / 1000).toFixed(0)}k` },
+                    { label: 'Spent', value: `${(spent / 1000).toFixed(1)}k` },
+                    {
+                      label: 'Left',
+                      value: remaining > 0 ? `${(remaining / 1000).toFixed(1)}k` : '0',
+                    },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="rounded-lg bg-secondary p-2">
+                      <p className="text-xs text-muted-foreground">{label}</p>
+                      <p className="text-sm font-bold text-card-foreground">{value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Meal type badges */}
+                <div className="flex flex-wrap gap-1.5">
+                  {plan.mealTypes.map((mt) => (
+                    <Badge key={mt.id} variant="outline" className="text-xs capitalize">
+                      {mt.label}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-2">
+          <p className="text-xs text-muted-foreground">
+            Page {page + 1} of {totalPages} · {meta.total} plan{meta.total === 1 ? '' : 's'}
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={!hasPrev || isFetching}
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={!hasNext || isFetching}
+            >
+              Next
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

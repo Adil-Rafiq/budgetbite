@@ -1,5 +1,5 @@
 import { AppShell } from '@/components/app-shell';
 
-export default function AnalyticsLayout({ children }: { children: React.ReactNode }) {
+export default function PlansLayout({ children }: { children: React.ReactNode }) {
   return <AppShell>{children}</AppShell>;
 }
