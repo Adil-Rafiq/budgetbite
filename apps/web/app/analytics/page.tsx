@@ -21,7 +21,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -30,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { ChartSkeleton, TableSkeleton } from '@/components/skeletons';
 
 import { useBudgetPlans } from '@/hooks/use-budget-plan';
 import { useListActiveMealTypes } from '@/hooks/use-meal-type';
@@ -72,6 +72,22 @@ const chartFills = [
   'var(--color-chart-4)',
   'var(--color-chart-5)',
 ];
+
+const chartTooltipStyle = {
+  backgroundColor: 'var(--color-card)',
+  border: '1px solid var(--color-border)',
+  borderRadius: '8px',
+  color: 'var(--color-card-foreground)',
+} as const;
+
+const chartAxisTick = { fontSize: 12, fill: 'var(--color-muted-foreground)' } as const;
+
+const formatPKR = (value: number) => `PKR ${value.toLocaleString()}`;
+const formatPKRCompact = (value: number) => {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `${Math.round(value / 1000)}k`;
+  return String(value);
+};
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -218,36 +234,42 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="h-64">
               {spendingQuery.isLoading ? (
-                <Skeleton className="h-full w-full" />
+                <ChartSkeleton variant="line" />
               ) : spendingQuery.error ? (
                 <p className="text-sm text-destructive">Could not load spending.</p>
               ) : spendingChartData.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No spending in this range.</p>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={spendingChartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }}
+                  <LineChart
+                    data={spendingChartData}
+                    margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid
+                      vertical={false}
+                      strokeDasharray="3 3"
+                      stroke="var(--color-border)"
                     />
-                    <YAxis tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }} />
+                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={chartAxisTick} />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={chartAxisTick}
+                      tickFormatter={formatPKRCompact}
+                      width={40}
+                    />
                     <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'var(--color-card)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: '8px',
-                        color: 'var(--color-card-foreground)',
-                      }}
-                      formatter={(value: number) => [`PKR ${value.toLocaleString()}`, 'Spent']}
+                      cursor={{ stroke: 'var(--color-border)', strokeDasharray: '3 3' }}
+                      contentStyle={chartTooltipStyle}
+                      formatter={(value: number) => [formatPKR(value), 'Spent']}
                     />
                     <Line
                       type="monotone"
                       dataKey="amount"
                       stroke="var(--color-primary)"
                       strokeWidth={2}
-                      dot={{ fill: 'var(--color-primary)', strokeWidth: 0, r: 4 }}
-                      activeDot={{ r: 6 }}
+                      dot={false}
+                      activeDot={{ r: 5, fill: 'var(--color-primary)', strokeWidth: 0 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -264,38 +286,52 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="h-64">
               {plansQuery.isLoading ? (
-                <Skeleton className="h-full w-full" />
+                <ChartSkeleton variant="bar" />
               ) : budgetVsActual.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No budget plans yet.</p>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={budgetVsActual}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                    <XAxis
-                      dataKey="label"
-                      tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }}
+                  <BarChart
+                    data={budgetVsActual}
+                    barCategoryGap="28%"
+                    barGap={4}
+                    margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid
+                      vertical={false}
+                      strokeDasharray="3 3"
+                      stroke="var(--color-border)"
                     />
-                    <YAxis tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }} />
+                    <XAxis dataKey="label" axisLine={false} tickLine={false} tick={chartAxisTick} />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={chartAxisTick}
+                      tickFormatter={formatPKRCompact}
+                      width={40}
+                    />
                     <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'var(--color-card)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: '8px',
-                        color: 'var(--color-card-foreground)',
-                      }}
-                      formatter={(value: number) => [`PKR ${value.toLocaleString()}`]}
+                      cursor={{ fill: 'var(--color-muted)', opacity: 0.4 }}
+                      contentStyle={chartTooltipStyle}
+                      formatter={(value: number) => [formatPKR(value)]}
                     />
-                    <Legend />
+                    <Legend
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{ paddingTop: 12, fontSize: 12 }}
+                    />
                     <Bar
                       dataKey="budget"
                       fill="var(--color-chart-2)"
-                      radius={[4, 4, 0, 0]}
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={36}
                       name="Budget"
                     />
                     <Bar
                       dataKey="actual"
                       fill="var(--color-chart-1)"
-                      radius={[4, 4, 0, 0]}
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={36}
                       name="Actual"
                     />
                   </BarChart>
@@ -313,7 +349,7 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="h-64 flex items-center justify-center">
               {historyQuery.isLoading ? (
-                <Skeleton className="h-full w-full" />
+                <ChartSkeleton variant="pie" />
               ) : breakdown.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No meals in this range.</p>
               ) : (
@@ -335,15 +371,14 @@ export default function AnalyticsPage() {
                       ))}
                     </Pie>
                     <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'var(--color-card)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: '8px',
-                        color: 'var(--color-card-foreground)',
-                      }}
-                      formatter={(value: number) => [`PKR ${value.toLocaleString()}`]}
+                      contentStyle={chartTooltipStyle}
+                      formatter={(value: number) => [formatPKR(value)]}
                     />
-                    <Legend />
+                    <Legend
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{ paddingTop: 12, fontSize: 12 }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               )}
@@ -359,7 +394,7 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="overflow-auto">
               {historyQuery.isLoading ? (
-                <Skeleton className="h-40 w-full" />
+                <TableSkeleton rows={5} columns={4} />
               ) : history.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No meals logged in this range.</p>
               ) : (
