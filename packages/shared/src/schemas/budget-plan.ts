@@ -73,10 +73,16 @@ export const budgetPlanResponseSchema = budgetPlanSchema.omit({ mealTypeIds: tru
   remainingAmount: z.number(),
 });
 
+/** DTO for meal plan generation metadata. */
+export const budgetGenerationSchema = z.object({
+  id: uuidSchema,
+  generatedAt: z.coerce.date(),
+});
+
 /** Single-plan detail: response DTO + full running context + latest generation pointer. */
 export const budgetPlanDetailSchema = budgetPlanResponseSchema.extend({
   context: budgetStateContextSchema,
-  latestGeneration: z.object({ id: uuidSchema, generatedAt: z.coerce.date() }).nullable(),
+  latestGeneration: budgetGenerationSchema.nullable(),
 });
 
 /** Shape returned by GET /api/budget-plans/active — matches what the FE expects. */
@@ -92,5 +98,6 @@ export type UpdateBudgetPlanInput = z.infer<typeof updateBudgetPlanSchema>;
 export type ListBudgetPlansQuery = z.infer<typeof listBudgetPlansQuerySchema>;
 export type BudgetPlan = z.infer<typeof budgetPlanSchema>;
 export type BudgetPlanResponse = z.infer<typeof budgetPlanResponseSchema>;
+export type BudgetGeneration = z.infer<typeof budgetGenerationSchema>;
 export type BudgetPlanDetail = z.infer<typeof budgetPlanDetailSchema>;
 export type ActiveBudgetPlanResponse = z.infer<typeof activeBudgetPlanResponseSchema>;
