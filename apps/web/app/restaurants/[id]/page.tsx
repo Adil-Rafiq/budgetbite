@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { ArrowLeft, Star } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 
 import { useRestaurant, useRestaurantMenu } from '@/hooks/use-restaurant';
+
+import { MenuItemSkeleton } from '../_components/menu-item-skeleton';
+import { RestaurantHeaderSkeleton } from '../_components/restaurant-header-skeleton';
 
 export default function RestaurantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -27,7 +29,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
       </Link>
 
       {restaurantQuery.isLoading ? (
-        <Skeleton className="h-24 w-full" />
+        <RestaurantHeaderSkeleton />
       ) : restaurantQuery.error ? (
         <p className="text-sm text-destructive">Could not load restaurant.</p>
       ) : !r ? (
@@ -56,7 +58,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         {menuQuery.isLoading ? (
           <div className="grid gap-3 md:grid-cols-2 mt-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-20 w-full" />
+              <MenuItemSkeleton key={i} />
             ))}
           </div>
         ) : menuQuery.error ? (
