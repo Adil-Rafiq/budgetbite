@@ -2,8 +2,6 @@ import type { GetSuggestionsQuery } from '@repo/shared';
 import { toNumber, toNumberOrNull } from '@repo/shared';
 import { budgetPlanRepository, mealPlanRepository, mealTypeRepository } from '@repo/database';
 
-import { AppError } from '../middleware/error.middleware.js';
-
 type SuggestionRow = Awaited<ReturnType<typeof mealPlanRepository.getSuggestionsForDay>>[number];
 
 function toOption(o: SuggestionRow) {
@@ -26,7 +24,7 @@ function toOption(o: SuggestionRow) {
 export const mealPlanService = {
   async getSuggestionsForDay(userId: string, query: GetSuggestionsQuery) {
     const activePlan = await budgetPlanRepository.findActiveByUserId(userId);
-    if (!activePlan) throw new AppError(400, 'No active budget plan', 'NO_ACTIVE_PLAN');
+    if (!activePlan) return { date: query.date, slots: [] };
 
     const generationId = await mealPlanRepository.getLatestGenerationId(activePlan.id);
     if (!generationId) {

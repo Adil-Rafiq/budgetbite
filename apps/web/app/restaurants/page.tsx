@@ -8,10 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { Skeleton } from '@/components/ui/skeleton';
 
 import { useUser } from '@/hooks/use-user';
 import { useRestaurants } from '@/hooks/use-restaurant';
+
+import { RestaurantCardSkeleton } from './_components/restaurant-card-skeleton';
 
 export default function RestaurantsPage() {
   const { data: user } = useUser();
@@ -109,7 +110,7 @@ export default function RestaurantsPage() {
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-36 w-full" />
+            <RestaurantCardSkeleton key={i} />
           ))}
         </div>
       ) : error ? (

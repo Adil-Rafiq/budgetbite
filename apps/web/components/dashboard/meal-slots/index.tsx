@@ -63,9 +63,9 @@ export function MealSlots() {
 
   if (!slotsData?.slots.length)
     return (
-      <p className="text-sm text-muted-foreground">
-        No meal suggestions yet — your AI plan will populate here.
-      </p>
+      <div className="p-4 bg-muted text-muted-foreground rounded-lg border border-border text-sm">
+        No meal suggestions available — create or activate a plan to get started.
+      </div>
     );
 
   return (
