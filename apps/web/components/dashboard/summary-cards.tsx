@@ -1,7 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { Wallet, TrendingDown, PiggyBank, CalendarDays, AlertCircle } from 'lucide-react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 
@@ -65,8 +67,13 @@ function SummaryCardsError({ message }: { message: string }) {
 
 function NoPlanMessage() {
   return (
-    <div className="p-4 bg-muted text-muted-foreground rounded-lg border border-border text-sm">
-      No active budget plan found. Create one to see your summary.
+    <div className="flex items-center justify-between gap-4 p-4 bg-muted rounded-lg border border-border">
+      <p className="text-sm text-muted-foreground">
+        No active budget plan found. Create one to see your summary.
+      </p>
+      <Button asChild size="sm" className="shrink-0">
+        <Link href="/plans">Create plan</Link>
+      </Button>
     </div>
   );
 }
