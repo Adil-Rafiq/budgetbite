@@ -1,6 +1,6 @@
 import { eq, and, asc, desc } from 'drizzle-orm';
 
-import { db } from '../db.js';
+import { db, type DbOrTx } from '../db.js';
 import {
   mealPlanGeneration,
   mealSuggestion,
@@ -15,8 +15,9 @@ export const mealPlanRepository = {
    * Create a new meal plan generation record for a budget plan.
    * Generation record connects the meal suggestions to the budget plan and allows tracking multiple generations over time.
    */
-  async createGeneration(budgetPlanId: string): Promise<MealPlanGeneration> {
-    const [inserted] = await db.insert(mealPlanGeneration).values({ budgetPlanId }).returning();
+  async createGeneration(budgetPlanId: string, tx?: DbOrTx): Promise<MealPlanGeneration> {
+    const exec = tx ?? db;
+    const [inserted] = await exec.insert(mealPlanGeneration).values({ budgetPlanId }).returning();
 
     if (!inserted) throw new Error('MealPlanGeneration insert failed');
     return inserted;
@@ -134,9 +135,10 @@ export const mealPlanRepository = {
    * Bulk insert all suggestion rows for a generation.
    * Called by MealPlannerService after the LLM returns a valid plan.
    */
-  async insertSuggestions(suggestions: NewMealSuggestion[]): Promise<void> {
+  async insertSuggestions(suggestions: NewMealSuggestion[], tx?: DbOrTx): Promise<void> {
     if (suggestions.length === 0) return;
-    await db.insert(mealSuggestion).values(suggestions);
+    const exec = tx ?? db;
+    await exec.insert(mealSuggestion).values(suggestions);
   },
 
   /**

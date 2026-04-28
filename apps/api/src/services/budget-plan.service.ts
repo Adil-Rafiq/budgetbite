@@ -12,12 +12,12 @@ import { toNumber } from '@repo/shared';
 import {
   budgetPlanRepository,
   planContextRepository,
-  mealPlanRepository,
   type BudgetPlanWithRelations,
   type PlanContextRelationRow,
 } from '@repo/database';
 
 import { AppError } from '../middleware/error.middleware.js';
+import { mealGenerationService, type GenerationResult } from './meal-generation.service.js';
 
 // ─── Composition rule (for future contributors) ──────────────────────────────
 // Reads that hydrate a budget plan with its owned children (plan_context 1:1,
@@ -136,6 +136,12 @@ export const budgetPlanService = {
       withMealTypes: true,
     });
     if (!created) throw new AppError(500, 'Created plan could not be loaded', 'INTERNAL_ERROR');
+
+    // Async fire-and-forget AI generation — never blocks the create response.
+    if (process.env.AUTO_GENERATE_ON_CREATE === 'true') {
+      mealGenerationService.kickoffGenerationAsync(userId, created.id);
+    }
+
     return toBudgetPlanResponse(created);
   },
 
@@ -210,16 +216,7 @@ export const budgetPlanService = {
     return toBudgetPlanResponse(reloaded);
   },
 
-  async generateMealPlan(userId: string, planId: string) {
-    const plan = await budgetPlanRepository.findById(planId);
-    if (!plan) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
-    if (plan.userId !== userId) throw new AppError(403, 'Forbidden', 'FORBIDDEN');
-
-    const generation = await mealPlanRepository.createGeneration(planId);
-    return {
-      generationId: generation.id,
-      budgetPlanId: planId,
-      generatedAt: generation.generatedAt,
-    };
+  async generateMealPlan(userId: string, planId: string): Promise<GenerationResult> {
+    return mealGenerationService.generate(userId, planId);
   },
 };

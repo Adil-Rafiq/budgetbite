@@ -3,6 +3,15 @@ import { toNumber } from '@repo/shared';
 import { budgetPlanRepository, db, orderRepository, planContextRepository } from '@repo/database';
 
 import { AppError } from '../middleware/error.middleware.js';
+import { mealGenerationService } from './meal-generation.service.js';
+
+const DEFAULT_REPLAN_RATIO_THRESHOLD = 0.4;
+
+function getReplanRatioThreshold(): number {
+  const raw = process.env.REPLAN_CUMULATIVE_DEVIATION_RATIO_THRESHOLD;
+  const parsed = raw != null ? Number(raw) : NaN;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_REPLAN_RATIO_THRESHOLD;
+}
 
 function toMealChoiceResponse(c: {
   id: string;
@@ -81,6 +90,28 @@ export const mealChoiceService = {
 
       return inserted;
     });
+
+    // Replan trigger: re-read plan_context (it was just updated above) and
+    // kick off an async replan if cumulative deviation crossed the threshold.
+    // Wrapped so any failure here cannot break the choice-record response.
+    try {
+      const refreshed = await planContextRepository.findByPlanId(budgetPlanId);
+      if (refreshed) {
+        const totalBudget = toNumber(refreshed.totalBudget);
+        const variance = toNumber(refreshed.cumulativeVariance);
+        const ratio = Math.abs(variance) / Math.max(totalBudget, 1);
+        if (ratio > getReplanRatioThreshold()) {
+          const triggerSummary =
+            `User confirmed ${input.restaurantName ?? 'a meal'} on ${input.slotDate} ` +
+            `for PKR ${input.actualAmountSpent} (planned PKR ${plannedMealBudget.toFixed(2)}). ` +
+            `Cumulative variance is now PKR ${variance.toFixed(2)} ` +
+            `(${(ratio * 100).toFixed(1)}% of total budget).`;
+          mealGenerationService.kickoffReplanAsync(userId, budgetPlanId, triggerSummary);
+        }
+      }
+    } catch (err) {
+      console.error('[mealChoiceService] failed to evaluate replan trigger', err);
+    }
 
     return toMealChoiceResponse(choice);
   },
