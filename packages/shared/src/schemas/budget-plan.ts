@@ -73,16 +73,35 @@ export const budgetPlanResponseSchema = budgetPlanSchema.omit({ mealTypeIds: tru
   remainingAmount: z.number(),
 });
 
-/** DTO for meal plan generation metadata. */
+/**
+ * DTO for meal plan generation metadata.
+ *
+ * `status` lifecycle: pending -> succeeded | failed | superseded.
+ * `errorCode` / `errorMessage` populated only when status='failed'.
+ * `completedAt` set on every terminal transition; null while pending.
+ */
 export const budgetGenerationSchema = z.object({
   id: uuidSchema,
   generatedAt: z.coerce.date(),
+  status: z.enum(['pending', 'succeeded', 'failed', 'superseded']),
+  errorCode: z.string().nullable(),
+  errorMessage: z.string().nullable(),
+  completedAt: z.coerce.date().nullable(),
 });
 
-/** Single-plan detail: response DTO + full running context + latest generation pointer. */
+/**
+ * Single-plan detail. Two generation pointers, intentionally split:
+ *  - `activeGeneration`: latest *succeeded* generation. Drives the suggestions
+ *    screen. Stable across pending/failed/superseded replans, so the in-place
+ *    plan never visibly disappears.
+ *  - `latestAttempt`: latest generation by generatedAt regardless of status.
+ *    Drives "regenerating…" / "replan failed: X" UX banners. May equal
+ *    activeGeneration when no newer attempt exists.
+ */
 export const budgetPlanDetailSchema = budgetPlanResponseSchema.extend({
   context: budgetStateContextSchema,
-  latestGeneration: budgetGenerationSchema.nullable(),
+  activeGeneration: budgetGenerationSchema.nullable(),
+  latestAttempt: budgetGenerationSchema.nullable(),
 });
 
 /** Shape returned by GET /api/budget-plans/active — matches what the FE expects. */

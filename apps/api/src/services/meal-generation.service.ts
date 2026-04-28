@@ -30,6 +30,20 @@ export interface GenerationResult {
   estimatedTotalCost: number;
 }
 
+/**
+ * Sentinel thrown from inside the suggestion-insert tx when the conditional
+ * `markGenerationSucceeded` reports 0 affected rows — meaning the generation
+ * was superseded by a newer kickoff while this LLM call was in flight. Throwing
+ * this rolls back the suggestion insert so the superseded gen never carries
+ * orphan suggestions, then the outer catch translates it into a no-op return.
+ */
+class SupersededError extends Error {
+  constructor() {
+    super('generation superseded mid-flight');
+    this.name = 'SupersededError';
+  }
+}
+
 const DEFAULT_GENERATION_TEMPERATURE = 0.3;
 const DEFAULT_GENERATION_MAX_TOKENS = 8192;
 
@@ -61,7 +75,12 @@ function getGenerationMaxTokens(): number {
  * (plan create, meal-choice record).
  */
 export const mealGenerationService = {
-  async generate(userId: string, planId: string): Promise<GenerationResult> {
+  /**
+   * Synchronous entry: throws on real failures (mapped to HTTP 502 by the
+   * route). Returns `null` when this attempt was superseded mid-flight by a
+   * newer kickoff — caller should treat as a no-op (HTTP 202).
+   */
+  async generate(userId: string, planId: string): Promise<GenerationResult | null> {
     await assertPlanOwnership(userId, planId);
     const ctx = await contextBuilderService.build(planId, userId);
 
@@ -88,7 +107,7 @@ export const mealGenerationService = {
     userId: string,
     planId: string,
     triggerSummary: string,
-  ): Promise<GenerationResult> {
+  ): Promise<GenerationResult | null> {
     await assertPlanOwnership(userId, planId);
     const ctx = await contextBuilderService.build(planId, userId);
 
@@ -159,139 +178,175 @@ async function runGeneration({
   ctx,
   prompt,
   mode,
-}: RunArgs): Promise<GenerationResult> {
+}: RunArgs): Promise<GenerationResult | null> {
   const startedAt = Date.now();
 
-  // ─── 1. Call the LLM ──────────────────────────────────────────────────────
-  let response: Awaited<ReturnType<typeof llm.complete>>;
+  // ─── 0. Insert pending row up-front, supersede any prior pending ──────────
+  // Doing this BEFORE the LLM call gives the FE a queryable status the moment
+  // a kickoff begins, and the supersede write makes a newer kickoff for the
+  // same plan win automatically — older in-flight LLM calls discard their
+  // results via the conditional success/fail markers below.
+  const generation = await mealPlanRepository.createGenerationSupersedingPrior(planId);
+
   try {
-    response = await llm.complete(
-      [{ role: 'user', content: prompt }],
-      {
-        systemPrompt: SYSTEM_PROMPT,
-        temperature: getGenerationTemperature(),
-        maxTokens: getGenerationMaxTokens(),
-      },
-    );
-  } catch (err) {
-    console.error(`[mealGenerationService:${mode}] llm.complete failed`, err);
-    throw new AppError(502, 'AI provider failed', 'AI_PROVIDER_ERROR', { cause: err });
-  }
-
-  // ─── 2. Parse + Zod validate the response ─────────────────────────────────
-  let parsed: AIPlanOutput;
-  try {
-    parsed = aiPlanOutputSchema.parse(JSON.parse(stripFences(response.text)));
-  } catch (err) {
-    console.error(
-      `[mealGenerationService:${mode}] failed to parse LLM output. preview=${response.text.slice(0, 500)}`,
-      err,
-    );
-    throw new AppError(502, 'AI returned invalid output', 'AI_GENERATION_FAILED', {
-      cause: err,
-    });
-  }
-
-  // ─── 3. Build lookup maps from active context ─────────────────────────────
-  const mealTypes = await mealTypeRepository.listActive();
-  const mealTypeKeyToId = new Map(mealTypes.map((m) => [m.key, m.id] as const));
-  const restaurantIds = new Set(ctx.restaurants.map((r) => r.restaurantId));
-  const menuItemIds = buildMenuItemIdSet(ctx.restaurants);
-  const remainingDates = new Set(ctx.remainingDates);
-
-  // ─── 4. Cross-validate every slot/option against context ──────────────────
-  const rows: NewMealSuggestion[] = [];
-  for (const slot of parsed.slots) {
-    const mealTypeId = mealTypeKeyToId.get(slot.mealTypeKey);
-    if (!mealTypeId) {
-      throw new AppError(
-        502,
-        `AI returned unknown mealTypeKey "${slot.mealTypeKey}"`,
-        'AI_GENERATION_FAILED',
+    // ─── 1. Call the LLM ────────────────────────────────────────────────────
+    let response: Awaited<ReturnType<typeof llm.complete>>;
+    try {
+      response = await llm.complete(
+        [{ role: 'user', content: prompt }],
+        {
+          systemPrompt: SYSTEM_PROMPT,
+          temperature: getGenerationTemperature(),
+          maxTokens: getGenerationMaxTokens(),
+        },
       );
-    }
-    if (!remainingDates.has(slot.slotDate)) {
-      throw new AppError(
-        502,
-        `AI returned slotDate "${slot.slotDate}" outside the remaining-dates window`,
-        'AI_GENERATION_FAILED',
-      );
+    } catch (err) {
+      console.error(`[mealGenerationService:${mode}] llm.complete failed`, err);
+      throw new AppError(502, 'AI provider failed', 'AI_PROVIDER_ERROR', { cause: err });
     }
 
-    const seenOptionIndices = new Set<number>();
-    for (const opt of slot.options) {
-      if (seenOptionIndices.has(opt.optionIndex)) {
-        throw new AppError(
-          502,
-          `AI returned duplicate optionIndex ${opt.optionIndex} for ${slot.slotDate}/${slot.mealTypeKey}`,
-          'AI_GENERATION_FAILED',
-        );
-      }
-      seenOptionIndices.add(opt.optionIndex);
-
-      if (!restaurantIds.has(opt.restaurantId)) {
-        throw new AppError(
-          502,
-          `AI referenced restaurantId "${opt.restaurantId}" not in provided context`,
-          'AI_GENERATION_FAILED',
-        );
-      }
-      if (!menuItemIds.has(opt.menuItemId)) {
-        throw new AppError(
-          502,
-          `AI referenced menuItemId "${opt.menuItemId}" not in provided context`,
-          'AI_GENERATION_FAILED',
-        );
-      }
-
-      rows.push({
-        // generationId is filled in transaction below once we have it
-        generationId: '__placeholder__',
-        slotDate: slot.slotDate,
-        mealTypeId,
-        optionIndex: opt.optionIndex,
-        restaurantId: opt.restaurantId,
-        menuItemId: opt.menuItemId,
-        estimatedPrice: opt.estimatedPrice.toFixed(2),
-        notes: opt.notes ?? null,
+    // ─── 2. Parse + Zod validate the response ───────────────────────────────
+    let parsed: AIPlanOutput;
+    try {
+      parsed = aiPlanOutputSchema.parse(JSON.parse(stripFences(response.text)));
+    } catch (err) {
+      console.error(
+        `[mealGenerationService:${mode}] failed to parse LLM output. preview=${response.text.slice(0, 500)}`,
+        err,
+      );
+      throw new AppError(502, 'AI returned invalid output', 'AI_GENERATION_FAILED', {
+        cause: err,
       });
     }
-  }
 
-  // ─── 5. Persist generation + suggestions atomically ───────────────────────
-  const generation = await db.transaction(async (tx) => {
-    const gen = await mealPlanRepository.createGeneration(planId, tx);
-    const withGenerationId = rows.map((r) => ({ ...r, generationId: gen.id }));
-    await mealPlanRepository.insertSuggestions(withGenerationId, tx);
-    return gen;
-  });
+    // ─── 3. Build lookup maps from active context ───────────────────────────
+    const mealTypes = await mealTypeRepository.listActive();
+    const mealTypeKeyToId = new Map(mealTypes.map((m) => [m.key, m.id] as const));
+    const restaurantIds = new Set(ctx.restaurants.map((r) => r.restaurantId));
+    const menuItemIds = buildMenuItemIdSet(ctx.restaurants);
+    const remainingDates = new Set(ctx.remainingDates);
 
-  // ─── 6. Structured log ────────────────────────────────────────────────────
-  const latencyMs = Date.now() - startedAt;
-  console.info(
-    `[mealGenerationService:${mode}] success`,
-    JSON.stringify({
-      planId,
+    // ─── 4. Cross-validate every slot/option against context ────────────────
+    const rows: NewMealSuggestion[] = [];
+    for (const slot of parsed.slots) {
+      const mealTypeId = mealTypeKeyToId.get(slot.mealTypeKey);
+      if (!mealTypeId) {
+        throw new AppError(
+          502,
+          `AI returned unknown mealTypeKey "${slot.mealTypeKey}"`,
+          'AI_GENERATION_FAILED',
+        );
+      }
+      if (!remainingDates.has(slot.slotDate)) {
+        throw new AppError(
+          502,
+          `AI returned slotDate "${slot.slotDate}" outside the remaining-dates window`,
+          'AI_GENERATION_FAILED',
+        );
+      }
+
+      const seenOptionIndices = new Set<number>();
+      for (const opt of slot.options) {
+        if (seenOptionIndices.has(opt.optionIndex)) {
+          throw new AppError(
+            502,
+            `AI returned duplicate optionIndex ${opt.optionIndex} for ${slot.slotDate}/${slot.mealTypeKey}`,
+            'AI_GENERATION_FAILED',
+          );
+        }
+        seenOptionIndices.add(opt.optionIndex);
+
+        if (!restaurantIds.has(opt.restaurantId)) {
+          throw new AppError(
+            502,
+            `AI referenced restaurantId "${opt.restaurantId}" not in provided context`,
+            'AI_GENERATION_FAILED',
+          );
+        }
+        if (!menuItemIds.has(opt.menuItemId)) {
+          throw new AppError(
+            502,
+            `AI referenced menuItemId "${opt.menuItemId}" not in provided context`,
+            'AI_GENERATION_FAILED',
+          );
+        }
+
+        rows.push({
+          generationId: generation.id,
+          slotDate: slot.slotDate,
+          mealTypeId,
+          optionIndex: opt.optionIndex,
+          restaurantId: opt.restaurantId,
+          menuItemId: opt.menuItemId,
+          estimatedPrice: opt.estimatedPrice.toFixed(2),
+          notes: opt.notes ?? null,
+        });
+      }
+    }
+
+    // ─── 5. Persist suggestions + flip status='succeeded' atomically ────────
+    // The conditional mark inside the same tx is what makes supersede-on-kickoff
+    // safe: if a newer kickoff flipped this row to 'superseded' while we were
+    // calling the LLM, markGenerationSucceeded affects 0 rows and we throw
+    // SupersededError to roll the suggestion insert back. No orphan rows.
+    await db.transaction(async (tx) => {
+      await mealPlanRepository.insertSuggestions(rows, tx);
+      const applied = await mealPlanRepository.markGenerationSucceeded(generation.id, tx);
+      if (!applied) throw new SupersededError();
+    });
+
+    // ─── 6. Structured log ──────────────────────────────────────────────────
+    const latencyMs = Date.now() - startedAt;
+    console.info(
+      `[mealGenerationService:${mode}] success`,
+      JSON.stringify({
+        planId,
+        generationId: generation.id,
+        provider: response.provider,
+        model: response.model,
+        inputTokens: response.inputTokens ?? null,
+        outputTokens: response.outputTokens ?? null,
+        slotCount: parsed.slots.length,
+        suggestionCount: rows.length,
+        estimatedTotalCost: parsed.estimatedTotalCost,
+        latencyMs,
+      }),
+    );
+
+    return {
       generationId: generation.id,
-      provider: response.provider,
-      model: response.model,
-      inputTokens: response.inputTokens ?? null,
-      outputTokens: response.outputTokens ?? null,
-      slotCount: parsed.slots.length,
+      budgetPlanId: planId,
+      generatedAt: generation.generatedAt,
       suggestionCount: rows.length,
+      planSummary: parsed.planSummary,
       estimatedTotalCost: parsed.estimatedTotalCost,
-      latencyMs,
-    }),
-  );
+    };
+  } catch (err) {
+    if (err instanceof SupersededError) {
+      console.info(
+        `[mealGenerationService:${mode}] generation=${generation.id} superseded mid-flight; result dropped`,
+      );
+      return null;
+    }
 
-  return {
-    generationId: generation.id,
-    budgetPlanId: planId,
-    generatedAt: generation.generatedAt,
-    suggestionCount: rows.length,
-    planSummary: parsed.planSummary,
-    estimatedTotalCost: parsed.estimatedTotalCost,
-  };
+    // Mark the row as failed before re-throwing so the FE polling sees the
+    // status flip on its next tick. Conditional WHERE status='pending' so we
+    // never overwrite a 'superseded' marker (e.g. if a newer kickoff arrived
+    // between the LLM error and this update).
+    const errorCode = err instanceof AppError && err.code ? err.code : 'AI_GENERATION_FAILED';
+    const errorMessage = err instanceof Error ? err.message : null;
+    try {
+      await mealPlanRepository.markGenerationFailed(generation.id, errorCode, errorMessage);
+    } catch (markErr) {
+      // Logging only — never let a marker write hide the original error.
+      console.error(
+        `[mealGenerationService:${mode}] markGenerationFailed for generation=${generation.id} threw`,
+        markErr,
+      );
+    }
+
+    throw err;
+  }
 }
 
 function buildMenuItemIdSet(restaurants: NearbyRestaurantContext[]): Set<string> {

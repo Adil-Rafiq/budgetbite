@@ -30,19 +30,52 @@ export type PlanContextRelationRow = {
 
 export type MealTypeOnPlanRow = Pick<MealType, 'id' | 'key' | 'label' | 'sortOrder'>;
 
-export type LatestGenerationRow = { id: string; generatedAt: Date };
+export type LatestGenerationRow = {
+  id: string;
+  generatedAt: Date;
+  status: 'pending' | 'succeeded' | 'failed' | 'superseded';
+  errorCode: string | null;
+  errorMessage: string | null;
+  completedAt: Date | null;
+};
 
 export type BudgetPlanWithRelations = BudgetPlan & {
   planContext?: PlanContextRelationRow | null;
   mealTypes?: MealTypeOnPlanRow[];
-  latestGeneration?: LatestGenerationRow | null;
+  /**
+   * Latest *succeeded* generation. This is the source-of-truth pointer for
+   * what the suggestions screen renders. Stable across pending/failed replans.
+   */
+  activeGeneration?: LatestGenerationRow | null;
+  /**
+   * Latest generation by `generatedAt` regardless of status. Used as the UX
+   * signal: drives "regenerating…" banners while pending, "replan failed: X"
+   * banners while failed, hidden while superseded or when it equals
+   * `activeGeneration`.
+   */
+  latestAttempt?: LatestGenerationRow | null;
 };
 
 export type BudgetPlanIncludeFlags = {
   withContext?: boolean;
   withMealTypes?: boolean;
+  /**
+   * When true, the loader populates BOTH `activeGeneration` (latest succeeded)
+   * and `latestAttempt` (latest by generatedAt, any status). Two cheap selects
+   * — drizzle's relational `with` can't express two differently-filtered limit-1
+   * orderings cleanly, so we lift one of them out.
+   */
   withLatestGeneration?: boolean;
 };
+
+const generationColumns = {
+  id: true,
+  generatedAt: true,
+  status: true,
+  errorCode: true,
+  errorMessage: true,
+  completedAt: true,
+} as const;
 
 // Shared `with:` builder for the relational query. Keeps the loader shape in
 // one place so the three find* functions below stay in sync.
@@ -74,8 +107,10 @@ function buildWithClause(include: BudgetPlanIncludeFlags) {
       } as const,
     }),
     ...(include.withLatestGeneration && {
+      // The relational with serves `latestAttempt` (any status, latest by time).
+      // `activeGeneration` is fetched separately below — see hydrateGenerationPointers.
       mealGenerations: {
-        columns: { id: true, generatedAt: true },
+        columns: generationColumns,
         orderBy: desc(mealPlanGeneration.generatedAt),
         limit: 1,
       } as const,
@@ -97,9 +132,57 @@ function shapeRow(row: RelationRow, include: BudgetPlanIncludeFlags): BudgetPlan
     out.mealTypes = (budgetPlanMealTypes ?? []).map((bpmt) => bpmt.mealType);
   }
   if (include.withLatestGeneration) {
-    out.latestGeneration = mealGenerations?.[0] ?? null;
+    out.latestAttempt = mealGenerations?.[0] ?? null;
+    // activeGeneration is hydrated below in a follow-up query (see
+    // hydrateGenerationPointers). When absent (no rows / not requested), it
+    // stays undefined and the public DTO mapper coerces to null.
   }
   return out;
+}
+
+// Second select for the activeGeneration pointer. Cheap, hits the partial-index
+// candidates efficiently because the latest-succeeded row is virtually always at
+// the head of the per-plan index.
+async function hydrateGenerationPointers(
+  rows: BudgetPlanWithRelations[],
+  include: BudgetPlanIncludeFlags,
+): Promise<void> {
+  if (!include.withLatestGeneration || rows.length === 0) return;
+
+  // Optimisation: when latestAttempt itself is succeeded, it IS the active gen.
+  const needsLookup = rows.filter((r) => r.latestAttempt?.status !== 'succeeded');
+  for (const r of rows) {
+    if (r.latestAttempt?.status === 'succeeded') {
+      r.activeGeneration = r.latestAttempt;
+    }
+  }
+  if (needsLookup.length === 0) return;
+
+  // Per-plan one-shot select. Could be a window-function batch, but plan counts
+  // here are tiny (single-plan reads dominate; list endpoints page to ~20).
+  await Promise.all(
+    needsLookup.map(async (r) => {
+      const [active] = await db
+        .select({
+          id: mealPlanGeneration.id,
+          generatedAt: mealPlanGeneration.generatedAt,
+          status: mealPlanGeneration.status,
+          errorCode: mealPlanGeneration.errorCode,
+          errorMessage: mealPlanGeneration.errorMessage,
+          completedAt: mealPlanGeneration.completedAt,
+        })
+        .from(mealPlanGeneration)
+        .where(
+          and(
+            eq(mealPlanGeneration.budgetPlanId, r.id),
+            eq(mealPlanGeneration.status, 'succeeded'),
+          ),
+        )
+        .orderBy(desc(mealPlanGeneration.generatedAt))
+        .limit(1);
+      r.activeGeneration = (active as LatestGenerationRow | undefined) ?? null;
+    }),
+  );
 }
 
 // ─── Repository ───────────────────────────────────────────────────────────────
@@ -162,7 +245,10 @@ export const budgetPlanRepository = {
       where: eq(budgetPlan.id, id),
       with: buildWithClause(include),
     });
-    return row ? shapeRow(row as RelationRow, include) : undefined;
+    if (!row) return undefined;
+    const shaped = shapeRow(row as RelationRow, include);
+    await hydrateGenerationPointers([shaped], include);
+    return shaped;
   },
 
   async findActiveByUserIdWithRelations(
@@ -174,7 +260,10 @@ export const budgetPlanRepository = {
       orderBy: desc(budgetPlan.startDate),
       with: buildWithClause(include),
     });
-    return row ? shapeRow(row as RelationRow, include) : undefined;
+    if (!row) return undefined;
+    const shaped = shapeRow(row as RelationRow, include);
+    await hydrateGenerationPointers([shaped], include);
+    return shaped;
   },
 
   async listByUserIdWithRelations(
@@ -196,7 +285,9 @@ export const budgetPlanRepository = {
       offset,
       with: buildWithClause(include),
     });
-    return (rows as RelationRow[]).map((r) => shapeRow(r, include));
+    const shaped = (rows as RelationRow[]).map((r) => shapeRow(r, include));
+    await hydrateGenerationPointers(shaped, include);
+    return shaped;
   },
 
   async countByUserId(

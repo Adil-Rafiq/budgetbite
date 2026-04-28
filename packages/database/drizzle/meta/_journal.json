@@ -15,6 +15,20 @@
       "when": 1774792875943,
       "tag": "0001_greedy_namora",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774792875944,
+      "tag": "0002_gifted_shiva",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777371154899,
+      "tag": "0003_rare_killer_shrike",
+      "breakpoints": true
     }
   ]
 }

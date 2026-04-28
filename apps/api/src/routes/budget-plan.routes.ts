@@ -37,7 +37,7 @@ router.get(
 /** Get the caller's active plan with running budget state. Returns { plan, budgetState } or null. */
 router.get('/active', asyncHandler(budgetPlanController.getActivePlan));
 
-/** Get full detail for one plan (context + mealTypes + latestGeneration). Returns BudgetPlanDetail. */
+/** Get full detail for one plan (context + mealTypes + activeGeneration + latestAttempt). Returns BudgetPlanDetail. */
 router.get('/:id', validate({ params: idParams }), asyncHandler(budgetPlanController.getPlanById));
 
 /** Patch plan metadata (totalBudget / notificationTimes / status). Returns BudgetPlanResponse. */

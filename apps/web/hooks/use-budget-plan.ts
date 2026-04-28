@@ -11,11 +11,18 @@ export const useBudgetPlans = (params: Parameters<typeof budgetPlanApi.list>[0])
   });
 
 // get budget plan by id
+//
+// Polls every 2s while the latest generation attempt is still pending so the
+// "regenerating…" UX state stays in sync with backend AI work without any
+// manual refetch wiring at the call site. Once the attempt reaches a terminal
+// state (succeeded / failed / superseded) polling stops automatically.
 export const useBudgetPlanById = (id: string) =>
   useQuery({
     queryKey: ['budgetPlan', id],
     queryFn: () => budgetPlanApi.getById(id),
     enabled: !!id,
+    refetchInterval: (query) =>
+      query.state.data?.latestAttempt?.status === 'pending' ? 2000 : false,
   });
 
 // get active budget plan

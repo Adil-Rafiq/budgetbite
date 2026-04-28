@@ -86,7 +86,8 @@ function toBudgetPlanDetail(plan: BudgetPlanWithRelations): BudgetPlanDetail {
   return {
     ...toBudgetPlanResponse(plan),
     context: toBudgetStateContext(plan.planContext),
-    latestGeneration: plan.latestGeneration ?? null,
+    activeGeneration: plan.activeGeneration ?? null,
+    latestAttempt: plan.latestAttempt ?? null,
   };
 }
 
@@ -216,7 +217,7 @@ export const budgetPlanService = {
     return toBudgetPlanResponse(reloaded);
   },
 
-  async generateMealPlan(userId: string, planId: string): Promise<GenerationResult> {
+  async generateMealPlan(userId: string, planId: string): Promise<GenerationResult | null> {
     return mealGenerationService.generate(userId, planId);
   },
 };
