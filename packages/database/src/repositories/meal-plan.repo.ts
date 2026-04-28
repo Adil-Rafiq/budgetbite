@@ -1,4 +1,4 @@
-import { eq, and, asc, desc } from 'drizzle-orm';
+import { eq, and, asc, desc, sql } from 'drizzle-orm';
 
 import { db, type DbOrTx } from '../db.js';
 import {
@@ -147,6 +147,41 @@ export const mealPlanRepository = {
         ),
       )
       .orderBy(desc(mealPlanGeneration.generatedAt))
+      .limit(1);
+    return row;
+  },
+
+  /**
+   * Paginated list of every generation row for a plan ordered newest-first.
+   * Drives the Generation History timeline on the FE detail page; includes
+   * pending / superseded / failed rows so users can audit the full attempt log.
+   */
+  async listGenerations(
+    budgetPlanId: string,
+    { limit = 20, offset = 0 }: { limit?: number; offset?: number } = {},
+  ): Promise<MealPlanGeneration[]> {
+    return db
+      .select()
+      .from(mealPlanGeneration)
+      .where(eq(mealPlanGeneration.budgetPlanId, budgetPlanId))
+      .orderBy(desc(mealPlanGeneration.generatedAt))
+      .limit(limit)
+      .offset(offset);
+  },
+
+  async countGenerations(budgetPlanId: string): Promise<number> {
+    const [row] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(mealPlanGeneration)
+      .where(eq(mealPlanGeneration.budgetPlanId, budgetPlanId));
+    return row?.count ?? 0;
+  },
+
+  async getGenerationById(generationId: string): Promise<MealPlanGeneration | undefined> {
+    const [row] = await db
+      .select()
+      .from(mealPlanGeneration)
+      .where(eq(mealPlanGeneration.id, generationId))
       .limit(1);
     return row;
   },

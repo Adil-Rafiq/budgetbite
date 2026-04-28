@@ -1,23 +1,32 @@
 import type {
   ActiveBudgetPlanResponse,
+  BudgetGeneration,
+  BudgetGenerationDayGroup,
+  BudgetGenerationDetailResponse,
   BudgetPlanDetail,
   BudgetPlanResponse,
   BudgetStateContext,
   CreateBudgetPlanInput,
+  ListBudgetGenerationsResponse,
   ListBudgetPlansQuery,
   Paginated,
+  PaginationQuery,
   UpdateBudgetPlanInput,
 } from '@repo/shared';
 import { toNumber } from '@repo/shared';
 import {
   budgetPlanRepository,
+  mealPlanRepository,
+  mealTypeRepository,
   planContextRepository,
   type BudgetPlanWithRelations,
+  type MealPlanGeneration,
   type PlanContextRelationRow,
 } from '@repo/database';
 
 import { AppError } from '../middleware/error.middleware.js';
 import { mealGenerationService, type GenerationResult } from './meal-generation.service.js';
+import { toOption, type SuggestionRow } from './meal-plan.service.js';
 
 // ─── Composition rule (for future contributors) ──────────────────────────────
 // Reads that hydrate a budget plan with its owned children (plan_context 1:1,
@@ -220,4 +229,105 @@ export const budgetPlanService = {
   async generateMealPlan(userId: string, planId: string): Promise<GenerationResult | null> {
     return mealGenerationService.generate(userId, planId);
   },
+
+  /**
+   * Paginated list of every generation row for a plan ordered newest-first.
+   * Drives the Generation History timeline on the FE plan detail page.
+   */
+  async listGenerations(
+    userId: string,
+    planId: string,
+    query: PaginationQuery,
+  ): Promise<ListBudgetGenerationsResponse> {
+    await assertOwned(userId, planId);
+    const [rows, total] = await Promise.all([
+      mealPlanRepository.listGenerations(planId, { limit: query.limit, offset: query.offset }),
+      mealPlanRepository.countGenerations(planId),
+    ]);
+    return {
+      data: rows.map(toBudgetGeneration),
+      meta: { total, limit: query.limit, offset: query.offset },
+    };
+  },
+
+  /**
+   * Full detail for a single generation: row metadata + grouped suggestions.
+   * Suggestions are returned grouped by `slotDate` then by mealType (sorted by
+   * `mealType.sortOrder`) so the FE can render a vertical day-by-day grid
+   * without doing client-side bucketing.
+   *
+   * Non-succeeded statuses (pending/failed/superseded) return `days: []` —
+   * there are no persisted suggestions in those states; the row's
+   * `errorCode`/`errorMessage` carry the relevant context for failed gens.
+   */
+  async getGenerationDetail(
+    userId: string,
+    planId: string,
+    generationId: string,
+  ): Promise<BudgetGenerationDetailResponse> {
+    await assertOwned(userId, planId);
+
+    const gen = await mealPlanRepository.getGenerationById(generationId);
+    if (!gen || gen.budgetPlanId !== planId) {
+      throw new AppError(404, 'Generation not found', 'NOT_FOUND');
+    }
+
+    if (gen.status !== 'succeeded') {
+      return { generation: toBudgetGeneration(gen), days: [] };
+    }
+
+    const [suggestions, mealTypes] = await Promise.all([
+      mealPlanRepository.getSuggestionsForGeneration(generationId),
+      mealTypeRepository.listActive(),
+    ]);
+
+    // Group suggestions: slotDate -> mealTypeId -> rows. Then materialize into
+    // ordered day groups, with mealTypes ordered by mealType.sortOrder so the
+    // grid reads breakfast/lunch/dinner consistently.
+    const byDate = new Map<string, Map<string, SuggestionRow[]>>();
+    for (const s of suggestions as SuggestionRow[]) {
+      let bySlot = byDate.get(s.slotDate);
+      if (!bySlot) {
+        bySlot = new Map();
+        byDate.set(s.slotDate, bySlot);
+      }
+      const bucket = bySlot.get(s.mealTypeId) ?? [];
+      bucket.push(s);
+      bySlot.set(s.mealTypeId, bucket);
+    }
+
+    const days: BudgetGenerationDayGroup[] = Array.from(byDate.keys())
+      .sort()
+      .map((slotDate) => {
+        const bySlot = byDate.get(slotDate)!;
+        const slots = mealTypes
+          .filter((mt) => bySlot.has(mt.id))
+          .map((mt) => ({
+            mealTypeId: mt.id,
+            mealTypeKey: mt.key,
+            mealTypeLabel: mt.label,
+            options: (bySlot.get(mt.id) ?? []).map(toOption),
+          }));
+        return { slotDate, slots };
+      });
+
+    return { generation: toBudgetGeneration(gen), days };
+  },
 };
+
+function toBudgetGeneration(row: MealPlanGeneration): BudgetGeneration {
+  return {
+    id: row.id,
+    generatedAt: row.generatedAt,
+    status: row.status,
+    errorCode: row.errorCode,
+    errorMessage: row.errorMessage,
+    completedAt: row.completedAt,
+  };
+}
+
+async function assertOwned(userId: string, planId: string): Promise<void> {
+  const plan = await budgetPlanRepository.findById(planId);
+  if (!plan) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
+  if (plan.userId !== userId) throw new AppError(403, 'Forbidden', 'FORBIDDEN');
+}

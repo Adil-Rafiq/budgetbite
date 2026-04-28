@@ -80,3 +80,16 @@ export async function generateMealPlan(req: AuthRequest, res: Response): Promise
   }
   res.status(201).json(result);
 }
+
+export async function listGenerations(req: AuthRequest, res: Response): Promise<void> {
+  const { id } = req.params as IdParams;
+  const { limit, offset } = req.query as unknown as PaginationQuery;
+  const result = await budgetPlanService.listGenerations(req.userId!, id, { limit, offset });
+  res.json(result);
+}
+
+export async function getGenerationDetail(req: AuthRequest, res: Response): Promise<void> {
+  const { id, gid } = req.params as IdParams & { gid: string };
+  const result = await budgetPlanService.getGenerationDetail(req.userId!, id, gid);
+  res.json(result);
+}

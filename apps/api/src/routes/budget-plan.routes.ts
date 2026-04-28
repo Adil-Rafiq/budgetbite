@@ -77,4 +77,18 @@ router.post(
   asyncHandler(budgetPlanController.generateMealPlan),
 );
 
+/** Paginated list of every generation attempt for a plan, newest-first. Returns { data: BudgetGeneration[], meta }. */
+router.get(
+  '/:id/generations',
+  validate({ params: idParams, query: paginationSchema }),
+  asyncHandler(budgetPlanController.listGenerations),
+);
+
+/** Get one generation row + grouped suggestions (empty `days` for non-succeeded statuses). Returns BudgetGenerationDetailResponse. */
+router.get(
+  '/:id/generations/:gid',
+  validate({ params: z.object({ id: uuidSchema, gid: uuidSchema }) }),
+  asyncHandler(budgetPlanController.getGenerationDetail),
+);
+
 export default router;

@@ -2,12 +2,14 @@ import { z } from 'zod';
 
 import {
   isoDateStringSchema,
+  paginatedSchema,
   paginationSchema,
   timeOfDayStringSchema,
   uuidSchema,
 } from './common.js';
 import { mealTypeSummarySchema } from './meal-type.js';
 import { budgetStateContextSchema } from './budget-state.js';
+import { suggestionSlotSchema } from './meal-plan.js';
 
 // ─── Inputs ─────────────────────────────────────────────────────────────────
 
@@ -110,6 +112,27 @@ export const activeBudgetPlanResponseSchema = z.object({
   budgetState: budgetStateContextSchema,
 });
 
+// ─── Generation history (FE detail page) ────────────────────────────────────
+
+/** Paginated envelope for GET /api/budget-plans/:id/generations. */
+export const listBudgetGenerationsResponseSchema = paginatedSchema(budgetGenerationSchema);
+
+/** One day's worth of slots inside a single generation's detail payload. */
+export const budgetGenerationDayGroupSchema = z.object({
+  slotDate: isoDateStringSchema,
+  slots: z.array(suggestionSlotSchema),
+});
+
+/**
+ * Shape returned by GET /api/budget-plans/:id/generations/:gid.
+ * `days` is empty for non-succeeded statuses; the gen row's `errorCode` /
+ * `errorMessage` carry the relevant context in that case.
+ */
+export const budgetGenerationDetailResponseSchema = z.object({
+  generation: budgetGenerationSchema,
+  days: z.array(budgetGenerationDayGroupSchema),
+});
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type CreateBudgetPlanInput = z.infer<typeof createBudgetPlanSchema>;
@@ -120,3 +143,6 @@ export type BudgetPlanResponse = z.infer<typeof budgetPlanResponseSchema>;
 export type BudgetGeneration = z.infer<typeof budgetGenerationSchema>;
 export type BudgetPlanDetail = z.infer<typeof budgetPlanDetailSchema>;
 export type ActiveBudgetPlanResponse = z.infer<typeof activeBudgetPlanResponseSchema>;
+export type ListBudgetGenerationsResponse = z.infer<typeof listBudgetGenerationsResponseSchema>;
+export type BudgetGenerationDayGroup = z.infer<typeof budgetGenerationDayGroupSchema>;
+export type BudgetGenerationDetailResponse = z.infer<typeof budgetGenerationDetailResponseSchema>;

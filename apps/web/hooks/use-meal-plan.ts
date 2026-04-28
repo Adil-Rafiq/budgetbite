@@ -16,6 +16,7 @@ export const useGenerateMealPlan = () => {
     onSuccess: (_data, planId) => {
       queryClient.invalidateQueries({ queryKey: ['mealPlanSuggestions'] });
       queryClient.invalidateQueries({ queryKey: ['budgetPlan', planId] });
+      queryClient.invalidateQueries({ queryKey: ['budgetPlanGenerations', planId] });
       queryClient.invalidateQueries({ queryKey: ['activeBudgetPlan'] });
     },
   });

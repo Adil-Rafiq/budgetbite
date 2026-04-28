@@ -2,9 +2,11 @@ import type { GetSuggestionsQuery } from '@repo/shared';
 import { toNumber, toNumberOrNull } from '@repo/shared';
 import { budgetPlanRepository, mealPlanRepository, mealTypeRepository } from '@repo/database';
 
-type SuggestionRow = Awaited<ReturnType<typeof mealPlanRepository.getSuggestionsForDay>>[number];
+export type SuggestionRow = Awaited<
+  ReturnType<typeof mealPlanRepository.getSuggestionsForDay>
+>[number];
 
-function toOption(o: SuggestionRow) {
+export function toOption(o: SuggestionRow) {
   return {
     id: o.id,
     optionIndex: o.optionIndex,

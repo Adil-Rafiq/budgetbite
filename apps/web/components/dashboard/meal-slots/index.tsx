@@ -1,6 +1,6 @@
 'use client';
 
-import { Coffee, Sun, Moon, Check, ThumbsDown, PenLine } from 'lucide-react';
+import { Check, ThumbsDown, PenLine } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,23 +17,8 @@ import { LogMealModal } from '@/components/dashboard/meal-slots/_components/log-
 import { MealSlotsSkeleton } from '@/components/dashboard/meal-slots/_components/meal-slots-skeleton';
 import { MealSlotsError } from '@/components/dashboard/meal-slots/_components/meal-slots-error';
 import { useMealSlots } from '@/components/dashboard/meal-slots/_hooks/use-meal-slots';
+import { getMealTypeVisual } from '@/lib/meal-type-visuals';
 import type { SuggestionSlot, SuggestionOption } from '@repo/shared';
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const slotIcons: Record<string, React.ElementType> = {
-  breakfast: Coffee,
-  lunch: Sun,
-  dinner: Moon,
-};
-
-const slotColors: Record<string, string> = {
-  breakfast: 'text-chart-1 bg-chart-1/10',
-  lunch: 'text-chart-4 bg-chart-4/10',
-  dinner: 'text-chart-3 bg-chart-3/10',
-};
-
-const defaultSlotColor = 'text-primary bg-primary/10';
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -86,9 +71,7 @@ export function MealSlots() {
         {/* ── Slot cards ── */}
         <div className="grid gap-4 lg:grid-cols-3">
           {slotsData.slots.map((slot: SuggestionSlot) => {
-            const key = slot.mealTypeKey.toLowerCase();
-            const Icon = slotIcons[key] ?? Coffee;
-            const colors = slotColors[key] ?? defaultSlotColor;
+            const { Icon, colors } = getMealTypeVisual(slot.mealTypeKey);
             const loggedMeal = loggedByMealType[slot.mealTypeId];
             const isLogged = !!loggedMeal;
 
