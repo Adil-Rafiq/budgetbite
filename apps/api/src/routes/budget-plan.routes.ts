@@ -37,7 +37,7 @@ router.get(
 /** Get the caller's active plan with running budget state. Returns { plan, budgetState } or null. */
 router.get('/active', asyncHandler(budgetPlanController.getActivePlan));
 
-/** Get full detail for one plan (context + mealTypes + latestGeneration). Returns BudgetPlanDetail. */
+/** Get full detail for one plan (context + mealTypes + activeGeneration + latestAttempt). Returns BudgetPlanDetail. */
 router.get('/:id', validate({ params: idParams }), asyncHandler(budgetPlanController.getPlanById));
 
 /** Patch plan metadata (totalBudget / notificationTimes / status). Returns BudgetPlanResponse. */
@@ -75,6 +75,20 @@ router.post(
   '/:id/meal-plan/generate',
   validate({ params: idParams }),
   asyncHandler(budgetPlanController.generateMealPlan),
+);
+
+/** Paginated list of every generation attempt for a plan, newest-first. Returns { data: BudgetGeneration[], meta }. */
+router.get(
+  '/:id/generations',
+  validate({ params: idParams, query: paginationSchema }),
+  asyncHandler(budgetPlanController.listGenerations),
+);
+
+/** Get one generation row + grouped suggestions (empty `days` for non-succeeded statuses). Returns BudgetGenerationDetailResponse. */
+router.get(
+  '/:id/generations/:gid',
+  validate({ params: z.object({ id: uuidSchema, gid: uuidSchema }) }),
+  asyncHandler(budgetPlanController.getGenerationDetail),
 );
 
 export default router;

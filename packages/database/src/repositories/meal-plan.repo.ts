@@ -1,6 +1,6 @@
-import { eq, and, asc, desc } from 'drizzle-orm';
+import { eq, and, asc, desc, sql } from 'drizzle-orm';
 
-import { db } from '../db.js';
+import { db, type DbOrTx } from '../db.js';
 import {
   mealPlanGeneration,
   mealSuggestion,
@@ -14,14 +14,96 @@ export const mealPlanRepository = {
   /**
    * Create a new meal plan generation record for a budget plan.
    * Generation record connects the meal suggestions to the budget plan and allows tracking multiple generations over time.
+   *
+   * Defaults to status='pending'. Used for tests / non-kickoff callers; the real
+   * AI flow uses `createGenerationSupersedingPrior` to also flip any in-flight
+   * pending row for the same plan to 'superseded' atomically.
    */
-  async createGeneration(budgetPlanId: string): Promise<MealPlanGeneration> {
-    const [inserted] = await db.insert(mealPlanGeneration).values({ budgetPlanId }).returning();
+  async createGeneration(budgetPlanId: string, tx?: DbOrTx): Promise<MealPlanGeneration> {
+    const exec = tx ?? db;
+    const [inserted] = await exec.insert(mealPlanGeneration).values({ budgetPlanId }).returning();
 
     if (!inserted) throw new Error('MealPlanGeneration insert failed');
     return inserted;
   },
 
+  /**
+   * Atomically supersede any in-flight pending generations for this plan and
+   * insert a new pending row. This is the entry point used by the AI kickoff:
+   * a newer attempt always wins, the older pending row is marked 'superseded'
+   * and its eventual LLM result will be discarded by the conditional
+   * `markGenerationSucceeded` / `markGenerationFailed` calls below.
+   */
+  async createGenerationSupersedingPrior(budgetPlanId: string): Promise<MealPlanGeneration> {
+    return db.transaction(async (tx) => {
+      await tx
+        .update(mealPlanGeneration)
+        .set({ status: 'superseded', completedAt: new Date() })
+        .where(
+          and(
+            eq(mealPlanGeneration.budgetPlanId, budgetPlanId),
+            eq(mealPlanGeneration.status, 'pending'),
+          ),
+        );
+
+      const [inserted] = await tx
+        .insert(mealPlanGeneration)
+        .values({ budgetPlanId })
+        .returning();
+
+      if (!inserted) throw new Error('MealPlanGeneration insert failed');
+      return inserted;
+    });
+  },
+
+  /**
+   * Conditional success marker. Only flips status to 'succeeded' if the row is
+   * still 'pending' (i.e. has not been superseded mid-flight). Returns true if
+   * the update applied, false otherwise. Caller (the suggestion-insert tx) must
+   * roll back when this returns false so superseded gens never carry orphan
+   * suggestion rows.
+   */
+  async markGenerationSucceeded(generationId: string, tx?: DbOrTx): Promise<boolean> {
+    const exec = tx ?? db;
+    const updated = await exec
+      .update(mealPlanGeneration)
+      .set({ status: 'succeeded', completedAt: new Date() })
+      .where(
+        and(eq(mealPlanGeneration.id, generationId), eq(mealPlanGeneration.status, 'pending')),
+      )
+      .returning({ id: mealPlanGeneration.id });
+    return updated.length > 0;
+  },
+
+  /**
+   * Conditional failure marker. Only flips status to 'failed' if the row is
+   * still 'pending' — never overwrites a 'superseded' marker. Always its own
+   * statement so it survives a rolled-back suggestion-insert tx.
+   */
+  async markGenerationFailed(
+    generationId: string,
+    errorCode: string,
+    errorMessage: string | null,
+  ): Promise<boolean> {
+    const updated = await db
+      .update(mealPlanGeneration)
+      .set({
+        status: 'failed',
+        completedAt: new Date(),
+        errorCode,
+        errorMessage,
+      })
+      .where(
+        and(eq(mealPlanGeneration.id, generationId), eq(mealPlanGeneration.status, 'pending')),
+      )
+      .returning({ id: mealPlanGeneration.id });
+    return updated.length > 0;
+  },
+
+  /**
+   * Latest generation **id** by generatedAt regardless of status. Used for the
+   * `latestAttempt` UX signal (banners, toasts) — never for serving suggestions.
+   */
   async getLatestGenerationId(budgetPlanId: string): Promise<string | undefined> {
     const [row] = await db
       .select({ id: mealPlanGeneration.id })
@@ -30,6 +112,78 @@ export const mealPlanRepository = {
       .orderBy(desc(mealPlanGeneration.generatedAt))
       .limit(1);
     return row?.id;
+  },
+
+  /**
+   * Latest **succeeded** generation id. This is the source-of-truth pointer for
+   * the suggestions read path: a pending or failed replan never empties the
+   * in-place plan because we resolve through this filter.
+   */
+  async getLatestSucceededGenerationId(budgetPlanId: string): Promise<string | undefined> {
+    const [row] = await db
+      .select({ id: mealPlanGeneration.id })
+      .from(mealPlanGeneration)
+      .where(
+        and(
+          eq(mealPlanGeneration.budgetPlanId, budgetPlanId),
+          eq(mealPlanGeneration.status, 'succeeded'),
+        ),
+      )
+      .orderBy(desc(mealPlanGeneration.generatedAt))
+      .limit(1);
+    return row?.id;
+  },
+
+  async getLatestSucceededGeneration(
+    budgetPlanId: string,
+  ): Promise<MealPlanGeneration | undefined> {
+    const [row] = await db
+      .select()
+      .from(mealPlanGeneration)
+      .where(
+        and(
+          eq(mealPlanGeneration.budgetPlanId, budgetPlanId),
+          eq(mealPlanGeneration.status, 'succeeded'),
+        ),
+      )
+      .orderBy(desc(mealPlanGeneration.generatedAt))
+      .limit(1);
+    return row;
+  },
+
+  /**
+   * Paginated list of every generation row for a plan ordered newest-first.
+   * Drives the Generation History timeline on the FE detail page; includes
+   * pending / superseded / failed rows so users can audit the full attempt log.
+   */
+  async listGenerations(
+    budgetPlanId: string,
+    { limit = 20, offset = 0 }: { limit?: number; offset?: number } = {},
+  ): Promise<MealPlanGeneration[]> {
+    return db
+      .select()
+      .from(mealPlanGeneration)
+      .where(eq(mealPlanGeneration.budgetPlanId, budgetPlanId))
+      .orderBy(desc(mealPlanGeneration.generatedAt))
+      .limit(limit)
+      .offset(offset);
+  },
+
+  async countGenerations(budgetPlanId: string): Promise<number> {
+    const [row] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(mealPlanGeneration)
+      .where(eq(mealPlanGeneration.budgetPlanId, budgetPlanId));
+    return row?.count ?? 0;
+  },
+
+  async getGenerationById(generationId: string): Promise<MealPlanGeneration | undefined> {
+    const [row] = await db
+      .select()
+      .from(mealPlanGeneration)
+      .where(eq(mealPlanGeneration.id, generationId))
+      .limit(1);
+    return row;
   },
 
   async getSuggestionsForSlot(
@@ -134,9 +288,10 @@ export const mealPlanRepository = {
    * Bulk insert all suggestion rows for a generation.
    * Called by MealPlannerService after the LLM returns a valid plan.
    */
-  async insertSuggestions(suggestions: NewMealSuggestion[]): Promise<void> {
+  async insertSuggestions(suggestions: NewMealSuggestion[], tx?: DbOrTx): Promise<void> {
     if (suggestions.length === 0) return;
-    await db.insert(mealSuggestion).values(suggestions);
+    const exec = tx ?? db;
+    await exec.insert(mealSuggestion).values(suggestions);
   },
 
   /**

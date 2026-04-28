@@ -2,9 +2,11 @@ import type { GetSuggestionsQuery } from '@repo/shared';
 import { toNumber, toNumberOrNull } from '@repo/shared';
 import { budgetPlanRepository, mealPlanRepository, mealTypeRepository } from '@repo/database';
 
-type SuggestionRow = Awaited<ReturnType<typeof mealPlanRepository.getSuggestionsForDay>>[number];
+export type SuggestionRow = Awaited<
+  ReturnType<typeof mealPlanRepository.getSuggestionsForDay>
+>[number];
 
-function toOption(o: SuggestionRow) {
+export function toOption(o: SuggestionRow) {
   return {
     id: o.id,
     optionIndex: o.optionIndex,
@@ -26,7 +28,10 @@ export const mealPlanService = {
     const activePlan = await budgetPlanRepository.findActiveByUserId(userId);
     if (!activePlan) return { date: query.date, slots: [] };
 
-    const generationId = await mealPlanRepository.getLatestGenerationId(activePlan.id);
+    // Resolve via the latest *succeeded* generation specifically. A pending or
+    // failed replan in flight must not blank out the in-place plan; the user
+    // keeps reading from the previous successful gen until a new one succeeds.
+    const generationId = await mealPlanRepository.getLatestSucceededGenerationId(activePlan.id);
     if (!generationId) {
       return { date: query.date, slots: [] };
     }

@@ -39,6 +39,12 @@ export const generateMealPlanResponseSchema = z.object({
   generationId: z.string(),
   budgetPlanId: z.string(),
   generatedAt: z.coerce.date(),
+  /** Number of suggestion rows persisted across all slots. Present on AI-backed generations. */
+  suggestionCount: z.number().int().nonnegative().optional(),
+  /** Short human-readable summary the LLM returned to describe the plan. */
+  planSummary: z.string().optional(),
+  /** Sum of estimated prices across all "best" picks per slot, as reported by the LLM. */
+  estimatedTotalCost: z.number().nonnegative().optional(),
 });
 
 // ─── Types ──────────────────────────────────────────────────────────────────

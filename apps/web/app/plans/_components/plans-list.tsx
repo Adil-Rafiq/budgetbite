@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AlertCircle, CalendarDays, ChevronLeft, ChevronRight, ChevronRightIcon } from 'lucide-react';
 import { useBudgetPlans } from '@/hooks/use-budget-plan';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -104,69 +105,84 @@ export default function PlansList() {
           const remaining = plan.totalBudget - spent;
 
           return (
-            <Card key={plan.id} className="border-border">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base capitalize text-card-foreground">
-                    {plan.planType} Plan
-                  </CardTitle>
-                  <Badge variant="secondary" className={statusStyles[plan.status]}>
-                    {plan.status}
-                  </Badge>
-                </div>
-              </CardHeader>
+            <Link
+              key={plan.id}
+              href={`/plans/${plan.id}`}
+              className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              aria-label={`Open ${plan.planType} plan details`}
+            >
+              <Card className="border-border transition-all duration-200 cursor-pointer hover:border-primary/40 hover:shadow-md group-focus-visible:border-primary/40">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base capitalize text-card-foreground flex items-center gap-1.5">
+                      {plan.planType} Plan
+                      <ChevronRightIcon
+                        aria-hidden
+                        className="w-4 h-4 text-muted-foreground/0 transition-all duration-200 group-hover:text-muted-foreground group-hover:translate-x-0.5"
+                      />
+                    </CardTitle>
+                    <Badge variant="secondary" className={statusStyles[plan.status]}>
+                      {plan.status}
+                    </Badge>
+                  </div>
+                </CardHeader>
 
-              <CardContent className="flex flex-col gap-4">
-                {/* Date range */}
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CalendarDays className="w-4 h-4 shrink-0" />
-                  <span>
-                    {formatDate(plan.startDate, { month: 'short', day: 'numeric' })}
-                    {' – '}
-                    {formatDate(plan.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
-                </div>
-
-                {/* Spend progress */}
-                <div>
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">
-                      PKR {spent.toLocaleString()} spent
-                    </span>
-                    <span className="font-semibold text-card-foreground">
-                      PKR {plan.totalBudget.toLocaleString()}
+                <CardContent className="flex flex-col gap-4">
+                  {/* Date range */}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CalendarDays className="w-4 h-4 shrink-0" />
+                    <span>
+                      {formatDate(plan.startDate, { month: 'short', day: 'numeric' })}
+                      {' – '}
+                      {formatDate(plan.endDate, {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
                     </span>
                   </div>
-                  <Progress value={spentPercent} className="h-2" />
-                </div>
 
-                {/* Stats grid */}
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  {[
-                    { label: 'Budget', value: `${(plan.totalBudget / 1000).toFixed(0)}k` },
-                    { label: 'Spent', value: `${(spent / 1000).toFixed(1)}k` },
-                    {
-                      label: 'Left',
-                      value: remaining > 0 ? `${(remaining / 1000).toFixed(1)}k` : '0',
-                    },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="rounded-lg bg-secondary p-2">
-                      <p className="text-xs text-muted-foreground">{label}</p>
-                      <p className="text-sm font-bold text-card-foreground">{value}</p>
+                  {/* Spend progress */}
+                  <div>
+                    <div className="flex items-center justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">
+                        PKR {spent.toLocaleString()} spent
+                      </span>
+                      <span className="font-semibold text-card-foreground">
+                        PKR {plan.totalBudget.toLocaleString()}
+                      </span>
                     </div>
-                  ))}
-                </div>
+                    <Progress value={spentPercent} className="h-2" />
+                  </div>
 
-                {/* Meal type badges */}
-                <div className="flex flex-wrap gap-1.5">
-                  {plan.mealTypes.map((mt) => (
-                    <Badge key={mt.id} variant="outline" className="text-xs capitalize">
-                      {mt.label}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  {/* Stats grid */}
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    {[
+                      { label: 'Budget', value: `${(plan.totalBudget / 1000).toFixed(0)}k` },
+                      { label: 'Spent', value: `${(spent / 1000).toFixed(1)}k` },
+                      {
+                        label: 'Left',
+                        value: remaining > 0 ? `${(remaining / 1000).toFixed(1)}k` : '0',
+                      },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="rounded-lg bg-secondary p-2">
+                        <p className="text-xs text-muted-foreground">{label}</p>
+                        <p className="text-sm font-bold text-card-foreground">{value}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Meal type badges */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {plan.mealTypes.map((mt) => (
+                      <Badge key={mt.id} variant="outline" className="text-xs capitalize">
+                        {mt.label}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           );
         })}
       </div>

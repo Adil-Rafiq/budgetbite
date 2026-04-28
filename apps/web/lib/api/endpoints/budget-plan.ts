@@ -7,7 +7,10 @@ import type {
   ActiveBudgetPlanResponse,
   BudgetPlanDetail,
   BudgetStateContext,
+  ListBudgetGenerationsResponse,
+  BudgetGenerationDetailResponse,
   Paginated,
+  PaginationQuery,
 } from '@repo/shared';
 
 export const budgetPlanApi = {
@@ -23,4 +26,12 @@ export const budgetPlanApi = {
     apiClient.patch(`api/budget-plans/${id}`, { json: input }).json(),
   getContext: (id: string): Promise<BudgetStateContext> =>
     apiClient.get(`api/budget-plans/${id}/context`).json(),
+  listGenerations: (planId: string, params: PaginationQuery) =>
+    apiClient
+      .get(`api/budget-plans/${planId}/generations`, { searchParams: params })
+      .json<ListBudgetGenerationsResponse>(),
+  getGeneration: (planId: string, gid: string) =>
+    apiClient
+      .get(`api/budget-plans/${planId}/generations/${gid}`)
+      .json<BudgetGenerationDetailResponse>(),
 };

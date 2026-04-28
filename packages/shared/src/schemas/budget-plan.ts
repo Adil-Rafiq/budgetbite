@@ -2,12 +2,14 @@ import { z } from 'zod';
 
 import {
   isoDateStringSchema,
+  paginatedSchema,
   paginationSchema,
   timeOfDayStringSchema,
   uuidSchema,
 } from './common.js';
 import { mealTypeSummarySchema } from './meal-type.js';
 import { budgetStateContextSchema } from './budget-state.js';
+import { suggestionSlotSchema } from './meal-plan.js';
 
 // ─── Inputs ─────────────────────────────────────────────────────────────────
 
@@ -73,22 +75,62 @@ export const budgetPlanResponseSchema = budgetPlanSchema.omit({ mealTypeIds: tru
   remainingAmount: z.number(),
 });
 
-/** DTO for meal plan generation metadata. */
+/**
+ * DTO for meal plan generation metadata.
+ *
+ * `status` lifecycle: pending -> succeeded | failed | superseded.
+ * `errorCode` / `errorMessage` populated only when status='failed'.
+ * `completedAt` set on every terminal transition; null while pending.
+ */
 export const budgetGenerationSchema = z.object({
   id: uuidSchema,
   generatedAt: z.coerce.date(),
+  status: z.enum(['pending', 'succeeded', 'failed', 'superseded']),
+  errorCode: z.string().nullable(),
+  errorMessage: z.string().nullable(),
+  completedAt: z.coerce.date().nullable(),
 });
 
-/** Single-plan detail: response DTO + full running context + latest generation pointer. */
+/**
+ * Single-plan detail. Two generation pointers, intentionally split:
+ *  - `activeGeneration`: latest *succeeded* generation. Drives the suggestions
+ *    screen. Stable across pending/failed/superseded replans, so the in-place
+ *    plan never visibly disappears.
+ *  - `latestAttempt`: latest generation by generatedAt regardless of status.
+ *    Drives "regenerating…" / "replan failed: X" UX banners. May equal
+ *    activeGeneration when no newer attempt exists.
+ */
 export const budgetPlanDetailSchema = budgetPlanResponseSchema.extend({
   context: budgetStateContextSchema,
-  latestGeneration: budgetGenerationSchema.nullable(),
+  activeGeneration: budgetGenerationSchema.nullable(),
+  latestAttempt: budgetGenerationSchema.nullable(),
 });
 
 /** Shape returned by GET /api/budget-plans/active — matches what the FE expects. */
 export const activeBudgetPlanResponseSchema = z.object({
   plan: budgetPlanResponseSchema,
   budgetState: budgetStateContextSchema,
+});
+
+// ─── Generation history (FE detail page) ────────────────────────────────────
+
+/** Paginated envelope for GET /api/budget-plans/:id/generations. */
+export const listBudgetGenerationsResponseSchema = paginatedSchema(budgetGenerationSchema);
+
+/** One day's worth of slots inside a single generation's detail payload. */
+export const budgetGenerationDayGroupSchema = z.object({
+  slotDate: isoDateStringSchema,
+  slots: z.array(suggestionSlotSchema),
+});
+
+/**
+ * Shape returned by GET /api/budget-plans/:id/generations/:gid.
+ * `days` is empty for non-succeeded statuses; the gen row's `errorCode` /
+ * `errorMessage` carry the relevant context in that case.
+ */
+export const budgetGenerationDetailResponseSchema = z.object({
+  generation: budgetGenerationSchema,
+  days: z.array(budgetGenerationDayGroupSchema),
 });
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -101,3 +143,6 @@ export type BudgetPlanResponse = z.infer<typeof budgetPlanResponseSchema>;
 export type BudgetGeneration = z.infer<typeof budgetGenerationSchema>;
 export type BudgetPlanDetail = z.infer<typeof budgetPlanDetailSchema>;
 export type ActiveBudgetPlanResponse = z.infer<typeof activeBudgetPlanResponseSchema>;
+export type ListBudgetGenerationsResponse = z.infer<typeof listBudgetGenerationsResponseSchema>;
+export type BudgetGenerationDayGroup = z.infer<typeof budgetGenerationDayGroupSchema>;
+export type BudgetGenerationDetailResponse = z.infer<typeof budgetGenerationDetailResponseSchema>;
