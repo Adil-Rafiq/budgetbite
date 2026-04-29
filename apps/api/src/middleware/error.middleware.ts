@@ -7,6 +7,7 @@ export class AppError extends Error {
     message: string,
     public readonly code?: string,
     options?: ErrorOptions, // accepts { cause }
+    public readonly details?: Record<string, unknown>,
   ) {
     super(message, options);
     this.name = 'AppError';
@@ -25,6 +26,7 @@ export function errorMiddleware(
     res.status(err.statusCode).json({
       error: err.message,
       ...(err.code && { code: err.code }),
+      ...(err.details && { details: err.details }),
     });
     return;
   }

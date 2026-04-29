@@ -48,13 +48,21 @@ export function GenerationStatusBanner({ plan }: GenerationStatusBannerProps) {
   }
 
   if (latest.status === 'failed' && latest.id !== active?.id) {
+    const isTimeout = latest.errorCode === 'TIMEOUT';
     return (
       <BannerShell tone="failed">
         <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium">We couldn&apos;t update your plan.</p>
-          {latest.errorMessage && (
+          <p className="text-sm font-medium">
+            {isTimeout ? 'Generation timed out.' : "We couldn't update your plan."}
+          </p>
+          {!isTimeout && latest.errorMessage && (
             <p className="text-xs opacity-80 mt-0.5 line-clamp-2">{latest.errorMessage}</p>
+          )}
+          {isTimeout && (
+            <p className="text-xs opacity-80 mt-0.5">
+              The AI took too long to respond. Try again to refresh your plan.
+            </p>
           )}
           {active && (
             <p className="text-xs opacity-70 mt-1">

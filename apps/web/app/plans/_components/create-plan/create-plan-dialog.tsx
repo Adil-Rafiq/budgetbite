@@ -16,10 +16,15 @@ import { StepNotifications } from '@/app/plans/_components/create-plan/steps/ste
 type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
+  /**
+   * When set, the submit flow cancels this plan first, then creates the new
+   * one. Drives the "Cancel & create new" replace UX from PlansPageHeader.
+   */
+  replaceActivePlanId?: string | null;
 };
 
-export function CreatePlanDialog({ open, onOpenChange }: Props) {
-  const createPlan = useCreatePlan();
+export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = null }: Props) {
+  const createPlan = useCreatePlan(replaceActivePlanId);
   const { currentStep, currentStepData, progress, isLastStep, isSubmitting, actions } = createPlan;
 
   return (

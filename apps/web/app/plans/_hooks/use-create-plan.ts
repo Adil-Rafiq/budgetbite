@@ -1,7 +1,8 @@
 'use client';
 
 import { useMachine } from '@xstate/react';
-import { useCreateBudgetPlan } from '@/hooks/use-budget-plan';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCancelBudgetPlan, useCreateBudgetPlan } from '@/hooks/use-budget-plan';
 import { useListActiveMealTypes } from '@/hooks/use-meal-type';
 import { showToast } from '@/lib/toast';
 import { CREATE_PLAN_STEPS } from '@/app/plans/constants';
@@ -9,7 +10,7 @@ import { createBudgetPlanMachine } from '@/app/plans/_machines/create-budget-pla
 import { useBudgetStep } from '@/app/plans/_hooks/use-budget-step';
 import { useNotificationStep } from '@/app/plans/_hooks/use-notification-step';
 import type { BudgetPlanPreferencesInput } from '@/app/plans/types';
-import { getErrorMessage } from '@/lib/api/errors';
+import { getErrorMessage, isPlanAlreadyActive } from '@/lib/api/errors';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -38,10 +39,12 @@ const getPlanDateRange = (planType: BudgetPlanPreferencesInput['planType']) => {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
-export const useCreatePlan = () => {
+export const useCreatePlan = (replaceActivePlanId: string | null = null) => {
   // ─── Data dependencies ──────────────────────────────────────────────────
 
+  const queryClient = useQueryClient();
   const { mutateAsync: createBudgetPlan } = useCreateBudgetPlan();
+  const { mutateAsync: cancelBudgetPlan } = useCancelBudgetPlan();
   const { data: activeMealTypes = [] } = useListActiveMealTypes();
 
   // ─── Step hooks ─────────────────────────────────────────────────────────
@@ -80,12 +83,38 @@ export const useCreatePlan = () => {
       const budget = budgetStep.getValues();
       const { notificationSlots } = notificationStep.getValues();
 
-      await createBudgetPlan({
-        ...budget,
-        mealsPerDay: budget.mealTypeIds.length,
-        ...getPlanDateRange(budget.planType),
-        notificationTimes: notificationSlots.map((s) => s.time),
-      });
+      // Replace flow: cancel the prior active plan first. The user already
+      // confirmed in the AlertDialog upstream; the partial unique index on
+      // budget_plan still backstops any race that bypasses this UX.
+      if (replaceActivePlanId) {
+        await cancelBudgetPlan(replaceActivePlanId);
+      }
+
+      try {
+        await createBudgetPlan({
+          ...budget,
+          mealsPerDay: budget.mealTypeIds.length,
+          ...getPlanDateRange(budget.planType),
+          notificationTimes: notificationSlots.map((s) => s.time),
+        });
+      } catch (err) {
+        // Race fallback: another tab created an active plan between our
+        // pre-check and our create. Surface a recoverable toast and refresh
+        // the active-plan cache so the next "New Plan" click sees fresh state.
+        const conflict = await isPlanAlreadyActive(err);
+        if (conflict) {
+          queryClient.invalidateQueries({ queryKey: ['activeBudgetPlan'] });
+          queryClient.invalidateQueries({ queryKey: ['budgetPlans'] });
+          send({ type: 'SUBMIT_FAILURE' });
+          showToast.error({
+            title: 'Active plan detected',
+            description:
+              'Another active plan was created. Refresh and try again from the plans page.',
+          });
+          return;
+        }
+        throw err;
+      }
 
       send({ type: 'SUBMIT_SUCCESS' });
       showToast.success({ title: 'Budget plan created!', description: '...' });

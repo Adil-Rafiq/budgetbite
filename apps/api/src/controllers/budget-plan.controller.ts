@@ -46,6 +46,12 @@ export async function updatePlan(req: AuthRequest, res: Response): Promise<void>
   res.json(plan);
 }
 
+export async function cancelPlan(req: AuthRequest, res: Response): Promise<void> {
+  const { id } = req.params as IdParams;
+  const plan = await budgetPlanService.cancel(req.userId!, id);
+  res.json(plan);
+}
+
 export async function getPlanContext(req: AuthRequest, res: Response): Promise<void> {
   const { id } = req.params as IdParams;
   const ctx = await budgetPlanService.getContext(req.userId!, id);

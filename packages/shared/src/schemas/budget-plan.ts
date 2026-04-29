@@ -32,10 +32,26 @@ export const createBudgetPlanSchema = z
     path: ['endDate'],
   });
 
+// Lifecycle transitions (cancel / complete) go through dedicated endpoints
+// (POST /:id/cancel, lazy completion on read). PATCH is restricted to
+// metadata edits so we cannot accept invalid transitions like
+// cancelled→active by accident.
 export const updateBudgetPlanSchema = z.object({
   totalBudget: z.coerce.number().positive().optional(),
   notificationTimes: z.array(timeOfDayStringSchema).optional(),
-  status: z.enum(['active', 'completed', 'cancelled']).optional(),
+});
+
+/**
+ * 409 body returned by POST /api/budget-plans when the user already has an
+ * active plan. The FE uses `details.existingPlanId` to drive the
+ * "Cancel and create new" replace flow without an extra GET.
+ */
+export const planAlreadyActiveErrorSchema = z.object({
+  error: z.string(),
+  code: z.literal('PLAN_ALREADY_ACTIVE'),
+  details: z.object({
+    existingPlanId: uuidSchema,
+  }),
 });
 
 export const listBudgetPlansQuerySchema = paginationSchema.extend({
@@ -137,6 +153,7 @@ export const budgetGenerationDetailResponseSchema = z.object({
 
 export type CreateBudgetPlanInput = z.infer<typeof createBudgetPlanSchema>;
 export type UpdateBudgetPlanInput = z.infer<typeof updateBudgetPlanSchema>;
+export type PlanAlreadyActiveError = z.infer<typeof planAlreadyActiveErrorSchema>;
 export type ListBudgetPlansQuery = z.infer<typeof listBudgetPlansQuerySchema>;
 export type BudgetPlan = z.infer<typeof budgetPlanSchema>;
 export type BudgetPlanResponse = z.infer<typeof budgetPlanResponseSchema>;

@@ -16,6 +16,7 @@ import type {
 import { toNumber } from '@repo/shared';
 import {
   budgetPlanRepository,
+  db,
   mealPlanRepository,
   mealTypeRepository,
   planContextRepository,
@@ -27,6 +28,18 @@ import {
 import { AppError } from '../middleware/error.middleware.js';
 import { mealGenerationService, type GenerationResult } from './meal-generation.service.js';
 import { toOption, type SuggestionRow } from './meal-plan.service.js';
+
+// 5 minutes — pending generations older than this are considered crashed
+// (Vercel restart, OOM, dropped LLM connection). Read paths flip them to
+// 'failed' with errorCode='TIMEOUT' so the FE can render a retry affordance.
+// TODO(cron): replace with a scheduled janitor when a worker tier exists.
+const PENDING_GENERATION_TIMEOUT_MS = 5 * 60 * 1000;
+
+function todayDateString(): string {
+  // YYYY-MM-DD; matches the `date` column representation. Lexicographic
+  // compare is correct for this format.
+  return new Date().toISOString().slice(0, 10);
+}
 
 // ─── Composition rule (for future contributors) ──────────────────────────────
 // Reads that hydrate a budget plan with its owned children (plan_context 1:1,
@@ -111,10 +124,53 @@ async function loadOwned(userId: string, planId: string) {
   return plan;
 }
 
+// Read-path self-healers. Both fixers are idempotent and conditional, so
+// running them on every read is cheap and safe.
+//
+//   1. Lazy-complete: any active plan whose endDate has passed flips to
+//      'completed'. Scope is per-user (covers list endpoints) or per-plan
+//      (covers single-plan reads).
+//   2. Lazy-timeout: any pending generation older than the timeout window
+//      flips to failed/TIMEOUT. Only meaningful with a planId since
+//      generation rows are scoped to a plan.
+//
+// Both writes are conditional UPDATEs that only fire when the row is in the
+// expected state, so a concurrent cancel() always wins the race.
+async function applyLazyFixersForRead(userId: string, planId?: string): Promise<void> {
+  const today = todayDateString();
+  if (planId) {
+    await budgetPlanRepository.completeIfExpiredById(planId, today);
+    const cutoff = new Date(Date.now() - PENDING_GENERATION_TIMEOUT_MS);
+    await mealPlanRepository.failStalePending(planId, cutoff);
+  } else {
+    await budgetPlanRepository.completeExpiredForUser(userId, today);
+  }
+}
+
 export const budgetPlanService = {
   async create(userId: string, input: CreateBudgetPlanInput): Promise<BudgetPlanResponse> {
     const totalMeals = totalMealsForPlan(input);
     const avg = input.totalBudget / totalMeals;
+
+    // Precondition: enforce one-active-plan-per-user. Lazy-complete any
+    // expired-but-still-active plan first, then 409 if an active plan
+    // remains. SELECT FOR UPDATE pins the candidate row so concurrent
+    // create+cancel races see consistent state inside this tx; the partial
+    // unique index on (userId WHERE status='active') is the final backstop.
+    const today = todayDateString();
+    await db.transaction(async (tx) => {
+      const existing = await budgetPlanRepository.findActiveByUserIdForUpdate(userId, tx);
+      if (!existing) return;
+      const flipped = await budgetPlanRepository.completeIfExpiredById(existing.id, today, tx);
+      if (flipped) return; // expired -> completed; user is free to create
+      throw new AppError(
+        409,
+        'You already have an active plan',
+        'PLAN_ALREADY_ACTIVE',
+        undefined,
+        { existingPlanId: existing.id },
+      );
+    });
 
     await budgetPlanRepository.createWithRelations(
       {
@@ -155,7 +211,38 @@ export const budgetPlanService = {
     return toBudgetPlanResponse(created);
   },
 
+  /**
+   * Lifecycle: soft-cancel a plan and supersede any in-flight generation.
+   * Preserves all suggestions, meal choices, and plan context — the plan
+   * becomes a frozen historical record. The atomic supersede ensures any
+   * LLM call still in flight rolls back its suggestion insert when it
+   * discovers the generation row is no longer pending.
+   */
+  async cancel(userId: string, planId: string): Promise<BudgetPlanResponse> {
+    const existing = await budgetPlanRepository.findById(planId);
+    if (!existing) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
+    if (existing.userId !== userId) throw new AppError(403, 'Forbidden', 'FORBIDDEN');
+    if (existing.status === 'cancelled') {
+      throw new AppError(409, 'Plan already cancelled', 'PLAN_ALREADY_CANCELLED');
+    }
+    if (existing.status === 'completed') {
+      throw new AppError(409, 'Completed plans cannot be cancelled', 'PLAN_ALREADY_COMPLETED');
+    }
+
+    await budgetPlanRepository.cancelWithPendingSupersede(planId);
+
+    const reloaded = await budgetPlanRepository.findByIdWithRelations(planId, {
+      withContext: true,
+      withMealTypes: true,
+    });
+    if (!reloaded) {
+      throw new AppError(500, 'Cancelled plan could not be loaded', 'INTERNAL_ERROR');
+    }
+    return toBudgetPlanResponse(reloaded);
+  },
+
   async list(userId: string, query: ListBudgetPlansQuery): Promise<Paginated<BudgetPlanResponse>> {
+    await applyLazyFixersForRead(userId);
     const [rows, total] = await Promise.all([
       budgetPlanRepository.listByUserIdWithRelations(userId, {
         limit: query.limit,
@@ -173,11 +260,13 @@ export const budgetPlanService = {
   },
 
   async getById(userId: string, planId: string): Promise<BudgetPlanDetail> {
+    await applyLazyFixersForRead(userId, planId);
     const plan = await loadOwned(userId, planId);
     return toBudgetPlanDetail(plan);
   },
 
   async getActive(userId: string): Promise<ActiveBudgetPlanResponse | null> {
+    await applyLazyFixersForRead(userId);
     const plan = await budgetPlanRepository.findActiveByUserIdWithRelations(userId, {
       withContext: true,
       withMealTypes: true,
@@ -212,10 +301,12 @@ export const budgetPlanService = {
     if (!existing) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
     if (existing.userId !== userId) throw new AppError(403, 'Forbidden', 'FORBIDDEN');
 
+    // Lifecycle transitions go through dedicated methods (cancel,
+    // lazy-completion). The shared updateBudgetPlanSchema rejects `status`
+    // at the API boundary; this is the second line of defense.
     await budgetPlanRepository.update(planId, {
       totalBudget: input.totalBudget != null ? String(input.totalBudget) : undefined,
       notificationTimes: input.notificationTimes ?? undefined,
-      status: input.status,
     });
 
     const reloaded = await budgetPlanRepository.findByIdWithRelations(planId, {

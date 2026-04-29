@@ -29,6 +29,13 @@
       "when": 1777371154899,
       "tag": "0003_rare_killer_shrike",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1777446598157,
+      "tag": "0004_outgoing_jubilee",
+      "breakpoints": true
     }
   ]
 }
