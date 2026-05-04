@@ -3,6 +3,7 @@
 ## In Progress
 
 ## Up Next
+- [ ] AI returns invalid plan often times, sometimes uuid is invalid, sometimes the max-token limit is reached etc
 
 - [ ] Fix budget generating suggestions for a generation
 - [ ] Add logic checks in services
