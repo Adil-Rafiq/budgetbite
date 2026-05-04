@@ -101,6 +101,37 @@ export const mealPlanRepository = {
   },
 
   /**
+   * Lazy timeout: flip any 'pending' row whose generatedAt is older than
+   * `cutoff` to 'failed' with errorCode='TIMEOUT'. Conditional on
+   * status='pending' so it never overwrites a 'superseded' marker.
+   *
+   * Called from the GET path that surfaces generation status — recovers a
+   * row stuck in pending after a process crash mid-LLM-call. Returns the
+   * count of rows flipped.
+   *
+   * TODO(cron): replace with a scheduled janitor when a worker tier exists.
+   */
+  async failStalePending(budgetPlanId: string, cutoff: Date): Promise<number> {
+    const updated = await db
+      .update(mealPlanGeneration)
+      .set({
+        status: 'failed',
+        completedAt: new Date(),
+        errorCode: 'TIMEOUT',
+        errorMessage: 'Generation exceeded timeout window',
+      })
+      .where(
+        and(
+          eq(mealPlanGeneration.budgetPlanId, budgetPlanId),
+          eq(mealPlanGeneration.status, 'pending'),
+          sql`${mealPlanGeneration.generatedAt} < ${cutoff}`,
+        ),
+      )
+      .returning({ id: mealPlanGeneration.id });
+    return updated.length;
+  },
+
+  /**
    * Latest generation **id** by generatedAt regardless of status. Used for the
    * `latestAttempt` UX signal (banners, toasts) — never for serving suggestions.
    */

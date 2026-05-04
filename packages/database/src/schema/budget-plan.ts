@@ -1,5 +1,15 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, uuid, check, decimal, integer, text, date, jsonb } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  check,
+  decimal,
+  integer,
+  text,
+  date,
+  jsonb,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core';
 
 import { timestamps } from './common/timestamps.js';
 import { user } from './auth.js';
@@ -32,5 +42,11 @@ export const budgetPlan = pgTable(
       'budget_plans_notification_times_length',
       sql`(${table.notificationTimes} IS NULL OR jsonb_array_length(${table.notificationTimes}) = ${table.mealsPerDay})`,
     ),
+    // Enforces "one active plan per user" at the DB level. Partial index so
+    // cancelled/completed rows don't conflict. Backstops the service-level
+    // SELECT FOR UPDATE precondition against any race that bypasses it.
+    uniqueIndex('budget_plan_one_active_per_user_idx')
+      .on(table.userId)
+      .where(sql`${table.status} = 'active'`),
   ],
 );

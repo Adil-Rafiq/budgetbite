@@ -203,6 +203,104 @@ export const budgetPlanRepository = {
     return row;
   },
 
+  /**
+   * SELECT FOR UPDATE the user's active plan inside a transaction so the
+   * lazy-complete check + status flip + downstream uniqueness check all
+   * observe consistent row state. Used by `budgetPlanService.create()` as
+   * the precondition gate; the partial unique index on (userId WHERE
+   * status='active') is the final backstop.
+   */
+  async findActiveByUserIdForUpdate(
+    userId: string,
+    tx: DbOrTx,
+  ): Promise<BudgetPlan | undefined> {
+    const [row] = await tx
+      .select()
+      .from(budgetPlan)
+      .where(and(eq(budgetPlan.userId, userId), eq(budgetPlan.status, 'active')))
+      .for('update')
+      .limit(1);
+    return row;
+  },
+
+  /**
+   * Conditional lazy-completion bound to expiry. Flips status to 'completed'
+   * only when the row is still 'active' AND endDate < today. Lets a
+   * concurrent cancel() win the race cleanly. Returns the updated row, or
+   * undefined when nothing flipped.
+   *
+   * TODO(cron): replace this read-time fixer with a nightly cron when one
+   * exists. Until then every read is the deadline-watcher.
+   */
+  async completeIfExpiredById(
+    planId: string,
+    today: string,
+    tx?: DbOrTx,
+  ): Promise<BudgetPlan | undefined> {
+    const exec = tx ?? db;
+    const [row] = await exec
+      .update(budgetPlan)
+      .set({ status: 'completed' })
+      .where(
+        and(
+          eq(budgetPlan.id, planId),
+          eq(budgetPlan.status, 'active'),
+          sql`${budgetPlan.endDate} < ${today}`,
+        ),
+      )
+      .returning();
+    return row;
+  },
+
+  /**
+   * Bulk lazy-completion for a user. One UPDATE retires every active plan
+   * whose endDate has passed. Used by list read paths so callers never see
+   * stale "active but expired" rows.
+   */
+  async completeExpiredForUser(userId: string, today: string): Promise<number> {
+    const updated = await db
+      .update(budgetPlan)
+      .set({ status: 'completed' })
+      .where(
+        and(
+          eq(budgetPlan.userId, userId),
+          eq(budgetPlan.status, 'active'),
+          sql`${budgetPlan.endDate} < ${today}`,
+        ),
+      )
+      .returning({ id: budgetPlan.id });
+    return updated.length;
+  },
+
+  /**
+   * Atomic plan cancel + supersede in-flight generations. One transaction so
+   * the FE never sees a "cancelled" plan whose pending generation row is
+   * still pending. The conditional `markGenerationSucceeded` upstream means
+   * any LLM call still in flight will roll back its suggestion insert when
+   * it discovers the row is no longer pending.
+   */
+  async cancelWithPendingSupersede(planId: string): Promise<BudgetPlan> {
+    return db.transaction(async (tx) => {
+      const [plan] = await tx
+        .update(budgetPlan)
+        .set({ status: 'cancelled' })
+        .where(eq(budgetPlan.id, planId))
+        .returning();
+      if (!plan) throw new Error('BudgetPlan not found');
+
+      await tx
+        .update(mealPlanGeneration)
+        .set({ status: 'superseded', completedAt: new Date() })
+        .where(
+          and(
+            eq(mealPlanGeneration.budgetPlanId, planId),
+            eq(mealPlanGeneration.status, 'pending'),
+          ),
+        );
+      return plan;
+    });
+  },
+
   async listByUserId(userId: string, limit = 20): Promise<BudgetPlan[]> {
     return db
       .select()

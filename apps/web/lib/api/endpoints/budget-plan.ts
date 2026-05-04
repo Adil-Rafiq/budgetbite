@@ -24,6 +24,8 @@ export const budgetPlanApi = {
     apiClient.post('api/budget-plans', { json: input }).json(),
   update: (id: string, input: UpdateBudgetPlanInput): Promise<BudgetPlanResponse> =>
     apiClient.patch(`api/budget-plans/${id}`, { json: input }).json(),
+  cancel: (id: string): Promise<BudgetPlanResponse> =>
+    apiClient.post(`api/budget-plans/${id}/cancel`).json(),
   getContext: (id: string): Promise<BudgetStateContext> =>
     apiClient.get(`api/budget-plans/${id}/context`).json(),
   listGenerations: (planId: string, params: PaginationQuery) =>

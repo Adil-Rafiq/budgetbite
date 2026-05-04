@@ -40,11 +40,18 @@ router.get('/active', asyncHandler(budgetPlanController.getActivePlan));
 /** Get full detail for one plan (context + mealTypes + activeGeneration + latestAttempt). Returns BudgetPlanDetail. */
 router.get('/:id', validate({ params: idParams }), asyncHandler(budgetPlanController.getPlanById));
 
-/** Patch plan metadata (totalBudget / notificationTimes / status). Returns BudgetPlanResponse. */
+/** Patch plan metadata (totalBudget / notificationTimes). Lifecycle transitions go through POST /:id/cancel. Returns BudgetPlanResponse. */
 router.patch(
   '/:id',
   validate({ params: idParams, body: updateBudgetPlanSchema }),
   asyncHandler(budgetPlanController.updatePlan),
+);
+
+/** Cancel a plan and atomically supersede any in-flight generation. Idempotency-guarded via 409 on already-terminal states. Returns BudgetPlanResponse. */
+router.post(
+  '/:id/cancel',
+  validate({ params: idParams }),
+  asyncHandler(budgetPlanController.cancelPlan),
 );
 
 /** Get only the running budget state (amountSpent, mealsRemaining, etc.) for a plan. Returns BudgetStateContext. */

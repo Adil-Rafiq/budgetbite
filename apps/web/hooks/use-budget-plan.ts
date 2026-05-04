@@ -58,6 +58,19 @@ export const useUpdateBudgetPlan = (id: string) => {
   });
 };
 
+// cancel a budget plan (soft-cancel; supersedes any pending generation)
+export const useCancelBudgetPlan = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => budgetPlanApi.cancel(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['budgetPlans'] });
+      queryClient.invalidateQueries({ queryKey: ['activeBudgetPlan'] });
+      queryClient.invalidateQueries({ queryKey: ['budgetPlan', id] });
+    },
+  });
+};
+
 // get budget plan context
 export const useBudgetPlanContext = (id: string) =>
   useQuery({
