@@ -3,8 +3,6 @@
 ## In Progress
 
 ## Up Next
-- [ ] AI returns invalid plan often times, sometimes uuid is invalid, sometimes the max-token limit is reached etc
-
 - [ ] Fix budget generating suggestions for a generation
 - [ ] Add logic checks in services
 - [ ] Remove any `try-catch` from the AI related code. Use `AppError` instead
@@ -30,6 +28,7 @@
 
 ## Done
 
+- [x] AI returns invalid plan often times, sometimes uuid is invalid, sometimes the max-token limit is reached etc
 - [x] Auth setup (email + password)
 - [x] Email OTP verification
 - [x] Google OAuth
