@@ -5,8 +5,47 @@ import type {
   CreateMenuItemInput,
   UpdateMenuItemInput,
 } from '@repo/shared';
-import { restaurantRepository, menuRepository, userRepository } from '@repo/database';
+import {
+  budgetPlanRepository,
+  mealPinRepository,
+  menuRepository,
+  planContextRepository,
+  restaurantRepository,
+  userRepository,
+} from '@repo/database';
 import { AppError } from '../middleware/error.middleware.js';
+import { applyPinAdjustment } from './context-builder.service.js';
+
+function todayDateString(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Resolve the per-meal target used by the "best for budget" sort. Reads the
+ * caller's active plan + plan_context, applies the same pin adjustment the AI
+ * sees so list-page sort and detail-page fit-badges agree on the target.
+ * Returns null when the user has no active plan or no remaining meals.
+ */
+async function resolveBudgetFitTarget(userId?: string): Promise<number | null> {
+  if (!userId) return null;
+  const plan = await budgetPlanRepository.findActiveByUserId(userId);
+  if (!plan) return null;
+  const ctx = await planContextRepository.findByPlanId(plan.id);
+  if (!ctx) return null;
+  const raw = {
+    totalBudget: Number(ctx.totalBudget),
+    amountSpent: Number(ctx.amountSpent),
+    amountRemaining: Number(ctx.amountRemaining),
+    totalMeals: ctx.totalMeals,
+    mealsConsumed: ctx.mealsConsumed,
+    mealsRemaining: ctx.mealsRemaining,
+    avgBudgetPerRemainingMeal: Number(ctx.avgBudgetPerRemainingMeal),
+    cumulativeVariance: Number(ctx.cumulativeVariance),
+  };
+  const pinAggregate = await mealPinRepository.sumFutureForPlan(plan.id, todayDateString());
+  const adjusted = applyPinAdjustment(raw, Number(pinAggregate.totalPriceAtPin), pinAggregate.count);
+  return adjusted.avgBudgetPerRemainingMeal > 0 ? adjusted.avgBudgetPerRemainingMeal : null;
+}
 
 export const restaurantService = {
   async list(query: ListRestaurantsQuery, userId?: string) {
@@ -22,6 +61,13 @@ export const restaurantService = {
         lng = lng ?? Number(profile.longitude);
       }
     }
+
+    // budget-fit sort needs the active plan's per-meal target. Compute it
+    // only when the caller actually asked for that sort to avoid the extra
+    // query on every list call.
+    const budgetFitTarget =
+      query.sort === 'budget-fit' ? await resolveBudgetFitTarget(userId) : null;
+
     const results = await restaurantRepository.list({
       limit: query.limit,
       offset: query.offset,
@@ -29,6 +75,9 @@ export const restaurantService = {
       userLat: lat,
       userLng: lng,
       minRating: query.minRating,
+      q: query.q,
+      sort: query.sort,
+      budgetFitTarget: budgetFitTarget ?? undefined,
     });
     return results.map((r) => ({
       ...r.restaurant,
@@ -38,6 +87,8 @@ export const restaurantService = {
       minimumOrder: r.restaurant.minimumOrder != null ? Number(r.restaurant.minimumOrder) : null,
       rating: r.restaurant.rating != null ? Number(r.restaurant.rating) : null,
       distanceKm: r.distanceKm != null ? Number(r.distanceKm) : undefined,
+      minItemPrice: r.minItemPrice,
+      avgItemPrice: r.avgItemPrice,
     }));
   },
 
@@ -72,6 +123,7 @@ export const restaurantService = {
     const restaurant = await restaurantRepository.create({
       externalId: input.externalId,
       name: input.name,
+      slug: input.slug ?? null,
       latitude: String(input.latitude),
       longitude: String(input.longitude),
       deliveryFee: input.deliveryFee != null ? String(input.deliveryFee) : null,
@@ -93,6 +145,7 @@ export const restaurantService = {
     const restaurant = await restaurantRepository.update(id, {
       ...(input.externalId !== undefined && { externalId: input.externalId }),
       ...(input.name !== undefined && { name: input.name }),
+      ...(input.slug !== undefined && { slug: input.slug }),
       ...(input.latitude !== undefined && { latitude: String(input.latitude) }),
       ...(input.longitude !== undefined && { longitude: String(input.longitude) }),
       ...(input.deliveryFee !== undefined && { deliveryFee: String(input.deliveryFee) }),
@@ -153,6 +206,7 @@ export const restaurantService = {
     id: string;
     externalId: string;
     name: string;
+    slug: string | null;
     latitude: string;
     longitude: string;
     deliveryFee: string | null;
@@ -166,6 +220,7 @@ export const restaurantService = {
       id: restaurant.id,
       externalId: restaurant.externalId,
       name: restaurant.name,
+      slug: restaurant.slug,
       latitude: Number(restaurant.latitude),
       longitude: Number(restaurant.longitude),
       deliveryFee: restaurant.deliveryFee != null ? Number(restaurant.deliveryFee) : null,

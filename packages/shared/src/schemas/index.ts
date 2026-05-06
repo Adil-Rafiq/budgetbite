@@ -14,6 +14,7 @@ export * from './budget-state.js';
 export * from './budget-plan.js';
 export * from './meal-plan.js';
 export * from './meal-choice.js';
+export * from './meal-pin.js';
 export * from './feedback.js';
 export * from './analytics.js';
 export * from './ai-output.js';

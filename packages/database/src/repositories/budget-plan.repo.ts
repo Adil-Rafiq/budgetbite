@@ -439,9 +439,10 @@ export const budgetPlanRepository = {
    */
   async getMealTypesWithDetails(
     budgetPlanId: string,
-  ): Promise<{ key: string; label: string; sortOrder: number }[]> {
+  ): Promise<{ id: string; key: string; label: string; sortOrder: number }[]> {
     const rows = await db
       .select({
+        id: mealType.id,
         key: mealType.key,
         label: mealType.label,
         sortOrder: mealType.sortOrder,

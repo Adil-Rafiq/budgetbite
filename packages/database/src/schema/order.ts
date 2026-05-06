@@ -3,6 +3,8 @@ import { date, decimal, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-co
 import { budgetPlan } from './budget-plan.js';
 import { mealSuggestion } from './meal-plan.js';
 import { mealType } from './meal-type.js';
+import { menuItem } from './menu-item.js';
+import { restaurant } from './restaurant.js';
 import { user } from './auth.js';
 
 export const mealChoice = pgTable('meal_choice', {
@@ -18,6 +20,16 @@ export const mealChoice = pgTable('meal_choice', {
     .notNull()
     .references(() => mealType.id, { onDelete: 'restrict' }),
   suggestionId: uuid('suggestion_id').references(() => mealSuggestion.id, {
+    onDelete: 'set null',
+  }),
+  // Optional structured links to the actual restaurant/menu item the user
+  // ordered. Nullable because pre-existing rows and free-form "manual" entries
+  // may not have these. restaurantName remains as a denormalized snapshot
+  // (menu items get re-scraped; the human-readable label should not drift).
+  restaurantId: uuid('restaurant_id').references(() => restaurant.id, {
+    onDelete: 'set null',
+  }),
+  menuItemId: uuid('menu_item_id').references(() => menuItem.id, {
     onDelete: 'set null',
   }),
   manualDescription: text('manual_description'),

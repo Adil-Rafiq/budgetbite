@@ -9,6 +9,7 @@ import { restaurant } from './restaurant.js';
 import { menuItem } from './menu-item.js';
 import { mealPlanGeneration, mealSuggestion } from './meal-plan.js';
 import { mealChoice } from './order.js';
+import { mealPin } from './meal-pin.js';
 import { feedback } from './feedback.js';
 import { budgetPlanMealType } from './budget-plan-meal-type.js';
 
@@ -19,6 +20,7 @@ export const userRelations = relations(user, ({ many, one }) => ({
   userProfile: one(userProfile),
   budgetPlans: many(budgetPlan),
   mealChoices: many(mealChoice),
+  mealPins: many(mealPin),
   feedbacks: many(feedback),
 }));
 
@@ -59,6 +61,7 @@ export const budgetPlanRelations = relations(budgetPlan, ({ one, many }) => ({
   budgetPlanMealTypes: many(budgetPlanMealType),
   mealGenerations: many(mealPlanGeneration),
   mealChoices: many(mealChoice),
+  mealPins: many(mealPin),
 }));
 
 // Meal Type Relations
@@ -66,12 +69,15 @@ export const mealTypeRelations = relations(mealType, ({ many }) => ({
   budgetPlanMealTypes: many(budgetPlanMealType),
   mealSuggestions: many(mealSuggestion),
   mealChoices: many(mealChoice),
+  mealPins: many(mealPin),
 }));
 
 // Restaurant Relations
 export const restaurantRelations = relations(restaurant, ({ many }) => ({
   menuItems: many(menuItem),
   mealSuggestions: many(mealSuggestion),
+  mealChoices: many(mealChoice),
+  mealPins: many(mealPin),
 }));
 
 // Menu Item Relations
@@ -81,6 +87,8 @@ export const menuItemRelations = relations(menuItem, ({ one, many }) => ({
     references: [restaurant.id],
   }),
   mealSuggestions: many(mealSuggestion),
+  mealChoices: many(mealChoice),
+  mealPins: many(mealPin),
 }));
 
 // Meal Plan Generation Relations
@@ -131,7 +139,39 @@ export const mealChoiceRelations = relations(mealChoice, ({ one, many }) => ({
     fields: [mealChoice.suggestionId],
     references: [mealSuggestion.id],
   }),
+  restaurant: one(restaurant, {
+    fields: [mealChoice.restaurantId],
+    references: [restaurant.id],
+  }),
+  menuItem: one(menuItem, {
+    fields: [mealChoice.menuItemId],
+    references: [menuItem.id],
+  }),
   feedbacks: many(feedback),
+}));
+
+// Meal Pin Relations
+export const mealPinRelations = relations(mealPin, ({ one }) => ({
+  user: one(user, {
+    fields: [mealPin.userId],
+    references: [user.id],
+  }),
+  budgetPlan: one(budgetPlan, {
+    fields: [mealPin.budgetPlanId],
+    references: [budgetPlan.id],
+  }),
+  mealType: one(mealType, {
+    fields: [mealPin.mealTypeId],
+    references: [mealType.id],
+  }),
+  restaurant: one(restaurant, {
+    fields: [mealPin.restaurantId],
+    references: [restaurant.id],
+  }),
+  menuItem: one(menuItem, {
+    fields: [mealPin.menuItemId],
+    references: [menuItem.id],
+  }),
 }));
 
 // Feedback Relations

@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, ThumbsDown, PenLine } from 'lucide-react';
+import { Check, Pin, ThumbsDown, PenLine } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -74,6 +74,10 @@ export function MealSlots() {
             const { Icon, colors } = getMealTypeVisual(slot.mealTypeKey);
             const loggedMeal = loggedByMealType[slot.mealTypeId];
             const isLogged = !!loggedMeal;
+            // Pin merge in mealPlanService.getSuggestionsForDay collapses a
+            // pinned slot to a single option with source='pin'. Surface that
+            // to the user with a small badge so they know this slot is locked.
+            const isPinned = !isLogged && slot.options.length > 0 && slot.options[0]?.source === 'pin';
 
             return (
               <Card key={slot.mealTypeId} className="border-border">
@@ -89,12 +93,17 @@ export function MealSlots() {
                         {slot.mealTypeLabel}
                       </CardTitle>
                     </div>
-                    {isLogged && (
+                    {isLogged ? (
                       <Badge variant="secondary" className="text-accent bg-accent/10 border-0">
                         <Check className="w-3 h-3 mr-1" />
                         Logged
                       </Badge>
-                    )}
+                    ) : isPinned ? (
+                      <Badge variant="secondary" className="text-primary bg-primary/10 border-0">
+                        <Pin className="w-3 h-3 mr-1" />
+                        Pinned
+                      </Badge>
+                    ) : null}
                   </div>
                 </CardHeader>
 

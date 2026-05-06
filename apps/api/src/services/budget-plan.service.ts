@@ -17,6 +17,7 @@ import { toNumber } from '@repo/shared';
 import {
   budgetPlanRepository,
   db,
+  mealPinRepository,
   mealPlanRepository,
   mealTypeRepository,
   planContextRepository,
@@ -26,6 +27,7 @@ import {
 } from '@repo/database';
 
 import { AppError } from '../middleware/error.middleware.js';
+import { applyPinAdjustment } from './context-builder.service.js';
 import { mealGenerationService, type GenerationResult } from './meal-generation.service.js';
 import { toOption, type SuggestionRow } from './meal-plan.service.js';
 
@@ -79,6 +81,21 @@ function toBudgetStateContext(ctx: PlanContextRelationRow): BudgetStateContext {
   };
 }
 
+/**
+ * Read pin-adjusted budget state for a plan. plan_context is choice-driven
+ * only — pins are pre-allocations the user has committed to but not logged.
+ * For the FE budget meter and budget-fit indicator, the AI math (which already
+ * accounts for pins via contextBuilderService) and the FE math need to match.
+ */
+async function getPinAdjustedState(
+  ctx: PlanContextRelationRow,
+  budgetPlanId: string,
+): Promise<BudgetStateContext> {
+  const raw = toBudgetStateContext(ctx);
+  const pinAggregate = await mealPinRepository.sumFutureForPlan(budgetPlanId, todayDateString());
+  return applyPinAdjustment(raw, Number(pinAggregate.totalPriceAtPin), pinAggregate.count);
+}
+
 function toBudgetPlanResponse(plan: BudgetPlanWithRelations): BudgetPlanResponse {
   const ctx = plan.planContext;
   const spent = ctx ? toNumber(ctx.amountSpent) : 0;
@@ -101,13 +118,13 @@ function toBudgetPlanResponse(plan: BudgetPlanWithRelations): BudgetPlanResponse
   };
 }
 
-function toBudgetPlanDetail(plan: BudgetPlanWithRelations): BudgetPlanDetail {
+async function toBudgetPlanDetail(plan: BudgetPlanWithRelations): Promise<BudgetPlanDetail> {
   if (!plan.planContext) {
     throw new AppError(500, 'Plan context missing', 'PLAN_CONTEXT_MISSING');
   }
   return {
     ...toBudgetPlanResponse(plan),
-    context: toBudgetStateContext(plan.planContext),
+    context: await getPinAdjustedState(plan.planContext, plan.id),
     activeGeneration: plan.activeGeneration ?? null,
     latestAttempt: plan.latestAttempt ?? null,
   };
@@ -277,7 +294,7 @@ export const budgetPlanService = {
     }
     return {
       plan: toBudgetPlanResponse(plan),
-      budgetState: toBudgetStateContext(plan.planContext),
+      budgetState: await getPinAdjustedState(plan.planContext, plan.id),
     };
   },
 
@@ -289,7 +306,7 @@ export const budgetPlanService = {
 
     const ctx = await planContextRepository.findByPlanId(planId);
     if (!ctx) throw new AppError(500, 'Plan context missing', 'PLAN_CONTEXT_MISSING');
-    return toBudgetStateContext(ctx);
+    return getPinAdjustedState(ctx, planId);
   },
 
   async update(

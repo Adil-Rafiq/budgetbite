@@ -407,4 +407,23 @@ export const mealPlanRepository = {
       .limit(1);
     return row;
   },
+
+  /**
+   * Lift restaurantId / menuItemId off a suggestion. Used by the
+   * record-choice flow to backfill the structured FKs on meal_choice when the
+   * client only supplies suggestionId.
+   */
+  async getSuggestionForChoice(
+    suggestionId: string,
+  ): Promise<{ restaurantId: string; menuItemId: string } | undefined> {
+    const [row] = await db
+      .select({
+        restaurantId: mealSuggestion.restaurantId,
+        menuItemId: mealSuggestion.menuItemId,
+      })
+      .from(mealSuggestion)
+      .where(eq(mealSuggestion.id, suggestionId))
+      .limit(1);
+    return row;
+  },
 };

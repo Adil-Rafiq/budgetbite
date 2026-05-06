@@ -226,6 +226,13 @@ async function runGeneration({
       restaurantIds: new Set(ctx.restaurants.map((r) => r.restaurantId)),
       menuItemIds: buildMenuItemIdSet(ctx.restaurants),
       remainingDates: new Set(ctx.remainingDates),
+      // Defense in depth: even though the prompt instructs the model not to
+      // generate for pinned (date, mealType) cells, drop any rows that match
+      // before persisting. The read path always favors pins anyway, but
+      // dropping here keeps the suggestion table free of dead rows.
+      pinnedSlotKeys: new Set(
+        ctx.pinnedSlots.map((p) => `${p.slotDate}|${p.mealTypeId}`),
+      ),
     };
 
     // ─── 2. Call the LLM with a retry-on-validation-failure loop ───────────
@@ -400,6 +407,8 @@ interface ContextValidators {
   restaurantIds: Set<string>;
   menuItemIds: Set<string>;
   remainingDates: Set<string>;
+  /** "{slotDate}|{mealTypeId}" — slots the user has pinned; AI suggestions for these are dropped. */
+  pinnedSlotKeys: Set<string>;
 }
 
 /** Single LLM call with the standard generation knobs. */
@@ -456,6 +465,11 @@ function parseAndValidate(
         `slotDate "${slot.slotDate}" outside the remaining-dates window`,
         `Slot ${slot.slotDate}/${slot.mealTypeKey}: slotDate "${slot.slotDate}" is not in the remaining-dates window. Only use dates from the "Days to plan" / "Remaining dates" section.`,
       );
+    }
+    // Silently drop AI suggestions for pinned slots — the read path always
+    // serves the pin instead, so persisting these would just be dead data.
+    if (validators.pinnedSlotKeys.has(`${slot.slotDate}|${mealTypeId}`)) {
+      continue;
     }
 
     const seenOptionIndices = new Set<number>();

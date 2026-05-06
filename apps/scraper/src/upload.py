@@ -60,8 +60,9 @@ def _request(
 def _restaurant_payload(restaurant: Restaurant, lat: float, lng: float) -> dict[str, Any]:
     """Build API create-restaurant payload from scraped restaurant."""
     # Use slug as display name (vendor_id is internal id)
-    name = restaurant.get("slug") or restaurant.get("vendor_id") or "Unknown"
-    return {
+    slug = restaurant.get("slug")
+    name = slug or restaurant.get("vendor_id") or "Unknown"
+    payload: dict[str, Any] = {
         "externalId": restaurant["vendor_id"],
         "name": name[:300],
         "latitude": lat,
@@ -71,6 +72,12 @@ def _restaurant_payload(restaurant: Restaurant, lat: float, lng: float) -> dict[
         "rating": restaurant.get("rating"),
         "ratingCount": restaurant.get("rating_count") or 0,
     }
+    # Foodpanda URL slug — drives the "Order on Foodpanda" deep-link on the
+    # web app. Optional so older restaurant rows scraped before this field
+    # was tracked stay valid; the API column is nullable.
+    if slug:
+        payload["slug"] = slug[:300]
+    return payload
 
 
 def _menu_item_payload(item: dict) -> dict[str, Any]:

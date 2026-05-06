@@ -6,6 +6,7 @@ export const restaurant = pgTable('restaurant', {
   id: uuid('id').primaryKey().defaultRandom(),
   externalId: text('external_id').notNull().unique(),
   name: text('name').notNull(),
+  slug: text('slug'),
   latitude: decimal('latitude', { precision: 10, scale: 7 }).notNull(),
   longitude: decimal('longitude', { precision: 10, scale: 7 }).notNull(),
   deliveryFee: decimal('delivery_fee', { precision: 10, scale: 2 }),

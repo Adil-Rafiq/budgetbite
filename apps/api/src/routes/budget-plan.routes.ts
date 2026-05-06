@@ -2,7 +2,9 @@ import { Router } from 'express';
 import { z } from 'zod';
 import {
   createBudgetPlanSchema,
+  createMealPinSchema,
   listBudgetPlansQuerySchema,
+  listMealPinsQuerySchema,
   paginationSchema,
   recordMealChoiceSchema,
   updateBudgetPlanSchema,
@@ -13,6 +15,7 @@ import { authMiddleware } from '../middleware/auth.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
 import { asyncHandler } from '../lib/async-handler.js';
 import * as budgetPlanController from '../controllers/budget-plan.controller.js';
+import * as mealPinController from '../controllers/meal-pin.controller.js';
 
 const router: Router = Router();
 
@@ -96,6 +99,29 @@ router.get(
   '/:id/generations/:gid',
   validate({ params: z.object({ id: uuidSchema, gid: uuidSchema }) }),
   asyncHandler(budgetPlanController.getGenerationDetail),
+);
+
+// ─── Meal pins (user-locked future slots) ────────────────────────────────────
+
+/** Upsert a pin for (slotDate, mealTypeId). Server snapshots priceAtPin from menuItem.price. Returns MealPinResponse. */
+router.post(
+  '/:id/meal-pins',
+  validate({ params: idParams, body: createMealPinSchema }),
+  asyncHandler(mealPinController.createPin),
+);
+
+/** List pins for the plan (defaults to today onwards). Returns MealPinResponse[]. */
+router.get(
+  '/:id/meal-pins',
+  validate({ params: idParams, query: listMealPinsQuerySchema }),
+  asyncHandler(mealPinController.listPins),
+);
+
+/** Delete a pin by id. Idempotent on re-delete (404 on second call). Returns 204. */
+router.delete(
+  '/:id/meal-pins/:pinId',
+  validate({ params: z.object({ id: uuidSchema, pinId: uuidSchema }) }),
+  asyncHandler(mealPinController.deletePin),
 );
 
 export default router;
