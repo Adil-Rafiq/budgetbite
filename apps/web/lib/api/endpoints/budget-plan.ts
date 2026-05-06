@@ -11,6 +11,7 @@ import type {
   BudgetGenerationDetailResponse,
   Paginated,
   PaginationQuery,
+  PlanTimelineResponse,
 } from '@repo/shared';
 
 export const budgetPlanApi = {
@@ -36,4 +37,6 @@ export const budgetPlanApi = {
     apiClient
       .get(`api/budget-plans/${planId}/generations/${gid}`)
       .json<BudgetGenerationDetailResponse>(),
+  getTimeline: (planId: string) =>
+    apiClient.get(`api/budget-plans/${planId}/timeline`).json<PlanTimelineResponse>(),
 };

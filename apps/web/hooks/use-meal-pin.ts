@@ -24,6 +24,7 @@ function pinInvalidations(queryClient: ReturnType<typeof useQueryClient>, planId
   queryClient.invalidateQueries({ queryKey: ['budgetPlan', planId] });
   queryClient.invalidateQueries({ queryKey: ['budgetPlanContext', planId] });
   queryClient.invalidateQueries({ queryKey: ['mealPlanSuggestions'] });
+  queryClient.invalidateQueries({ queryKey: ['planTimeline', planId] });
 }
 
 export const useCreateMealPin = (planId: string) => {

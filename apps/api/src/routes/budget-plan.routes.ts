@@ -101,6 +101,13 @@ router.get(
   asyncHandler(budgetPlanController.getGenerationDetail),
 );
 
+/** Pin/choice/suggestion-merged day-by-day timeline across the plan's full date range. Returns PlanTimelineResponse. */
+router.get(
+  '/:id/timeline',
+  validate({ params: idParams }),
+  asyncHandler(budgetPlanController.getPlanTimeline),
+);
+
 // ─── Meal pins (user-locked future slots) ────────────────────────────────────
 
 /** Upsert a pin for (slotDate, mealTypeId). Server snapshots priceAtPin from menuItem.price. Returns MealPinResponse. */

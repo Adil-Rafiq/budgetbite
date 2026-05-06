@@ -109,3 +109,16 @@ export const useBudgetPlanGenerationDetail = (planId: string, gid: string | null
     enabled: !!planId && !!gid,
     staleTime: 60_000,
   });
+
+// Pin/choice/suggestion-merged timeline across the plan's full date range.
+// Invalidated by the meal-pin and meal-choice hooks (see those files) so the
+// view reflects user actions immediately. Polls while a fresh generation is
+// pending so newly succeeded suggestions land in the timeline without a hard
+// reload.
+export const usePlanTimeline = (planId: string, isPendingGeneration: boolean = false) =>
+  useQuery({
+    queryKey: ['planTimeline', planId],
+    queryFn: () => budgetPlanApi.getTimeline(planId),
+    enabled: !!planId,
+    refetchInterval: isPendingGeneration ? 2000 : false,
+  });
