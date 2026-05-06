@@ -13,7 +13,18 @@ export interface LLMRequestOptions {
   maxTokens?: number;
   temperature?: number;
   systemPrompt?: string;
+  /** Ask the provider for strict JSON output where supported. */
+  jsonMode?: boolean;
 }
+
+/**
+ * Why the provider stopped generating. Normalised across vendors so the
+ * caller can react uniformly:
+ *  - 'stop'      — natural end of message (good)
+ *  - 'length'    — hit max_tokens / max_output_tokens (truncated, JSON likely invalid)
+ *  - 'other'     — provider-specific reason (safety filter, tool stop, etc.)
+ */
+export type LLMFinishReason = 'stop' | 'length' | 'other';
 
 export interface LLMResponse {
   text: string;
@@ -21,6 +32,7 @@ export interface LLMResponse {
   outputTokens?: number;
   model: string;
   provider: string;
+  finishReason: LLMFinishReason;
 }
 
 export interface LLMProvider {

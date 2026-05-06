@@ -1,4 +1,4 @@
-import type { MealPlannerContext } from '@repo/shared';
+import type { MealPlannerContext, NearbyRestaurantContext } from '@repo/shared';
 
 /**
  * All system and user prompts live here.
@@ -9,7 +9,31 @@ Your job is to suggest meals from real restaurants that fit within a user's budg
 You always respond with valid JSON only. No prose, no markdown, no code fences.
 You consider the user's taste preferences, disliked restaurants, dietary notes, and price sensitivity.
 You always suggest exactly 3 options per meal slot, ordered from most recommended to least.
-Budget adherence is critical — the user's financial wellbeing depends on staying within budget.`;
+Budget adherence is critical — the user's financial wellbeing depends on staying within budget.
+
+ID handling rules (critical):
+- restaurantId and menuItemId values are UUIDs supplied to you in the user message.
+- You may ONLY use UUIDs that appear verbatim in the provided "Available Restaurants" data.
+- Never invent, guess, abbreviate, or modify any UUID.
+- A menuItemId must belong to the restaurant you paired it with — do not mix items across restaurants.
+- If you would otherwise need an ID you weren't given, pick a different real option from the data instead.`;
+
+/**
+ * Compact id catalogue: one line per (restaurant, menu item) pair. Repeating
+ * the IDs in this flat form (in addition to the structured JSON below) makes
+ * it harder for the model to drift to a hallucinated UUID — copying is easier
+ * than inventing.
+ */
+function buildIdCatalogue(restaurants: NearbyRestaurantContext[]): string {
+  const lines: string[] = [];
+  for (const r of restaurants) {
+    lines.push(`Restaurant ${r.restaurantId} — ${r.name}`);
+    for (const item of r.menuItems) {
+      lines.push(`  Item ${item.menuItemId} — ${item.name} (PKR ${item.price})`);
+    }
+  }
+  return lines.join('\n');
+}
 
 // ─── Prompt: Initial full plan generation ─────────────────────────────────────
 
@@ -34,6 +58,9 @@ export function buildGeneratePlanPrompt(ctx: MealPlannerContext): string {
 
 ## Available Restaurants (nearby, preferences already filtered)
 ${JSON.stringify(ctx.restaurants, null, 2)}
+
+## ID catalogue (the ONLY UUIDs you may use — copy exactly)
+${buildIdCatalogue(ctx.restaurants)}
 
 ## Days to plan
 ${ctx.remainingDates.join(', ')}
@@ -67,10 +94,12 @@ Rules:
 - optionIndex 0 = most recommended, 1 = second choice, 2 = third choice
 - mealTypeKey must be EXACTLY as listed in the meal type keys section above — lowercase, no capitalization
 - estimatedPrice must be realistic based on the menu item price
-- Never use a restaurantId or menuItemId not present in the available restaurants list
-- Never invent or guess UUIDs — only use IDs from the provided restaurants data
+- Never use a restaurantId or menuItemId not present in the ID catalogue above
+- Never invent, modify, or guess UUIDs — copy them character-for-character from the catalogue
+- A menuItemId must belong to the restaurant it's paired with under that restaurant in the catalogue
 - Distribute variety across the plan — avoid repeating the same restaurant for consecutive meals
-- Keep the total estimated cost within the total budget`;
+- Keep the total estimated cost within the total budget
+- Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget`;
 }
 
 // ─── Prompt: Re-plan after a meal choice ──────────────────────────────────────
@@ -102,6 +131,9 @@ ${triggerSummary}
 
 ## Available Restaurants (nearby, preferences already filtered)
 ${JSON.stringify(ctx.restaurants, null, 2)}
+
+## ID catalogue (the ONLY UUIDs you may use — copy exactly)
+${buildIdCatalogue(ctx.restaurants)}
 
 ## Remaining dates and meal slots to fill
 ${ctx.remainingDates.join(', ')}
@@ -135,11 +167,13 @@ Rules:
 - Each slot must have exactly 3 options (optionIndex 0, 1, 2)
 - optionIndex 0 = most recommended, 1 = second choice, 2 = third choice
 - mealTypeKey must be EXACTLY as listed in the meal type keys section above — lowercase, no capitalisation
-- Never use a restaurantId or menuItemId not present in the available restaurants list
-- Never invent or guess UUIDs — only use IDs from the provided restaurants data
+- Never use a restaurantId or menuItemId not present in the ID catalogue above
+- Never invent, modify, or guess UUIDs — copy them character-for-character from the catalogue
+- A menuItemId must belong to the restaurant it's paired with under that restaurant in the catalogue
 - estimatedTotalCost refers to the remaining meals only, not the full plan
 - Distribute variety — avoid repeating the same restaurant for consecutive meals
-- Keep the remaining estimated cost within the remaining budget of PKR ${ctx.budget.amountRemaining}`;
+- Keep the remaining estimated cost within the remaining budget of PKR ${ctx.budget.amountRemaining}
+- Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget`;
 }
 
 // ─── Prompt: Preference extraction from feedback ───────────────────────────────
