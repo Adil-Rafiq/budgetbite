@@ -1,5 +1,10 @@
 import OpenAI from 'openai';
-import type { LLMMessage, LLMRequestOptions, LLMResponse } from '@repo/shared';
+import type {
+  LLMFinishReason,
+  LLMMessage,
+  LLMRequestOptions,
+  LLMResponse,
+} from '@repo/shared';
 import { BaseLLMProvider } from './base.provider.js';
 
 export class OpenAIProvider extends BaseLLMProvider {
@@ -20,6 +25,7 @@ export class OpenAIProvider extends BaseLLMProvider {
       model: options.model ?? this.defaultModel,
       max_tokens: options.maxTokens ?? 4096,
       temperature: options.temperature ?? 0.3,
+      ...(options.jsonMode ? { response_format: { type: 'json_object' as const } } : {}),
       messages: [
         ...(options.systemPrompt
           ? [{ role: 'system' as const, content: options.systemPrompt }]
@@ -28,13 +34,26 @@ export class OpenAIProvider extends BaseLLMProvider {
       ],
     });
 
-    const text = response.choices[0]?.message?.content ?? '';
+    const choice = response.choices[0];
+    const text = choice?.message?.content ?? '';
     return {
       text,
       inputTokens: response.usage?.prompt_tokens,
       outputTokens: response.usage?.completion_tokens,
       model: response.model,
       provider: this.name,
+      finishReason: mapOpenAIFinishReason(choice?.finish_reason),
     };
+  }
+}
+
+function mapOpenAIFinishReason(reason: string | null | undefined): LLMFinishReason {
+  switch (reason) {
+    case 'stop':
+      return 'stop';
+    case 'length':
+      return 'length';
+    default:
+      return reason ? 'other' : 'stop';
   }
 }

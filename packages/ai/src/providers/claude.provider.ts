@@ -1,5 +1,10 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { LLMMessage, LLMRequestOptions, LLMResponse } from '@repo/shared';
+import type {
+  LLMFinishReason,
+  LLMMessage,
+  LLMRequestOptions,
+  LLMResponse,
+} from '@repo/shared';
 import { BaseLLMProvider } from './base.provider.js';
 
 export class ClaudeProvider extends BaseLLMProvider {
@@ -16,18 +21,27 @@ export class ClaudeProvider extends BaseLLMProvider {
   }
 
   async complete(messages: LLMMessage[], options: LLMRequestOptions = {}): Promise<LLMResponse> {
+    // Anthropic has no JSON mode; prefilling the assistant turn with `{` is
+    // the documented way to coerce a JSON-only response.
+    const apiMessages = messages.map((m) => ({ role: m.role, content: m.content }));
+    if (options.jsonMode) {
+      apiMessages.push({ role: 'assistant', content: '{' });
+    }
+
     const response = await this.client.messages.create({
       model: options.model ?? this.defaultModel,
       max_tokens: options.maxTokens ?? 4096,
       temperature: options.temperature ?? 0.3,
       ...(options.systemPrompt ? { system: options.systemPrompt } : {}),
-      messages: messages.map((m) => ({ role: m.role, content: m.content })),
+      messages: apiMessages,
     });
 
-    const text = response.content
+    const body = response.content
       .filter((b) => b.type === 'text')
       .map((b) => (b as { type: 'text'; text: string }).text)
       .join('');
+    // When we prefilled `{`, the API only returns the continuation — re-attach.
+    const text = options.jsonMode ? `{${body}` : body;
 
     return {
       text,
@@ -35,6 +49,19 @@ export class ClaudeProvider extends BaseLLMProvider {
       outputTokens: response.usage.output_tokens,
       model: response.model,
       provider: this.name,
+      finishReason: mapAnthropicStopReason(response.stop_reason),
     };
+  }
+}
+
+function mapAnthropicStopReason(reason: string | null | undefined): LLMFinishReason {
+  switch (reason) {
+    case 'end_turn':
+    case 'stop_sequence':
+      return 'stop';
+    case 'max_tokens':
+      return 'length';
+    default:
+      return reason ? 'other' : 'stop';
   }
 }

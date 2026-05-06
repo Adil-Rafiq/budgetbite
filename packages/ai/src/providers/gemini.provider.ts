@@ -1,5 +1,10 @@
 import { GoogleGenAI } from '@google/genai';
-import type { LLMMessage, LLMRequestOptions, LLMResponse } from '@repo/shared';
+import type {
+  LLMFinishReason,
+  LLMMessage,
+  LLMRequestOptions,
+  LLMResponse,
+} from '@repo/shared';
 import { BaseLLMProvider } from './base.provider.js';
 
 export class GeminiProvider extends BaseLLMProvider {
@@ -31,6 +36,7 @@ export class GeminiProvider extends BaseLLMProvider {
         temperature: options.temperature ?? 0.3,
         maxOutputTokens: options.maxTokens ?? 16000,
         ...(options.systemPrompt ? { systemInstruction: options.systemPrompt } : {}),
+        ...(options.jsonMode ? { responseMimeType: 'application/json' } : {}),
         thinkingConfig: {
           thinkingBudget: 0,
         },
@@ -38,6 +44,9 @@ export class GeminiProvider extends BaseLLMProvider {
     });
 
     const result = await chat.sendMessage({ message: lastMessage.content });
+    const finishReason = mapGeminiFinishReason(
+      result.candidates?.[0]?.finishReason as string | undefined,
+    );
 
     return {
       text: result.text ?? '',
@@ -45,6 +54,18 @@ export class GeminiProvider extends BaseLLMProvider {
       outputTokens: result.usageMetadata?.candidatesTokenCount,
       model: options.model ?? this.defaultModel,
       provider: this.name,
+      finishReason,
     };
+  }
+}
+
+function mapGeminiFinishReason(reason: string | undefined): LLMFinishReason {
+  switch (reason) {
+    case 'STOP':
+      return 'stop';
+    case 'MAX_TOKENS':
+      return 'length';
+    default:
+      return reason ? 'other' : 'stop';
   }
 }
