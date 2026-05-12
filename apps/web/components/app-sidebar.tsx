@@ -16,11 +16,11 @@ const MUTED = '#71716a';
 const SOFT = '#a6a691';
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', code: 'dashboard' },
-  { href: '/plans', label: 'Plans', code: 'plans' },
-  { href: '/restaurants', label: 'Restaurants', code: 'restaurants' },
-  { href: '/analytics', label: 'Analytics', code: 'analytics' },
-  { href: '/profile', label: 'Profile', code: 'profile' },
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/plans', label: 'Plans' },
+  { href: '/restaurants', label: 'Restaurants' },
+  { href: '/analytics', label: 'Analytics' },
+  { href: '/profile', label: 'Profile' },
 ];
 
 function initials(name: string | undefined): string {
@@ -86,7 +86,7 @@ export function AppSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`group flex items-center justify-between rounded-lg px-3 py-2 text-[14px] transition-colors ${
+              className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-[14px] transition-colors ${
                 isActive ? '' : 'hover:bg-[#ffffeb] hover:text-[#1a1a1a]'
               }`}
               style={{
@@ -97,26 +97,14 @@ export function AppSidebar() {
                 boxShadow: isActive ? '0 1px 0 rgba(0,0,0,0.03)' : 'none',
               }}
             >
-              <span className="flex items-center gap-3">
-                <span
-                  className="inline-block h-1.5 w-1.5 rounded-full transition-colors group-hover:bg-[#a6a691]"
-                  style={{
-                    background: isActive ? FATHOM : 'transparent',
-                    border: isActive ? 'none' : `1px solid ${SOFT}`,
-                  }}
-                />
-                {item.label}
-              </span>
               <span
+                className="inline-block h-1.5 w-1.5 rounded-full transition-colors group-hover:bg-[#a6a691]"
                 style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 10,
-                  color: isActive ? FATHOM : SOFT,
-                  letterSpacing: '0.12em',
+                  background: isActive ? FATHOM : 'transparent',
+                  border: isActive ? 'none' : `1px solid ${SOFT}`,
                 }}
-              >
-                /{item.code}
-              </span>
+              />
+              {item.label}
             </Link>
           );
         })}
