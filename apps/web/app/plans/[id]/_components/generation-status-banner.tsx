@@ -1,14 +1,13 @@
 'use client';
 
 import { AlertCircle, Loader2, RefreshCw } from 'lucide-react';
-import { motion } from 'motion/react';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
+import { Pill } from '@/components/ui/pill';
 import { cn } from '@/lib/utils';
 import type { BudgetPlanDetail } from '@repo/shared';
 
 const PULSE = '#7f1c34';
 const AMBER = '#b8741a';
-const WHITE = '#ffffff';
 
 interface GenerationStatusBannerProps {
   plan: BudgetPlanDetail;
@@ -62,18 +61,16 @@ export function GenerationStatusBanner({ plan }: GenerationStatusBannerProps) {
             </p>
           )}
         </div>
-        <motion.button
+        <Pill
+          variant="danger"
+          size="xs"
           onClick={() => generate.mutate(plan.id)}
           disabled={generate.isPending}
-          whileHover={generate.isPending ? undefined : { background: `${PULSE}10` }}
-          whileTap={generate.isPending ? undefined : { scale: 0.97 }}
-          transition={{ duration: 0.16, ease: 'easeOut' }}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-1.5 text-[12px] font-medium disabled:opacity-40"
-          style={{ background: WHITE, color: PULSE, border: `1px solid ${PULSE}` }}
+          className="shrink-0"
         >
           <RefreshCw className={cn('h-3.5 w-3.5', generate.isPending && 'animate-spin')} />
           Retry
-        </motion.button>
+        </Pill>
       </BannerShell>
     );
   }

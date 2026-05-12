@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Pill } from '@/components/ui/pill';
 
 import { useUpdateProfile, useUser } from '@/hooks/use-user';
 import { authClient } from '@/lib/auth-client';
@@ -136,36 +137,6 @@ function Panel({
       </div>
       <div className="p-5">{children}</div>
     </div>
-  );
-}
-
-function PrimaryButton({
-  children,
-  ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return (
-    <button
-      {...props}
-      className="inline-flex items-center gap-2 self-start rounded-full px-5 py-2.5 text-[13px] font-medium transition disabled:opacity-40"
-      style={{ background: VAST, color: LUMEN }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function OutlineButton({
-  children,
-  ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return (
-    <button
-      {...props}
-      className="inline-flex items-center gap-2 self-start rounded-full px-4 py-2 text-[13px] transition disabled:opacity-40"
-      style={{ border: `1px solid ${LUMEN_DK}`, background: WHITE, color: VAST }}
-    >
-      {children}
-    </button>
   );
 }
 
@@ -314,15 +285,16 @@ export default function ProfilePage() {
             Account, location, reminders.
           </p>
         </div>
-        <button
+        <Pill
+          variant="ghost"
+          size="sm"
           onClick={handleSignOut}
           disabled={signingOut}
-          className="inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-[13px] transition disabled:opacity-40"
-          style={{ border: `1px solid ${LUMEN_DK}`, background: WHITE, color: VAST }}
+          className="shrink-0"
         >
           <LogOut className="h-3.5 w-3.5" />
           Sign out
-        </button>
+        </Pill>
       </header>
 
       {/* Profile info */}
@@ -401,13 +373,15 @@ export default function ProfilePage() {
               email changes aren&apos;t supported yet.
             </p>
           </div>
-          <PrimaryButton
+          <Pill
             type="submit"
+            size="md"
+            className="self-start"
             disabled={accountForm.formState.isSubmitting || !accountForm.formState.isDirty}
           >
             {accountForm.formState.isSubmitting ? 'Saving…' : 'Save changes'}
             <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
-          </PrimaryButton>
+          </Pill>
         </form>
       </Panel>
 
@@ -460,12 +434,15 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
-          <OutlineButton
+          <Pill
             type="submit"
+            variant="ghost"
+            size="sm"
+            className="self-start"
             disabled={locationForm.formState.isSubmitting || !locationForm.formState.isDirty}
           >
             {locationForm.formState.isSubmitting ? 'Updating…' : 'Update location'}
-          </OutlineButton>
+          </Pill>
         </form>
       </Panel>
 
@@ -536,9 +513,15 @@ export default function ProfilePage() {
               </p>
             )}
           </div>
-          <OutlineButton type="submit" disabled={passwordForm.formState.isSubmitting}>
+          <Pill
+            type="submit"
+            variant="ghost"
+            size="sm"
+            className="self-start"
+            disabled={passwordForm.formState.isSubmitting}
+          >
             {passwordForm.formState.isSubmitting ? 'Changing…' : 'Change password'}
-          </OutlineButton>
+          </Pill>
         </form>
       </Panel>
     </div>

@@ -10,6 +10,8 @@ import type { BudgetFit, MenuItem } from '@repo/shared';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useRestaurant, useRestaurantMenu } from '@/hooks/use-restaurant';
 
+import { Pill } from '@/components/ui/pill';
+
 import { AddToPlanModal } from '../_components/add-to-plan-modal';
 import { MenuItemSkeleton } from '../_components/menu-item-skeleton';
 import { RestaurantHeaderSkeleton } from '../_components/restaurant-header-skeleton';
@@ -119,15 +121,12 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
             </div>
 
             {foodpandaUrl && (
-              <a href={foodpandaUrl} target="_blank" rel="noopener noreferrer">
-                <button
-                  className="inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-[13px] font-medium transition"
-                  style={{ background: VAST, color: LUMEN }}
-                >
+              <Pill asChild size="sm" className="shrink-0">
+                <a href={foodpandaUrl} target="_blank" rel="noopener noreferrer">
                   Order on Foodpanda
                   <ExternalLink className="h-3.5 w-3.5" />
-                </button>
-              </a>
+                </a>
+              </Pill>
             )}
           </div>
         </div>
@@ -311,18 +310,15 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                     </div>
 
                     {hasActivePlan && (
-                      <button
+                      <Pill
+                        variant="ghost"
+                        size="sm"
                         onClick={() => setPickedItem(item)}
-                        className="inline-flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2 text-[13px] transition"
-                        style={{
-                          border: `1px solid ${LUMEN_DK}`,
-                          background: LUMEN,
-                          color: VAST,
-                        }}
+                        className="w-full"
                       >
                         Add to plan
                         <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>+</span>
-                      </button>
+                      </Pill>
                     )}
                   </div>
                 </div>

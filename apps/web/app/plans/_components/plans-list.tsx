@@ -4,7 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { useBudgetPlans } from '@/hooks/use-budget-plan';
-import { Stagger, StaggerItem, Pill } from '@/components/motion';
+import { Stagger, StaggerItem } from '@/components/motion';
+import { Pill } from '@/components/ui/pill';
 
 const LUMEN = '#ffffeb';
 const LUMEN_DK = '#e4e4d0';
@@ -282,17 +283,19 @@ export default function PlansList() {
           <div className="flex gap-2">
             <Pill
               variant="ghost"
+              size="xs"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={!hasPrev || isFetching}
-              style={{ padding: '6px 16px', fontSize: 12 }}
+              style={{ fontFamily: 'var(--font-mono)' }}
             >
               ← prev
             </Pill>
             <Pill
               variant="ghost"
+              size="xs"
               onClick={() => setPage((p) => p + 1)}
               disabled={!hasNext || isFetching}
-              style={{ padding: '6px 16px', fontSize: 12 }}
+              style={{ fontFamily: 'var(--font-mono)' }}
             >
               next →
             </Pill>

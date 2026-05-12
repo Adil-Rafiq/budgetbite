@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Inter, JetBrains_Mono, Bricolage_Grotesque } from 'next/font/google';
+import { Pill } from '@/components/ui/pill';
 
 const body = Inter({
   subsets: ['latin'],
@@ -107,14 +108,12 @@ export default function LandingPage() {
             <Link href="/login" className="text-[13px]" style={{ color: VAST }}>
               Log in
             </Link>
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:bg-[#2a2a2a] hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] active:scale-[0.97]"
-              style={{ color: LUMEN }}
-            >
-              Get started
-              <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
-            </Link>
+            <Pill asChild size="sm">
+              <Link href="/register">
+                Get started
+                <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
+              </Link>
+            </Pill>
           </div>
         </nav>
       </header>
@@ -167,21 +166,15 @@ export default function LandingPage() {
           </p>
 
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-6 py-3 text-[14px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:bg-[#2a2a2a] hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] active:scale-[0.97]"
-              style={{ color: LUMEN }}
-            >
-              Create your plan
-              <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 rounded-full border bg-transparent px-6 py-3 text-[14px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:bg-black/[0.04] active:scale-[0.97]"
-              style={{ borderColor: VAST, color: VAST }}
-            >
-              I have an account →
-            </Link>
+            <Pill asChild size="lg">
+              <Link href="/register">
+                Create your plan
+                <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
+              </Link>
+            </Pill>
+            <Pill asChild variant="outline" size="lg">
+              <Link href="/login">I have an account →</Link>
+            </Pill>
           </div>
 
           <div
@@ -292,18 +285,8 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
-                      className="rounded-full border px-4 py-2 text-[12px] transition-all duration-150 ease-out hover:-translate-y-px hover:bg-black/[0.04] active:scale-[0.97]"
-                      style={{ borderColor: LUMEN_DK, color: VAST }}
-                    >
-                      Re-roll
-                    </button>
-                    <button
-                      className="rounded-full px-4 py-2 text-[12px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] active:scale-[0.97]"
-                      style={{ background: FATHOM, color: LUMEN }}
-                    >
-                      Order on Foodpanda →
-                    </button>
+                    <Pill variant="ghost" size="xs">Re-roll</Pill>
+                    <Pill variant="accent" size="xs">Order on Foodpanda →</Pill>
                   </div>
                 </div>
 
@@ -494,21 +477,15 @@ export default function LandingPage() {
             rest. You can change engines and re-roll any day at any time.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-6 py-3 text-[14px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:bg-[#2a2a2a] hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] active:scale-[0.97]"
-              style={{ color: LUMEN }}
-            >
-              Get started — free
-              <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 rounded-full border bg-transparent px-6 py-3 text-[14px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:bg-black/[0.04] active:scale-[0.97]"
-              style={{ borderColor: VAST, color: VAST }}
-            >
-              Log in
-            </Link>
+            <Pill asChild size="lg">
+              <Link href="/register">
+                Get started — free
+                <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
+              </Link>
+            </Pill>
+            <Pill asChild variant="outline" size="lg">
+              <Link href="/login">Log in</Link>
+            </Pill>
           </div>
         </div>
       </section>

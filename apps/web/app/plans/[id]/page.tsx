@@ -9,11 +9,10 @@ import { GenerationStatusBanner } from '@/app/plans/[id]/_components/generation-
 import { GenerationHistoryTimeline } from '@/app/plans/[id]/_components/generation-history-timeline';
 import { PlanTimeline } from '@/app/plans/[id]/_components/plan-timeline';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Pill } from '@/components/ui/pill';
 import { FadeUp } from '@/components/motion';
 
-const LUMEN = '#ffffeb';
 const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
 const PULSE = '#7f1c34';
 const WHITE = '#ffffff';
 const MUTED = '#71716a';
@@ -77,13 +76,9 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
           <p className="text-[14px]" style={{ color: MUTED }}>
             This plan doesn&apos;t exist or you don&apos;t have access to it.
           </p>
-          <Link
-            href="/plans"
-            className="mt-3 inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px]"
-            style={{ background: VAST, color: LUMEN }}
-          >
-            Back to plans
-          </Link>
+          <Pill asChild size="sm" className="mt-3">
+            <Link href="/plans">Back to plans</Link>
+          </Pill>
         </div>
       </div>
     );

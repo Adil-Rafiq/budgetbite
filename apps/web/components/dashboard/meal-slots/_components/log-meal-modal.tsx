@@ -14,6 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Pill } from '@/components/ui/pill';
 import { logSuggestionSchema, logCustomSchema } from '../_schemas/log-meal.schema';
 import type { LogSuggestionForm, LogCustomForm } from '../_schemas/log-meal.schema';
 import type { LogModalState, SavePayload } from '../_hooks/use-meal-slots';
@@ -161,15 +162,10 @@ function PrimaryPill({
   disabled: boolean;
 }) {
   return (
-    <button
-      type="submit"
-      disabled={disabled}
-      className="inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-medium transition disabled:opacity-40"
-      style={{ background: VAST, color: LUMEN }}
-    >
+    <Pill type="submit" size="md" disabled={disabled} className="w-full">
       {children}
       <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
-    </button>
+    </Pill>
   );
 }
 

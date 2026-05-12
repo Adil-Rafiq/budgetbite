@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { CreatePlanDialog } from '@/app/plans/_components/create-plan/create-plan-dialog';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
-import { Pill } from '@/components/motion';
+import { Pill } from '@/components/ui/pill';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -84,9 +84,9 @@ export function PlansPageHeader() {
         </div>
 
         <Pill
+          size="md"
           onClick={handleNewPlanClick}
           className="self-start sm:self-auto"
-          style={{ padding: '10px 20px', fontSize: 13 }}
         >
           New plan
           <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>+</span>

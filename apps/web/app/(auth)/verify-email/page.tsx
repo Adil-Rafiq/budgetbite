@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Inter, JetBrains_Mono, Bricolage_Grotesque } from 'next/font/google';
 import { authClient } from '@/lib/auth-client';
+import { Pill } from '@/components/ui/pill';
 
 const body = Inter({
   subsets: ['latin'],
@@ -240,15 +241,10 @@ export default function VerifyEmailPage() {
             )}
           </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-[14px] font-medium transition disabled:opacity-40"
-            style={{ background: VAST, color: LUMEN }}
-          >
+          <Pill type="submit" size="lg" disabled={isSubmitting} className="w-full">
             {isSubmitting ? 'Verifying…' : 'Verify email'}
             <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
-          </button>
+          </Pill>
 
           <div className="mt-2 text-center text-[13px]" style={{ color: MUTED }}>
             <span>Didn&apos;t receive the code? </span>
