@@ -110,8 +110,8 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-medium"
-              style={{ background: VAST, color: LUMEN }}
+              className="inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:bg-[#2a2a2a] hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] active:scale-[0.97]"
+              style={{ color: LUMEN }}
             >
               Get started
               <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
@@ -170,16 +170,16 @@ export default function LandingPage() {
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-medium transition hover:opacity-90"
-              style={{ background: VAST, color: LUMEN }}
+              className="inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-6 py-3 text-[14px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:bg-[#2a2a2a] hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] active:scale-[0.97]"
+              style={{ color: LUMEN }}
             >
               Create your plan
               <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 rounded-full border px-6 py-3 text-[14px] font-medium"
-              style={{ borderColor: VAST, color: VAST, background: 'transparent' }}
+              className="inline-flex items-center gap-2 rounded-full border bg-transparent px-6 py-3 text-[14px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:bg-black/[0.04] active:scale-[0.97]"
+              style={{ borderColor: VAST, color: VAST }}
             >
               I have an account →
             </Link>
@@ -294,13 +294,13 @@ export default function LandingPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      className="rounded-full border px-4 py-2 text-[12px]"
+                      className="rounded-full border px-4 py-2 text-[12px] transition-all duration-150 ease-out hover:-translate-y-px hover:bg-black/[0.04] active:scale-[0.97]"
                       style={{ borderColor: LUMEN_DK, color: VAST }}
                     >
                       Re-roll
                     </button>
                     <button
-                      className="rounded-full px-4 py-2 text-[12px] font-medium"
+                      className="rounded-full px-4 py-2 text-[12px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] active:scale-[0.97]"
                       style={{ background: FATHOM, color: LUMEN }}
                     >
                       Order on Foodpanda →
@@ -497,15 +497,15 @@ export default function LandingPage() {
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-medium"
-              style={{ background: VAST, color: LUMEN }}
+              className="inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-6 py-3 text-[14px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:bg-[#2a2a2a] hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] active:scale-[0.97]"
+              style={{ color: LUMEN }}
             >
               Get started — free
               <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 rounded-full border px-6 py-3 text-[14px] font-medium"
+              className="inline-flex items-center gap-2 rounded-full border bg-transparent px-6 py-3 text-[14px] font-medium transition-all duration-150 ease-out hover:-translate-y-px hover:bg-black/[0.04] active:scale-[0.97]"
               style={{ borderColor: VAST, color: VAST }}
             >
               Log in
