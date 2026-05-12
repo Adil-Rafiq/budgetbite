@@ -17,8 +17,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
+import { Pill } from '@/components/ui/pill';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
 import { GenerationSuggestionsGrid } from './generation-suggestions-grid';
 import type { BudgetGeneration } from '@repo/shared';
@@ -149,43 +149,30 @@ export function GenerationAttemptItem({
 
           <div className="flex shrink-0 items-center gap-2">
             {showRetry && (
-              <motion.button
+              <Pill
+                variant="danger"
+                size="xs"
                 onClick={() => generate.mutate(planId)}
                 disabled={generate.isPending}
-                whileHover={generate.isPending ? undefined : { background: `${PULSE}10` }}
-                whileTap={generate.isPending ? undefined : { scale: 0.97 }}
-                transition={{ duration: 0.16, ease: 'easeOut' }}
-                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] disabled:opacity-40"
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  background: WHITE,
-                  color: PULSE,
-                  border: `1px solid ${PULSE}55`,
-                }}
+                style={{ fontFamily: 'var(--font-mono)' }}
               >
                 <RefreshCw className={cn('h-3.5 w-3.5', generate.isPending && 'animate-spin')} />
                 retry
-              </motion.button>
+              </Pill>
             )}
             {isSucceeded && (
               <CollapsibleTrigger asChild>
-                <motion.button
-                  whileHover={{ background: LUMEN, borderColor: '#cfcfb8' }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.16, ease: 'easeOut' }}
-                  className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px]"
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    background: open ? LUMEN : WHITE,
-                    color: VAST,
-                    border: `1px solid ${LUMEN_DK}`,
-                  }}
+                <Pill
+                  variant="ghost"
+                  size="xs"
+                  className={cn(open && 'bg-[#ffffeb] border-[#cfcfb8]')}
+                  style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   <ChevronDown
                     className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')}
                   />
                   {open ? 'hide' : 'view'}
-                </motion.button>
+                </Pill>
               </CollapsibleTrigger>
             )}
           </div>

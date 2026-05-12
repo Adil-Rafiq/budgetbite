@@ -4,7 +4,7 @@ import { RefreshCw, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
 import { cn } from '@/lib/utils';
-import { Pill } from '@/components/motion';
+import { Pill } from '@/components/ui/pill';
 import type { BudgetPlanDetail } from '@repo/shared';
 
 const LUMEN = '#ffffeb';
@@ -85,10 +85,10 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
           </div>
 
           <Pill
+            size="md"
             onClick={() => generate.mutate(plan.id)}
             disabled={disabled}
             className="shrink-0"
-            style={{ padding: '10px 20px', fontSize: 13 }}
           >
             {hasActiveGen ? (
               <>

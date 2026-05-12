@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Pill } from '@/components/ui/pill';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useRecordMealChoice } from '@/hooks/use-meal-choice';
 import { useCreateMealPin, useMealPins } from '@/hooks/use-meal-pin';
@@ -286,24 +287,19 @@ export function AddToPlanModal({
         )}
 
         <DialogFooter>
-          <button
+          <Pill
+            variant="ghost"
+            size="sm"
             onClick={() => onOpenChange(false)}
             disabled={isSaving}
-            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px] transition disabled:opacity-40"
-            style={{
-              fontFamily: 'var(--font-mono)',
-              border: `1px solid ${LUMEN_DK}`,
-              background: 'transparent',
-              color: VAST,
-            }}
+            style={{ fontFamily: 'var(--font-mono)' }}
           >
             Cancel
-          </button>
-          <button
+          </Pill>
+          <Pill
+            size="sm"
             onClick={handleSubmit}
             disabled={!planId || !mealTypeId || isSaving}
-            className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-[13px] font-medium transition disabled:opacity-40"
-            style={{ background: VAST, color: LUMEN }}
           >
             {isSaving
               ? 'Saving…'
@@ -311,7 +307,7 @@ export function AddToPlanModal({
                 ? `Log ₨ ${actualAmount.toLocaleString()}`
                 : 'Pin to plan'}
             <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
-          </button>
+          </Pill>
         </DialogFooter>
       </DialogContent>
     </Dialog>

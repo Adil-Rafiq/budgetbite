@@ -19,7 +19,8 @@ import {
 } from 'recharts';
 
 import { ChartSkeleton, TableSkeleton } from '@/components/skeletons';
-import { FadeUp, Stagger, StaggerItem, Pill } from '@/components/motion';
+import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
+import { Pill } from '@/components/ui/pill';
 import { motion } from 'motion/react';
 
 import { useBudgetPlans } from '@/hooks/use-budget-plan';
@@ -150,10 +151,10 @@ function RangeButton({
 }) {
   return (
     <Pill
-      variant="filter"
-      active={active}
+      variant={active ? 'primary' : 'ghost'}
+      size="xs"
       onClick={onClick}
-      style={{ padding: '6px 16px', fontSize: 12 }}
+      style={{ fontFamily: 'var(--font-mono)' }}
     >
       {children}
     </Pill>

@@ -2,10 +2,9 @@
 
 import { useMemo } from 'react';
 import { Sparkles } from 'lucide-react';
-import { motion } from 'motion/react';
 import { useBudgetPlanGenerations } from '@/hooks/use-budget-plan';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
-import { Pill, Stagger, StaggerItem } from '@/components/motion';
+import { Pill } from '@/components/ui/pill';
 import { GenerationAttemptItem } from './generation-attempt-item';
 import type { BudgetGeneration, BudgetPlanDetail } from '@repo/shared';
 
@@ -81,11 +80,7 @@ function TimelineEmpty({ planId }: { planId: string }) {
           Kick off your first AI-curated meal plan to see suggestions for every day.
         </p>
       </div>
-      <Pill
-        onClick={() => generate.mutate(planId)}
-        disabled={generate.isPending}
-        style={{ padding: '8px 16px', fontSize: 13 }}
-      >
+      <Pill size="sm" onClick={() => generate.mutate(planId)} disabled={generate.isPending}>
         <Sparkles className="h-3.5 w-3.5" />
         Generate now
       </Pill>

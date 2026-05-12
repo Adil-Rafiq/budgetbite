@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Inter, JetBrains_Mono, Bricolage_Grotesque } from 'next/font/google';
 import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-context';
 import { ONBOARDING_STEPS } from '@/app/onboarding/constants';
+import { Pill } from '@/components/ui/pill';
 
 const body = Inter({
   subsets: ['latin'],
@@ -172,47 +173,34 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
         </div>
 
         <div className="mt-7 flex items-center justify-between">
-          <button
-            type="button"
+          <Pill
+            variant="ghost"
+            size="md"
             onClick={handleBack}
             disabled={currentStep === 0 || isSubmitting}
-            className="inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-[13px] font-medium disabled:cursor-not-allowed disabled:opacity-40"
-            style={{ borderColor: LUMEN_DK, color: VAST, background: 'transparent' }}
           >
             <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>←</span>
             Back
-          </button>
+          </Pill>
 
           {!isLastStep ? (
-            <button
-              type="button"
-              onClick={handleContinue}
-              disabled={isSubmitting}
-              className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-[13px] font-medium disabled:opacity-60"
-              style={{ background: VAST, color: LUMEN }}
-            >
+            <Pill size="md" onClick={handleContinue} disabled={isSubmitting}>
               {isSubmitting ? 'Saving…' : (
                 <>
                   Continue
                   <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
                 </>
               )}
-            </button>
+            </Pill>
           ) : (
-            <button
-              type="button"
-              onClick={handleFinish}
-              disabled={isSubmitting}
-              className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-[13px] font-medium disabled:opacity-60"
-              style={{ background: FATHOM, color: LUMEN }}
-            >
+            <Pill variant="accent" size="md" onClick={handleFinish} disabled={isSubmitting}>
               {isSubmitting ? 'Finishing…' : (
                 <>
                   Finish setup
                   <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
                 </>
               )}
-            </button>
+            </Pill>
           )}
         </div>
 

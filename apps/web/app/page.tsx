@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Inter, JetBrains_Mono, Bricolage_Grotesque } from 'next/font/google';
+import { Pill } from '@/components/ui/pill';
 
 const body = Inter({
   subsets: ['latin'],
@@ -21,8 +22,6 @@ const LUMEN = '#ffffeb';
 const LUMEN_DK = '#e4e4d0';
 const VAST = '#1a1a1a';
 const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const GLOW = '#ffa946';
 const FOCUS = '#2d62ff';
 const WHITE = '#ffffff';
 const MUTED = '#71716a';
@@ -32,23 +31,23 @@ const HAIR = 'rgba(26,26,26,0.08)';
 const steps = [
   {
     n: '01',
-    title: 'Set the week',
-    body: 'Your budget in PKR, your radius, the restaurants you actually like. The default radius is 5 km.',
+    title: 'Start a plan',
+    body: 'Pick a budget and timeframe, set your radius, and add the restaurants you actually like. The default radius is 5 km.',
   },
   {
     n: '02',
-    title: 'Ask for a plan',
-    body: 'The AI proposes seven dinners from menus near you, ranked by fit-to-budget and your pins. Re-roll any single day.',
+    title: 'Let the AI plan',
+    body: 'It fills the plan with meals that fit the budget and lean on your pinned restaurants. Don\'t like one? Swap it.',
   },
   {
     n: '03',
-    title: 'Order on Foodpanda',
-    body: 'BudgetBite never places orders. Tap the day, open Foodpanda, pay. Checkout is two taps.',
+    title: 'Order it yourself',
+    body: 'BudgetBite never places orders. Tap the day and order through Foodpanda — or wherever the restaurant takes orders. Checkout is two taps.',
   },
   {
     n: '04',
     title: 'Log what you paid',
-    body: 'Enter the real amount in under five seconds. If the week drifts past threshold, the AI silently re-plans the rest.',
+    body: 'Enter the real amount in under five seconds. If spending drifts past threshold, the AI silently re-plans the rest.',
   },
 ];
 
@@ -104,20 +103,17 @@ export default function LandingPage() {
           >
             <a href="#how">How it works</a>
             <a href="#privacy">Privacy</a>
-            <a href="#faq">FAQ</a>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-[13px]" style={{ color: VAST }}>
               Log in
             </Link>
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-medium"
-              style={{ background: VAST, color: LUMEN }}
-            >
-              Get started
-              <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
-            </Link>
+            <Pill asChild size="sm">
+              <Link href="/register">
+                Get started
+                <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
+              </Link>
+            </Pill>
           </div>
         </nav>
       </header>
@@ -144,7 +140,7 @@ export default function LandingPage() {
             }}
           >
             <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: FATHOM }} />
-            Early access · Karachi · free during beta
+            Real menus · Real prices · Real budgets
           </div>
 
           <h1
@@ -165,27 +161,20 @@ export default function LandingPage() {
             className="mx-auto mt-7 max-w-[58ch] text-[18px] leading-[1.55]"
             style={{ color: MUTED }}
           >
-            BudgetBite plans your week of dinners from real Foodpanda menus near you,
-            within your budget. You order on Foodpanda; we log what you paid and re-plan
-            when the week drifts.
+            BudgetBite plans your meals from real menus near you, within your budget.
+            You handle the ordering; we log what you paid and re-plan when spending drifts.
           </p>
 
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-medium transition hover:opacity-90"
-              style={{ background: VAST, color: LUMEN }}
-            >
-              Create your plan
-              <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 rounded-full border px-6 py-3 text-[14px] font-medium"
-              style={{ borderColor: VAST, color: VAST, background: 'transparent' }}
-            >
-              I have an account →
-            </Link>
+            <Pill asChild size="lg">
+              <Link href="/register">
+                Create your plan
+                <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
+              </Link>
+            </Pill>
+            <Pill asChild variant="outline" size="lg">
+              <Link href="/login">I have an account →</Link>
+            </Pill>
           </div>
 
           <div
@@ -296,18 +285,8 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
-                      className="rounded-full border px-4 py-2 text-[12px]"
-                      style={{ borderColor: LUMEN_DK, color: VAST }}
-                    >
-                      Re-roll
-                    </button>
-                    <button
-                      className="rounded-full px-4 py-2 text-[12px] font-medium"
-                      style={{ background: FATHOM, color: LUMEN }}
-                    >
-                      Order on Foodpanda →
-                    </button>
+                    <Pill variant="ghost" size="xs">Re-roll</Pill>
+                    <Pill variant="accent" size="xs">Order on Foodpanda →</Pill>
                   </div>
                 </div>
 
@@ -450,16 +429,16 @@ export default function LandingPage() {
                 letterSpacing: '-0.025em',
               }}
             >
-              The week stays{' '}
+              Your meals stay{' '}
               <span style={{ color: MUTED }}>between you and your plan.</span>
             </h2>
           </div>
           <ul className="col-span-12 space-y-4 lg:col-span-7 lg:col-start-6">
             {[
               'Your spending log never leaves your device unless you sign in.',
-              'Restaurant data is fetched from public Foodpanda listings, server-side. No tracking pixels.',
-              'AI calls send the current week and your pins. They do not include your name, email, or order history.',
-              'BudgetBite does not place orders. It does not see your Foodpanda account or card.',
+              'Restaurant data is fetched from public listings, server-side.',
+              'AI calls send the current plan and your pins. They do not include your name, email, or order history.',
+              'BudgetBite does not place orders. It never sees your ordering accounts or payment details.',
             ].map((line) => (
               <li key={line} className="flex items-start gap-3 text-[15px]" style={{ color: VAST }}>
                 <span
@@ -487,7 +466,7 @@ export default function LandingPage() {
               letterSpacing: '-0.03em',
             }}
           >
-            Plan this week{' '}
+            Plan your meals{' '}
             <span style={{ color: FATHOM }}>in two minutes.</span>
           </h2>
           <p
@@ -498,34 +477,22 @@ export default function LandingPage() {
             rest. You can change engines and re-roll any day at any time.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-medium"
-              style={{ background: VAST, color: LUMEN }}
-            >
-              Get started — free
-              <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 rounded-full border px-6 py-3 text-[14px] font-medium"
-              style={{ borderColor: VAST, color: VAST }}
-            >
-              Log in
-            </Link>
-          </div>
-          <div
-            className="mt-5 text-[12px]"
-            style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
-          >
-            Karachi only during beta · ETA Lahore Q3
+            <Pill asChild size="lg">
+              <Link href="/register">
+                Get started — free
+                <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
+              </Link>
+            </Pill>
+            <Pill asChild variant="outline" size="lg">
+              <Link href="/login">Log in</Link>
+            </Pill>
           </div>
         </div>
       </section>
 
       <footer className="border-t" style={{ borderColor: LUMEN_DK, background: LUMEN }}>
-        <div className="mx-auto grid max-w-[1180px] grid-cols-12 gap-8 px-8 py-14">
-          <div className="col-span-12 md:col-span-4">
+        <div className="mx-auto flex max-w-[1180px] flex-col gap-10 px-8 py-14 md:flex-row md:items-start md:justify-between md:gap-8">
+          <div className="md:max-w-[420px]">
             <div className="flex items-center gap-2.5">
               <span
                 className="inline-flex h-6 w-6 items-center justify-center rounded-md"
@@ -548,53 +515,38 @@ export default function LandingPage() {
               </span>
             </div>
             <p className="mt-3 text-[13px] leading-[1.6]" style={{ color: MUTED }}>
-              A meal-planning app for people with a budget and a Foodpanda app. Built
-              in Karachi.
+              A meal-planning app for people who eat out and want to stay on budget.
             </p>
           </div>
 
-          {[
-            {
-              h: 'Product',
-              items: [
-                ['How it works', '#how'],
-                ['Privacy', '#privacy'],
-                ['Get started', '/register'],
-              ],
-            },
-            {
-              h: 'Company',
-              items: [
-                ['About', '#'],
-                ['Contact', 'mailto:hello@budgetbite.app'],
-                ['Press kit', '#'],
-              ],
-            },
-            {
-              h: 'Legal',
-              items: [
-                ['Terms', '#'],
-                ['Privacy policy', '#'],
-                ['Cookies', '#'],
-              ],
-            },
-          ].map((col) => (
-            <div key={col.h} className="col-span-6 md:col-span-2">
-              <div
-                className="text-[10px] uppercase tracking-[0.22em]"
-                style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
-              >
-                {col.h}
-              </div>
-              <ul className="mt-4 space-y-2 text-[13px]" style={{ color: VAST }}>
-                {col.items.map(([label, href]) => (
-                  <li key={label}>
-                    <a href={href}>{label}</a>
-                  </li>
-                ))}
-              </ul>
+          <div>
+            <div
+              className="text-[10px] uppercase tracking-[0.22em]"
+              style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+            >
+              Product
             </div>
-          ))}
+            <ul className="mt-4 space-y-2 text-[13px]" style={{ color: VAST }}>
+              <li>
+                <a href="#how">How it works</a>
+              </li>
+              <li>
+                <a href="#privacy">Privacy</a>
+              </li>
+              <li>
+                <a href="/register">Get started</a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/Adil-Rafiq/budgetbite"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Source
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div
@@ -607,9 +559,16 @@ export default function LandingPage() {
           >
             <span>© 2026 BudgetBite</span>
             <span>
-              v 1.0.4 · Karachi · made with{' '}
-              <span style={{ color: PULSE }}>♥</span> and{' '}
-              <span style={{ color: GLOW }}>karahi</span>
+              Built by{' '}
+              <a
+                href="https://github.com/Adil-Rafiq"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+                style={{ color: VAST, textUnderlineOffset: 2 }}
+              >
+                Adil Rafiq
+              </a>
             </span>
           </div>
         </div>

@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { CountUp, Stagger, StaggerItem } from '@/components/motion';
+import { Pill } from '@/components/ui/pill';
 
 const LUMEN = '#ffffeb';
 const LUMEN_DK = '#e4e4d0';
@@ -106,18 +107,12 @@ function NoPlanMessage() {
           Two minutes. We&apos;ll plan the meals.
         </p>
       </div>
-      <Link href="/plans" className="self-start cursor-pointer sm:self-auto">
-        <motion.span
-          whileHover={{ background: '#2a2a2a', y: -1, boxShadow: '0 6px 14px rgba(0,0,0,0.18)' }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ duration: 0.16, ease: 'easeOut' }}
-          className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-medium"
-          style={{ background: VAST, color: LUMEN }}
-        >
+      <Pill asChild size="md" className="self-start sm:self-auto">
+        <Link href="/plans">
           Create plan
           <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
-        </motion.span>
-      </Link>
+        </Link>
+      </Pill>
     </div>
   );
 }

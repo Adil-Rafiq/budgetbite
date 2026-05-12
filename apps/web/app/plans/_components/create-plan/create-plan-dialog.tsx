@@ -10,8 +10,8 @@ import { useCreatePlan } from '@/app/plans/_hooks/use-create-plan';
 import { CreatePlanProvider } from '@/app/plans/_context/create-plan-context';
 import { StepBudgetDetails } from '@/app/plans/_components/create-plan/steps/step-budget';
 import { StepNotifications } from '@/app/plans/_components/create-plan/steps/step-notification';
+import { Pill } from '@/components/ui/pill';
 
-const LUMEN = '#ffffeb';
 const LUMEN_DK = '#e4e4d0';
 const VAST = '#1a1a1a';
 const FATHOM = '#034f46';
@@ -78,30 +78,20 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
 
           <DialogFooter>
             {currentStep > 0 && (
-              <button
-                onClick={actions.handleBack}
-                disabled={isSubmitting}
-                className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px] transition disabled:opacity-40"
-                style={{
-                  border: `1px solid ${LUMEN_DK}`,
-                  background: 'transparent',
-                  color: VAST,
-                }}
-              >
+              <Pill variant="ghost" size="sm" onClick={actions.handleBack} disabled={isSubmitting}>
                 ← back
-              </button>
+              </Pill>
             )}
-            <button
+            <Pill
+              size="sm"
               onClick={isLastStep ? actions.handleSubmit : actions.handleNext}
               disabled={isSubmitting}
-              className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-[13px] font-medium transition disabled:opacity-40"
-              style={{ background: VAST, color: LUMEN }}
             >
               {isLastStep ? (isSubmitting ? 'Creating…' : 'Create plan') : 'Next'}
               <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>
                 {isLastStep ? '↵' : '→'}
               </span>
-            </button>
+            </Pill>
           </DialogFooter>
 
           <p

@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { LogMealModal } from '@/components/dashboard/meal-slots/_components/log-meal-modal';
 import { useMealSlots } from '@/components/dashboard/meal-slots/_hooks/use-meal-slots';
-import { Pill } from '@/components/motion';
+import { Pill } from '@/components/ui/pill';
 import type { SuggestionSlot, SuggestionOption } from '@repo/shared';
 
 const LUMEN = '#ffffeb';
@@ -253,9 +253,9 @@ export function MealSlots() {
 
                       <Pill
                         variant="ghost"
+                        size="xs"
                         onClick={() => actions.setExpandedSlotId(slot.mealTypeId)}
-                        className="mt-auto w-full"
-                        style={{ padding: '8px 16px', fontSize: 12, background: 'transparent' }}
+                        className="mt-auto w-full bg-transparent"
                       >
                         Change choice
                         <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.5 }}>→</span>
@@ -310,9 +310,9 @@ export function MealSlots() {
                       ))}
 
                       <Pill
+                        size="sm"
                         onClick={() => actions.setExpandedSlotId(slot.mealTypeId)}
                         className="mt-auto w-full"
-                        style={{ padding: '10px 16px', fontSize: 13 }}
                       >
                         View all options
                         <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
@@ -396,11 +396,11 @@ export function MealSlots() {
                 </div>
 
                 <Pill
+                  size="xs"
                   onClick={() =>
                     actions.openLogModal(expandedSlotId!, { type: 'suggestion', option })
                   }
                   className="shrink-0"
-                  style={{ padding: '8px 16px', fontSize: 12 }}
                 >
                   Choose
                 </Pill>
@@ -450,9 +450,9 @@ export function MealSlots() {
               </div>
               <Pill
                 variant="ghost"
+                size="xs"
                 onClick={() => actions.openLogModal(expandedSlotId!, { type: 'custom' })}
                 className="shrink-0"
-                style={{ padding: '8px 16px', fontSize: 12 }}
               >
                 Enter
               </Pill>

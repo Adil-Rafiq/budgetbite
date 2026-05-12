@@ -21,7 +21,8 @@ import { Slider } from '@/components/ui/slider';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { useRestaurants } from '@/hooks/use-restaurant';
-import { FadeUp, Stagger, StaggerItem, Pill } from '@/components/motion';
+import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
+import { Pill } from '@/components/ui/pill';
 import { motion } from 'motion/react';
 
 import { RestaurantCardSkeleton } from './_components/restaurant-card-skeleton';
@@ -417,9 +418,10 @@ export default function RestaurantsPage() {
             <div className="flex items-center justify-between gap-3">
               <Pill
                 variant="ghost"
+                size="xs"
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
                 disabled={page === 0 || isFetching}
-                style={{ padding: '6px 16px', fontSize: 12 }}
+                style={{ fontFamily: 'var(--font-mono)' }}
               >
                 ← prev
               </Pill>
@@ -432,9 +434,10 @@ export default function RestaurantsPage() {
               </p>
               <Pill
                 variant="ghost"
+                size="xs"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={isLastPage || isFetching}
-                style={{ padding: '6px 16px', fontSize: 12 }}
+                style={{ fontFamily: 'var(--font-mono)' }}
               >
                 next →
               </Pill>

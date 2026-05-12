@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Bell, Plus, Trash2 } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
+import { Pill } from '@/components/ui/pill';
 import { useActiveBudgetPlan, useUpdateBudgetPlan } from '@/hooks/use-budget-plan';
 import { showToast } from '@/lib/toast';
 import { getErrorMessage } from '@/lib/api/errors';
@@ -130,35 +131,31 @@ export function NotificationTimesCard() {
                       fontFamily: 'var(--font-mono)',
                     }}
                   />
-                  <button
+                  <Pill
+                    variant="subtle"
+                    size="iconSm"
                     onClick={() => remove(i)}
                     aria-label="Remove reminder"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full transition hover:opacity-80"
                     style={{ color: MUTED }}
                   >
                     <Trash2 className="h-4 w-4" />
-                  </button>
+                  </Pill>
                 </div>
               ))}
             </div>
 
             <div className="flex gap-2">
-              <button
-                onClick={add}
-                className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[12px] transition"
-                style={{ border: `1px solid ${LUMEN_DK}`, background: WHITE, color: VAST }}
-              >
+              <Pill variant="ghost" size="xs" onClick={add}>
                 <Plus className="h-3.5 w-3.5" />
                 Add time
-              </button>
-              <button
+              </Pill>
+              <Pill
+                size="xs"
                 onClick={save}
                 disabled={!isDirty || !allValid || isPending}
-                className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[12px] font-medium transition disabled:opacity-40"
-                style={{ background: VAST, color: LUMEN }}
               >
                 {isPending ? 'Saving…' : 'Save'}
-              </button>
+              </Pill>
             </div>
           </>
         )}

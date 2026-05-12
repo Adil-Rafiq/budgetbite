@@ -1,6 +1,7 @@
 'use client';
 
 import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-context';
+import { Pill } from '@/components/ui/pill';
 
 const LUMEN = '#ffffeb';
 const LUMEN_DK = '#e4e4d0';
@@ -36,18 +37,17 @@ export const LocationStep = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      <button
-        type="button"
+      <Pill
+        variant="accent"
+        size="md"
         onClick={actions.detectLocation}
         disabled={state.isDetectingLocation}
-        className="inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-[13px] font-medium disabled:opacity-60"
-        style={{ borderColor: FATHOM, color: FATHOM, background: 'rgba(3,79,70,0.04)' }}
       >
         {state.isDetectingLocation ? (
           <>
             <span
               className="inline-block h-3 w-3 animate-spin rounded-full border-2"
-              style={{ borderColor: FATHOM, borderTopColor: 'transparent' }}
+              style={{ borderColor: LUMEN, borderTopColor: 'transparent' }}
             />
             Detecting…
           </>
@@ -57,7 +57,7 @@ export const LocationStep = () => {
             Use my current location
           </>
         )}
-      </button>
+      </Pill>
 
       <div
         className="flex items-center gap-3 rounded-md px-3 py-1.5 text-[11px]"
