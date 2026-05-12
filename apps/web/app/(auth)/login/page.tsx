@@ -12,6 +12,7 @@ import { loginSchema, type LoginInput } from '@repo/shared';
 import { showToast, type ToastOptions } from '@/lib/toast';
 import { Pill } from '@/components/ui/pill';
 import { LogoIcon, GoogleIcon, GitHubIcon } from '@/components/icons';
+import { getPostLoginPath } from '@/lib/auth/post-login-redirect';
 
 type OAuthProvider = 'google' | 'github';
 
@@ -101,13 +102,17 @@ export default function LoginPage() {
       return;
     }
 
+    const nextPath = await getPostLoginPath();
+
     showToast({
       title: 'Login successful',
-      description: 'Welcome back! Redirecting to dashboard...',
+      description: nextPath === '/dashboard'
+        ? 'Welcome back! Redirecting to dashboard...'
+        : 'Welcome back! Let’s finish setting up your account.',
       variant: 'success',
     });
 
-    router.push('/dashboard');
+    router.push(nextPath);
   };
 
   const handleOAuthSignIn = async (provider: OAuthProvider) => {

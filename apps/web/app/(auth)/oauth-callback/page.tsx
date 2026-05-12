@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
+import { getPostLoginPath } from '@/lib/auth/post-login-redirect';
 
 const LUMEN = '#ffffeb';
 const LUMEN_DK = '#e4e4d0';
@@ -22,12 +23,7 @@ export default function OAuthCallbackPage() {
         return;
       }
 
-      if (!session.user.latitude || !session.user.longitude) {
-        router.push('/onboarding');
-        return;
-      }
-
-      router.push('/dashboard');
+      router.push(await getPostLoginPath());
     };
 
     checkOnboarding();
