@@ -1,5 +1,8 @@
-import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const WHITE = '#ffffff';
 
 interface CardGridSkeletonProps {
   cards?: number;
@@ -24,7 +27,19 @@ export function CardGridSkeleton({
   return (
     <div className={cn('grid gap-4', COLUMN_CLASSES[columns], className)}>
       {Array.from({ length: cards }).map((_, i) => (
-        <Skeleton key={i} className={cn('w-full', cardClassName)} />
+        <div
+          key={i}
+          className={cn('w-full overflow-hidden rounded-2xl p-5', cardClassName)}
+          style={{
+            background: WHITE,
+            border: `1px solid ${LUMEN_DK}`,
+            boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
+          }}
+        >
+          <div className="h-3 w-12 animate-pulse rounded" style={{ background: LUMEN }} />
+          <div className="mt-3 h-5 w-32 animate-pulse rounded" style={{ background: LUMEN }} />
+          <div className="mt-2 h-3 w-24 animate-pulse rounded" style={{ background: LUMEN }} />
+        </div>
       ))}
     </div>
   );

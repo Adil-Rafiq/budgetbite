@@ -8,18 +8,26 @@ import { LogOut, Lock, MapPin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 import { useUpdateProfile, useUser } from '@/hooks/use-user';
 import { authClient } from '@/lib/auth-client';
 import { showToast } from '@/lib/toast';
 import { getErrorMessage } from '@/lib/api/errors';
 import { NotificationTimesCard } from '@/app/profile/_components/notification-times-card';
+
+// ─── Wispr palette ───────────────────────────────────────────────────────────
+
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const VAST = '#1a1a1a';
+const FATHOM = '#034f46';
+const PULSE = '#7f1c34';
+const AMBER = '#b8741a';
+const WHITE = '#ffffff';
+const MUTED = '#71716a';
+const SOFT = '#a6a691';
 
 // ─── Schemas ─────────────────────────────────────────────────────────────────
 
@@ -65,6 +73,102 @@ function initials(firstName: string, lastName: string): string {
   return `${a}${b}` || '•';
 }
 
+// ─── Reusable bits ───────────────────────────────────────────────────────────
+
+function Panel({
+  code,
+  title,
+  description,
+  tint,
+  Icon,
+  children,
+}: {
+  code: string;
+  title: string;
+  description: string;
+  tint: string;
+  Icon: typeof MapPin;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="overflow-hidden rounded-2xl"
+      style={{
+        background: WHITE,
+        border: `1px solid ${LUMEN_DK}`,
+        boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
+      }}
+    >
+      <div
+        className="flex items-center justify-between gap-3 border-b px-5 py-4"
+        style={{ borderColor: LUMEN_DK, background: LUMEN }}
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            className="flex h-8 w-8 items-center justify-center rounded-lg"
+            style={{ background: `${tint}14`, color: tint }}
+          >
+            <Icon className="h-4 w-4" />
+          </div>
+          <div className="flex flex-col">
+            <span
+              className="text-[10px] uppercase"
+              style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.22em' }}
+            >
+              {code}
+            </span>
+            <span
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 15,
+                fontWeight: 600,
+                color: VAST,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {title}
+            </span>
+          </div>
+        </div>
+        <p className="hidden text-right text-[12px] sm:block" style={{ color: MUTED, maxWidth: 280 }}>
+          {description}
+        </p>
+      </div>
+      <div className="p-5">{children}</div>
+    </div>
+  );
+}
+
+function PrimaryButton({
+  children,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      {...props}
+      className="inline-flex items-center gap-2 self-start rounded-full px-5 py-2.5 text-[13px] font-medium transition disabled:opacity-40"
+      style={{ background: VAST, color: LUMEN }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function OutlineButton({
+  children,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      {...props}
+      className="inline-flex items-center gap-2 self-start rounded-full px-4 py-2 text-[13px] transition disabled:opacity-40"
+      style={{ border: `1px solid ${LUMEN_DK}`, background: WHITE, color: VAST }}
+    >
+      {children}
+    </button>
+  );
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
@@ -102,7 +206,6 @@ export default function ProfilePage() {
     defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
   });
 
-  // Reset forms when user arrives / changes.
   useEffect(() => {
     if (user) {
       accountForm.reset(initialAccount);
@@ -123,7 +226,6 @@ export default function ProfilePage() {
       });
       return;
     }
-    // Better-auth's email updates require verification and are provider-scoped — skip for now.
     queryClient.invalidateQueries({ queryKey: ['users', 'me'] });
     showToast.success({ title: 'Profile updated' });
   };
@@ -168,232 +270,277 @@ export default function ProfilePage() {
 
   if (isLoading || !user) {
     return (
-      <div className="flex flex-col gap-6 max-w-2xl">
-        <Skeleton className="h-8 w-32" />
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-40 w-full" />
-        <Skeleton className="h-56 w-full" />
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+        <div className="h-10 w-40 animate-pulse rounded" style={{ background: LUMEN_DK }} />
+        <div className="h-48 w-full animate-pulse rounded-2xl" style={{ background: LUMEN_DK }} />
+        <div className="h-40 w-full animate-pulse rounded-2xl" style={{ background: LUMEN_DK }} />
+        <div className="h-56 w-full animate-pulse rounded-2xl" style={{ background: LUMEN_DK }} />
       </div>
     );
   }
 
   const { firstName, lastName } = splitName(user.name);
+  const inputStyle = { background: LUMEN, borderColor: LUMEN_DK, color: VAST };
+  const labelStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-mono)',
+    color: SOFT,
+    letterSpacing: '0.18em',
+  };
+  const errStyle: React.CSSProperties = { color: PULSE, fontFamily: 'var(--font-mono)' };
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Profile</h1>
-          <p className="text-muted-foreground text-sm mt-1">Manage your account settings.</p>
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+      <header className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <div
+            className="text-[10px] uppercase"
+            style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+          >
+            account · /profile
+          </div>
+          <h1
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(28px, 3.6vw, 40px)',
+              fontWeight: 600,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.05,
+              color: VAST,
+            }}
+          >
+            Profile.
+          </h1>
+          <p className="text-[14px]" style={{ color: MUTED }}>
+            Account, location, reminders.
+          </p>
         </div>
-        <Button
-          variant="outline"
+        <button
           onClick={handleSignOut}
           disabled={signingOut}
-          className="shrink-0"
+          className="inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-[13px] transition disabled:opacity-40"
+          style={{ border: `1px solid ${LUMEN_DK}`, background: WHITE, color: VAST }}
         >
-          <LogOut className="w-4 h-4 mr-2" />
+          <LogOut className="h-3.5 w-3.5" />
           Sign out
-        </Button>
-      </div>
+        </button>
+      </header>
 
       {/* Profile info */}
-      <Card className="border-border">
-        <CardHeader>
-          <div className="flex items-center gap-4">
-            <Avatar className="h-14 w-14">
-              <AvatarFallback className="bg-primary text-primary-foreground text-lg font-semibold">
-                {initials(firstName, lastName)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <CardTitle className="text-lg text-card-foreground">{user.name || '—'}</CardTitle>
-              <CardDescription>{user.email}</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={accountForm.handleSubmit(onSaveAccount)}
-            noValidate
+      <Panel
+        code="01"
+        title={user.name || '—'}
+        description={user.email}
+        tint={FATHOM}
+        Icon={MapPin}
+      >
+        <div className="flex items-center gap-4 pb-4">
+          <div
+            className="flex h-14 w-14 items-center justify-center rounded-full text-[18px] font-semibold"
+            style={{ background: FATHOM, color: LUMEN, fontFamily: 'var(--font-display)' }}
           >
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="firstName">First name</Label>
-                <Input id="firstName" {...accountForm.register('firstName')} />
-                {accountForm.formState.errors.firstName && (
-                  <p className="text-xs text-destructive">
-                    {accountForm.formState.errors.firstName.message}
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="lastName">Last name</Label>
-                <Input id="lastName" {...accountForm.register('lastName')} />
-                {accountForm.formState.errors.lastName && (
-                  <p className="text-xs text-destructive">
-                    {accountForm.formState.errors.lastName.message}
-                  </p>
-                )}
-              </div>
+            {initials(firstName, lastName)}
+          </div>
+          <div>
+            <p
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 18,
+                fontWeight: 600,
+                color: VAST,
+              }}
+            >
+              {user.name || '—'}
+            </p>
+            <p className="text-[13px]" style={{ color: MUTED }}>
+              {user.email}
+            </p>
+          </div>
+        </div>
+
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={accountForm.handleSubmit(onSaveAccount)}
+          noValidate
+        >
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="firstName" className="text-[10px] uppercase" style={labelStyle}>
+                First name
+              </Label>
+              <Input id="firstName" {...accountForm.register('firstName')} style={inputStyle} />
+              {accountForm.formState.errors.firstName && (
+                <p className="text-[11px]" style={errStyle}>
+                  {accountForm.formState.errors.firstName.message}
+                </p>
+              )}
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" {...accountForm.register('email')} disabled />
-              <p className="text-xs text-muted-foreground">
-                Email changes aren{"'"}t supported yet — contact support if you need to switch.
-              </p>
-            </div>
-            <Button
-              type="submit"
-              className="self-start"
-              disabled={accountForm.formState.isSubmitting || !accountForm.formState.isDirty}
-            >
-              {accountForm.formState.isSubmitting ? 'Saving...' : 'Save changes'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Location */}
-      <Card className="border-border">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-accent/10">
-              <MapPin className="w-4 h-4 text-accent" />
-            </div>
-            <div>
-              <CardTitle className="text-base text-card-foreground">Location</CardTitle>
-              <CardDescription>
-                Update your location for better restaurant suggestions
-              </CardDescription>
+              <Label htmlFor="lastName" className="text-[10px] uppercase" style={labelStyle}>
+                Last name
+              </Label>
+              <Input id="lastName" {...accountForm.register('lastName')} style={inputStyle} />
+              {accountForm.formState.errors.lastName && (
+                <p className="text-[11px]" style={errStyle}>
+                  {accountForm.formState.errors.lastName.message}
+                </p>
+              )}
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={locationForm.handleSubmit(onSaveLocation)}
-            noValidate
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="email" className="text-[10px] uppercase" style={labelStyle}>
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              {...accountForm.register('email')}
+              disabled
+              style={inputStyle}
+            />
+            <p className="text-[11px]" style={{ color: SOFT, fontFamily: 'var(--font-mono)' }}>
+              email changes aren&apos;t supported yet.
+            </p>
+          </div>
+          <PrimaryButton
+            type="submit"
+            disabled={accountForm.formState.isSubmitting || !accountForm.formState.isDirty}
           >
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="lat">Latitude</Label>
-                <Input
-                  id="lat"
-                  type="number"
-                  step="0.0001"
-                  {...locationForm.register('latitude', { valueAsNumber: true })}
-                />
-                {locationForm.formState.errors.latitude && (
-                  <p className="text-xs text-destructive">
-                    {locationForm.formState.errors.latitude.message}
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="lng">Longitude</Label>
-                <Input
-                  id="lng"
-                  type="number"
-                  step="0.0001"
-                  {...locationForm.register('longitude', { valueAsNumber: true })}
-                />
-                {locationForm.formState.errors.longitude && (
-                  <p className="text-xs text-destructive">
-                    {locationForm.formState.errors.longitude.message}
-                  </p>
-                )}
-              </div>
+            {accountForm.formState.isSubmitting ? 'Saving…' : 'Save changes'}
+            <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
+          </PrimaryButton>
+        </form>
+      </Panel>
+
+      {/* Location */}
+      <Panel
+        code="02"
+        title="Location"
+        description="Powers nearby restaurant suggestions."
+        tint={AMBER}
+        Icon={MapPin}
+      >
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={locationForm.handleSubmit(onSaveLocation)}
+          noValidate
+        >
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="lat" className="text-[10px] uppercase" style={labelStyle}>
+                Latitude
+              </Label>
+              <Input
+                id="lat"
+                type="number"
+                step="0.0001"
+                {...locationForm.register('latitude', { valueAsNumber: true })}
+                style={inputStyle}
+              />
+              {locationForm.formState.errors.latitude && (
+                <p className="text-[11px]" style={errStyle}>
+                  {locationForm.formState.errors.latitude.message}
+                </p>
+              )}
             </div>
-            <Button
-              type="submit"
-              variant="outline"
-              className="self-start"
-              disabled={locationForm.formState.isSubmitting || !locationForm.formState.isDirty}
-            >
-              {locationForm.formState.isSubmitting ? 'Updating...' : 'Update location'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="lng" className="text-[10px] uppercase" style={labelStyle}>
+                Longitude
+              </Label>
+              <Input
+                id="lng"
+                type="number"
+                step="0.0001"
+                {...locationForm.register('longitude', { valueAsNumber: true })}
+                style={inputStyle}
+              />
+              {locationForm.formState.errors.longitude && (
+                <p className="text-[11px]" style={errStyle}>
+                  {locationForm.formState.errors.longitude.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <OutlineButton
+            type="submit"
+            disabled={locationForm.formState.isSubmitting || !locationForm.formState.isDirty}
+          >
+            {locationForm.formState.isSubmitting ? 'Updating…' : 'Update location'}
+          </OutlineButton>
+        </form>
+      </Panel>
 
       {/* Notification times — active plan */}
       <NotificationTimesCard />
 
       {/* Change password */}
-      <Card className="border-border">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-chart-3/10">
-              <Lock className="w-4 h-4 text-chart-3" />
-            </div>
-            <div>
-              <CardTitle className="text-base text-card-foreground">Change Password</CardTitle>
-              <CardDescription>Update your password to keep your account secure</CardDescription>
-            </div>
+      <Panel
+        code="03"
+        title="Change password"
+        description="Keep your account secure."
+        tint={PULSE}
+        Icon={Lock}
+      >
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={passwordForm.handleSubmit(onChangePassword)}
+          noValidate
+        >
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="currentPassword" className="text-[10px] uppercase" style={labelStyle}>
+              Current password
+            </Label>
+            <Input
+              id="currentPassword"
+              type="password"
+              placeholder="Enter current password"
+              {...passwordForm.register('currentPassword')}
+              style={inputStyle}
+            />
+            {passwordForm.formState.errors.currentPassword && (
+              <p className="text-[11px]" style={errStyle}>
+                {passwordForm.formState.errors.currentPassword.message}
+              </p>
+            )}
           </div>
-        </CardHeader>
-        <CardContent>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={passwordForm.handleSubmit(onChangePassword)}
-            noValidate
-          >
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="currentPassword">Current password</Label>
-              <Input
-                id="currentPassword"
-                type="password"
-                placeholder="Enter current password"
-                {...passwordForm.register('currentPassword')}
-              />
-              {passwordForm.formState.errors.currentPassword && (
-                <p className="text-xs text-destructive">
-                  {passwordForm.formState.errors.currentPassword.message}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="newPassword">New password</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                placeholder="Enter new password"
-                {...passwordForm.register('newPassword')}
-              />
-              {passwordForm.formState.errors.newPassword && (
-                <p className="text-xs text-destructive">
-                  {passwordForm.formState.errors.newPassword.message}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="confirmPassword">Confirm new password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm new password"
-                {...passwordForm.register('confirmPassword')}
-              />
-              {passwordForm.formState.errors.confirmPassword && (
-                <p className="text-xs text-destructive">
-                  {passwordForm.formState.errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-            <Button
-              type="submit"
-              variant="outline"
-              className="self-start"
-              disabled={passwordForm.formState.isSubmitting}
-            >
-              {passwordForm.formState.isSubmitting ? 'Changing...' : 'Change password'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="newPassword" className="text-[10px] uppercase" style={labelStyle}>
+              New password
+            </Label>
+            <Input
+              id="newPassword"
+              type="password"
+              placeholder="Enter new password"
+              {...passwordForm.register('newPassword')}
+              style={inputStyle}
+            />
+            {passwordForm.formState.errors.newPassword && (
+              <p className="text-[11px]" style={errStyle}>
+                {passwordForm.formState.errors.newPassword.message}
+              </p>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="confirmPassword" className="text-[10px] uppercase" style={labelStyle}>
+              Confirm new password
+            </Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm new password"
+              {...passwordForm.register('confirmPassword')}
+              style={inputStyle}
+            />
+            {passwordForm.formState.errors.confirmPassword && (
+              <p className="text-[11px]" style={errStyle}>
+                {passwordForm.formState.errors.confirmPassword.message}
+              </p>
+            )}
+          </div>
+          <OutlineButton type="submit" disabled={passwordForm.formState.isSubmitting}>
+            {passwordForm.formState.isSubmitting ? 'Changing…' : 'Change password'}
+          </OutlineButton>
+        </form>
+      </Panel>
     </div>
   );
 }

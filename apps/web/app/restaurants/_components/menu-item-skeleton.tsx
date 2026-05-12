@@ -1,6 +1,8 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const WHITE = '#ffffff';
 
 interface MenuItemSkeletonProps {
   className?: string;
@@ -8,16 +10,23 @@ interface MenuItemSkeletonProps {
 
 export function MenuItemSkeleton({ className }: MenuItemSkeletonProps) {
   return (
-    <Card className={cn('border-border overflow-hidden', className)}>
-      <Skeleton className="h-32 w-full rounded-none" />
-      <CardContent className="flex items-start justify-between gap-4 pt-4">
+    <div
+      className={cn('overflow-hidden rounded-2xl', className)}
+      style={{
+        background: WHITE,
+        border: `1px solid ${LUMEN_DK}`,
+        boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
+      }}
+    >
+      <div className="h-32 w-full animate-pulse" style={{ background: LUMEN }} />
+      <div className="flex items-start justify-between gap-4 p-4">
         <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <Skeleton className="h-4 w-32 rounded-sm" />
-          <Skeleton className="h-3 w-full rounded-sm" />
-          <Skeleton className="h-3 w-3/4 rounded-sm" />
+          <div className="h-4 w-32 animate-pulse rounded" style={{ background: LUMEN }} />
+          <div className="h-3 w-full animate-pulse rounded" style={{ background: LUMEN }} />
+          <div className="h-3 w-3/4 animate-pulse rounded" style={{ background: LUMEN }} />
         </div>
-        <Skeleton className="h-4 w-16 shrink-0 rounded-sm" />
-      </CardContent>
-    </Card>
+        <div className="h-4 w-16 shrink-0 animate-pulse rounded" style={{ background: LUMEN }} />
+      </div>
+    </div>
   );
 }

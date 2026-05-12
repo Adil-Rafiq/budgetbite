@@ -1,11 +1,17 @@
 'use client';
 
-import { UtensilsCrossed } from 'lucide-react';
-
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
+import Link from 'next/link';
+import { motion } from 'motion/react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
+
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const VAST = '#1a1a1a';
+const FATHOM = '#034f46';
+const WHITE = '#ffffff';
+const MUTED = '#71716a';
+const SOFT = '#a6a691';
 
 function initials(name: string | undefined): string {
   if (!name) return '•';
@@ -25,34 +31,112 @@ export function AppHeader() {
   const spentPercent = totalBudget > 0 ? Math.round((spent / totalBudget) * 100) : 0;
 
   return (
-    <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-sm border-b border-border">
-      <div className="flex items-center justify-between px-4 py-3 lg:px-6">
-        <div className="flex items-center gap-3 lg:hidden">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary">
-            <UtensilsCrossed className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-semibold tracking-tight text-foreground">BudgetBite</span>
+    <header
+      className="sticky top-0 z-40"
+      style={{
+        background: 'rgba(255,255,235,0.85)',
+        backdropFilter: 'saturate(180%) blur(10px)',
+        borderBottom: `1px solid ${LUMEN_DK}`,
+      }}
+    >
+      <div className="flex items-center justify-between px-4 py-3 lg:px-8 lg:py-4">
+        <Link href="/dashboard" className="flex items-center gap-2.5 lg:hidden">
+          <span
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md"
+            style={{ background: FATHOM, color: LUMEN }}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="13"
+              height="13"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 11v9a1 1 0 0 0 1 1h6v-7h4v7h6a1 1 0 0 0 1-1v-9" />
+              <path d="M1 11 12 3l11 8" />
+            </svg>
+          </span>
+          <span
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 16,
+              fontWeight: 600,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            BudgetBite
+          </span>
+        </Link>
+
+        <div
+          className="hidden lg:block text-[11px] uppercase"
+          style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.22em' }}
+        >
+          home · /dashboard
         </div>
 
-        <div className="hidden lg:block" />
-
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {active && (
-            <div className="hidden sm:flex items-center gap-3 bg-secondary rounded-lg px-3 py-2">
-              <div className="text-xs text-muted-foreground">
-                <span className="font-medium text-foreground">
-                  PKR {remaining.toLocaleString()}
-                </span>{' '}
-                remaining
+            <div
+              className="hidden items-center gap-3 rounded-full px-4 py-1.5 sm:flex"
+              style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
+            >
+              <span
+                className="text-[10px] uppercase"
+                style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+              >
+                left
+              </span>
+              <span
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: VAST,
+                }}
+              >
+                ₨ {remaining.toLocaleString()}
+              </span>
+              <div
+                className="h-1.5 w-20 overflow-hidden rounded-full"
+                style={{ background: LUMEN }}
+              >
+                <motion.div
+                  className="h-full rounded-full"
+                  initial={{ width: '0%' }}
+                  animate={{ width: `${Math.min(100, spentPercent)}%` }}
+                  transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+                  style={{
+                    background: spentPercent >= 90 ? '#7f1c34' : FATHOM,
+                  }}
+                />
               </div>
-              <Progress value={spentPercent} className="w-24 h-2" />
+              <span
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 10,
+                  color: MUTED,
+                }}
+              >
+                {spentPercent}%
+              </span>
             </div>
           )}
-          <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
-              {initials(user?.name)}
-            </AvatarFallback>
-          </Avatar>
+          <span
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[12px]"
+            style={{
+              background: FATHOM,
+              color: LUMEN,
+              fontFamily: 'var(--font-mono)',
+              fontWeight: 600,
+            }}
+            title={user?.name ?? ''}
+          >
+            {initials(user?.name)}
+          </span>
         </div>
       </div>
     </header>

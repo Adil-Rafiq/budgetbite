@@ -1,5 +1,7 @@
-import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
 
 interface TableSkeletonProps {
   rows?: number;
@@ -13,11 +15,21 @@ export function TableSkeleton({ rows = 5, columns = 4, className }: TableSkeleto
   const widths = (i: number) => COLUMN_WIDTHS[i % COLUMN_WIDTHS.length];
 
   return (
-    <div className={cn('flex w-full flex-col gap-3', className)} role="status" aria-label="Loading">
-      <div className="flex items-center gap-4 border-b pb-2">
+    <div
+      className={cn('flex w-full flex-col gap-3', className)}
+      role="status"
+      aria-label="Loading"
+    >
+      <div
+        className="flex items-center gap-4 pb-2"
+        style={{ borderBottom: `1px solid ${LUMEN_DK}` }}
+      >
         {Array.from({ length: columns }).map((_, i) => (
           <div key={i} className={cn('flex-1', i === columns - 1 && 'flex justify-end')}>
-            <Skeleton className={cn('h-3', widths(i))} />
+            <div
+              className={cn('h-3 animate-pulse rounded', widths(i))}
+              style={{ background: LUMEN }}
+            />
           </div>
         ))}
       </div>
@@ -25,7 +37,10 @@ export function TableSkeleton({ rows = 5, columns = 4, className }: TableSkeleto
         <div key={r} className="flex items-center gap-4">
           {Array.from({ length: columns }).map((_, c) => (
             <div key={c} className={cn('flex-1', c === columns - 1 && 'flex justify-end')}>
-              <Skeleton className={cn('h-4', widths(c))} />
+              <div
+                className={cn('h-4 animate-pulse rounded', widths(c))}
+                style={{ background: LUMEN }}
+              />
             </div>
           ))}
         </div>

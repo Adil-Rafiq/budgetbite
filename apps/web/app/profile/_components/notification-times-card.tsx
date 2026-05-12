@@ -3,13 +3,18 @@
 import { useEffect, useState } from 'react';
 import { Bell, Plus, Trash2 } from 'lucide-react';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useActiveBudgetPlan, useUpdateBudgetPlan } from '@/hooks/use-budget-plan';
 import { showToast } from '@/lib/toast';
 import { getErrorMessage } from '@/lib/api/errors';
+
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const VAST = '#1a1a1a';
+const FATHOM = '#034f46';
+const WHITE = '#ffffff';
+const MUTED = '#71716a';
+const SOFT = '#a6a691';
 
 const TIME_PATTERN = /^\d{2}:\d{2}$/;
 
@@ -48,33 +53,67 @@ export function NotificationTimesCard() {
   };
 
   if (isLoading) {
-    return <Skeleton className="h-44 w-full" />;
+    return (
+      <div className="h-44 w-full animate-pulse rounded-2xl" style={{ background: LUMEN_DK }} />
+    );
   }
 
   return (
-    <Card className="border-border">
-      <CardHeader>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-chart-1/10">
-            <Bell className="w-4 h-4 text-chart-1" />
+    <div
+      className="overflow-hidden rounded-2xl"
+      style={{
+        background: WHITE,
+        border: `1px solid ${LUMEN_DK}`,
+        boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
+      }}
+    >
+      <div
+        className="flex items-center justify-between gap-3 border-b px-5 py-4"
+        style={{ borderColor: LUMEN_DK, background: LUMEN }}
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            className="flex h-8 w-8 items-center justify-center rounded-lg"
+            style={{ background: `${FATHOM}14`, color: FATHOM }}
+          >
+            <Bell className="h-4 w-4" />
           </div>
-          <div>
-            <CardTitle className="text-base text-card-foreground">Notification times</CardTitle>
-            <CardDescription>
-              {active
-                ? 'When should we remind you to choose a meal?'
-                : 'Create a budget plan to configure reminders.'}
-            </CardDescription>
+          <div className="flex flex-col">
+            <span
+              className="text-[10px] uppercase"
+              style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.22em' }}
+            >
+              04
+            </span>
+            <span
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 15,
+                fontWeight: 600,
+                color: VAST,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Notification times
+            </span>
           </div>
         </div>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        {!active ? null : (
+        <p className="hidden text-right text-[12px] sm:block" style={{ color: MUTED, maxWidth: 280 }}>
+          {active ? 'When should we remind you?' : 'Create a plan to configure reminders.'}
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-4 p-5">
+        {!active ? (
+          <p className="text-[13px]" style={{ color: MUTED }}>
+            No active plan yet.
+          </p>
+        ) : (
           <>
             <div className="flex flex-col gap-2">
               {times.length === 0 && (
-                <p className="text-xs text-muted-foreground">
-                  No reminders configured. Add one below.
+                <p className="text-[12px]" style={{ fontFamily: 'var(--font-mono)', color: SOFT }}>
+                  no reminders configured. add one below.
                 </p>
               )}
               {times.map((t, i) => (
@@ -84,31 +123,46 @@ export function NotificationTimesCard() {
                     value={t}
                     onChange={(e) => update(i, e.target.value)}
                     className="w-32"
+                    style={{
+                      background: LUMEN,
+                      borderColor: LUMEN_DK,
+                      color: VAST,
+                      fontFamily: 'var(--font-mono)',
+                    }}
                   />
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <button
                     onClick={() => remove(i)}
                     aria-label="Remove reminder"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full transition hover:opacity-80"
+                    style={{ color: MUTED }}
                   >
-                    <Trash2 className="w-4 h-4 text-muted-foreground" />
-                  </Button>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               ))}
             </div>
 
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={add}>
-                <Plus className="w-4 h-4 mr-1" />
+              <button
+                onClick={add}
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[12px] transition"
+                style={{ border: `1px solid ${LUMEN_DK}`, background: WHITE, color: VAST }}
+              >
+                <Plus className="h-3.5 w-3.5" />
                 Add time
-              </Button>
-              <Button size="sm" onClick={save} disabled={!isDirty || !allValid || isPending}>
-                {isPending ? 'Saving...' : 'Save'}
-              </Button>
+              </button>
+              <button
+                onClick={save}
+                disabled={!isDirty || !allValid || isPending}
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[12px] font-medium transition disabled:opacity-40"
+                style={{ background: VAST, color: LUMEN }}
+              >
+                {isPending ? 'Saving…' : 'Save'}
+              </button>
             </div>
           </>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -1,21 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import { Wallet, TrendingDown, PiggyBank, CalendarDays, AlertCircle } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { motion } from 'motion/react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
+import { CountUp, Stagger, StaggerItem } from '@/components/motion';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const VAST = '#1a1a1a';
+const FATHOM = '#034f46';
+const PULSE = '#7f1c34';
+const AMBER = '#b8741a';
+const WHITE = '#ffffff';
+const MUTED = '#71716a';
+const SOFT = '#a6a691';
 
-const formatPKR = (value: number) =>
-  `PKR ${value.toLocaleString('en-PK', { maximumFractionDigits: 0 })}`;
-
-/**
- * Uses local date parts to avoid UTC offset shifting the day.
- * e.g. 2 AM PKT (UTC+5) would otherwise show the previous day.
- */
 const getDaysLeft = (endDateStr: string): number => {
   const today = new Date();
   const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -34,23 +34,33 @@ const getSpendingHealth = (spent: number, total: number): 'good' | 'warning' | '
   return 'danger';
 };
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+function StatCardSkeleton() {
+  return (
+    <div
+      className="rounded-2xl p-5"
+      style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
+    >
+      <div
+        className="h-3 w-16 rounded animate-pulse"
+        style={{ background: LUMEN }}
+      />
+      <div
+        className="mt-4 h-7 w-28 rounded animate-pulse"
+        style={{ background: LUMEN }}
+      />
+      <div
+        className="mt-2 h-3 w-20 rounded animate-pulse"
+        style={{ background: LUMEN }}
+      />
+    </div>
+  );
+}
 
 function SummaryCardsSkeleton() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <Card key={i} className="border-border">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <Skeleton className="w-10 h-10 rounded-lg shrink-0" />
-              <div className="flex flex-col gap-1.5 flex-1">
-                <Skeleton className="h-3 w-16" />
-                <Skeleton className="h-5 w-24" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCardSkeleton key={i} />
       ))}
     </div>
   );
@@ -58,113 +68,179 @@ function SummaryCardsSkeleton() {
 
 function SummaryCardsError({ message }: { message: string }) {
   return (
-    <div className="flex items-center gap-2 p-4 bg-destructive/10 text-destructive rounded-lg border border-destructive/20">
-      <AlertCircle className="w-4 h-4 shrink-0" />
-      <p className="text-sm">{message}</p>
+    <div
+      className="flex items-center gap-3 rounded-xl p-4 text-[13px]"
+      style={{ background: 'rgba(127,28,52,0.06)', border: `1px solid ${PULSE}`, color: PULSE }}
+    >
+      <span style={{ fontFamily: 'var(--font-mono)' }}>!</span>
+      {message}
     </div>
   );
 }
 
 function NoPlanMessage() {
   return (
-    <div className="flex items-center justify-between gap-4 p-4 bg-muted rounded-lg border border-border">
-      <p className="text-sm text-muted-foreground">
-        No active budget plan found. Create one to see your summary.
-      </p>
-      <Button asChild size="sm" className="shrink-0">
-        <Link href="/plans">Create plan</Link>
-      </Button>
+    <div
+      className="flex flex-col gap-4 rounded-2xl p-6 sm:flex-row sm:items-center sm:justify-between"
+      style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
+    >
+      <div className="flex flex-col gap-1">
+        <div
+          className="text-[10px] uppercase"
+          style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+        >
+          no active plan
+        </div>
+        <p
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 22,
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
+            color: VAST,
+          }}
+        >
+          Set this week&apos;s budget to get started.
+        </p>
+        <p className="text-[13px]" style={{ color: MUTED }}>
+          Two minutes. We&apos;ll plan the meals.
+        </p>
+      </div>
+      <Link href="/plans" className="self-start cursor-pointer sm:self-auto">
+        <motion.span
+          whileHover={{ background: '#2a2a2a', y: -1, boxShadow: '0 6px 14px rgba(0,0,0,0.18)' }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ duration: 0.16, ease: 'easeOut' }}
+          className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-medium"
+          style={{ background: VAST, color: LUMEN }}
+        >
+          Create plan
+          <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
+        </motion.span>
+      </Link>
     </div>
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+interface CardProps {
+  code: string;
+  label: string;
+  value: ReactNode;
+  sub: string;
+  accent: string;
+  glyph: string;
+}
+
+function StatCard({ code, label, value, sub, accent, glyph }: CardProps) {
+  return (
+    <motion.div
+      className="relative overflow-hidden rounded-2xl p-5"
+      whileHover={{ y: -2, boxShadow: '0 6px 18px rgba(0,0,0,0.06)' }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      style={{
+        background: WHITE,
+        border: `1px solid ${LUMEN_DK}`,
+        boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
+      }}
+    >
+      <div className="flex items-start justify-between">
+        <span
+          className="text-[10px] uppercase"
+          style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+        >
+          {code} · {label}
+        </span>
+        <span
+          className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[12px]"
+          style={{ background: `${accent}14`, color: accent, fontFamily: 'var(--font-mono)' }}
+          aria-hidden
+        >
+          {glyph}
+        </span>
+      </div>
+      <div
+        className="mt-4 truncate"
+        style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 26,
+          fontWeight: 600,
+          letterSpacing: '-0.02em',
+          color: VAST,
+          lineHeight: 1.05,
+        }}
+      >
+        {value}
+      </div>
+      <div
+        className="mt-1 truncate text-[12px]"
+        style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+      >
+        {sub}
+      </div>
+    </motion.div>
+  );
+}
 
 export function SummaryCards() {
   const { data: planData, isLoading: isPlanLoading, error: planError } = useActiveBudgetPlan();
   const { plan: activePlan, budgetState: ctx } = planData ?? {};
 
   if (isPlanLoading) return <SummaryCardsSkeleton />;
-
   if (planError)
     return <SummaryCardsError message={`Failed to load budget plan: ${planError.message}`} />;
-
   if (!activePlan) return <NoPlanMessage />;
-
   if (!ctx) return <SummaryCardsSkeleton />;
 
   const daysLeft = getDaysLeft(activePlan.endDate);
   const health = getSpendingHealth(ctx.amountSpent, ctx.totalBudget);
+  const spentAccent = health === 'good' ? FATHOM : health === 'warning' ? AMBER : PULSE;
 
-  const spentColor = {
-    good: 'text-chart-2',
-    warning: 'text-chart-3',
-    danger: 'text-destructive',
-  }[health];
-
-  const spentBg = {
-    good: 'bg-chart-2/10',
-    warning: 'bg-chart-3/10',
-    danger: 'bg-destructive/10',
-  }[health];
-
-  const cards = [
+  const cards: CardProps[] = [
     {
-      label: 'Total Budget',
-      value: formatPKR(ctx.totalBudget),
+      code: '01',
+      label: 'total budget',
+      value: <CountUp value={ctx.totalBudget} prefix="₨ " />,
       sub: `${activePlan.planType} plan`,
-      icon: Wallet,
-      color: 'text-primary',
-      bg: 'bg-primary/10',
+      accent: FATHOM,
+      glyph: '◉',
     },
     {
-      label: 'Amount Spent',
-      value: formatPKR(ctx.amountSpent),
+      code: '02',
+      label: 'spent',
+      value: <CountUp value={ctx.amountSpent} prefix="₨ " />,
       sub: `${ctx.mealsConsumed} of ${ctx.totalMeals} meals`,
-      icon: TrendingDown,
-      color: spentColor,
-      bg: spentBg,
+      accent: spentAccent,
+      glyph: '↓',
     },
     {
-      label: 'Remaining',
-      value: formatPKR(ctx.amountRemaining),
-      sub: `PKR ${Math.round(ctx.avgBudgetPerRemainingMeal).toLocaleString()} / meal`,
-      icon: PiggyBank,
-      color: 'text-accent',
-      bg: 'bg-accent/10',
+      code: '03',
+      label: 'remaining',
+      value: <CountUp value={ctx.amountRemaining} prefix="₨ " />,
+      sub: `₨ ${Math.round(ctx.avgBudgetPerRemainingMeal).toLocaleString()} / meal`,
+      accent: FATHOM,
+      glyph: '⊙',
     },
     {
-      label: 'Days Left',
-      value: `${daysLeft} days`,
+      code: '04',
+      label: 'days left',
+      value: (
+        <>
+          <CountUp value={daysLeft} /> {daysLeft === 1 ? 'day' : 'days'}
+        </>
+      ),
       sub: `ends ${activePlan.endDate}`,
-      icon: CalendarDays,
-      color: 'text-chart-4',
-      bg: 'bg-chart-4/10',
+      accent: AMBER,
+      glyph: '⌖',
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+    <Stagger className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
       {cards.map((card) => (
-        <Card key={card.label} className="border-border">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div
-                className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${card.bg}`}
-              >
-                <card.icon className={`w-5 h-5 ${card.color}`} />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-xs text-muted-foreground truncate">{card.label}</span>
-                <span className="text-base font-bold text-card-foreground leading-tight truncate">
-                  {card.value}
-                </span>
-                <span className="text-xs text-muted-foreground truncate">{card.sub}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <StaggerItem key={card.code}>
+          <StatCard {...card} />
+        </StaggerItem>
       ))}
-    </div>
+    </Stagger>
   );
 }
