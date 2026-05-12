@@ -102,7 +102,6 @@ export default function LandingPage() {
           >
             <a href="#how">How it works</a>
             <a href="#privacy">Privacy</a>
-            <a href="#faq">FAQ</a>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-[13px]" style={{ color: VAST }}>
