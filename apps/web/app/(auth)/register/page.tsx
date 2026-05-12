@@ -194,23 +194,24 @@ export default function RegisterPage() {
             }}
           >
             <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: FATHOM }} />
-            new account · free during beta
+            create your account
           </div>
           <h1
             className="mt-6"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(32px, 4vw, 44px)',
+              fontSize: 'clamp(28px, 3.4vw, 38px)',
               fontWeight: 600,
               lineHeight: 1.06,
               letterSpacing: '-0.025em',
+              whiteSpace: 'nowrap',
             }}
           >
-            Plan your{' '}
-            <span style={{ color: FATHOM }}>first week.</span>
+            Welcome to{' '}
+            <span style={{ color: FATHOM }}>BudgetBite.</span>
           </h1>
           <p className="mt-3 text-[15px] leading-[1.55]" style={{ color: MUTED }}>
-            Two minutes to set up. No card required.
+            Plan meals from real menus, on a real budget.
           </p>
         </div>
 
