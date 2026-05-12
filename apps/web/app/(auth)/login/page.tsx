@@ -131,6 +131,14 @@ export default function LoginPage() {
     outline: 'none',
   };
 
+  const labelStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-mono)',
+    letterSpacing: '0.16em',
+    color: MUTED,
+    fontSize: 11,
+    textTransform: 'uppercase',
+  };
+
   return (
     <div
       className={`${body.variable} ${display.variable} ${mono.variable} relative min-h-screen antialiased`}
@@ -177,7 +185,7 @@ export default function LoginPage() {
         </Link>
       </header>
 
-      <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[440px] flex-col justify-center px-6 pb-16">
+      <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[460px] flex-col justify-center px-6 pb-16">
         <div className="text-center">
           <div
             className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px]"
@@ -189,22 +197,23 @@ export default function LoginPage() {
             }}
           >
             <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: FATHOM }} />
-            login · /auth/email
+            sign in to your account
           </div>
           <h1
             className="mt-6"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(32px, 4vw, 44px)',
+              fontSize: 'clamp(28px, 3.4vw, 38px)',
               fontWeight: 600,
               lineHeight: 1.06,
               letterSpacing: '-0.025em',
+              whiteSpace: 'nowrap',
             }}
           >
-            Welcome back.
+            Welcome <span style={{ color: FATHOM }}>back.</span>
           </h1>
           <p className="mt-3 text-[15px] leading-[1.55]" style={{ color: MUTED }}>
-            Sign in to plan meals on your budget.
+            Pick up where you left off.
           </p>
         </div>
 
@@ -223,13 +232,7 @@ export default function LoginPage() {
             className="flex flex-col gap-5"
           >
             <div className="flex flex-col gap-2">
-              <label
-                htmlFor="email"
-                className="text-[11px] uppercase"
-                style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.16em', color: MUTED }}
-              >
-                Email
-              </label>
+              <label htmlFor="email" style={labelStyle}>Email</label>
               <input
                 id="email"
                 type="email"
@@ -247,13 +250,7 @@ export default function LoginPage() {
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="text-[11px] uppercase"
-                  style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.16em', color: MUTED }}
-                >
-                  Password
-                </label>
+                <label htmlFor="password" style={labelStyle}>Password</label>
                 <button
                   type="button"
                   className="text-[11px]"
