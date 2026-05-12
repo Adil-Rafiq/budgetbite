@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Inter, JetBrains_Mono, Bricolage_Grotesque } from 'next/font/google';
 import { Pill } from '@/components/ui/pill';
+import { LogoIcon } from '@/components/icons';
 
 const body = Inter({
   subsets: ['latin'],
@@ -81,10 +82,7 @@ export default function LandingPage() {
               className="inline-flex h-7 w-7 items-center justify-center rounded-md"
               style={{ background: FATHOM, color: LUMEN }}
             >
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 11v9a1 1 0 0 0 1 1h6v-7h4v7h6a1 1 0 0 0 1-1v-9" />
-                <path d="M1 11 12 3l11 8" />
-              </svg>
+              <LogoIcon />
             </span>
             <span
               style={{
@@ -498,10 +496,7 @@ export default function LandingPage() {
                 className="inline-flex h-6 w-6 items-center justify-center rounded-md"
                 style={{ background: FATHOM, color: LUMEN }}
               >
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 11v9a1 1 0 0 0 1 1h6v-7h4v7h6a1 1 0 0 0 1-1v-9" />
-                  <path d="M1 11 12 3l11 8" />
-                </svg>
+                <LogoIcon size={12} />
               </span>
               <span
                 style={{
