@@ -91,7 +91,7 @@ export function AppHeader() {
               </span>
               <div
                 className="h-1.5 w-20 overflow-hidden rounded-full"
-                style={{ background: LUMEN }}
+                style={{ background: LUMEN_DK }}
               >
                 <motion.div
                   className="h-full rounded-full"
