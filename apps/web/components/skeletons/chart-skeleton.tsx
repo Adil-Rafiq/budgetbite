@@ -1,9 +1,5 @@
 import { cn } from '@/lib/utils';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const WHITE = '#ffffff';
-
 interface ChartSkeletonProps {
   variant: 'line' | 'bar' | 'pie' | 'area';
   className?: string;
@@ -38,19 +34,13 @@ export function ChartSkeleton({ variant, className }: ChartSkeletonProps) {
         )}
       >
         <div className="relative">
-          <div
-            className="size-36 animate-pulse rounded-full"
-            style={{ background: LUMEN }}
-          />
-          <div
-            className="absolute inset-0 m-auto size-16 rounded-full"
-            style={{ background: WHITE }}
-          />
+          <div className="size-36 animate-pulse rounded-full bg-lumen" />
+          <div className="absolute inset-0 m-auto size-16 rounded-full bg-white" />
         </div>
         <div className="flex flex-wrap justify-center gap-2">
-          <div className={cn(shimmerCls, 'h-3 w-14')} style={{ background: LUMEN }} />
-          <div className={cn(shimmerCls, 'h-3 w-16')} style={{ background: LUMEN }} />
-          <div className={cn(shimmerCls, 'h-3 w-12')} style={{ background: LUMEN }} />
+          <div className={cn(shimmerCls, 'h-3 w-14 bg-lumen')} />
+          <div className={cn(shimmerCls, 'h-3 w-16 bg-lumen')} />
+          <div className={cn(shimmerCls, 'h-3 w-12 bg-lumen')} />
         </div>
       </div>
     );
@@ -63,17 +53,17 @@ export function ChartSkeleton({ variant, className }: ChartSkeletonProps) {
           {BAR_HEIGHTS_A.map((h, i) => (
             <div key={i} className="flex h-full flex-1 items-end justify-center gap-1">
               <div
-                className="w-3 animate-pulse rounded-sm"
-                style={{ background: LUMEN, height: h }}
+                className="w-3 animate-pulse rounded-sm bg-lumen"
+                style={{ height: h }}
               />
               <div
-                className="w-3 animate-pulse rounded-sm"
-                style={{ background: LUMEN_DK, opacity: 0.6, height: BAR_HEIGHTS_B[i] }}
+                className="w-3 animate-pulse rounded-sm bg-lumen-dk opacity-60"
+                style={{ height: BAR_HEIGHTS_B[i] }}
               />
             </div>
           ))}
         </div>
-        <div className="h-px w-full" style={{ background: LUMEN_DK }} />
+        <div className="h-px w-full bg-lumen-dk" />
       </div>
     );
   }
@@ -84,26 +74,26 @@ export function ChartSkeleton({ variant, className }: ChartSkeletonProps) {
         {[0, 1, 2, 3].map((i) => (
           <div
             key={`grid-${i}`}
-            className="absolute left-0 right-0 h-px"
-            style={{ background: LUMEN_DK, opacity: 0.5, bottom: `${(i + 1) * 20}%` }}
+            className="absolute left-0 right-0 h-px bg-lumen-dk opacity-50"
+            style={{ bottom: `${(i + 1) * 20}%` }}
           />
         ))}
         {LINE_HEIGHTS.map((h, i) => (
           <div key={i} className="relative flex h-full flex-1 items-end justify-center">
             {variant === 'area' && (
               <div
-                className="absolute bottom-0 left-0 right-0 animate-pulse"
-                style={{ background: LUMEN, height: h, opacity: 0.6 }}
+                className="absolute bottom-0 left-0 right-0 animate-pulse bg-lumen opacity-60"
+                style={{ height: h }}
               />
             )}
             <div
-              className="size-2 animate-pulse rounded-full"
-              style={{ background: LUMEN_DK, marginBottom: h }}
+              className="size-2 animate-pulse rounded-full bg-lumen-dk"
+              style={{ marginBottom: h }}
             />
           </div>
         ))}
       </div>
-      <div className="h-px w-full" style={{ background: LUMEN_DK }} />
+      <div className="h-px w-full bg-lumen-dk" />
     </div>
   );
 }

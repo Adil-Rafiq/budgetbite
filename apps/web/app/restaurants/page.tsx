@@ -27,38 +27,33 @@ import { motion } from 'motion/react';
 
 import { RestaurantCardSkeleton } from './_components/restaurant-card-skeleton';
 
-// ─── Wispr palette ───────────────────────────────────────────────────────────
-
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const AMBER = '#b8741a';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
 const PAGE_SIZE = 24;
 const SEARCH_DEBOUNCE_MS = 300;
 
-const FIT_TINT: Record<'green' | 'amber' | 'red', { tint: string; label: string }> = {
-  green: { tint: FATHOM, label: 'Fits budget' },
-  amber: { tint: AMBER, label: 'Tight' },
-  red: { tint: PULSE, label: 'Over budget' },
+type FitTone = 'green' | 'amber' | 'red';
+const FIT_TONE: Record<FitTone, { dot: string; pill: string; label: string }> = {
+  green: { dot: 'bg-fathom', pill: 'bg-fathom/[0.08] text-fathom', label: 'Fits budget' },
+  amber: { dot: 'bg-amber', pill: 'bg-amber/[0.08] text-amber', label: 'Tight' },
+  red: { dot: 'bg-pulse', pill: 'bg-pulse/[0.08] text-pulse', label: 'Over budget' },
 };
 
-function FitDot({ fit }: { fit: 'green' | 'amber' | 'red' }) {
-  const v = FIT_TINT[fit];
+function FitDot({ fit }: { fit: FitTone }) {
+  const v = FIT_TONE[fit];
   return (
     <span
-      className="inline-block h-2 w-2 rounded-full"
-      style={{ background: v.tint }}
+      className={`inline-block h-2 w-2 rounded-full ${v.dot}`}
       aria-label={v.label}
       title={v.label}
     />
   );
 }
+
+const labelClass = 'text-[10px] uppercase text-soft';
+const labelStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)',
+  letterSpacing: '0.18em',
+};
+const inputClass = 'bg-lumen border-lumen-dk text-vast';
 
 export default function RestaurantsPage() {
   const { data: user } = useUser();
@@ -111,164 +106,148 @@ export default function RestaurantsPage() {
   const hasLocation = userLat != null && userLng != null;
   const isLastPage = data.length < PAGE_SIZE;
 
-  const labelStyle: React.CSSProperties = {
-    fontFamily: 'var(--font-mono)',
-    color: SOFT,
-    letterSpacing: '0.18em',
-  };
-  const inputStyle = { background: LUMEN, borderColor: LUMEN_DK, color: VAST };
-
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8">
       <FadeUp>
-      <header className="flex items-end justify-between gap-3">
-        <div className="flex flex-col gap-2">
-          <div
-            className="text-[10px] uppercase"
-            style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
-          >
-            nearby · /restaurants
-          </div>
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(28px, 3.6vw, 40px)',
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.05,
-              color: VAST,
-            }}
-          >
-            Restaurants.
-          </h1>
-          <p className="text-[14px]" style={{ color: MUTED, maxWidth: 540 }}>
-            Places that deliver to you, ranked for your budget.
-          </p>
-        </div>
-        {hasActivePlan && avgPerMeal > 0 && (
-          <div
-            className="hidden flex-col items-end gap-0.5 sm:flex"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            <p className="text-[11px] uppercase" style={{ color: SOFT, letterSpacing: '0.18em' }}>
-              avg target / meal
-            </p>
-            <p
+        <header className="flex items-end justify-between gap-3">
+          <div className="flex flex-col gap-2">
+            <div
+              className="text-[10px] uppercase text-fathom"
+              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
+            >
+              nearby · /restaurants
+            </div>
+            <h1
+              className="text-vast"
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 22,
+                fontSize: 'clamp(28px, 3.6vw, 40px)',
                 fontWeight: 600,
-                color: VAST,
                 letterSpacing: '-0.02em',
+                lineHeight: 1.05,
               }}
             >
-              ₨ {avgPerMeal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-            </p>
-            <p className="text-[11px]" style={{ color: MUTED }}>
-              ₨ {amountRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 })} remaining
+              Restaurants.
+            </h1>
+            <p className="max-w-[540px] text-[14px] text-ink">
+              Places that deliver to you, ranked for your budget.
             </p>
           </div>
-        )}
-      </header>
+          {hasActivePlan && avgPerMeal > 0 && (
+            <div
+              className="hidden flex-col items-end gap-0.5 sm:flex"
+              style={{ fontFamily: 'var(--font-mono)' }}
+            >
+              <p
+                className="text-[11px] uppercase text-soft"
+                style={{ letterSpacing: '0.18em' }}
+              >
+                avg target / meal
+              </p>
+              <p
+                className="text-vast"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 22,
+                  fontWeight: 600,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                ₨ {avgPerMeal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </p>
+              <p className="text-[11px] text-ink">
+                ₨ {amountRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 })} remaining
+              </p>
+            </div>
+          )}
+        </header>
       </FadeUp>
 
-      {/* Filters */}
       <FadeUp delay={0.08}>
-      <div
-        className="overflow-hidden rounded-2xl"
-        style={{
-          background: WHITE,
-          border: `1px solid ${LUMEN_DK}`,
-          boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
-        }}
-      >
-        <div className="flex flex-col gap-4 p-5">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="search" className="text-[10px] uppercase" style={labelStyle}>
-                Search by name
-              </Label>
-              <div className="relative">
-                <Search
-                  className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
-                  style={{ color: SOFT }}
-                />
-                <Input
-                  id="search"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  placeholder="e.g. Nihari"
-                  className="pl-9"
-                  style={inputStyle}
-                />
+        <div className="overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+          <div className="flex flex-col gap-4 p-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="search" className={labelClass} style={labelStyle}>
+                  Search by name
+                </Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-soft" />
+                  <Input
+                    id="search"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    placeholder="e.g. Nihari"
+                    className={`pl-9 ${inputClass}`}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="sort" className={labelClass} style={labelStyle}>
+                  Sort
+                </Label>
+                <Select value={sort} onValueChange={(v) => setSort(v as RestaurantSort | 'auto')}>
+                  <SelectTrigger id="sort" className={`w-full ${inputClass}`}>
+                    <SelectValue placeholder="Default" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">
+                      Default {hasLocation ? '(distance)' : '(name)'}
+                    </SelectItem>
+                    <SelectItem value="distance" disabled={!hasLocation}>
+                      Distance
+                    </SelectItem>
+                    <SelectItem value="rating">Rating</SelectItem>
+                    {hasActivePlan && <SelectItem value="budget-fit">Best for budget</SelectItem>}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="sort" className="text-[10px] uppercase" style={labelStyle}>
-                Sort
-              </Label>
-              <Select value={sort} onValueChange={(v) => setSort(v as RestaurantSort | 'auto')}>
-                <SelectTrigger id="sort" className="w-full" style={inputStyle}>
-                  <SelectValue placeholder="Default" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="auto">
-                    Default {hasLocation ? '(distance)' : '(name)'}
-                  </SelectItem>
-                  <SelectItem value="distance" disabled={!hasLocation}>
-                    Distance
-                  </SelectItem>
-                  <SelectItem value="rating">Rating</SelectItem>
-                  {hasActivePlan && <SelectItem value="budget-fit">Best for budget</SelectItem>}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="flex flex-col gap-2">
+                <Label className={labelClass} style={labelStyle}>
+                  Max distance: <span className="text-fathom">{maxDistanceKm} km</span>
+                </Label>
+                <Slider
+                  value={[maxDistanceKm]}
+                  onValueChange={(vals) => setMaxDistanceKm(vals[0] ?? 10)}
+                  min={1}
+                  max={30}
+                  step={1}
+                  disabled={!hasLocation}
+                />
+                {!hasLocation && (
+                  <p
+                    className="text-[11px] text-soft"
+                    style={{ fontFamily: 'var(--font-mono)' }}
+                  >
+                    set your location in profile to enable distance.
+                  </p>
+                )}
+              </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-2">
-              <Label className="text-[10px] uppercase" style={labelStyle}>
-                Max distance:{' '}
-                <span style={{ color: FATHOM }}>{maxDistanceKm} km</span>
-              </Label>
-              <Slider
-                value={[maxDistanceKm]}
-                onValueChange={(vals) => setMaxDistanceKm(vals[0] ?? 10)}
-                min={1}
-                max={30}
-                step={1}
-                disabled={!hasLocation}
-              />
-              {!hasLocation && (
-                <p
-                  className="text-[11px]"
-                  style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
-                >
-                  set your location in profile to enable distance.
-                </p>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label className="text-[10px] uppercase" style={labelStyle}>
-                Minimum rating:{' '}
-                <span style={{ color: FATHOM }}>{minRating === 0 ? 'Any' : `${minRating}+`}</span>
-              </Label>
-              <Slider
-                value={[minRating]}
-                onValueChange={(vals) => setMinRating(vals[0] ?? 0)}
-                min={0}
-                max={5}
-                step={0.5}
-              />
+              <div className="flex flex-col gap-2">
+                <Label className={labelClass} style={labelStyle}>
+                  Minimum rating:{' '}
+                  <span className="text-fathom">
+                    {minRating === 0 ? 'Any' : `${minRating}+`}
+                  </span>
+                </Label>
+                <Slider
+                  value={[minRating]}
+                  onValueChange={(vals) => setMinRating(vals[0] ?? 0)}
+                  min={0}
+                  max={5}
+                  step={0.5}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </FadeUp>
 
-      {/* Results */}
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -276,17 +255,11 @@ export default function RestaurantsPage() {
           ))}
         </div>
       ) : error ? (
-        <p
-          className="rounded-xl p-4 text-[13px]"
-          style={{ background: 'rgba(127,28,52,0.06)', border: `1px solid ${PULSE}33`, color: PULSE }}
-        >
+        <p className="rounded-xl border border-pulse/20 bg-pulse/[0.06] p-4 text-[13px] text-pulse">
           Could not load restaurants.
         </p>
       ) : data.length === 0 ? (
-        <div
-          className="rounded-2xl p-8 text-center text-[13px]"
-          style={{ background: WHITE, border: `1px dashed ${LUMEN_DK}`, color: MUTED }}
-        >
+        <div className="rounded-2xl border border-dashed border-lumen-dk bg-white p-8 text-center text-[13px] text-ink">
           {debouncedSearch
             ? 'No restaurants match your search.'
             : 'No restaurants found — try widening your radius.'}
@@ -306,109 +279,95 @@ export default function RestaurantsPage() {
               const code = String(idx + 1 + page * PAGE_SIZE).padStart(2, '0');
               return (
                 <StaggerItem key={r.id}>
-                <Link href={`/restaurants/${r.id}`} className="group block h-full">
-                  <motion.div
-                    whileHover={{ y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }}
-                    transition={{ duration: 0.22, ease: 'easeOut' }}
-                    className="flex h-full flex-col rounded-2xl p-5"
-                    style={{
-                      background: WHITE,
-                      border: `1px solid ${LUMEN_DK}`,
-                      boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
-                    }}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <span
-                        className="text-[10px] uppercase"
+                  <Link href={`/restaurants/${r.id}`} className="group block h-full">
+                    <motion.div
+                      whileHover={{ y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }}
+                      transition={{ duration: 0.22, ease: 'easeOut' }}
+                      className="flex h-full flex-col rounded-2xl border border-lumen-dk bg-white p-5 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <span
+                          className="text-[10px] uppercase text-soft"
+                          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
+                        >
+                          {code}
+                        </span>
+                        {r.rating != null && (
+                          <div
+                            className="flex shrink-0 items-center gap-1"
+                            style={{ fontFamily: 'var(--font-mono)' }}
+                          >
+                            <Star
+                              className="h-3.5 w-3.5 text-amber"
+                              style={{ fill: 'var(--color-amber)' }}
+                            />
+                            <span className="text-[13px] font-medium text-vast">
+                              {r.rating.toFixed(1)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <h3
+                        className="mt-2 truncate text-vast"
                         style={{
-                          fontFamily: 'var(--font-mono)',
-                          color: SOFT,
-                          letterSpacing: '0.18em',
+                          fontFamily: 'var(--font-display)',
+                          fontSize: 18,
+                          fontWeight: 600,
+                          letterSpacing: '-0.01em',
                         }}
                       >
-                        {code}
-                      </span>
-                      {r.rating != null && (
-                        <div
-                          className="flex shrink-0 items-center gap-1"
-                          style={{ fontFamily: 'var(--font-mono)' }}
-                        >
-                          <Star
-                            className="h-3.5 w-3.5"
-                            style={{ color: AMBER, fill: AMBER }}
-                          />
-                          <span className="text-[13px] font-medium" style={{ color: VAST }}>
-                            {r.rating.toFixed(1)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                        {r.name}
+                      </h3>
 
-                    <h3
-                      className="mt-2 truncate"
-                      style={{
-                        fontFamily: 'var(--font-display)',
-                        fontSize: 18,
-                        fontWeight: 600,
-                        letterSpacing: '-0.01em',
-                        color: VAST,
-                      }}
-                    >
-                      {r.name}
-                    </h3>
+                      <div
+                        className="mt-1 flex items-center gap-3 text-[12px] text-ink"
+                        style={{ fontFamily: 'var(--font-mono)' }}
+                      >
+                        {r.distanceKm != null && <span>{r.distanceKm.toFixed(1)} km</span>}
+                        {r.deliveryFee != null && <span>₨ {r.deliveryFee} fee</span>}
+                      </div>
 
-                    <div
-                      className="mt-1 flex items-center gap-3 text-[12px]"
-                      style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
-                    >
-                      {r.distanceKm != null && <span>{r.distanceKm.toFixed(1)} km</span>}
-                      {r.deliveryFee != null && <span>₨ {r.deliveryFee} fee</span>}
-                    </div>
-
-                    <div className="mt-auto flex items-end justify-between gap-2 pt-4">
-                      {r.minItemPrice != null ? (
-                        <div className="flex flex-col gap-0.5">
+                      <div className="mt-auto flex items-end justify-between gap-2 pt-4">
+                        {r.minItemPrice != null ? (
+                          <div className="flex flex-col gap-0.5">
+                            <span
+                              className="flex items-center gap-1.5 text-[10px] uppercase text-soft"
+                              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
+                            >
+                              {fit && <FitDot fit={fit} />}
+                              from
+                            </span>
+                            <span
+                              className="text-vast"
+                              style={{
+                                fontFamily: 'var(--font-display)',
+                                fontSize: 16,
+                                fontWeight: 600,
+                              }}
+                            >
+                              ₨ {r.minItemPrice.toLocaleString()}
+                            </span>
+                          </div>
+                        ) : (
                           <span
-                            className="flex items-center gap-1.5 text-[10px] uppercase"
-                            style={{
-                              fontFamily: 'var(--font-mono)',
-                              color: SOFT,
-                              letterSpacing: '0.18em',
-                            }}
+                            className="text-[11px] text-soft"
+                            style={{ fontFamily: 'var(--font-mono)' }}
                           >
-                            {fit && <FitDot fit={fit} />}
-                            from
+                            no menu yet
                           </span>
+                        )}
+                        {r.minimumOrder != null && (
                           <span
-                            style={{
-                              fontFamily: 'var(--font-display)',
-                              fontSize: 16,
-                              fontWeight: 600,
-                              color: VAST,
-                            }}
+                            className="text-[11px] text-ink"
+                            style={{ fontFamily: 'var(--font-mono)' }}
                           >
-                            ₨ {r.minItemPrice.toLocaleString()}
+                            min ₨ {r.minimumOrder}
                           </span>
-                        </div>
-                      ) : (
-                        <span
-                          className="text-[11px]"
-                          style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
-                        >
-                          no menu yet
-                        </span>
-                      )}
-                      {r.minimumOrder != null && (
-                        <span
-                          className="text-[11px]"
-                          style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
-                        >
-                          min ₨ {r.minimumOrder}
-                        </span>
-                      )}
-                    </div>
-                  </motion.div>
-                </Link>
+                        )}
+                      </div>
+                    </motion.div>
+                  </Link>
                 </StaggerItem>
               );
             })}
@@ -426,8 +385,8 @@ export default function RestaurantsPage() {
                 ← prev
               </Pill>
               <p
-                className="text-[11px]"
-                style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+                className="text-[11px] text-ink"
+                style={{ fontFamily: 'var(--font-mono)' }}
               >
                 page {page + 1}
                 {isFetching ? ' · loading…' : ''}

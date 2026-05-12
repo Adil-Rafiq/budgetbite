@@ -31,15 +31,6 @@ const mono = JetBrains_Mono({
   weight: ['400', '500', '600'],
 });
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
 export default function RegisterPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -125,30 +116,18 @@ export default function RegisterPage() {
     }
   };
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    background: WHITE,
-    border: `1px solid ${LUMEN_DK}`,
-    borderRadius: 10,
-    padding: '11px 14px',
-    fontFamily: 'var(--font-body)',
-    fontSize: 14,
-    color: VAST,
-    outline: 'none',
-  };
-
+  const inputClass =
+    'w-full rounded-[10px] border border-lumen-dk bg-white px-3.5 py-[11px] text-[14px] text-vast outline-none';
+  const labelClass = 'text-[11px] uppercase text-ink';
   const labelStyle: React.CSSProperties = {
     fontFamily: 'var(--font-mono)',
     letterSpacing: '0.16em',
-    color: MUTED,
-    fontSize: 11,
-    textTransform: 'uppercase',
   };
 
   return (
     <div
-      className={`${body.variable} ${display.variable} ${mono.variable} relative min-h-screen antialiased`}
-      style={{ fontFamily: 'var(--font-body)', background: LUMEN, color: VAST }}
+      className={`${body.variable} ${display.variable} ${mono.variable} relative min-h-screen bg-lumen text-vast antialiased`}
+      style={{ fontFamily: 'var(--font-body)' }}
     >
       <div
         aria-hidden
@@ -162,10 +141,7 @@ export default function RegisterPage() {
 
       <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-8 py-6">
         <Link href="/" className="flex items-center gap-2.5">
-          <span
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md"
-            style={{ background: FATHOM, color: LUMEN }}
-          >
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-fathom text-lumen">
             <LogoIcon />
           </span>
           <span
@@ -181,8 +157,8 @@ export default function RegisterPage() {
         </Link>
         <Link
           href="/"
-          className="text-[12px]"
-          style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+          className="text-[12px] text-ink"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
           ← back to home
         </Link>
@@ -191,15 +167,10 @@ export default function RegisterPage() {
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[460px] flex-col justify-center px-6 pb-16">
         <div className="text-center">
           <div
-            className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px]"
-            style={{
-              fontFamily: 'var(--font-mono)',
-              borderColor: LUMEN_DK,
-              background: WHITE,
-              color: MUTED,
-            }}
+            className="inline-flex items-center gap-2 rounded-full border border-lumen-dk bg-white px-3 py-1 text-[11px] text-ink"
+            style={{ fontFamily: 'var(--font-mono)' }}
           >
-            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: FATHOM }} />
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-fathom" />
             create your account
           </div>
           <h1
@@ -213,19 +184,16 @@ export default function RegisterPage() {
               whiteSpace: 'nowrap',
             }}
           >
-            Welcome to{' '}
-            <span style={{ color: FATHOM }}>BudgetBite.</span>
+            Welcome to <span className="text-fathom">BudgetBite.</span>
           </h1>
-          <p className="mt-3 text-[15px] leading-[1.55]" style={{ color: MUTED }}>
+          <p className="mt-3 text-[15px] leading-[1.55] text-ink">
             Plan meals from real menus, on a real budget.
           </p>
         </div>
 
         <div
-          className="mt-10 rounded-[14px] p-7"
+          className="mt-10 rounded-[14px] border border-lumen-dk bg-white p-7"
           style={{
-            background: WHITE,
-            border: `1px solid ${LUMEN_DK}`,
             boxShadow:
               '0 1px 0 rgba(0,0,0,0.04), 0 30px 80px -30px rgba(26,26,26,0.18), 0 8px 30px -10px rgba(26,26,26,0.06)',
           }}
@@ -237,89 +205,89 @@ export default function RegisterPage() {
           >
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <label htmlFor="firstName" style={labelStyle}>First name</label>
+                <label htmlFor="firstName" className={labelClass} style={labelStyle}>
+                  First name
+                </label>
                 <input
                   id="firstName"
                   placeholder="Ahmed"
                   autoComplete="given-name"
-                  style={inputStyle}
+                  className={inputClass}
                   {...register('firstName')}
                 />
                 {errors.firstName && (
-                  <p className="text-[12px]" style={{ color: PULSE }}>
-                    {errors.firstName.message}
-                  </p>
+                  <p className="text-[12px] text-pulse">{errors.firstName.message}</p>
                 )}
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="lastName" style={labelStyle}>Last name</label>
+                <label htmlFor="lastName" className={labelClass} style={labelStyle}>
+                  Last name
+                </label>
                 <input
                   id="lastName"
                   placeholder="Khan"
                   autoComplete="family-name"
-                  style={inputStyle}
+                  className={inputClass}
                   {...register('lastName')}
                 />
                 {errors.lastName && (
-                  <p className="text-[12px]" style={{ color: PULSE }}>
-                    {errors.lastName.message}
-                  </p>
+                  <p className="text-[12px] text-pulse">{errors.lastName.message}</p>
                 )}
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="email" style={labelStyle}>Email</label>
+              <label htmlFor="email" className={labelClass} style={labelStyle}>
+                Email
+              </label>
               <input
                 id="email"
                 type="email"
                 placeholder="ahmed@example.com"
                 autoComplete="email"
-                style={inputStyle}
+                className={inputClass}
                 {...register('email')}
               />
               {errors.email && (
-                <p className="text-[12px]" style={{ color: PULSE }}>
-                  {errors.email.message}
-                </p>
+                <p className="text-[12px] text-pulse">{errors.email.message}</p>
               )}
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="password" style={labelStyle}>Password</label>
+              <label htmlFor="password" className={labelClass} style={labelStyle}>
+                Password
+              </label>
               <div className="relative">
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="At least 8 characters"
                   autoComplete="new-password"
-                  style={{ ...inputStyle, paddingRight: 40 }}
+                  className={`${inputClass} pr-10`}
                   {...register('password')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((p) => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                  style={{ color: MUTED, fontFamily: 'var(--font-mono)', fontSize: 11 }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-ink"
+                  style={{ fontFamily: 'var(--font-mono)' }}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? 'hide' : 'show'}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-[12px]" style={{ color: PULSE }}>
-                  {errors.password.message}
-                </p>
+                <p className="text-[12px] text-pulse">{errors.password.message}</p>
               )}
             </div>
 
             <p
-              className="text-[11px]"
-              style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+              className="text-[11px] text-soft"
+              style={{ fontFamily: 'var(--font-mono)' }}
             >
               By creating an account you agree to our{' '}
-              <a href="#" style={{ color: FATHOM }}>terms</a> and{' '}
-              <a href="#" style={{ color: FATHOM }}>privacy policy</a>.
+              <a href="#" className="text-fathom">terms</a> and{' '}
+              <a href="#" className="text-fathom">privacy policy</a>.
             </p>
 
             <Pill
@@ -338,18 +306,10 @@ export default function RegisterPage() {
           </form>
 
           <div className="relative my-7">
-            <div
-              className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2"
-              style={{ background: LUMEN_DK }}
-            />
+            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-lumen-dk" />
             <span
-              className="relative mx-auto inline-block px-3 text-[10px] uppercase"
-              style={{
-                background: WHITE,
-                fontFamily: 'var(--font-mono)',
-                color: SOFT,
-                letterSpacing: '0.18em',
-              }}
+              className="relative mx-auto inline-block bg-white px-3 text-[10px] uppercase text-soft"
+              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
             >
               or
             </span>
@@ -385,9 +345,9 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        <p className="mt-7 text-center text-[13px]" style={{ color: MUTED }}>
+        <p className="mt-7 text-center text-[13px] text-ink">
           Already have an account?{' '}
-          <Link href="/login" style={{ color: FATHOM, fontWeight: 500 }}>
+          <Link href="/login" className="font-medium text-fathom">
             Sign in →
           </Link>
         </p>

@@ -5,15 +5,6 @@ import { useBudgetPlanGenerationDetail } from '@/hooks/use-budget-plan';
 import { getMealTypeVisual } from '@/lib/meal-type-visuals';
 import type { SuggestionOption, SuggestionSlot } from '@repo/shared';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
 interface GenerationSuggestionsGridProps {
   planId: string;
   generationId: string;
@@ -34,13 +25,12 @@ function GridSkeleton() {
     <div className="flex flex-col gap-5">
       {Array.from({ length: 2 }).map((_, dayIdx) => (
         <div key={dayIdx} className="flex flex-col gap-3">
-          <div className="h-5 w-32 animate-pulse rounded" style={{ background: LUMEN_DK }} />
+          <div className="h-5 w-32 animate-pulse rounded bg-lumen-dk" />
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, slotIdx) => (
               <div
                 key={slotIdx}
-                className="h-40 w-full animate-pulse rounded-xl"
-                style={{ background: LUMEN_DK }}
+                className="h-40 w-full animate-pulse rounded-xl bg-lumen-dk"
               />
             ))}
           </div>
@@ -52,10 +42,7 @@ function GridSkeleton() {
 
 function GridError({ message }: { message: string }) {
   return (
-    <div
-      className="flex items-center gap-2 rounded-xl p-3 text-[13px]"
-      style={{ background: 'rgba(127,28,52,0.06)', border: `1px solid ${PULSE}33`, color: PULSE }}
-    >
+    <div className="flex items-center gap-2 rounded-xl border border-pulse/20 bg-pulse/[0.06] p-3 text-[13px] text-pulse">
       <span style={{ fontFamily: 'var(--font-mono)' }}>!</span>
       <span>{message}</span>
     </div>
@@ -65,20 +52,14 @@ function GridError({ message }: { message: string }) {
 function SlotCard({ slot }: { slot: SuggestionSlot }) {
   const { Icon } = getMealTypeVisual(slot.mealTypeKey);
   return (
-    <div
-      className="flex h-full flex-col rounded-xl p-4"
-      style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
-    >
+    <div className="flex h-full flex-col rounded-xl border border-lumen-dk bg-white p-4">
       <div className="mb-2 flex items-center gap-2">
-        <div
-          className="flex h-7 w-7 items-center justify-center rounded-md"
-          style={{ background: `${FATHOM}14`, color: FATHOM }}
-        >
+        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-fathom/[0.08] text-fathom">
           <Icon className="h-3.5 w-3.5" />
         </div>
         <span
-          className="text-[10px] uppercase capitalize"
-          style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+          className="text-[10px] uppercase capitalize text-soft"
+          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
         >
           {slot.mealTypeLabel}
         </span>
@@ -86,34 +67,24 @@ function SlotCard({ slot }: { slot: SuggestionSlot }) {
 
       <div className="flex flex-col gap-2">
         {slot.options.length === 0 ? (
-          <p className="text-[12px] italic" style={{ color: SOFT }}>
-            No options generated.
-          </p>
+          <p className="text-[12px] italic text-soft">No options generated.</p>
         ) : (
           slot.options.map((option: SuggestionOption) => (
             <div
               key={option.id}
-              className="flex items-start justify-between gap-3 rounded-lg p-2.5 transition hover:translate-y-[-1px]"
-              style={{ background: LUMEN, border: `1px solid ${LUMEN_DK}` }}
+              className="flex items-start justify-between gap-3 rounded-lg border border-lumen-dk bg-lumen p-2.5 transition hover:-translate-y-px"
             >
               <div className="min-w-0 flex-1">
-                <p
-                  className="truncate text-[13px]"
-                  style={{ color: VAST, fontWeight: 500 }}
-                >
+                <p className="truncate text-[13px] font-medium text-vast">
                   {option.menuItemName ?? '—'}
                 </p>
-                <p className="truncate text-[11px]" style={{ color: MUTED }}>
+                <p className="truncate text-[11px] text-ink">
                   {option.restaurantName ?? '—'}
                 </p>
               </div>
               <span
-                className="shrink-0 text-right text-[13px] tabular-nums"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 600,
-                  color: FATHOM,
-                }}
+                className="shrink-0 text-right text-[13px] font-semibold tabular-nums text-fathom"
+                style={{ fontFamily: 'var(--font-display)' }}
               >
                 ₨ {option.estimatedPrice.toLocaleString()}
               </span>
@@ -135,8 +106,8 @@ export function GenerationSuggestionsGrid({
     return (
       <div className="flex flex-col gap-3">
         <div
-          className="flex items-center gap-2 text-[12px]"
-          style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+          className="flex items-center gap-2 text-[12px] text-ink"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
           <span>loading suggestions…</span>
@@ -152,10 +123,7 @@ export function GenerationSuggestionsGrid({
 
   if (!data || data.days.length === 0) {
     return (
-      <div
-        className="rounded-xl p-4 text-center text-[13px]"
-        style={{ background: WHITE, border: `1px dashed ${LUMEN_DK}`, color: MUTED }}
-      >
+      <div className="rounded-xl border border-dashed border-lumen-dk bg-white p-4 text-center text-[13px] text-ink">
         This generation didn&apos;t produce any suggestions.
       </div>
     );
@@ -166,11 +134,9 @@ export function GenerationSuggestionsGrid({
       {data.days.map((day) => (
         <div key={day.slotDate} className="flex flex-col gap-3">
           <h4
-            className="text-[13px]"
+            className="text-[13px] font-semibold text-vast"
             style={{
               fontFamily: 'var(--font-display)',
-              fontWeight: 600,
-              color: VAST,
               letterSpacing: '-0.01em',
             }}
           >

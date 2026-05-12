@@ -21,14 +21,11 @@ const mono = JetBrains_Mono({
   weight: ['400', '500', '600'],
 });
 
-const LUMEN = '#ffffeb';
-const VAST = '#1a1a1a';
-
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className={`${body.variable} ${display.variable} ${mono.variable} min-h-screen antialiased`}
-      style={{ fontFamily: 'var(--font-body)', background: LUMEN, color: VAST }}
+      className={`${body.variable} ${display.variable} ${mono.variable} min-h-screen bg-lumen text-vast antialiased`}
+      style={{ fontFamily: 'var(--font-body)' }}
     >
       <AppSidebar />
       <div className="flex min-h-screen flex-col lg:pl-64">

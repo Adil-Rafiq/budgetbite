@@ -23,14 +23,6 @@ const mono = JetBrains_Mono({
   weight: ['400', '500', '600'],
 });
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
 interface OnboardingShellProps {
   children: React.ReactNode;
 }
@@ -48,8 +40,8 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
 
   return (
     <div
-      className={`${body.variable} ${display.variable} ${mono.variable} relative min-h-screen antialiased`}
-      style={{ fontFamily: 'var(--font-body)', background: LUMEN, color: VAST }}
+      className={`${body.variable} ${display.variable} ${mono.variable} relative min-h-screen bg-lumen text-vast antialiased`}
+      style={{ fontFamily: 'var(--font-body)' }}
     >
       <div
         aria-hidden
@@ -63,10 +55,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
 
       <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-8 py-6">
         <Link href="/" className="flex items-center gap-2.5">
-          <span
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md"
-            style={{ background: FATHOM, color: LUMEN }}
-          >
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-fathom text-lumen">
             <LogoIcon />
           </span>
           <span
@@ -81,8 +70,8 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
           </span>
         </Link>
         <div
-          className="text-[12px]"
-          style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+          className="text-[12px] text-ink"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
           setup · step {String(currentStep + 1).padStart(2, '0')} /{' '}
           {String(ONBOARDING_STEPS.length).padStart(2, '0')}
@@ -98,32 +87,27 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
               <li key={step.id} className="flex flex-1 items-center gap-3 last:flex-none">
                 <div className="flex items-center gap-3">
                   <span
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[11px] tabular-nums"
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      background: isCurrent ? FATHOM : isDone ? FATHOM : WHITE,
-                      color: isCurrent || isDone ? LUMEN : MUTED,
-                      border: `1px solid ${isCurrent || isDone ? FATHOM : LUMEN_DK}`,
-                      fontWeight: 600,
-                    }}
+                    className={`inline-flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-semibold tabular-nums ${
+                      isCurrent || isDone
+                        ? 'border-fathom bg-fathom text-lumen'
+                        : 'border-lumen-dk bg-white text-ink'
+                    }`}
+                    style={{ fontFamily: 'var(--font-mono)' }}
                   >
                     {isDone ? '✓' : String(i + 1).padStart(2, '0')}
                   </span>
                   <span
-                    className="hidden text-[12px] sm:inline"
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      color: isCurrent ? VAST : MUTED,
-                      fontWeight: isCurrent ? 500 : 400,
-                    }}
+                    className={`hidden text-[12px] sm:inline ${
+                      isCurrent ? 'font-medium text-vast' : 'font-normal text-ink'
+                    }`}
+                    style={{ fontFamily: 'var(--font-mono)' }}
                   >
                     {step.id}
                   </span>
                 </div>
                 {i < ONBOARDING_STEPS.length - 1 && (
                   <div
-                    className="h-px flex-1"
-                    style={{ background: isDone ? FATHOM : LUMEN_DK }}
+                    className={`h-px flex-1 ${isDone ? 'bg-fathom' : 'bg-lumen-dk'}`}
                   />
                 )}
               </li>
@@ -132,21 +116,16 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
         </ol>
 
         <div
-          className="overflow-hidden rounded-[14px]"
+          className="overflow-hidden rounded-[14px] border border-lumen-dk bg-white"
           style={{
-            background: WHITE,
-            border: `1px solid ${LUMEN_DK}`,
             boxShadow:
               '0 1px 0 rgba(0,0,0,0.04), 0 30px 80px -30px rgba(26,26,26,0.18), 0 8px 30px -10px rgba(26,26,26,0.06)',
           }}
         >
-          <div
-            className="border-b px-7 py-6"
-            style={{ borderColor: LUMEN_DK, background: LUMEN }}
-          >
+          <div className="border-b border-lumen-dk bg-lumen px-7 py-6">
             <div
-              className="text-[10px] uppercase"
-              style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+              className="text-[10px] uppercase text-fathom"
+              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
             >
               {String(currentStep + 1).padStart(2, '0')} · {currentStepData.id}
             </div>
@@ -162,7 +141,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
             >
               {currentStepData.title}
             </h1>
-            <p className="mt-1.5 text-[14px]" style={{ color: MUTED }}>
+            <p className="mt-1.5 text-[14px] text-ink">
               {currentStepData.description}
             </p>
           </div>
@@ -203,8 +182,8 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
         </div>
 
         <p
-          className="mt-7 text-center text-[11px]"
-          style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+          className="mt-7 text-center text-[11px] text-soft"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
           you can change all of this later in settings
         </p>

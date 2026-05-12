@@ -16,20 +16,10 @@ import { AddToPlanModal } from '../_components/add-to-plan-modal';
 import { MenuItemSkeleton } from '../_components/menu-item-skeleton';
 import { RestaurantHeaderSkeleton } from '../_components/restaurant-header-skeleton';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const AMBER = '#b8741a';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
-const FIT_TINT: Record<BudgetFit, { tint: string; label: string }> = {
-  green: { tint: FATHOM, label: 'Fits budget' },
-  amber: { tint: AMBER, label: 'Tight' },
-  red: { tint: PULSE, label: 'Over budget' },
+const FIT_PILL: Record<BudgetFit, { className: string; label: string }> = {
+  green: { className: 'bg-fathom/[0.08] text-fathom', label: 'Fits budget' },
+  amber: { className: 'bg-amber/[0.08] text-amber', label: 'Tight' },
+  red: { className: 'bg-pulse/[0.08] text-pulse', label: 'Over budget' },
 };
 
 function buildFoodpandaUrl(externalId: string, slug: string): string {
@@ -56,8 +46,8 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
       <Link
         href="/restaurants"
-        className="inline-flex w-fit items-center gap-1.5 text-[12px] transition hover:opacity-80"
-        style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+        className="inline-flex w-fit items-center gap-1.5 text-[12px] text-ink transition hover:opacity-80"
+        style={{ fontFamily: 'var(--font-mono)' }}
       >
         ← back to restaurants
       </Link>
@@ -65,53 +55,44 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
       {restaurantQuery.isLoading ? (
         <RestaurantHeaderSkeleton />
       ) : restaurantQuery.error ? (
-        <p
-          className="rounded-xl p-4 text-[13px]"
-          style={{ background: 'rgba(127,28,52,0.06)', border: `1px solid ${PULSE}33`, color: PULSE }}
-        >
+        <p className="rounded-xl border border-pulse/20 bg-pulse/[0.06] p-4 text-[13px] text-pulse">
           Could not load restaurant.
         </p>
       ) : !r ? (
-        <p className="text-[13px]" style={{ color: MUTED }}>
-          Restaurant not found.
-        </p>
+        <p className="text-[13px] text-ink">Restaurant not found.</p>
       ) : (
-        <div
-          className="overflow-hidden rounded-2xl"
-          style={{
-            background: WHITE,
-            border: `1px solid ${LUMEN_DK}`,
-            boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
-          }}
-        >
+        <div className="overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]">
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex flex-col gap-2">
               <div
-                className="text-[10px] uppercase"
-                style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+                className="text-[10px] uppercase text-fathom"
+                style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
               >
                 /restaurant
               </div>
               <h1
+                className="text-vast"
                 style={{
                   fontFamily: 'var(--font-display)',
                   fontSize: 'clamp(24px, 3vw, 32px)',
                   fontWeight: 600,
                   letterSpacing: '-0.02em',
                   lineHeight: 1.05,
-                  color: VAST,
                 }}
               >
                 {r.name}
               </h1>
               <div
-                className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[12px]"
-                style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+                className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[12px] text-ink"
+                style={{ fontFamily: 'var(--font-mono)' }}
               >
                 {r.rating != null && (
                   <span className="inline-flex items-center gap-1">
-                    <Star className="h-3.5 w-3.5" style={{ color: AMBER, fill: AMBER }} />
-                    <span style={{ color: VAST, fontWeight: 600 }}>{r.rating.toFixed(1)}</span>
+                    <Star
+                      className="h-3.5 w-3.5 text-amber"
+                      style={{ fill: 'var(--color-amber)' }}
+                    />
+                    <span className="font-semibold text-vast">{r.rating.toFixed(1)}</span>
                     {r.ratingCount > 0 && <span>({r.ratingCount.toLocaleString()})</span>}
                   </span>
                 )}
@@ -133,13 +114,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
       )}
 
       {hasActivePlan && avgPerMeal > 0 && (
-        <div
-          className="grid grid-cols-3 gap-3 rounded-2xl p-4"
-          style={{
-            background: LUMEN,
-            border: `1px solid ${LUMEN_DK}`,
-          }}
-        >
+        <div className="grid grid-cols-3 gap-3 rounded-2xl border border-lumen-dk bg-lumen p-4">
           {[
             {
               label: 'avg / meal',
@@ -153,21 +128,17 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
           ].map(({ label, value }) => (
             <div key={label} className="flex flex-col">
               <span
-                className="text-[10px] uppercase"
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  color: SOFT,
-                  letterSpacing: '0.18em',
-                }}
+                className="text-[10px] uppercase text-soft"
+                style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
               >
                 {label}
               </span>
               <span
+                className="text-vast"
                 style={{
                   fontFamily: 'var(--font-display)',
                   fontSize: 16,
                   fontWeight: 600,
-                  color: VAST,
                   letterSpacing: '-0.01em',
                 }}
               >
@@ -182,18 +153,18 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         <div className="flex items-end justify-between">
           <div className="flex flex-col gap-1">
             <span
-              className="text-[10px] uppercase"
-              style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+              className="text-[10px] uppercase text-fathom"
+              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
             >
               /menu
             </span>
             <h2
+              className="text-vast"
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 22,
                 fontWeight: 600,
                 letterSpacing: '-0.02em',
-                color: VAST,
               }}
             >
               Menu
@@ -201,8 +172,8 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
           </div>
           {menuQuery.data && (
             <span
-              className="text-[11px]"
-              style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+              className="text-[11px] text-soft"
+              style={{ fontFamily: 'var(--font-mono)' }}
             >
               {menuQuery.data.length} item{menuQuery.data.length === 1 ? '' : 's'}
             </span>
@@ -216,21 +187,11 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
             ))}
           </div>
         ) : menuQuery.error ? (
-          <p
-            className="rounded-xl p-4 text-[13px]"
-            style={{
-              background: 'rgba(127,28,52,0.06)',
-              border: `1px solid ${PULSE}33`,
-              color: PULSE,
-            }}
-          >
+          <p className="rounded-xl border border-pulse/20 bg-pulse/[0.06] p-4 text-[13px] text-pulse">
             Could not load menu.
           </p>
         ) : !menuQuery.data?.length ? (
-          <div
-            className="rounded-2xl p-6 text-center text-[13px]"
-            style={{ background: WHITE, border: `1px dashed ${LUMEN_DK}`, color: MUTED }}
-          >
+          <div className="rounded-2xl border border-dashed border-lumen-dk bg-white p-6 text-center text-[13px] text-ink">
             No menu items yet.
           </div>
         ) : (
@@ -247,12 +208,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
               return (
                 <div
                   key={item.id}
-                  className="flex flex-col overflow-hidden rounded-2xl"
-                  style={{
-                    background: WHITE,
-                    border: `1px solid ${LUMEN_DK}`,
-                    boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
-                  }}
+                  className="flex flex-col overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]"
                 >
                   {item.imageUrl && (
                     /* eslint-disable-next-line @next/next/no-img-element */
@@ -267,42 +223,33 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p
-                            className="truncate text-[14px]"
-                            style={{ color: VAST, fontWeight: 500 }}
-                          >
+                          <p className="truncate text-[14px] font-medium text-vast">
                             {item.name}
                           </p>
                           {fit && (
                             <span
-                              className="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] uppercase"
+                              className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] uppercase ${FIT_PILL[fit].className}`}
                               style={{
                                 fontFamily: 'var(--font-mono)',
-                                background: `${FIT_TINT[fit].tint}14`,
-                                color: FIT_TINT[fit].tint,
                                 letterSpacing: '0.18em',
                               }}
                             >
-                              {FIT_TINT[fit].label}
+                              {FIT_PILL[fit].label}
                             </span>
                           )}
                         </div>
                         {item.description && (
-                          <p
-                            className="mt-1 line-clamp-3 text-[12px]"
-                            style={{ color: MUTED }}
-                          >
+                          <p className="mt-1 line-clamp-3 text-[12px] text-ink">
                             {item.description}
                           </p>
                         )}
                       </div>
                       <span
-                        className="shrink-0 whitespace-nowrap text-right"
+                        className="shrink-0 whitespace-nowrap text-right text-fathom"
                         style={{
                           fontFamily: 'var(--font-display)',
                           fontSize: 16,
                           fontWeight: 600,
-                          color: FATHOM,
                         }}
                       >
                         ₨ {item.price.toLocaleString()}

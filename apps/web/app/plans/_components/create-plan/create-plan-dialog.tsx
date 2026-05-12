@@ -12,19 +12,9 @@ import { StepBudgetDetails } from '@/app/plans/_components/create-plan/steps/ste
 import { StepNotifications } from '@/app/plans/_components/create-plan/steps/step-notification';
 import { Pill } from '@/components/ui/pill';
 
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
 type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  /**
-   * When set, the submit flow cancels this plan first, then creates the new
-   * one. Drives the "Cancel & create new" replace UX from PlansPageHeader.
-   */
   replaceActivePlanId?: string | null;
 };
 
@@ -39,36 +29,34 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
         <DialogContent className="max-w-md">
           <DialogHeader>
             <div
-              className="text-[10px] uppercase"
-              style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+              className="text-[10px] uppercase text-fathom"
+              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
             >
               step {stepNumber} · /new-plan
             </div>
             <DialogTitle
+              className="text-vast"
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 22,
                 fontWeight: 600,
                 letterSpacing: '-0.02em',
-                color: VAST,
               }}
             >
               {currentStepData?.title}
             </DialogTitle>
-            <DialogDescription style={{ color: MUTED }}>
+            <DialogDescription className="text-ink">
               {currentStepData?.description}
             </DialogDescription>
           </DialogHeader>
 
-          <div
-            className="mt-2 h-1.5 w-full overflow-hidden rounded-full"
-            style={{ background: LUMEN_DK }}
-          >
+          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-lumen-dk">
             <div
               className="h-full rounded-full transition-all"
               style={{
                 width: `${progress}%`,
-                background: `linear-gradient(90deg, ${FATHOM}, ${VAST})`,
+                background:
+                  'linear-gradient(90deg, var(--color-fathom), var(--color-vast))',
               }}
             />
           </div>
@@ -95,8 +83,8 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
           </DialogFooter>
 
           <p
-            className="mt-1 text-center text-[10px]"
-            style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+            className="mt-1 text-center text-[10px] text-soft"
+            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
           >
             you can change every value later.
           </p>

@@ -27,14 +27,6 @@ const mono = JetBrains_Mono({
   weight: ['400', '500', '600'],
 });
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-
 const verifySchema = z.object({
   otp: z
     .string()
@@ -112,8 +104,8 @@ export default function VerifyEmailPage() {
 
   return (
     <div
-      className={`${body.variable} ${display.variable} ${mono.variable} relative min-h-screen antialiased`}
-      style={{ fontFamily: 'var(--font-body)', background: LUMEN, color: VAST }}
+      className={`${body.variable} ${display.variable} ${mono.variable} relative min-h-screen bg-lumen text-vast antialiased`}
+      style={{ fontFamily: 'var(--font-body)' }}
     >
       <div
         aria-hidden
@@ -127,10 +119,7 @@ export default function VerifyEmailPage() {
 
       <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-8 py-6">
         <Link href="/" className="flex items-center gap-2.5">
-          <span
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md"
-            style={{ background: FATHOM, color: LUMEN }}
-          >
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-fathom text-lumen">
             <LogoIcon />
           </span>
           <span
@@ -146,8 +135,8 @@ export default function VerifyEmailPage() {
         </Link>
         <Link
           href="/login"
-          className="text-[12px]"
-          style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+          className="text-[12px] text-ink"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
           ← back to login
         </Link>
@@ -156,18 +145,10 @@ export default function VerifyEmailPage() {
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[440px] flex-col justify-center px-6 pb-16">
         <div className="text-center">
           <div
-            className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px]"
-            style={{
-              fontFamily: 'var(--font-mono)',
-              borderColor: LUMEN_DK,
-              background: WHITE,
-              color: MUTED,
-            }}
+            className="inline-flex items-center gap-2 rounded-full border border-lumen-dk bg-white px-3 py-1 text-[11px] text-ink"
+            style={{ fontFamily: 'var(--font-mono)' }}
           >
-            <span
-              className="inline-block h-1.5 w-1.5 rounded-full"
-              style={{ background: FATHOM }}
-            />
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-fathom" />
             verify · /auth/otp
           </div>
           <h1
@@ -182,16 +163,13 @@ export default function VerifyEmailPage() {
           >
             Check your email.
           </h1>
-          <p
-            className="mt-3 text-[15px] leading-[1.55]"
-            style={{ color: MUTED }}
-          >
+          <p className="mt-3 text-[15px] leading-[1.55] text-ink">
             We sent a 6-digit code to{' '}
-            <span style={{ color: VAST, fontWeight: 500 }}>{email}</span>
+            <span className="font-medium text-vast">{email}</span>
           </p>
           <p
-            className="mt-1 text-[11px]"
-            style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+            className="mt-1 text-[11px] text-ink"
+            style={{ fontFamily: 'var(--font-mono)' }}
           >
             expires in 10 minutes.
           </p>
@@ -205,25 +183,16 @@ export default function VerifyEmailPage() {
               maxLength={6}
               autoFocus
               inputMode="numeric"
+              className="w-full rounded-xl border border-lumen-dk bg-white px-3.5 py-4 text-center text-[28px] font-semibold text-vast outline-none"
               style={{
-                width: '100%',
-                background: WHITE,
-                border: `1px solid ${LUMEN_DK}`,
-                borderRadius: 12,
-                padding: '16px 14px',
                 fontFamily: 'var(--font-mono)',
-                fontSize: 28,
-                fontWeight: 600,
                 letterSpacing: '0.5em',
-                textAlign: 'center',
-                color: VAST,
-                outline: 'none',
               }}
             />
             {errors.otp && (
               <p
-                className="text-[12px]"
-                style={{ color: PULSE, fontFamily: 'var(--font-mono)' }}
+                className="text-[12px] text-pulse"
+                style={{ fontFamily: 'var(--font-mono)' }}
               >
                 {errors.otp.message}
               </p>
@@ -235,14 +204,14 @@ export default function VerifyEmailPage() {
             <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
           </Pill>
 
-          <div className="mt-2 text-center text-[13px]" style={{ color: MUTED }}>
+          <div className="mt-2 text-center text-[13px] text-ink">
             <span>Didn&apos;t receive the code? </span>
             <button
               type="button"
               onClick={handleResend}
               disabled={resendCooldown > 0}
-              className="font-medium transition hover:underline disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ color: FATHOM, fontFamily: 'var(--font-mono)' }}
+              className="font-medium text-fathom transition hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+              style={{ fontFamily: 'var(--font-mono)' }}
             >
               {resendCooldown > 0 ? `resend in ${resendCooldown}s` : 'resend code'}
             </button>

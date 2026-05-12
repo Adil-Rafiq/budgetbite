@@ -11,18 +11,6 @@ import type {
 
 import { usePlanTimeline } from '@/hooks/use-budget-plan';
 import { getMealTypeVisual } from '@/lib/meal-type-visuals';
-import { cn } from '@/lib/utils';
-
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
-// ─── Date helpers ────────────────────────────────────────────────────────────
 
 const dayFmt = new Intl.DateTimeFormat('en-PK', {
   weekday: 'long',
@@ -34,34 +22,28 @@ function formatDay(slotDate: string): string {
   return dayFmt.format(new Date(`${slotDate}T12:00:00Z`));
 }
 
-// ─── Status badges ───────────────────────────────────────────────────────────
-
 function StatusBadge({ status }: { status: PlanTimelineSlot['status'] }) {
-  const map: Record<PlanTimelineSlot['status'], { tint: string; label: string; Icon: typeof Check } | null> = {
-    logged: { tint: FATHOM, label: 'Logged', Icon: Check },
-    pinned: { tint: FATHOM, label: 'Pinned', Icon: Pin },
-    suggested: { tint: SOFT, label: 'Suggested', Icon: Sparkles },
+  const map: Record<
+    PlanTimelineSlot['status'],
+    { className: string; label: string; Icon: typeof Check } | null
+  > = {
+    logged: { className: 'bg-fathom/[0.08] text-fathom', label: 'Logged', Icon: Check },
+    pinned: { className: 'bg-fathom/[0.08] text-fathom', label: 'Pinned', Icon: Pin },
+    suggested: { className: 'bg-soft/[0.08] text-soft', label: 'Suggested', Icon: Sparkles },
     empty: null,
   };
   const v = map[status];
   if (!v) return null;
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] uppercase"
-      style={{
-        fontFamily: 'var(--font-mono)',
-        background: `${v.tint}14`,
-        color: v.tint,
-        letterSpacing: '0.18em',
-      }}
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] uppercase ${v.className}`}
+      style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
     >
       <v.Icon className="h-3 w-3" />
       {v.label}
     </span>
   );
 }
-
-// ─── Bodies ──────────────────────────────────────────────────────────────────
 
 function LoggedBody({ slot }: { slot: PlanTimelineSlot }) {
   const c = slot.loggedChoice!;
@@ -70,27 +52,19 @@ function LoggedBody({ slot }: { slot: PlanTimelineSlot }) {
     : (c.menuItemName ?? c.manualDescription ?? '—');
 
   return (
-    <div
-      className="flex items-start justify-between gap-3 rounded-lg p-3"
-      style={{ background: `${FATHOM}08`, border: `1px solid ${FATHOM}22` }}
-    >
+    <div className="flex items-start justify-between gap-3 rounded-lg border border-fathom/20 bg-fathom/[0.03] p-3">
       <div className="min-w-0">
-        <p className="truncate text-[13px]" style={{ color: VAST, fontWeight: 500 }}>
-          {title}
-        </p>
+        <p className="truncate text-[13px] font-medium text-vast">{title}</p>
         {c.restaurantName && (
-          <p className="mt-0.5 truncate text-[11px]" style={{ color: MUTED }}>
-            {c.restaurantName}
-          </p>
+          <p className="mt-0.5 truncate text-[11px] text-ink">{c.restaurantName}</p>
         )}
       </div>
       <span
-        className="shrink-0 whitespace-nowrap text-right"
+        className="shrink-0 whitespace-nowrap text-right text-vast"
         style={{
           fontFamily: 'var(--font-display)',
           fontSize: 14,
           fontWeight: 600,
-          color: VAST,
         }}
       >
         ₨ {c.actualAmountSpent.toLocaleString()}
@@ -101,27 +75,21 @@ function LoggedBody({ slot }: { slot: PlanTimelineSlot }) {
 
 function PinnedBody({ option }: { option: SuggestionOption }) {
   return (
-    <div
-      className="flex items-start justify-between gap-3 rounded-lg p-3"
-      style={{ background: `${FATHOM}08`, border: `1px solid ${FATHOM}22` }}
-    >
+    <div className="flex items-start justify-between gap-3 rounded-lg border border-fathom/20 bg-fathom/[0.03] p-3">
       <div className="min-w-0">
-        <p className="truncate text-[13px]" style={{ color: VAST, fontWeight: 500 }}>
+        <p className="truncate text-[13px] font-medium text-vast">
           {option.menuItemName ?? '—'}
         </p>
         {option.restaurantName && (
-          <p className="mt-0.5 truncate text-[11px]" style={{ color: MUTED }}>
-            {option.restaurantName}
-          </p>
+          <p className="mt-0.5 truncate text-[11px] text-ink">{option.restaurantName}</p>
         )}
       </div>
       <span
-        className="shrink-0 whitespace-nowrap text-right"
+        className="shrink-0 whitespace-nowrap text-right text-fathom"
         style={{
           fontFamily: 'var(--font-display)',
           fontSize: 14,
           fontWeight: 600,
-          color: FATHOM,
         }}
       >
         ₨ {option.estimatedPrice.toLocaleString()}
@@ -136,34 +104,32 @@ function SuggestedBody({ options }: { options: SuggestionOption[] }) {
       {options.map((option, i) => (
         <div
           key={option.id}
-          className="flex items-start justify-between gap-3 py-2.5"
-          style={{ borderTop: i === 0 ? 'none' : `1px solid ${LUMEN_DK}` }}
+          className={`flex items-start justify-between gap-3 py-2.5 ${
+            i === 0 ? '' : 'border-t border-lumen-dk'
+          }`}
         >
           <div className="flex min-w-0 items-start gap-2.5">
             <span
-              className="mt-0.5 w-4 shrink-0 text-[11px] tabular-nums"
-              style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+              className="mt-0.5 w-4 shrink-0 text-[11px] tabular-nums text-soft"
+              style={{ fontFamily: 'var(--font-mono)' }}
             >
               {String(i + 1).padStart(2, '0')}
             </span>
             <div className="min-w-0">
-              <p className="truncate text-[13px]" style={{ color: VAST, fontWeight: 500 }}>
+              <p className="truncate text-[13px] font-medium text-vast">
                 {option.menuItemName ?? '—'}
               </p>
               {option.restaurantName && (
-                <p className="mt-0.5 truncate text-[11px]" style={{ color: MUTED }}>
-                  {option.restaurantName}
-                </p>
+                <p className="mt-0.5 truncate text-[11px] text-ink">{option.restaurantName}</p>
               )}
             </div>
           </div>
           <span
-            className="shrink-0 whitespace-nowrap text-right"
+            className="shrink-0 whitespace-nowrap text-right text-fathom"
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: 13,
               fontWeight: 600,
-              color: FATHOM,
             }}
           >
             ₨ {option.estimatedPrice.toLocaleString()}
@@ -182,17 +148,12 @@ function EmptyBody({ relative }: { relative: PlanTimelineDay['relative'] }) {
         ? 'Nothing planned yet'
         : 'No suggestion yet';
   return (
-    <div
-      className="flex items-center justify-center gap-2 rounded-lg p-3 text-[12px]"
-      style={{ border: `1px dashed ${LUMEN_DK}`, color: SOFT }}
-    >
+    <div className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-lumen-dk p-3 text-[12px] text-soft">
       <Utensils className="h-3.5 w-3.5" />
       <span>{message}</span>
     </div>
   );
 }
-
-// ─── Per-mealType section ────────────────────────────────────────────────────
 
 function MealSection({ slot, day }: { slot: PlanTimelineSlot; day: PlanTimelineDay }) {
   const { Icon } = getMealTypeVisual(slot.mealTypeKey);
@@ -201,15 +162,12 @@ function MealSection({ slot, day }: { slot: PlanTimelineSlot; day: PlanTimelineD
     <div className="flex flex-col gap-2.5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
-          <div
-            className="flex h-7 w-7 items-center justify-center rounded-md"
-            style={{ background: `${FATHOM}14`, color: FATHOM }}
-          >
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-fathom/[0.08] text-fathom">
             <Icon className="h-3.5 w-3.5" />
           </div>
           <span
-            className="text-[10px] uppercase capitalize"
-            style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+            className="text-[10px] uppercase capitalize text-soft"
+            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
           >
             {slot.mealTypeLabel}
           </span>
@@ -225,8 +183,6 @@ function MealSection({ slot, day }: { slot: PlanTimelineSlot; day: PlanTimelineD
   );
 }
 
-// ─── Day card ────────────────────────────────────────────────────────────────
-
 function DayCard({ day }: { day: PlanTimelineDay }) {
   const isToday = day.relative === 'today';
   const isPast = day.relative === 'past';
@@ -241,41 +197,35 @@ function DayCard({ day }: { day: PlanTimelineDay }) {
     return { logged, pinned };
   }, [day.slots]);
 
+  const containerClass = isToday
+    ? 'overflow-hidden rounded-2xl border-[1.5px] border-fathom bg-white shadow-[0_0_0_4px_rgba(3,79,70,0.07)]'
+    : isPast
+      ? 'overflow-hidden rounded-2xl border border-lumen-dk bg-lumen'
+      : 'overflow-hidden rounded-2xl border border-lumen-dk bg-white';
+
+  const headerClass = isToday
+    ? 'flex items-center justify-between gap-3 border-b border-lumen-dk bg-fathom/[0.04] px-5 py-3.5'
+    : 'flex items-center justify-between gap-3 border-b border-lumen-dk bg-lumen px-5 py-3.5';
+
   return (
-    <div
-      className="overflow-hidden rounded-2xl"
-      style={{
-        background: isPast ? LUMEN : WHITE,
-        border: isToday ? `1.5px solid ${FATHOM}` : `1px solid ${LUMEN_DK}`,
-        boxShadow: isToday ? `0 0 0 4px ${FATHOM}11` : 'none',
-      }}
-    >
-      <div
-        className="flex items-center justify-between gap-3 border-b px-5 py-3.5"
-        style={{ borderColor: LUMEN_DK, background: isToday ? `${FATHOM}06` : LUMEN }}
-      >
+    <div className={containerClass}>
+      <div className={headerClass}>
         <div className="flex min-w-0 items-center gap-2">
           <h3
-            className={cn('truncate')}
+            className={`truncate ${isPast ? 'text-ink' : 'text-vast'}`}
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: 16,
               fontWeight: 600,
               letterSpacing: '-0.01em',
-              color: isPast ? MUTED : VAST,
             }}
           >
             {formatDay(day.slotDate)}
           </h3>
           {isToday && (
             <span
-              className="rounded-full px-2 py-0.5 text-[10px] uppercase"
-              style={{
-                fontFamily: 'var(--font-mono)',
-                background: `${FATHOM}14`,
-                color: FATHOM,
-                letterSpacing: '0.18em',
-              }}
+              className="rounded-full bg-fathom/[0.08] px-2 py-0.5 text-[10px] uppercase text-fathom"
+              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
             >
               today
             </span>
@@ -284,17 +234,17 @@ function DayCard({ day }: { day: PlanTimelineDay }) {
 
         {(counts.logged > 0 || counts.pinned > 0) && (
           <div
-            className="flex shrink-0 items-center gap-3 text-[11px]"
-            style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+            className="flex shrink-0 items-center gap-3 text-[11px] text-ink"
+            style={{ fontFamily: 'var(--font-mono)' }}
           >
             {counts.logged > 0 && (
-              <span className="flex items-center gap-1" style={{ color: FATHOM }}>
+              <span className="flex items-center gap-1 text-fathom">
                 <Check className="h-3 w-3" />
                 {counts.logged} logged
               </span>
             )}
             {counts.pinned > 0 && (
-              <span className="flex items-center gap-1" style={{ color: FATHOM }}>
+              <span className="flex items-center gap-1 text-fathom">
                 <Pin className="h-3 w-3" />
                 {counts.pinned} pinned
               </span>
@@ -306,7 +256,7 @@ function DayCard({ day }: { day: PlanTimelineDay }) {
       <div className="flex flex-col gap-5 p-5">
         {day.slots.map((slot, i) => (
           <div key={`${day.slotDate}-${slot.mealTypeId}`} className="flex flex-col gap-2.5">
-            {i > 0 && <div className="-mx-1 h-px" style={{ background: LUMEN_DK }} />}
+            {i > 0 && <div className="-mx-1 h-px bg-lumen-dk" />}
             <MealSection slot={slot} day={day} />
           </div>
         ))}
@@ -315,26 +265,25 @@ function DayCard({ day }: { day: PlanTimelineDay }) {
   );
 }
 
-// ─── Section banners ─────────────────────────────────────────────────────────
-
 function SectionBanner({ label, count }: { label: string; count: number }) {
   return (
     <div className="flex items-center gap-3">
       <span
-        className="text-[10px] uppercase"
-        style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.22em' }}
+        className="text-[10px] uppercase text-soft"
+        style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
       >
         {label}
       </span>
-      <span className="text-[11px]" style={{ fontFamily: 'var(--font-mono)', color: SOFT }}>
+      <span
+        className="text-[11px] text-soft"
+        style={{ fontFamily: 'var(--font-mono)' }}
+      >
         {count} day{count === 1 ? '' : 's'}
       </span>
-      <div className="h-px flex-1" style={{ background: LUMEN_DK }} />
+      <div className="h-px flex-1 bg-lumen-dk" />
     </div>
   );
 }
-
-// ─── Top-level component ─────────────────────────────────────────────────────
 
 interface PlanTimelineProps {
   plan: BudgetPlanDetail;
@@ -360,18 +309,18 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
     <div className="flex items-end justify-between">
       <div className="flex flex-col gap-1">
         <span
-          className="text-[10px] uppercase"
-          style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+          className="text-[10px] uppercase text-fathom"
+          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
         >
           /timeline
         </span>
         <h2
+          className="text-vast"
           style={{
             fontFamily: 'var(--font-display)',
             fontSize: 22,
             fontWeight: 600,
             letterSpacing: '-0.02em',
-            color: VAST,
           }}
         >
           Day by day
@@ -379,8 +328,8 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
       </div>
       {data && (
         <span
-          className="text-[11px]"
-          style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+          className="text-[11px] text-soft"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
           {data.days.length} day{data.days.length === 1 ? '' : 's'}
         </span>
@@ -394,11 +343,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
         {header}
         <div className="flex flex-col gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-48 w-full animate-pulse rounded-2xl"
-              style={{ background: LUMEN }}
-            />
+            <div key={i} className="h-48 w-full animate-pulse rounded-2xl bg-lumen" />
           ))}
         </div>
       </div>
@@ -409,10 +354,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
     return (
       <div className="flex flex-col gap-4">
         {header}
-        <div
-          className="flex items-center gap-2 rounded-xl p-3 text-[13px]"
-          style={{ background: 'rgba(127,28,52,0.06)', border: `1px solid ${PULSE}33`, color: PULSE }}
-        >
+        <div className="flex items-center gap-2 rounded-xl border border-pulse/20 bg-pulse/[0.06] p-3 text-[13px] text-pulse">
           <span style={{ fontFamily: 'var(--font-mono)' }}>!</span>
           <span>Failed to load timeline: {error.message}</span>
         </div>
@@ -424,10 +366,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
     return (
       <div className="flex flex-col gap-4">
         {header}
-        <div
-          className="rounded-2xl p-6 text-center text-[13px]"
-          style={{ background: WHITE, border: `1px dashed ${LUMEN_DK}`, color: MUTED }}
-        >
+        <div className="rounded-2xl border border-dashed border-lumen-dk bg-white p-6 text-center text-[13px] text-ink">
           No days in this plan yet.
         </div>
       </div>

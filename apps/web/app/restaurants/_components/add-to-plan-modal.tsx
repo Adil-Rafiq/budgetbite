@@ -28,13 +28,6 @@ import { useCreateMealPin, useMealPins } from '@/hooks/use-meal-pin';
 import { getErrorMessage } from '@/lib/api/errors';
 import { showToast } from '@/lib/toast';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
 interface MenuItemPick {
   id: string;
   name: string;
@@ -52,6 +45,13 @@ interface Props {
 function todayString(): string {
   return new Date().toISOString().slice(0, 10);
 }
+
+const labelClass = 'text-[10px] uppercase text-soft';
+const labelStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)',
+  letterSpacing: '0.18em',
+};
+const inputClass = 'bg-lumen border-lumen-dk text-vast';
 
 export function AddToPlanModal({
   open,
@@ -136,57 +136,43 @@ export function AddToPlanModal({
     }
   };
 
-  const labelStyle: React.CSSProperties = {
-    fontFamily: 'var(--font-mono)',
-    color: SOFT,
-    letterSpacing: '0.18em',
-  };
-  const inputStyle = { background: LUMEN, borderColor: LUMEN_DK, color: VAST };
-
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <div
-            className="text-[10px] uppercase"
-            style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+            className="text-[10px] uppercase text-fathom"
+            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
           >
             {isPastOrToday ? 'log · /meals' : 'pin · /plan'}
           </div>
           <DialogTitle
+            className="text-vast"
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: 22,
               fontWeight: 600,
               letterSpacing: '-0.02em',
-              color: VAST,
             }}
           >
             Add to plan
           </DialogTitle>
-          <DialogDescription style={{ color: MUTED }}>
+          <DialogDescription className="text-ink">
             {isPastOrToday
               ? 'Log this as a meal you ordered. Your budget updates immediately.'
               : 'Pin this for a future slot. Your AI plan will keep it locked.'}
           </DialogDescription>
         </DialogHeader>
 
-        {/* Selected item summary */}
-        <div
-          className="rounded-xl p-3"
-          style={{ background: LUMEN, border: `1px solid ${LUMEN_DK}` }}
-        >
-          <p style={{ color: VAST, fontWeight: 500 }}>{menuItem.name}</p>
-          <p className="text-[12px]" style={{ color: MUTED }}>
-            {restaurantName}
-          </p>
+        <div className="rounded-xl border border-lumen-dk bg-lumen p-3">
+          <p className="font-medium text-vast">{menuItem.name}</p>
+          <p className="text-[12px] text-ink">{restaurantName}</p>
           <p
-            className="mt-1"
+            className="mt-1 text-fathom"
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: 16,
               fontWeight: 600,
-              color: FATHOM,
             }}
           >
             ₨ {menuItem.price.toLocaleString()}
@@ -194,13 +180,13 @@ export function AddToPlanModal({
         </div>
 
         {!planId ? (
-          <p className="text-[13px]" style={{ color: MUTED }}>
+          <p className="text-[13px] text-ink">
             Start a budget plan first to add meals to it.
           </p>
         ) : (
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="slot-date" className="text-[10px] uppercase" style={labelStyle}>
+              <Label htmlFor="slot-date" className={labelClass} style={labelStyle}>
                 Date
               </Label>
               <Input
@@ -210,16 +196,16 @@ export function AddToPlanModal({
                 min={minDate}
                 max={planEnd}
                 onChange={(e) => setSlotDate(e.target.value || today)}
-                style={inputStyle}
+                className={inputClass}
               />
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label className="text-[10px] uppercase" style={labelStyle}>
+              <Label className={labelClass} style={labelStyle}>
                 Meal
               </Label>
               <Select value={mealTypeId} onValueChange={setMealTypeId}>
-                <SelectTrigger className="w-full" style={inputStyle}>
+                <SelectTrigger className={`w-full ${inputClass}`}>
                   <SelectValue placeholder="Pick a meal type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -229,7 +215,7 @@ export function AddToPlanModal({
                       <SelectItem key={mt.id} value={mt.id}>
                         <span className="capitalize">{mt.label}</span>
                         {pin && (
-                          <span className="ml-2 text-[11px]" style={{ color: SOFT }}>
+                          <span className="ml-2 text-[11px] text-soft">
                             already pinned: {pin.menuItemName}
                           </span>
                         )}
@@ -242,7 +228,7 @@ export function AddToPlanModal({
 
             {isPastOrToday && (
               <div className="flex flex-col gap-2">
-                <Label htmlFor="actual-amount" className="text-[10px] uppercase" style={labelStyle}>
+                <Label htmlFor="actual-amount" className={labelClass} style={labelStyle}>
                   Actual amount spent (PKR)
                 </Label>
                 <Input
@@ -251,16 +237,15 @@ export function AddToPlanModal({
                   inputMode="numeric"
                   value={actualAmount}
                   onChange={(e) => setActualAmount(Number(e.target.value) || 0)}
+                  className={`${inputClass} font-semibold`}
                   style={{
-                    ...inputStyle,
                     fontFamily: 'var(--font-display)',
                     fontSize: 18,
-                    fontWeight: 600,
                   }}
                 />
                 <p
-                  className="text-[11px]"
-                  style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+                  className="text-[11px] text-soft"
+                  style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   pre-filled from menu. adjust to actual.
                 </p>
@@ -269,17 +254,16 @@ export function AddToPlanModal({
 
             {isPastOrToday && (
               <div className="flex flex-col gap-2">
-                <Label htmlFor="meal-notes" className="text-[10px] uppercase" style={labelStyle}>
+                <Label htmlFor="meal-notes" className={labelClass} style={labelStyle}>
                   Notes (optional)
                 </Label>
                 <Textarea
                   id="meal-notes"
                   rows={2}
-                  className="resize-none"
+                  className={`resize-none ${inputClass}`}
                   placeholder="Anything to remember?"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  style={inputStyle}
                 />
               </div>
             )}

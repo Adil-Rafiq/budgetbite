@@ -12,25 +12,13 @@ import { useMealSlots } from '@/components/dashboard/meal-slots/_hooks/use-meal-
 import { Pill } from '@/components/ui/pill';
 import type { SuggestionSlot, SuggestionOption } from '@repo/shared';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const AMBER = '#b8741a';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
 function SkeletonCard() {
   return (
-    <div
-      className="rounded-2xl p-5"
-      style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
-    >
-      <div className="h-3 w-20 rounded animate-pulse" style={{ background: LUMEN }} />
-      <div className="mt-4 h-14 w-full rounded-lg animate-pulse" style={{ background: LUMEN }} />
-      <div className="mt-3 h-14 w-full rounded-lg animate-pulse" style={{ background: LUMEN }} />
-      <div className="mt-3 h-9 w-full rounded-full animate-pulse" style={{ background: LUMEN }} />
+    <div className="rounded-2xl border border-lumen-dk bg-white p-5">
+      <div className="h-3 w-20 animate-pulse rounded bg-lumen" />
+      <div className="mt-4 h-14 w-full animate-pulse rounded-lg bg-lumen" />
+      <div className="mt-3 h-14 w-full animate-pulse rounded-lg bg-lumen" />
+      <div className="mt-3 h-9 w-full animate-pulse rounded-full bg-lumen" />
     </div>
   );
 }
@@ -62,10 +50,7 @@ export function MealSlots() {
 
   if (slotsError)
     return (
-      <div
-        className="flex items-center gap-3 rounded-xl p-4 text-[13px]"
-        style={{ background: 'rgba(127,28,52,0.06)', border: '1px solid #7f1c34', color: '#7f1c34' }}
-      >
+      <div className="flex items-center gap-3 rounded-xl border border-pulse bg-pulse/[0.06] p-4 text-[13px] text-pulse">
         <span style={{ fontFamily: 'var(--font-mono)' }}>!</span>
         Failed to load meal slots: {slotsError.message}
       </div>
@@ -73,10 +58,7 @@ export function MealSlots() {
 
   if (!slotsData?.slots.length)
     return (
-      <div
-        className="rounded-2xl p-5 text-[13px]"
-        style={{ background: WHITE, border: `1px solid ${LUMEN_DK}`, color: MUTED }}
-      >
+      <div className="rounded-2xl border border-lumen-dk bg-white p-5 text-[13px] text-ink">
         No meal suggestions available — create or activate a plan to get started.
       </div>
     );
@@ -102,38 +84,24 @@ export function MealSlots() {
             return (
               <article
                 key={slot.mealTypeId}
-                className="flex flex-col overflow-hidden rounded-2xl"
-                style={{
-                  background: WHITE,
-                  border: `1px solid ${LUMEN_DK}`,
-                  boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
-                }}
+                className="flex flex-col overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]"
               >
-                <div
-                  className="flex items-center justify-between px-5 py-3"
-                  style={{ background: LUMEN, borderBottom: `1px solid ${LUMEN_DK}` }}
-                >
+                <div className="flex items-center justify-between border-b border-lumen-dk bg-lumen px-5 py-3">
                   <div className="flex items-center gap-3">
                     <span
-                      className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[12px]"
-                      style={{
-                        background: 'rgba(3,79,70,0.10)',
-                        color: FATHOM,
-                        fontFamily: 'var(--font-mono)',
-                        fontWeight: 600,
-                      }}
+                      className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-fathom/10 text-[12px] text-fathom"
+                      style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}
                     >
                       {slot.mealTypeLabel.slice(0, 1).toUpperCase()}
                     </span>
                     <div className="flex flex-col">
                       <span
-                        className="capitalize"
+                        className="capitalize text-vast"
                         style={{
                           fontFamily: 'var(--font-display)',
                           fontSize: 16,
                           fontWeight: 600,
                           letterSpacing: '-0.01em',
-                          color: VAST,
                         }}
                       >
                         {slot.mealTypeLabel}
@@ -141,17 +109,13 @@ export function MealSlots() {
                     </div>
                   </div>
                   {isLogged ? (
-                    <StatusPill color={FATHOM} bg="rgba(3,79,70,0.10)" label="logged" glyph="✓" />
+                    <StatusPill tone="fathom" label="logged" glyph="✓" />
                   ) : isPinned ? (
-                    <StatusPill color={AMBER} bg="rgba(184,116,26,0.10)" label="pinned" glyph="⊙" />
+                    <StatusPill tone="amber" label="pinned" glyph="⊙" />
                   ) : (
                     <span
-                      className="text-[10px] uppercase"
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        color: SOFT,
-                        letterSpacing: '0.18em',
-                      }}
+                      className="text-[10px] uppercase text-soft"
+                      style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
                     >
                       ready
                     </span>
@@ -161,32 +125,21 @@ export function MealSlots() {
                 <div className="flex flex-1 flex-col gap-3 p-5">
                   {isLogged && loggedMeal ? (
                     <>
-                      <div
-                        className="rounded-xl p-4"
-                        style={{
-                          background: 'rgba(3,79,70,0.05)',
-                          border: `1px solid rgba(3,79,70,0.18)`,
-                        }}
-                      >
+                      <div className="rounded-xl border border-fathom/20 bg-fathom/5 p-4">
                         <div
-                          className="text-[10px] uppercase"
-                          style={{
-                            fontFamily: 'var(--font-mono)',
-                            color: FATHOM,
-                            letterSpacing: '0.22em',
-                          }}
+                          className="text-[10px] uppercase text-fathom"
+                          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
                         >
                           logged
                         </div>
                         <div className="mt-1.5 flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <p
-                              className="truncate"
+                              className="truncate text-vast"
                               style={{
                                 fontFamily: 'var(--font-display)',
                                 fontSize: 15,
                                 fontWeight: 600,
-                                color: VAST,
                                 letterSpacing: '-0.01em',
                               }}
                             >
@@ -195,20 +148,17 @@ export function MealSlots() {
                                 : (loggedMeal.menuItemName ?? '—')}
                             </p>
                             {loggedMeal.restaurantName && (
-                              <p
-                                className="mt-0.5 truncate text-[12px]"
-                                style={{ color: MUTED }}
-                              >
+                              <p className="mt-0.5 truncate text-[12px] text-ink">
                                 {loggedMeal.restaurantName}
                               </p>
                             )}
                           </div>
                           <span
+                            className="text-vast"
                             style={{
                               fontFamily: 'var(--font-display)',
                               fontSize: 16,
                               fontWeight: 700,
-                              color: VAST,
                               letterSpacing: '-0.01em',
                             }}
                           >
@@ -220,12 +170,8 @@ export function MealSlots() {
                       {slot.options.length > 0 && (
                         <div className="flex flex-col gap-1.5">
                           <p
-                            className="text-[10px] uppercase"
-                            style={{
-                              fontFamily: 'var(--font-mono)',
-                              color: SOFT,
-                              letterSpacing: '0.18em',
-                            }}
+                            className="text-[10px] uppercase text-soft"
+                            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
                           >
                             other options
                           </p>
@@ -234,15 +180,12 @@ export function MealSlots() {
                               key={option.id}
                               className="flex items-center justify-between rounded-lg px-3 py-1.5 opacity-60"
                             >
-                              <p className="mr-2 truncate text-[12px]" style={{ color: MUTED }}>
+                              <p className="mr-2 truncate text-[12px] text-ink">
                                 {option.menuItemName ?? '—'}
                               </p>
                               <span
-                                className="shrink-0 text-[11px]"
-                                style={{
-                                  fontFamily: 'var(--font-mono)',
-                                  color: SOFT,
-                                }}
+                                className="shrink-0 text-[11px] text-soft"
+                                style={{ fontFamily: 'var(--font-mono)' }}
                               >
                                 ₨ {option.estimatedPrice.toLocaleString()}
                               </span>
@@ -266,40 +209,31 @@ export function MealSlots() {
                       {slot.options.slice(0, 2).map((option: SuggestionOption) => (
                         <div
                           key={option.id}
-                          className="rounded-xl px-4 py-3"
-                          style={{
-                            background: LUMEN,
-                            border: `1px solid ${LUMEN_DK}`,
-                          }}
+                          className="rounded-xl border border-lumen-dk bg-lumen px-4 py-3"
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                               <p
-                                className="truncate"
+                                className="truncate text-vast"
                                 style={{
                                   fontFamily: 'var(--font-display)',
                                   fontSize: 14,
                                   fontWeight: 600,
-                                  color: VAST,
                                   letterSpacing: '-0.01em',
                                 }}
                               >
                                 {option.menuItemName ?? '—'}
                               </p>
-                              <p
-                                className="mt-0.5 truncate text-[12px]"
-                                style={{ color: MUTED }}
-                              >
+                              <p className="mt-0.5 truncate text-[12px] text-ink">
                                 {option.restaurantName ?? '—'}
                               </p>
                             </div>
                             <span
-                              className="shrink-0"
+                              className="shrink-0 text-fathom"
                               style={{
                                 fontFamily: 'var(--font-display)',
                                 fontSize: 14,
                                 fontWeight: 700,
-                                color: FATHOM,
                                 letterSpacing: '-0.01em',
                               }}
                             >
@@ -330,18 +264,17 @@ export function MealSlots() {
         <DialogContent className="flex max-h-[80vh] max-w-lg flex-col">
           <DialogHeader className="shrink-0">
             <DialogTitle
-              className="capitalize"
+              className="capitalize text-vast"
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 20,
                 fontWeight: 600,
                 letterSpacing: '-0.01em',
-                color: VAST,
               }}
             >
               Choose your {expandedSlot?.mealTypeLabel}
             </DialogTitle>
-            <DialogDescription style={{ color: MUTED, fontSize: 13 }}>
+            <DialogDescription className="text-ink" style={{ fontSize: 13 }}>
               Pick a suggested meal or log your own.
             </DialogDescription>
           </DialogHeader>
@@ -350,44 +283,40 @@ export function MealSlots() {
             {expandedSlot?.options.map((option: SuggestionOption) => (
               <div
                 key={option.id}
-                className="flex items-start justify-between gap-4 rounded-xl p-4"
-                style={{ border: `1px solid ${LUMEN_DK}`, background: WHITE }}
+                className="flex items-start justify-between gap-4 rounded-xl border border-lumen-dk bg-white p-4"
               >
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                   <p
+                    className="text-vast"
                     style={{
                       fontFamily: 'var(--font-display)',
                       fontSize: 14,
                       fontWeight: 600,
-                      color: VAST,
                       letterSpacing: '-0.01em',
                     }}
                   >
                     {option.menuItemName ?? '—'}
                   </p>
-                  <p className="text-[12px]" style={{ color: MUTED }}>
-                    {option.restaurantName ?? '—'}
-                  </p>
+                  <p className="text-[12px] text-ink">{option.restaurantName ?? '—'}</p>
                   {option.description && (
-                    <p className="mt-0.5 text-[12px] line-clamp-2" style={{ color: MUTED }}>
+                    <p className="mt-0.5 line-clamp-2 text-[12px] text-ink">
                       {option.description}
                     </p>
                   )}
                   {option.notes && (
                     <p
-                      className="mt-0.5 text-[12px] italic"
-                      style={{ color: SOFT, fontFamily: 'var(--font-mono)' }}
+                      className="mt-0.5 text-[12px] italic text-soft"
+                      style={{ fontFamily: 'var(--font-mono)' }}
                     >
                       {option.notes}
                     </p>
                   )}
                   <p
-                    className="mt-1"
+                    className="mt-1 text-vast"
                     style={{
                       fontFamily: 'var(--font-display)',
                       fontSize: 16,
                       fontWeight: 700,
-                      color: VAST,
                       letterSpacing: '-0.01em',
                     }}
                   >
@@ -407,43 +336,30 @@ export function MealSlots() {
               </div>
             ))}
 
-            <div
-              className="my-1 h-px"
-              style={{ background: LUMEN_DK }}
-            />
+            <div className="my-1 h-px bg-lumen-dk" />
 
-            <div
-              className="flex items-center justify-between gap-4 rounded-xl p-4"
-              style={{
-                border: `1px dashed ${LUMEN_DK}`,
-                background: LUMEN,
-              }}
-            >
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-lumen-dk bg-lumen p-4">
               <div className="flex items-center gap-3">
                 <span
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[13px]"
-                  style={{
-                    background: 'rgba(3,79,70,0.10)',
-                    color: FATHOM,
-                    fontFamily: 'var(--font-mono)',
-                  }}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-fathom/10 text-[13px] text-fathom"
+                  style={{ fontFamily: 'var(--font-mono)' }}
                   aria-hidden
                 >
                   ✎
                 </span>
                 <div>
                   <p
+                    className="text-vast"
                     style={{
                       fontFamily: 'var(--font-display)',
                       fontSize: 14,
                       fontWeight: 600,
-                      color: VAST,
                       letterSpacing: '-0.01em',
                     }}
                   >
                     Log your own
                   </p>
-                  <p className="text-[12px]" style={{ color: MUTED }}>
+                  <p className="text-[12px] text-ink">
                     Had something else? Enter it manually.
                   </p>
                 </div>
@@ -472,23 +388,20 @@ export function MealSlots() {
 }
 
 interface StatusPillProps {
-  color: string;
-  bg: string;
+  tone: 'fathom' | 'amber';
   label: string;
   glyph: string;
 }
 
-function StatusPill({ color, bg, label, glyph }: StatusPillProps) {
+function StatusPill({ tone, label, glyph }: StatusPillProps) {
+  const toneClass =
+    tone === 'fathom'
+      ? 'bg-fathom/10 text-fathom'
+      : 'bg-amber/10 text-amber';
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] uppercase"
-      style={{
-        background: bg,
-        color,
-        fontFamily: 'var(--font-mono)',
-        letterSpacing: '0.16em',
-        fontWeight: 600,
-      }}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase ${toneClass}`}
+      style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.16em' }}
     >
       <span aria-hidden>{glyph}</span>
       {label}
@@ -501,18 +414,18 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle: string })
     <div className="flex items-end justify-between gap-4">
       <div className="flex flex-col gap-1">
         <span
-          className="text-[10px] uppercase"
-          style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+          className="text-[10px] uppercase text-fathom"
+          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
         >
           /meals
         </span>
         <h2
+          className="text-vast"
           style={{
             fontFamily: 'var(--font-display)',
             fontSize: 22,
             fontWeight: 600,
             letterSpacing: '-0.02em',
-            color: VAST,
           }}
         >
           {title}
@@ -520,8 +433,8 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle: string })
       </div>
       {subtitle && (
         <span
-          className="text-[12px]"
-          style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+          className="text-[12px] text-ink"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
           {subtitle}
         </span>

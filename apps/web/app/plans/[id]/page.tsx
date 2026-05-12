@@ -12,11 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pill } from '@/components/ui/pill';
 import { FadeUp } from '@/components/motion';
 
-const LUMEN_DK = '#e4e4d0';
-const PULSE = '#7f1c34';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-
 export default function PlanDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { data: plan, isLoading, error } = useBudgetPlanById(id);
@@ -25,12 +20,12 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
     return (
       <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <div className="h-3 w-24 animate-pulse rounded" style={{ background: LUMEN_DK }} />
-          <div className="h-8 w-48 animate-pulse rounded" style={{ background: LUMEN_DK }} />
-          <div className="h-4 w-64 animate-pulse rounded" style={{ background: LUMEN_DK }} />
+          <div className="h-3 w-24 animate-pulse rounded bg-lumen-dk" />
+          <div className="h-8 w-48 animate-pulse rounded bg-lumen-dk" />
+          <div className="h-4 w-64 animate-pulse rounded bg-lumen-dk" />
         </div>
-        <div className="h-44 w-full animate-pulse rounded-2xl" style={{ background: LUMEN_DK }} />
-        <div className="h-32 w-full animate-pulse rounded-2xl" style={{ background: LUMEN_DK }} />
+        <div className="h-44 w-full animate-pulse rounded-2xl bg-lumen-dk" />
+        <div className="h-32 w-full animate-pulse rounded-2xl bg-lumen-dk" />
       </div>
     );
   }
@@ -40,15 +35,12 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
       <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-4">
         <Link
           href="/plans"
-          className="inline-flex w-fit items-center gap-1.5 text-[12px]"
-          style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+          className="inline-flex w-fit items-center gap-1.5 text-[12px] text-ink"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
           ← back to plans
         </Link>
-        <div
-          className="flex items-start gap-3 rounded-xl p-4"
-          style={{ background: 'rgba(127,28,52,0.06)', border: `1px solid ${PULSE}`, color: PULSE }}
-        >
+        <div className="flex items-start gap-3 rounded-xl border border-pulse bg-pulse/[0.06] p-4 text-pulse">
           <span style={{ fontFamily: 'var(--font-mono)' }}>!</span>
           <div className="min-w-0">
             <p className="text-[14px] font-medium">Couldn&apos;t load this plan</p>
@@ -64,16 +56,13 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
       <div className="mx-auto flex w-full max-w-[1180px] flex-col items-start gap-4">
         <Link
           href="/plans"
-          className="inline-flex items-center gap-1.5 text-[12px]"
-          style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+          className="inline-flex items-center gap-1.5 text-[12px] text-ink"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
           ← back to plans
         </Link>
-        <div
-          className="w-full rounded-2xl p-8 text-center"
-          style={{ background: WHITE, border: `1px dashed ${LUMEN_DK}` }}
-        >
-          <p className="text-[14px]" style={{ color: MUTED }}>
+        <div className="w-full rounded-2xl border border-dashed border-lumen-dk bg-white p-8 text-center">
+          <p className="text-[14px] text-ink">
             This plan doesn&apos;t exist or you don&apos;t have access to it.
           </p>
           <Pill asChild size="sm" className="mt-3">
