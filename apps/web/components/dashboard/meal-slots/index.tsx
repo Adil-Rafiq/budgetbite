@@ -1,11 +1,5 @@
 'use client';
 
-import { Check, Pin, ThumbsDown, PenLine } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
 import {
   Dialog,
   DialogContent,
@@ -14,13 +8,32 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { LogMealModal } from '@/components/dashboard/meal-slots/_components/log-meal-modal';
-import { MealSlotsSkeleton } from '@/components/dashboard/meal-slots/_components/meal-slots-skeleton';
-import { MealSlotsError } from '@/components/dashboard/meal-slots/_components/meal-slots-error';
 import { useMealSlots } from '@/components/dashboard/meal-slots/_hooks/use-meal-slots';
-import { getMealTypeVisual } from '@/lib/meal-type-visuals';
+import { Pill } from '@/components/motion';
 import type { SuggestionSlot, SuggestionOption } from '@repo/shared';
 
-// ─── Main component ───────────────────────────────────────────────────────────
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const VAST = '#1a1a1a';
+const FATHOM = '#034f46';
+const AMBER = '#b8741a';
+const WHITE = '#ffffff';
+const MUTED = '#71716a';
+const SOFT = '#a6a691';
+
+function SkeletonCard() {
+  return (
+    <div
+      className="rounded-2xl p-5"
+      style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
+    >
+      <div className="h-3 w-20 rounded animate-pulse" style={{ background: LUMEN }} />
+      <div className="mt-4 h-14 w-full rounded-lg animate-pulse" style={{ background: LUMEN }} />
+      <div className="mt-3 h-14 w-full rounded-lg animate-pulse" style={{ background: LUMEN }} />
+      <div className="mt-3 h-9 w-full rounded-full animate-pulse" style={{ background: LUMEN }} />
+    </div>
+  );
+}
 
 export function MealSlots() {
   const {
@@ -37,250 +50,417 @@ export function MealSlots() {
 
   if (isSlotsLoading)
     return (
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-6 w-40" />
-        <MealSlotsSkeleton />
-      </div>
+      <section className="flex flex-col gap-4">
+        <SectionHeader title="Today's meals" subtitle="" />
+        <div className="grid gap-4 lg:grid-cols-3">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </section>
     );
 
   if (slotsError)
-    return <MealSlotsError message={`Failed to load meal slots: ${slotsError.message}`} />;
+    return (
+      <div
+        className="flex items-center gap-3 rounded-xl p-4 text-[13px]"
+        style={{ background: 'rgba(127,28,52,0.06)', border: '1px solid #7f1c34', color: '#7f1c34' }}
+      >
+        <span style={{ fontFamily: 'var(--font-mono)' }}>!</span>
+        Failed to load meal slots: {slotsError.message}
+      </div>
+    );
 
   if (!slotsData?.slots.length)
     return (
-      <div className="p-4 bg-muted text-muted-foreground rounded-lg border border-border text-sm">
+      <div
+        className="rounded-2xl p-5 text-[13px]"
+        style={{ background: WHITE, border: `1px solid ${LUMEN_DK}`, color: MUTED }}
+      >
         No meal suggestions available — create or activate a plan to get started.
       </div>
     );
 
+  const dateStr = new Date(slotsData.date).toLocaleDateString('en-PK', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+
   return (
     <>
-      <div className="flex flex-col gap-4">
-        {/* ── Header ── */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">{"Today's Meals"}</h2>
-          <span className="text-sm text-muted-foreground">
-            {new Date(slotsData.date).toLocaleDateString('en-PK', {
-              weekday: 'long',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </span>
-        </div>
+      <section className="flex flex-col gap-4">
+        <SectionHeader title="Today's meals" subtitle={dateStr} />
 
-        {/* ── Slot cards ── */}
         <div className="grid gap-4 lg:grid-cols-3">
           {slotsData.slots.map((slot: SuggestionSlot) => {
-            const { Icon, colors } = getMealTypeVisual(slot.mealTypeKey);
             const loggedMeal = loggedByMealType[slot.mealTypeId];
             const isLogged = !!loggedMeal;
-            // Pin merge in mealPlanService.getSuggestionsForDay collapses a
-            // pinned slot to a single option with source='pin'. Surface that
-            // to the user with a small badge so they know this slot is locked.
-            const isPinned = !isLogged && slot.options.length > 0 && slot.options[0]?.source === 'pin';
+            const isPinned =
+              !isLogged && slot.options.length > 0 && slot.options[0]?.source === 'pin';
 
             return (
-              <Card key={slot.mealTypeId} className="border-border">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`flex items-center justify-center w-8 h-8 rounded-lg ${colors}`}
+              <article
+                key={slot.mealTypeId}
+                className="flex flex-col overflow-hidden rounded-2xl"
+                style={{
+                  background: WHITE,
+                  border: `1px solid ${LUMEN_DK}`,
+                  boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
+                }}
+              >
+                <div
+                  className="flex items-center justify-between px-5 py-3"
+                  style={{ background: LUMEN, borderBottom: `1px solid ${LUMEN_DK}` }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[12px]"
+                      style={{
+                        background: 'rgba(3,79,70,0.10)',
+                        color: FATHOM,
+                        fontFamily: 'var(--font-mono)',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {slot.mealTypeLabel.slice(0, 1).toUpperCase()}
+                    </span>
+                    <div className="flex flex-col">
+                      <span
+                        className="capitalize"
+                        style={{
+                          fontFamily: 'var(--font-display)',
+                          fontSize: 16,
+                          fontWeight: 600,
+                          letterSpacing: '-0.01em',
+                          color: VAST,
+                        }}
                       >
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <CardTitle className="text-sm capitalize text-card-foreground">
                         {slot.mealTypeLabel}
-                      </CardTitle>
+                      </span>
                     </div>
-                    {isLogged ? (
-                      <Badge variant="secondary" className="text-accent bg-accent/10 border-0">
-                        <Check className="w-3 h-3 mr-1" />
-                        Logged
-                      </Badge>
-                    ) : isPinned ? (
-                      <Badge variant="secondary" className="text-primary bg-primary/10 border-0">
-                        <Pin className="w-3 h-3 mr-1" />
-                        Pinned
-                      </Badge>
-                    ) : null}
                   </div>
-                </CardHeader>
+                  {isLogged ? (
+                    <StatusPill color={FATHOM} bg="rgba(3,79,70,0.10)" label="logged" glyph="✓" />
+                  ) : isPinned ? (
+                    <StatusPill color={AMBER} bg="rgba(184,116,26,0.10)" label="pinned" glyph="⊙" />
+                  ) : (
+                    <span
+                      className="text-[10px] uppercase"
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        color: SOFT,
+                        letterSpacing: '0.18em',
+                      }}
+                    >
+                      ready
+                    </span>
+                  )}
+                </div>
 
-                <CardContent>
+                <div className="flex flex-1 flex-col gap-3 p-5">
                   {isLogged && loggedMeal ? (
-                    <div className="flex flex-col gap-3">
-                      {/* Logged meal hero */}
-                      <div className="rounded-lg bg-accent/5 border border-accent/20 p-3">
-                        <div className="flex items-start justify-between gap-2">
+                    <>
+                      <div
+                        className="rounded-xl p-4"
+                        style={{
+                          background: 'rgba(3,79,70,0.05)',
+                          border: `1px solid rgba(3,79,70,0.18)`,
+                        }}
+                      >
+                        <div
+                          className="text-[10px] uppercase"
+                          style={{
+                            fontFamily: 'var(--font-mono)',
+                            color: FATHOM,
+                            letterSpacing: '0.22em',
+                          }}
+                        >
+                          logged
+                        </div>
+                        <div className="mt-1.5 flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="text-xs font-medium text-accent uppercase tracking-wide mb-1">
-                              Logged
-                            </p>
-                            <p className="font-semibold text-sm text-card-foreground truncate">
+                            <p
+                              className="truncate"
+                              style={{
+                                fontFamily: 'var(--font-display)',
+                                fontSize: 15,
+                                fontWeight: 600,
+                                color: VAST,
+                                letterSpacing: '-0.01em',
+                              }}
+                            >
                               {loggedMeal.isCustom
                                 ? (loggedMeal.manualDescription ?? 'Custom entry')
                                 : (loggedMeal.menuItemName ?? '—')}
                             </p>
                             {loggedMeal.restaurantName && (
-                              <p className="text-xs text-muted-foreground truncate mt-0.5">
+                              <p
+                                className="mt-0.5 truncate text-[12px]"
+                                style={{ color: MUTED }}
+                              >
                                 {loggedMeal.restaurantName}
                               </p>
                             )}
                           </div>
-                          <span className="text-sm font-bold text-card-foreground shrink-0">
-                            PKR {loggedMeal.actualAmountSpent.toLocaleString()}
+                          <span
+                            style={{
+                              fontFamily: 'var(--font-display)',
+                              fontSize: 16,
+                              fontWeight: 700,
+                              color: VAST,
+                              letterSpacing: '-0.01em',
+                            }}
+                          >
+                            ₨ {loggedMeal.actualAmountSpent.toLocaleString()}
                           </span>
                         </div>
                       </div>
 
-                      {/* Other options — condensed + muted */}
                       {slot.options.length > 0 && (
-                        <div className="flex flex-col gap-1">
-                          <p className="text-xs text-muted-foreground px-0.5">Other options</p>
+                        <div className="flex flex-col gap-1.5">
+                          <p
+                            className="text-[10px] uppercase"
+                            style={{
+                              fontFamily: 'var(--font-mono)',
+                              color: SOFT,
+                              letterSpacing: '0.18em',
+                            }}
+                          >
+                            other options
+                          </p>
                           {slot.options.slice(0, 2).map((option: SuggestionOption) => (
                             <div
                               key={option.id}
-                              className="flex items-center justify-between rounded-md px-2.5 py-1.5 opacity-50"
+                              className="flex items-center justify-between rounded-lg px-3 py-1.5 opacity-60"
                             >
-                              <p className="text-xs text-muted-foreground truncate mr-2">
+                              <p className="mr-2 truncate text-[12px]" style={{ color: MUTED }}>
                                 {option.menuItemName ?? '—'}
                               </p>
-                              <span className="text-xs text-muted-foreground shrink-0">
-                                PKR {option.estimatedPrice.toLocaleString()}
+                              <span
+                                className="shrink-0 text-[11px]"
+                                style={{
+                                  fontFamily: 'var(--font-mono)',
+                                  color: SOFT,
+                                }}
+                              >
+                                ₨ {option.estimatedPrice.toLocaleString()}
                               </span>
                             </div>
                           ))}
                         </div>
                       )}
 
-                      <Button
+                      <Pill
                         variant="ghost"
-                        size="sm"
-                        className="text-xs text-muted-foreground h-7"
                         onClick={() => actions.setExpandedSlotId(slot.mealTypeId)}
+                        className="mt-auto w-full"
+                        style={{ padding: '8px 16px', fontSize: 12, background: 'transparent' }}
                       >
                         Change choice
-                      </Button>
-                    </div>
+                        <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.5 }}>→</span>
+                      </Pill>
+                    </>
                   ) : (
-                    <div className="flex flex-col gap-2">
-                      {/* Preview of first 2 options */}
+                    <>
                       {slot.options.slice(0, 2).map((option: SuggestionOption) => (
                         <div
                           key={option.id}
-                          className="flex items-center justify-between rounded-lg bg-secondary p-3"
+                          className="rounded-xl px-4 py-3"
+                          style={{
+                            background: LUMEN,
+                            border: `1px solid ${LUMEN_DK}`,
+                          }}
                         >
-                          <div className="min-w-0 mr-3">
-                            <p className="font-medium text-sm text-card-foreground truncate">
-                              {option.menuItemName ?? '—'}
-                            </p>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {option.restaurantName ?? '—'}
-                            </p>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p
+                                className="truncate"
+                                style={{
+                                  fontFamily: 'var(--font-display)',
+                                  fontSize: 14,
+                                  fontWeight: 600,
+                                  color: VAST,
+                                  letterSpacing: '-0.01em',
+                                }}
+                              >
+                                {option.menuItemName ?? '—'}
+                              </p>
+                              <p
+                                className="mt-0.5 truncate text-[12px]"
+                                style={{ color: MUTED }}
+                              >
+                                {option.restaurantName ?? '—'}
+                              </p>
+                            </div>
+                            <span
+                              className="shrink-0"
+                              style={{
+                                fontFamily: 'var(--font-display)',
+                                fontSize: 14,
+                                fontWeight: 700,
+                                color: FATHOM,
+                                letterSpacing: '-0.01em',
+                              }}
+                            >
+                              ₨ {option.estimatedPrice.toLocaleString()}
+                            </span>
                           </div>
-                          <span className="text-sm font-semibold text-primary shrink-0">
-                            PKR {option.estimatedPrice.toLocaleString()}
-                          </span>
                         </div>
                       ))}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="mt-1"
+
+                      <Pill
                         onClick={() => actions.setExpandedSlotId(slot.mealTypeId)}
+                        className="mt-auto w-full"
+                        style={{ padding: '10px 16px', fontSize: 13 }}
                       >
                         View all options
-                      </Button>
-                    </div>
+                        <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
+                      </Pill>
+                    </>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </article>
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* ── Suggestion modal ── */}
       <Dialog open={expandedSlotId !== null} onOpenChange={() => actions.setExpandedSlotId(null)}>
-        <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
+        <DialogContent className="flex max-h-[80vh] max-w-lg flex-col">
           <DialogHeader className="shrink-0">
-            <DialogTitle className="text-foreground capitalize">
+            <DialogTitle
+              className="capitalize"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 20,
+                fontWeight: 600,
+                letterSpacing: '-0.01em',
+                color: VAST,
+              }}
+            >
               Choose your {expandedSlot?.mealTypeLabel}
             </DialogTitle>
-            <DialogDescription>Pick a suggested meal or log your own.</DialogDescription>
+            <DialogDescription style={{ color: MUTED, fontSize: 13 }}>
+              Pick a suggested meal or log your own.
+            </DialogDescription>
           </DialogHeader>
 
-          <div className="flex flex-col gap-3 overflow-y-auto pr-1 py-2">
+          <div className="flex flex-col gap-3 overflow-y-auto py-2 pr-1">
             {expandedSlot?.options.map((option: SuggestionOption) => (
               <div
                 key={option.id}
-                className="flex items-start justify-between gap-4 rounded-lg border border-border p-4"
+                className="flex items-start justify-between gap-4 rounded-xl p-4"
+                style={{ border: `1px solid ${LUMEN_DK}`, background: WHITE }}
               >
-                <div className="flex flex-col gap-1 min-w-0 flex-1">
-                  <p className="font-semibold text-sm text-card-foreground">
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: VAST,
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
                     {option.menuItemName ?? '—'}
                   </p>
-                  <p className="text-xs text-muted-foreground">{option.restaurantName ?? '—'}</p>
+                  <p className="text-[12px]" style={{ color: MUTED }}>
+                    {option.restaurantName ?? '—'}
+                  </p>
                   {option.description && (
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                    <p className="mt-0.5 text-[12px] line-clamp-2" style={{ color: MUTED }}>
                       {option.description}
                     </p>
                   )}
                   {option.notes && (
-                    <p className="text-xs text-muted-foreground italic mt-0.5">{option.notes}</p>
+                    <p
+                      className="mt-0.5 text-[12px] italic"
+                      style={{ color: SOFT, fontFamily: 'var(--font-mono)' }}
+                    >
+                      {option.notes}
+                    </p>
                   )}
-                  <p className="text-sm font-bold text-card-foreground mt-1">
-                    PKR {option.estimatedPrice.toLocaleString()}
+                  <p
+                    className="mt-1"
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: VAST,
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
+                    ₨ {option.estimatedPrice.toLocaleString()}
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-2 shrink-0">
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      actions.openLogModal(expandedSlotId!, { type: 'suggestion', option })
-                    }
-                  >
-                    Choose
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground" disabled>
-                    <ThumbsDown className="w-3.5 h-3.5" />
-                    <span className="sr-only">Not interested</span>
-                  </Button>
-                </div>
+                <Pill
+                  onClick={() =>
+                    actions.openLogModal(expandedSlotId!, { type: 'suggestion', option })
+                  }
+                  className="shrink-0"
+                  style={{ padding: '8px 16px', fontSize: 12 }}
+                >
+                  Choose
+                </Pill>
               </div>
             ))}
 
-            <Separator className="my-1" />
+            <div
+              className="my-1 h-px"
+              style={{ background: LUMEN_DK }}
+            />
 
-            {/* Custom entry */}
-            <div className="flex items-center justify-between gap-4 rounded-lg border border-dashed border-border p-4">
+            <div
+              className="flex items-center justify-between gap-4 rounded-xl p-4"
+              style={{
+                border: `1px dashed ${LUMEN_DK}`,
+                background: LUMEN,
+              }}
+            >
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-secondary shrink-0">
-                  <PenLine className="w-4 h-4 text-muted-foreground" />
-                </div>
+                <span
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[13px]"
+                  style={{
+                    background: 'rgba(3,79,70,0.10)',
+                    color: FATHOM,
+                    fontFamily: 'var(--font-mono)',
+                  }}
+                  aria-hidden
+                >
+                  ✎
+                </span>
                 <div>
-                  <p className="text-sm font-medium text-card-foreground">Log your own</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: VAST,
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
+                    Log your own
+                  </p>
+                  <p className="text-[12px]" style={{ color: MUTED }}>
                     Had something else? Enter it manually.
                   </p>
                 </div>
               </div>
-              <Button
-                size="sm"
-                variant="outline"
-                className="shrink-0"
+              <Pill
+                variant="ghost"
                 onClick={() => actions.openLogModal(expandedSlotId!, { type: 'custom' })}
+                className="shrink-0"
+                style={{ padding: '8px 16px', fontSize: 12 }}
               >
                 Enter
-              </Button>
+              </Pill>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* ── Log meal modal ── */}
       <LogMealModal
         state={logModal}
         onClose={actions.closeLogModal}
@@ -288,5 +468,64 @@ export function MealSlots() {
         isSaving={isSaving}
       />
     </>
+  );
+}
+
+interface StatusPillProps {
+  color: string;
+  bg: string;
+  label: string;
+  glyph: string;
+}
+
+function StatusPill({ color, bg, label, glyph }: StatusPillProps) {
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] uppercase"
+      style={{
+        background: bg,
+        color,
+        fontFamily: 'var(--font-mono)',
+        letterSpacing: '0.16em',
+        fontWeight: 600,
+      }}
+    >
+      <span aria-hidden>{glyph}</span>
+      {label}
+    </span>
+  );
+}
+
+function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="flex items-end justify-between gap-4">
+      <div className="flex flex-col gap-1">
+        <span
+          className="text-[10px] uppercase"
+          style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+        >
+          /meals
+        </span>
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 22,
+            fontWeight: 600,
+            letterSpacing: '-0.02em',
+            color: VAST,
+          }}
+        >
+          {title}
+        </h2>
+      </div>
+      {subtitle && (
+        <span
+          className="text-[12px]"
+          style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+        >
+          {subtitle}
+        </span>
+      )}
+    </div>
   );
 }

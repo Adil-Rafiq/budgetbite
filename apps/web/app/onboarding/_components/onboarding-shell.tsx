@@ -1,11 +1,33 @@
 'use client';
 
-import { ArrowLeft, ArrowRight, Loader2, UtensilsCrossed } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import Link from 'next/link';
+import { Inter, JetBrains_Mono, Bricolage_Grotesque } from 'next/font/google';
 import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-context';
 import { ONBOARDING_STEPS } from '@/app/onboarding/constants';
+
+const body = Inter({
+  subsets: ['latin'],
+  variable: '--font-body',
+  weight: ['400', '500', '600', '700'],
+});
+const display = Bricolage_Grotesque({
+  subsets: ['latin'],
+  variable: '--font-display',
+  axes: ['opsz'],
+});
+const mono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  weight: ['400', '500', '600'],
+});
+
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const VAST = '#1a1a1a';
+const FATHOM = '#034f46';
+const WHITE = '#ffffff';
+const MUTED = '#71716a';
+const SOFT = '#a6a691';
 
 interface OnboardingShellProps {
   children: React.ReactNode;
@@ -14,7 +36,6 @@ interface OnboardingShellProps {
 export const OnboardingShell = ({ children }: OnboardingShellProps) => {
   const {
     currentStep,
-    progress,
     currentStepData,
     actions: { handleContinue, handleBack, handleFinish },
     isLastStep,
@@ -22,67 +43,186 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
   } = useOnboardingContext();
 
   if (!currentStepData) return null;
-  const StepIcon = currentStepData.icon;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-lg">
-        <div className="flex flex-col items-center mb-8">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary mb-4">
-            <UtensilsCrossed className="w-5 h-5 text-primary-foreground" />
+    <div
+      className={`${body.variable} ${display.variable} ${mono.variable} relative min-h-screen antialiased`}
+      style={{ fontFamily: 'var(--font-body)', background: LUMEN, color: VAST }}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-32 -z-0 h-[420px] w-[760px] -translate-x-1/2 rounded-full"
+        style={{
+          background:
+            'radial-gradient(closest-side, rgba(3,79,70,0.14), rgba(255,169,70,0.10) 55%, transparent 75%)',
+          filter: 'blur(20px)',
+        }}
+      />
+
+      <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-8 py-6">
+        <Link href="/" className="flex items-center gap-2.5">
+          <span
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md"
+            style={{ background: FATHOM, color: LUMEN }}
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 11v9a1 1 0 0 0 1 1h6v-7h4v7h6a1 1 0 0 0 1-1v-9" />
+              <path d="M1 11 12 3l11 8" />
+            </svg>
+          </span>
+          <span
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 18,
+              fontWeight: 600,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            BudgetBite
+          </span>
+        </Link>
+        <div
+          className="text-[12px]"
+          style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+        >
+          setup · step {String(currentStep + 1).padStart(2, '0')} /{' '}
+          {String(ONBOARDING_STEPS.length).padStart(2, '0')}
+        </div>
+      </header>
+
+      <main className="relative z-10 mx-auto w-full max-w-[560px] px-6 pb-16 pt-6">
+        <ol className="mb-10 flex items-center justify-between">
+          {ONBOARDING_STEPS.map((step, i) => {
+            const isCurrent = i === currentStep;
+            const isDone = i < currentStep;
+            return (
+              <li key={step.id} className="flex flex-1 items-center gap-3 last:flex-none">
+                <div className="flex items-center gap-3">
+                  <span
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[11px] tabular-nums"
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      background: isCurrent ? FATHOM : isDone ? FATHOM : WHITE,
+                      color: isCurrent || isDone ? LUMEN : MUTED,
+                      border: `1px solid ${isCurrent || isDone ? FATHOM : LUMEN_DK}`,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {isDone ? '✓' : String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span
+                    className="hidden text-[12px] sm:inline"
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      color: isCurrent ? VAST : MUTED,
+                      fontWeight: isCurrent ? 500 : 400,
+                    }}
+                  >
+                    {step.id}
+                  </span>
+                </div>
+                {i < ONBOARDING_STEPS.length - 1 && (
+                  <div
+                    className="h-px flex-1"
+                    style={{ background: isDone ? FATHOM : LUMEN_DK }}
+                  />
+                )}
+              </li>
+            );
+          })}
+        </ol>
+
+        <div
+          className="overflow-hidden rounded-[14px]"
+          style={{
+            background: WHITE,
+            border: `1px solid ${LUMEN_DK}`,
+            boxShadow:
+              '0 1px 0 rgba(0,0,0,0.04), 0 30px 80px -30px rgba(26,26,26,0.18), 0 8px 30px -10px rgba(26,26,26,0.06)',
+          }}
+        >
+          <div
+            className="border-b px-7 py-6"
+            style={{ borderColor: LUMEN_DK, background: LUMEN }}
+          >
+            <div
+              className="text-[10px] uppercase"
+              style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+            >
+              {String(currentStep + 1).padStart(2, '0')} · {currentStepData.id}
+            </div>
+            <h1
+              className="mt-2"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 28,
+                fontWeight: 600,
+                lineHeight: 1.1,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              {currentStepData.title}
+            </h1>
+            <p className="mt-1.5 text-[14px]" style={{ color: MUTED }}>
+              {currentStepData.description}
+            </p>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Set up BudgetBite</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Step {currentStep + 1} of {ONBOARDING_STEPS.length}
-          </p>
-          <Progress value={progress} className="w-full max-w-xs mt-4 h-2" />
+
+          <div className="px-7 py-7">{children}</div>
         </div>
 
-        <Card className="border-border">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                <StepIcon className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <CardTitle className="text-lg text-card-foreground">
-                  {currentStepData.title}
-                </CardTitle>
-                <CardDescription>{currentStepData.description}</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>{children}</CardContent>
-        </Card>
-
-        <div className="flex items-center justify-between mt-6">
-          <Button
+        <div className="mt-7 flex items-center justify-between">
+          <button
             type="button"
-            variant="ghost"
             onClick={handleBack}
             disabled={currentStep === 0 || isSubmitting}
+            className="inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-[13px] font-medium disabled:cursor-not-allowed disabled:opacity-40"
+            style={{ borderColor: LUMEN_DK, color: VAST, background: 'transparent' }}
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
+            <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>←</span>
             Back
-          </Button>
+          </button>
 
           {!isLastStep ? (
-            <Button type="button" onClick={handleContinue} disabled={isSubmitting}>
-              {isSubmitting ? (
-                <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-              ) : (
-                <ArrowRight className="w-4 h-4 ml-1" />
+            <button
+              type="button"
+              onClick={handleContinue}
+              disabled={isSubmitting}
+              className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-[13px] font-medium disabled:opacity-60"
+              style={{ background: VAST, color: LUMEN }}
+            >
+              {isSubmitting ? 'Saving…' : (
+                <>
+                  Continue
+                  <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
+                </>
               )}
-              Continue
-            </Button>
+            </button>
           ) : (
-            <Button type="button" onClick={handleFinish} disabled={isSubmitting}>
-              Finish setup
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
+            <button
+              type="button"
+              onClick={handleFinish}
+              disabled={isSubmitting}
+              className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-[13px] font-medium disabled:opacity-60"
+              style={{ background: FATHOM, color: LUMEN }}
+            >
+              {isSubmitting ? 'Finishing…' : (
+                <>
+                  Finish setup
+                  <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
+                </>
+              )}
+            </button>
           )}
         </div>
-      </div>
+
+        <p
+          className="mt-7 text-center text-[11px]"
+          style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+        >
+          you can change all of this later in settings
+        </p>
+      </main>
     </div>
   );
 };

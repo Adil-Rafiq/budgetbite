@@ -2,13 +2,10 @@
 
 import { useState, use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ExternalLink, Star } from 'lucide-react';
+import { ExternalLink, Star } from 'lucide-react';
 
 import { classifyBudgetFit } from '@repo/shared';
 import type { BudgetFit, MenuItem } from '@repo/shared';
-
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useRestaurant, useRestaurantMenu } from '@/hooks/use-restaurant';
@@ -17,10 +14,20 @@ import { AddToPlanModal } from '../_components/add-to-plan-modal';
 import { MenuItemSkeleton } from '../_components/menu-item-skeleton';
 import { RestaurantHeaderSkeleton } from '../_components/restaurant-header-skeleton';
 
-const FIT_BADGE: Record<BudgetFit, { label: string; className: string }> = {
-  green: { label: 'Fits budget', className: 'bg-chart-2/10 text-chart-2 border-chart-2/30' },
-  amber: { label: 'Tight', className: 'bg-chart-4/10 text-chart-4 border-chart-4/30' },
-  red: { label: 'Over budget', className: 'bg-destructive/10 text-destructive border-destructive/30' },
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const VAST = '#1a1a1a';
+const FATHOM = '#034f46';
+const PULSE = '#7f1c34';
+const AMBER = '#b8741a';
+const WHITE = '#ffffff';
+const MUTED = '#71716a';
+const SOFT = '#a6a691';
+
+const FIT_TINT: Record<BudgetFit, { tint: string; label: string }> = {
+  green: { tint: FATHOM, label: 'Fits budget' },
+  amber: { tint: AMBER, label: 'Tight' },
+  red: { tint: PULSE, label: 'Over budget' },
 };
 
 function buildFoodpandaUrl(externalId: string, slug: string): string {
@@ -44,85 +51,191 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
     r?.externalId && r?.slug ? buildFoodpandaUrl(r.externalId, r.slug) : null;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
       <Link
         href="/restaurants"
-        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground w-fit"
+        className="inline-flex w-fit items-center gap-1.5 text-[12px] transition hover:opacity-80"
+        style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
       >
-        <ArrowLeft className="w-4 h-4" />
-        Back to restaurants
+        ← back to restaurants
       </Link>
 
       {restaurantQuery.isLoading ? (
         <RestaurantHeaderSkeleton />
       ) : restaurantQuery.error ? (
-        <p className="text-sm text-destructive">Could not load restaurant.</p>
+        <p
+          className="rounded-xl p-4 text-[13px]"
+          style={{ background: 'rgba(127,28,52,0.06)', border: `1px solid ${PULSE}33`, color: PULSE }}
+        >
+          Could not load restaurant.
+        </p>
       ) : !r ? (
-        <p className="text-sm text-muted-foreground">Restaurant not found.</p>
+        <p className="text-[13px]" style={{ color: MUTED }}>
+          Restaurant not found.
+        </p>
       ) : (
-        <Card className="border-border">
-          <CardHeader className="flex flex-row items-start justify-between gap-3">
-            <CardTitle className="text-2xl text-card-foreground">{r.name}</CardTitle>
+        <div
+          className="overflow-hidden rounded-2xl"
+          style={{
+            background: WHITE,
+            border: `1px solid ${LUMEN_DK}`,
+            boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
+          }}
+        >
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex flex-col gap-2">
+              <div
+                className="text-[10px] uppercase"
+                style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+              >
+                /restaurant
+              </div>
+              <h1
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'clamp(24px, 3vw, 32px)',
+                  fontWeight: 600,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.05,
+                  color: VAST,
+                }}
+              >
+                {r.name}
+              </h1>
+              <div
+                className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[12px]"
+                style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+              >
+                {r.rating != null && (
+                  <span className="inline-flex items-center gap-1">
+                    <Star className="h-3.5 w-3.5" style={{ color: AMBER, fill: AMBER }} />
+                    <span style={{ color: VAST, fontWeight: 600 }}>{r.rating.toFixed(1)}</span>
+                    {r.ratingCount > 0 && <span>({r.ratingCount.toLocaleString()})</span>}
+                  </span>
+                )}
+                {r.deliveryFee != null && <span>delivery ₨ {r.deliveryFee}</span>}
+                {r.minimumOrder != null && <span>min ₨ {r.minimumOrder}</span>}
+              </div>
+            </div>
+
             {foodpandaUrl && (
               <a href={foodpandaUrl} target="_blank" rel="noopener noreferrer">
-                <Button size="sm" variant="outline" className="gap-1.5">
+                <button
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-[13px] font-medium transition"
+                  style={{ background: VAST, color: LUMEN }}
+                >
                   Order on Foodpanda
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </Button>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </button>
               </a>
             )}
-          </CardHeader>
-          <CardContent className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            {r.rating != null && (
-              <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 text-chart-4 fill-chart-4" />
-                <span className="font-medium text-card-foreground">{r.rating.toFixed(1)}</span>
-                {r.ratingCount > 0 && <span>({r.ratingCount.toLocaleString()})</span>}
-              </div>
-            )}
-            {r.deliveryFee != null && <span>Delivery PKR {r.deliveryFee}</span>}
-            {r.minimumOrder != null && <span>Min order PKR {r.minimumOrder}</span>}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {hasActivePlan && avgPerMeal > 0 && (
-        <Card className="border-border bg-secondary/30">
-          <CardContent className="flex flex-wrap items-center gap-x-6 gap-y-1 pt-6 text-sm">
-            <span className="text-muted-foreground">
-              Avg meal target:{' '}
-              <span className="font-semibold text-foreground">
-                PKR {avgPerMeal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+        <div
+          className="grid grid-cols-3 gap-3 rounded-2xl p-4"
+          style={{
+            background: LUMEN,
+            border: `1px solid ${LUMEN_DK}`,
+          }}
+        >
+          {[
+            {
+              label: 'avg / meal',
+              value: `₨ ${avgPerMeal.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+            },
+            {
+              label: 'remaining',
+              value: `₨ ${amountRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+            },
+            { label: 'meals to plan', value: String(mealsRemaining) },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex flex-col">
+              <span
+                className="text-[10px] uppercase"
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  color: SOFT,
+                  letterSpacing: '0.18em',
+                }}
+              >
+                {label}
               </span>
-            </span>
-            <span className="text-muted-foreground">
-              Remaining:{' '}
-              <span className="font-semibold text-foreground">
-                PKR {amountRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              <span
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: VAST,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                {value}
               </span>
-            </span>
-            <span className="text-muted-foreground">
-              Meals to plan:{' '}
-              <span className="font-semibold text-foreground">{mealsRemaining}</span>
-            </span>
-          </CardContent>
-        </Card>
+            </div>
+          ))}
+        </div>
       )}
 
-      <div>
-        <h2 className="text-lg font-semibold text-foreground">Menu</h2>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-end justify-between">
+          <div className="flex flex-col gap-1">
+            <span
+              className="text-[10px] uppercase"
+              style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+            >
+              /menu
+            </span>
+            <h2
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 22,
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                color: VAST,
+              }}
+            >
+              Menu
+            </h2>
+          </div>
+          {menuQuery.data && (
+            <span
+              className="text-[11px]"
+              style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+            >
+              {menuQuery.data.length} item{menuQuery.data.length === 1 ? '' : 's'}
+            </span>
+          )}
+        </div>
+
         {menuQuery.isLoading ? (
-          <div className="grid gap-3 md:grid-cols-2 mt-3">
+          <div className="grid gap-3 md:grid-cols-2">
             {Array.from({ length: 4 }).map((_, i) => (
               <MenuItemSkeleton key={i} />
             ))}
           </div>
         ) : menuQuery.error ? (
-          <p className="text-sm text-destructive">Could not load menu.</p>
+          <p
+            className="rounded-xl p-4 text-[13px]"
+            style={{
+              background: 'rgba(127,28,52,0.06)',
+              border: `1px solid ${PULSE}33`,
+              color: PULSE,
+            }}
+          >
+            Could not load menu.
+          </p>
         ) : !menuQuery.data?.length ? (
-          <p className="text-sm text-muted-foreground mt-3">No menu items yet.</p>
+          <div
+            className="rounded-2xl p-6 text-center text-[13px]"
+            style={{ background: WHITE, border: `1px dashed ${LUMEN_DK}`, color: MUTED }}
+          >
+            No menu items yet.
+          </div>
         ) : (
-          <div className="grid gap-3 md:grid-cols-2 mt-3">
+          <div className="grid gap-3 md:grid-cols-2">
             {menuQuery.data.map((item) => {
               const fit =
                 hasActivePlan && avgPerMeal > 0
@@ -133,54 +246,86 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                     })
                   : null;
               return (
-                <Card key={item.id} className="border-border overflow-hidden">
+                <div
+                  key={item.id}
+                  className="flex flex-col overflow-hidden rounded-2xl"
+                  style={{
+                    background: WHITE,
+                    border: `1px solid ${LUMEN_DK}`,
+                    boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
+                  }}
+                >
                   {item.imageUrl && (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={item.imageUrl}
                       alt={item.name}
                       loading="lazy"
-                      className="w-full h-32 object-cover"
+                      className="h-32 w-full object-cover"
                     />
                   )}
-                  <CardContent className="flex flex-col gap-3 pt-4">
+                  <div className="flex flex-1 flex-col gap-3 p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-card-foreground">{item.name}</p>
+                          <p
+                            className="truncate text-[14px]"
+                            style={{ color: VAST, fontWeight: 500 }}
+                          >
+                            {item.name}
+                          </p>
                           {fit && (
                             <span
-                              className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-medium uppercase tracking-wide ${FIT_BADGE[fit].className}`}
+                              className="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] uppercase"
+                              style={{
+                                fontFamily: 'var(--font-mono)',
+                                background: `${FIT_TINT[fit].tint}14`,
+                                color: FIT_TINT[fit].tint,
+                                letterSpacing: '0.18em',
+                              }}
                             >
-                              {FIT_BADGE[fit].label}
+                              {FIT_TINT[fit].label}
                             </span>
                           )}
                         </div>
                         {item.description && (
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
+                          <p
+                            className="mt-1 line-clamp-3 text-[12px]"
+                            style={{ color: MUTED }}
+                          >
                             {item.description}
                           </p>
                         )}
                       </div>
-                      <div className="shrink-0 text-right">
-                        <p className="text-sm font-semibold text-primary">
-                          PKR {item.price.toLocaleString()}
-                        </p>
-                      </div>
+                      <span
+                        className="shrink-0 whitespace-nowrap text-right"
+                        style={{
+                          fontFamily: 'var(--font-display)',
+                          fontSize: 16,
+                          fontWeight: 600,
+                          color: FATHOM,
+                        }}
+                      >
+                        ₨ {item.price.toLocaleString()}
+                      </span>
                     </div>
 
                     {hasActivePlan && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
+                      <button
                         onClick={() => setPickedItem(item)}
+                        className="inline-flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2 text-[13px] transition"
+                        style={{
+                          border: `1px solid ${LUMEN_DK}`,
+                          background: LUMEN,
+                          color: VAST,
+                        }}
                       >
                         Add to plan
-                      </Button>
+                        <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>+</span>
+                      </button>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               );
             })}
           </div>

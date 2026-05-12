@@ -2,20 +2,24 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart3, LayoutDashboard, Receipt, User, UtensilsCrossed, Store } from 'lucide-react';
-
-import { cn } from '@/lib/utils';
-import { Progress } from '@/components/ui/progress';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { motion } from 'motion/react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const VAST = '#1a1a1a';
+const FATHOM = '#034f46';
+const WHITE = '#ffffff';
+const MUTED = '#71716a';
+const SOFT = '#a6a691';
+
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/plans', label: 'Plans', icon: Receipt },
-  { href: '/restaurants', label: 'Restaurants', icon: Store },
-  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/profile', label: 'Profile', icon: User },
+  { href: '/dashboard', label: 'Dashboard', code: 'dashboard' },
+  { href: '/plans', label: 'Plans', code: 'plans' },
+  { href: '/restaurants', label: 'Restaurants', code: 'restaurants' },
+  { href: '/analytics', label: 'Analytics', code: 'analytics' },
+  { href: '/profile', label: 'Profile', code: 'profile' },
 ];
 
 function initials(name: string | undefined): string {
@@ -33,69 +37,186 @@ export function AppSidebar() {
 
   const totalBudget = active?.plan.totalBudget ?? 0;
   const spent = active?.plan.spentAmount ?? 0;
+  const remaining = Math.max(0, totalBudget - spent);
   const spentPercent = totalBudget > 0 ? Math.round((spent / totalBudget) * 100) : 0;
 
   return (
-    <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
-      <div className="flex items-center gap-2 px-6 py-5 border-b border-sidebar-border">
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-sidebar-primary">
-          <UtensilsCrossed className="w-4 h-4 text-sidebar-primary-foreground" />
-        </div>
-        <span className="text-lg font-semibold tracking-tight">BudgetBite</span>
-      </div>
+    <aside
+      className="fixed inset-y-0 hidden lg:flex lg:w-64 lg:flex-col"
+      style={{
+        background: LUMEN,
+        borderRight: `1px solid ${LUMEN_DK}`,
+        color: VAST,
+      }}
+    >
+      <Link
+        href="/dashboard"
+        className="flex items-center gap-2.5 px-6 py-6"
+        style={{ borderBottom: `1px solid ${LUMEN_DK}` }}
+      >
+        <span
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md"
+          style={{ background: FATHOM, color: LUMEN }}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M3 11v9a1 1 0 0 0 1 1h6v-7h4v7h6a1 1 0 0 0 1-1v-9" />
+            <path d="M1 11 12 3l11 8" />
+          </svg>
+        </span>
+        <span
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 18,
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
+          }}
+        >
+          BudgetBite
+        </span>
+      </Link>
 
-      <nav className="flex-1 px-3 py-4 flex flex-col gap-1">
+      <div
+        className="px-6 pt-5 pb-2 text-[10px] uppercase"
+        style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.22em' }}
+      >
+        navigation
+      </div>
+      <nav className="flex flex-col gap-1 px-3">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-sidebar-accent text-sidebar-primary'
-                  : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground',
-              )}
+              className={`group flex items-center justify-between rounded-lg px-3 py-2 text-[14px] transition-colors ${
+                isActive ? '' : 'hover:bg-[#ffffeb] hover:text-[#1a1a1a]'
+              }`}
+              style={{
+                background: isActive ? WHITE : 'transparent',
+                color: isActive ? VAST : MUTED,
+                border: `1px solid ${isActive ? LUMEN_DK : 'transparent'}`,
+                fontWeight: isActive ? 500 : 400,
+                boxShadow: isActive ? '0 1px 0 rgba(0,0,0,0.03)' : 'none',
+              }}
             >
-              <item.icon className="w-5 h-5" />
-              {item.label}
+              <span className="flex items-center gap-3">
+                <span
+                  className="inline-block h-1.5 w-1.5 rounded-full transition-colors group-hover:bg-[#a6a691]"
+                  style={{
+                    background: isActive ? FATHOM : 'transparent',
+                    border: isActive ? 'none' : `1px solid ${SOFT}`,
+                  }}
+                />
+                {item.label}
+              </span>
+              <span
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 10,
+                  color: isActive ? FATHOM : SOFT,
+                  letterSpacing: '0.12em',
+                }}
+              >
+                /{item.code}
+              </span>
             </Link>
           );
         })}
       </nav>
 
-      {active && (
-        <div className="px-4 py-4 border-t border-sidebar-border">
-          <div className="rounded-lg bg-sidebar-accent/50 p-3">
-            <div className="flex items-center justify-between text-xs mb-2">
-              <span className="text-sidebar-foreground/70 capitalize">
+      <div className="mt-auto flex flex-col gap-3 px-4 pb-4 pt-6">
+        {active && (
+          <div
+            className="rounded-xl p-4"
+            style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
+          >
+            <div className="flex items-center justify-between">
+              <span
+                className="text-[10px] uppercase"
+                style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+              >
                 {active.plan.planType} budget
               </span>
-              <span className="font-semibold text-sidebar-primary">{spentPercent}%</span>
+              <span
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 11,
+                  color: FATHOM,
+                  fontWeight: 600,
+                }}
+              >
+                {spentPercent}%
+              </span>
             </div>
-            <Progress
-              value={spentPercent}
-              className="h-2 bg-sidebar-border [&>div]:bg-sidebar-primary"
-            />
-            <div className="flex items-center justify-between text-xs mt-2 text-sidebar-foreground/70">
-              <span>PKR {spent.toLocaleString()}</span>
-              <span>PKR {totalBudget.toLocaleString()}</span>
+            <div
+              className="mt-3"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 22,
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                color: VAST,
+              }}
+            >
+              ₨ {remaining.toLocaleString()}
+            </div>
+            <div className="mt-1 text-[11px]" style={{ color: MUTED }}>
+              left of ₨ {totalBudget.toLocaleString()}
+            </div>
+            <div
+              className="mt-3 h-1.5 w-full overflow-hidden rounded-full"
+              style={{ background: LUMEN }}
+            >
+              <motion.div
+                className="h-full rounded-full"
+                initial={{ width: '0%' }}
+                animate={{ width: `${Math.min(100, spentPercent)}%` }}
+                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+                style={{
+                  background: spentPercent >= 90 ? '#7f1c34' : FATHOM,
+                }}
+              />
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="px-4 py-4 border-t border-sidebar-border">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground text-xs">
-              {initials(user?.name)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col min-w-0">
-            <span className="text-sm font-medium truncate">{user?.name ?? '—'}</span>
-            <span className="text-xs text-sidebar-foreground/60 truncate">{user?.email ?? ''}</span>
+        <div
+          className="flex items-center gap-3 rounded-xl px-3 py-2.5"
+          style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
+        >
+          <span
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[11px]"
+            style={{
+              background: FATHOM,
+              color: LUMEN,
+              fontFamily: 'var(--font-mono)',
+              fontWeight: 600,
+            }}
+          >
+            {initials(user?.name)}
+          </span>
+          <div className="flex min-w-0 flex-col">
+            <span
+              className="truncate text-[13px]"
+              style={{ color: VAST, fontWeight: 500 }}
+            >
+              {user?.name ?? '—'}
+            </span>
+            <span
+              className="truncate text-[11px]"
+              style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+            >
+              {user?.email ?? ''}
+            </span>
           </div>
         </div>
       </div>

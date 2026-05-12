@@ -1,27 +1,28 @@
 'use client';
 
-import { RefreshCw, Sparkles, Wallet } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { RefreshCw, Sparkles } from 'lucide-react';
+import { motion } from 'motion/react';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
 import { cn } from '@/lib/utils';
+import { Pill } from '@/components/motion';
 import type { BudgetPlanDetail } from '@repo/shared';
+
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const VAST = '#1a1a1a';
+const FATHOM = '#034f46';
+const PULSE = '#7f1c34';
+const AMBER = '#b8741a';
+const WHITE = '#ffffff';
+const MUTED = '#71716a';
+const SOFT = '#a6a691';
 
 interface PlanSummaryCardProps {
   plan: BudgetPlanDetail;
 }
 
-const fmtPkr = (n: number) => `PKR ${n.toLocaleString()}`;
+const fmtPkr = (n: number) => `₨ ${n.toLocaleString()}`;
 
-/**
- * Drives the plan-detail summary header: budget progress, meals stats, and
- * the manual Generate / Regenerate CTA. We disable the CTA whenever a fresh
- * attempt is already pending, OR when the plan is in a terminal status
- * (cancelled / completed) — there's no point starting a new generation against
- * a plan the user is no longer running.
- */
 export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
   const generate = useGenerateMealPlan();
 
@@ -36,59 +37,103 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
   const isPending = plan.latestAttempt?.status === 'pending';
   const isTerminalPlan = plan.status === 'cancelled' || plan.status === 'completed';
   const canTrigger = !isPending && !isTerminalPlan;
+  const disabled = !canTrigger || generate.isPending;
+
+  const varianceTint =
+    ctx.cumulativeVariance >= 0
+      ? FATHOM
+      : ctx.cumulativeVariance < -total * 0.1
+        ? PULSE
+        : AMBER;
 
   return (
-    <Card className="border-border">
-      <CardContent className="flex flex-col gap-5 p-5">
+    <div
+      className="overflow-hidden rounded-2xl"
+      style={{
+        background: WHITE,
+        border: `1px solid ${LUMEN_DK}`,
+        boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
+      }}
+    >
+      <div className="flex flex-col gap-5 p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-              <Wallet className="h-3.5 w-3.5" />
-              Budget summary
+            <div
+              className="text-[10px] uppercase"
+              style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.22em' }}
+            >
+              budget summary
             </div>
-            <p className="text-3xl font-bold text-foreground leading-tight">
+            <p
+              className="leading-tight"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 32,
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                color: VAST,
+              }}
+            >
               {fmtPkr(remaining)}
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
+              <span
+                className="ml-2 text-[13px]"
+                style={{ fontFamily: 'var(--font-body)', fontWeight: 400, color: MUTED }}
+              >
                 of {fmtPkr(total)} left
               </span>
             </p>
           </div>
 
-          <Button
+          <Pill
             onClick={() => generate.mutate(plan.id)}
-            disabled={!canTrigger || generate.isPending}
+            disabled={disabled}
             className="shrink-0"
+            style={{ padding: '10px 20px', fontSize: 13 }}
           >
             {hasActiveGen ? (
               <>
-                <RefreshCw
-                  className={cn('h-4 w-4 mr-1.5', generate.isPending && 'animate-spin')}
-                />
+                <RefreshCw className={cn('h-4 w-4', generate.isPending && 'animate-spin')} />
                 Regenerate
               </>
             ) : (
               <>
-                <Sparkles className="h-4 w-4 mr-1.5" />
+                <Sparkles className="h-4 w-4" />
                 Generate now
               </>
             )}
-          </Button>
+          </Pill>
         </div>
 
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div
+            className="flex items-center justify-between text-[12px]"
+            style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+          >
             <span>{fmtPkr(spent)} spent</span>
-            <span>{spentPercent}%</span>
+            <span style={{ color: VAST, fontWeight: 600 }}>{spentPercent}%</span>
           </div>
-          <Progress value={spentPercent} className="h-2" />
+          <div
+            className="h-1.5 w-full overflow-hidden rounded-full"
+            style={{ background: LUMEN_DK }}
+          >
+            <motion.div
+              className="h-full rounded-full"
+              initial={{ width: '0%' }}
+              animate={{ width: `${spentPercent}%` }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+              style={{
+                background: `linear-gradient(90deg, ${FATHOM}, ${AMBER})`,
+              }}
+            />
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <SummaryStat
-            label="Meals consumed"
-            value={`${ctx.mealsConsumed} / ${ctx.totalMeals}`}
+            label="Consumed"
+            value={`${ctx.mealsConsumed}/${ctx.totalMeals}`}
           />
-          <SummaryStat label="Meals left" value={String(ctx.mealsRemaining)} />
+          <SummaryStat label="Remaining" value={String(ctx.mealsRemaining)} />
           <SummaryStat
             label="Avg / meal"
             value={fmtPkr(Math.round(ctx.avgBudgetPerRemainingMeal))}
@@ -100,42 +145,71 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
                 ? `+${fmtPkr(Math.round(ctx.cumulativeVariance))}`
                 : `−${fmtPkr(Math.round(Math.abs(ctx.cumulativeVariance)))}`
             }
-            tone={
-              ctx.cumulativeVariance >= 0
-                ? 'text-accent'
-                : ctx.cumulativeVariance < -total * 0.1
-                  ? 'text-destructive'
-                  : 'text-chart-4'
-            }
+            tint={varianceTint}
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-xs text-muted-foreground mr-1">Tracking:</span>
-          {plan.mealTypes.map((mt) => (
-            <Badge key={mt.id} variant="outline" className="text-xs capitalize">
-              {mt.label}
-            </Badge>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+        {plan.mealTypes.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span
+              className="mr-1 text-[10px] uppercase"
+              style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+            >
+              tracking
+            </span>
+            {plan.mealTypes.map((mt) => (
+              <span
+                key={mt.id}
+                className="rounded-full px-2.5 py-0.5 text-[10px] capitalize"
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  background: LUMEN,
+                  color: VAST,
+                  border: `1px solid ${LUMEN_DK}`,
+                }}
+              >
+                {mt.label}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
 function SummaryStat({
   label,
   value,
-  tone,
+  tint,
 }: {
   label: string;
   value: string;
-  tone?: string;
+  tint?: string;
 }) {
   return (
-    <div className="rounded-lg bg-secondary p-3">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={cn('text-sm font-bold text-card-foreground mt-0.5', tone)}>{value}</p>
+    <div
+      className="rounded-lg p-3"
+      style={{ background: LUMEN, border: `1px solid ${LUMEN_DK}` }}
+    >
+      <p
+        className="text-[9px] uppercase"
+        style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+      >
+        {label}
+      </p>
+      <p
+        className="mt-0.5"
+        style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 15,
+          fontWeight: 600,
+          color: tint ?? VAST,
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {value}
+      </p>
     </div>
   );
 }

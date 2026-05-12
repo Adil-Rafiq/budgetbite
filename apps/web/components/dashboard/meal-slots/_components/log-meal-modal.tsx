@@ -1,6 +1,6 @@
 'use client';
 
-import type { SubmitHandler } from 'react-hook-form';
+import type { SubmitHandler, Control } from 'react-hook-form';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Star, ThumbsUp, ThumbsDown } from 'lucide-react';
@@ -13,86 +13,126 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { logSuggestionSchema, logCustomSchema } from '../_schemas/log-meal.schema';
 import type { LogSuggestionForm, LogCustomForm } from '../_schemas/log-meal.schema';
 import type { LogModalState, SavePayload } from '../_hooks/use-meal-slots';
 
+// ─── Wispr palette ────────────────────────────────────────────────────────────
+
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const VAST = '#1a1a1a';
+const FATHOM = '#034f46';
+const PULSE = '#7f1c34';
+const AMBER = '#b8741a';
+const MUTED = '#71716a';
+const SOFT = '#a6a691';
+
+const labelStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)',
+  color: SOFT,
+  letterSpacing: '0.18em',
+};
+const inputStyle = { background: LUMEN, borderColor: LUMEN_DK, color: VAST };
+
 // ─── Shared feedback fields ───────────────────────────────────────────────────
 
-function FeedbackFields({ control }: { control: any }) {
+function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
+  control,
+}: {
+  control: Control<T>;
+}) {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <Label>Rating</Label>
+        <Label className="text-[10px] uppercase" style={labelStyle}>
+          Rating
+        </Label>
         <Controller
-          name="rating"
+          name={'rating' as never}
           control={control}
           render={({ field }) => (
             <div className="flex gap-1">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => field.onChange(i + 1)}
-                  className="p-0.5"
-                  aria-label={`Rate ${i + 1} stars`}
-                >
-                  <Star
-                    className={`w-6 h-6 transition-colors ${
-                      i < field.value ? 'text-chart-4 fill-chart-4' : 'text-muted-foreground/30'
-                    }`}
-                  />
-                </button>
-              ))}
+              {Array.from({ length: 5 }).map((_, i) => {
+                const filled = i < (field.value as number);
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => field.onChange(i + 1)}
+                    className="p-0.5 transition"
+                    aria-label={`Rate ${i + 1} stars`}
+                  >
+                    <Star
+                      className="h-6 w-6 transition-colors"
+                      style={{
+                        color: filled ? AMBER : LUMEN_DK,
+                        fill: filled ? AMBER : 'transparent',
+                      }}
+                    />
+                  </button>
+                );
+              })}
             </div>
           )}
         />
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Did you enjoy it?</Label>
-        <Controller
-          name="liked"
-          control={control}
-          render={({ field }) => (
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => field.onChange(field.value === true ? null : true)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm transition-colors ${
-                  field.value === true
-                    ? 'bg-chart-2/10 text-chart-2 border-chart-2/30'
-                    : 'border-border text-muted-foreground hover:border-chart-2/30'
-                }`}
-              >
-                <ThumbsUp className="w-3.5 h-3.5" />
-                Yes
-              </button>
-              <button
-                type="button"
-                onClick={() => field.onChange(field.value === false ? null : false)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm transition-colors ${
-                  field.value === false
-                    ? 'bg-destructive/10 text-destructive border-destructive/30'
-                    : 'border-border text-muted-foreground hover:border-destructive/30'
-                }`}
-              >
-                <ThumbsDown className="w-3.5 h-3.5" />
-                No
-              </button>
-            </div>
-          )}
-        />
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="comment">
-          Comment <span className="text-muted-foreground text-xs">(optional)</span>
+        <Label className="text-[10px] uppercase" style={labelStyle}>
+          Did you enjoy it?
         </Label>
         <Controller
-          name="comment"
+          name={'liked' as never}
+          control={control}
+          render={({ field }) => {
+            const v = field.value as boolean | null;
+            return (
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => field.onChange(v === true ? null : true)}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] transition"
+                  style={{
+                    border: `1px solid ${v === true ? FATHOM : LUMEN_DK}`,
+                    background: v === true ? 'rgba(3,79,70,0.08)' : 'transparent',
+                    color: v === true ? FATHOM : MUTED,
+                    fontFamily: 'var(--font-mono)',
+                  }}
+                >
+                  <ThumbsUp className="h-3.5 w-3.5" />
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => field.onChange(v === false ? null : false)}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] transition"
+                  style={{
+                    border: `1px solid ${v === false ? PULSE : LUMEN_DK}`,
+                    background: v === false ? 'rgba(127,28,52,0.08)' : 'transparent',
+                    color: v === false ? PULSE : MUTED,
+                    fontFamily: 'var(--font-mono)',
+                  }}
+                >
+                  <ThumbsDown className="h-3.5 w-3.5" />
+                  No
+                </button>
+              </div>
+            );
+          }}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="comment" className="text-[10px] uppercase" style={labelStyle}>
+          Comment{' '}
+          <span className="ml-1 normal-case" style={{ letterSpacing: 0, color: SOFT }}>
+            (optional)
+          </span>
+        </Label>
+        <Controller
+          name={'comment' as never}
           control={control}
           render={({ field }) => (
             <Textarea
@@ -100,12 +140,36 @@ function FeedbackFields({ control }: { control: any }) {
               placeholder="Anything to note about this meal?"
               rows={2}
               className="resize-none"
+              style={inputStyle}
               {...field}
+              value={(field.value as string) ?? ''}
             />
           )}
         />
       </div>
     </>
+  );
+}
+
+// ─── Pill buttons ─────────────────────────────────────────────────────────────
+
+function PrimaryPill({
+  children,
+  disabled,
+}: {
+  children: React.ReactNode;
+  disabled: boolean;
+}) {
+  return (
+    <button
+      type="submit"
+      disabled={disabled}
+      className="inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-medium transition disabled:opacity-40"
+      style={{ background: VAST, color: LUMEN }}
+    >
+      {children}
+      <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
+    </button>
   );
 }
 
@@ -141,22 +205,30 @@ function SuggestionForm({
       className="flex flex-col gap-4"
     >
       <div className="flex flex-col gap-2">
-        <Label htmlFor="actual-amount">Actual amount spent (PKR)</Label>
+        <Label htmlFor="actual-amount" className="text-[10px] uppercase" style={labelStyle}>
+          Actual amount spent (PKR)
+        </Label>
         <Input
           id="actual-amount"
           type="number"
           {...register('actualAmountSpent', { valueAsNumber: true })}
+          style={{
+            ...inputStyle,
+            fontFamily: 'var(--font-display)',
+            fontSize: 18,
+            fontWeight: 600,
+          }}
         />
         {errors.actualAmountSpent && (
-          <p className="text-xs text-destructive">{errors.actualAmountSpent.message}</p>
+          <p className="text-[11px]" style={{ color: PULSE, fontFamily: 'var(--font-mono)' }}>
+            {errors.actualAmountSpent.message}
+          </p>
         )}
       </div>
 
       <FeedbackFields control={control} />
 
-      <Button type="submit" className="w-full" disabled={isSaving}>
-        {isSaving ? 'Saving...' : 'Save meal'}
-      </Button>
+      <PrimaryPill disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryPill>
     </form>
   );
 }
@@ -187,46 +259,64 @@ function CustomForm({ onSave, isSaving }: { onSave: (p: SavePayload) => void; is
       className="flex flex-col gap-4"
     >
       <div className="flex flex-col gap-2">
-        <Label htmlFor="restaurant-name">Restaurant name</Label>
+        <Label htmlFor="restaurant-name" className="text-[10px] uppercase" style={labelStyle}>
+          Restaurant name
+        </Label>
         <Input
           id="restaurant-name"
           placeholder="e.g. Burns Road Nihari"
           {...register('restaurantName')}
+          style={inputStyle}
         />
         {errors.restaurantName && (
-          <p className="text-xs text-destructive">{errors.restaurantName.message}</p>
+          <p className="text-[11px]" style={{ color: PULSE, fontFamily: 'var(--font-mono)' }}>
+            {errors.restaurantName.message}
+          </p>
         )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="manual-desc">What did you have?</Label>
+        <Label htmlFor="manual-desc" className="text-[10px] uppercase" style={labelStyle}>
+          What did you have?
+        </Label>
         <Input
           id="manual-desc"
           placeholder="e.g. Nihari with naan"
           {...register('manualDescription')}
+          style={inputStyle}
         />
         {errors.manualDescription && (
-          <p className="text-xs text-destructive">{errors.manualDescription.message}</p>
+          <p className="text-[11px]" style={{ color: PULSE, fontFamily: 'var(--font-mono)' }}>
+            {errors.manualDescription.message}
+          </p>
         )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="custom-amount">Actual amount spent (PKR)</Label>
+        <Label htmlFor="custom-amount" className="text-[10px] uppercase" style={labelStyle}>
+          Actual amount spent (PKR)
+        </Label>
         <Input
           id="custom-amount"
           type="number"
           {...register('actualAmountSpent', { valueAsNumber: true })}
+          style={{
+            ...inputStyle,
+            fontFamily: 'var(--font-display)',
+            fontSize: 18,
+            fontWeight: 600,
+          }}
         />
         {errors.actualAmountSpent && (
-          <p className="text-xs text-destructive">{errors.actualAmountSpent.message}</p>
+          <p className="text-[11px]" style={{ color: PULSE, fontFamily: 'var(--font-mono)' }}>
+            {errors.actualAmountSpent.message}
+          </p>
         )}
       </div>
 
       <FeedbackFields control={control} />
 
-      <Button type="submit" className="w-full" disabled={isSaving}>
-        {isSaving ? 'Saving...' : 'Save meal'}
-      </Button>
+      <PrimaryPill disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryPill>
     </form>
   );
 }
@@ -246,27 +336,44 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
 
   return (
     <Dialog open={state.open} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-sm overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-foreground">
+          <div
+            className="text-[10px] uppercase"
+            style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+          >
+            {isCustom ? 'custom · /log' : 'choose · /log'}
+          </div>
+          <DialogTitle
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 22,
+              fontWeight: 600,
+              letterSpacing: '-0.02em',
+              color: VAST,
+            }}
+          >
             {isCustom ? 'Log custom meal' : 'Log your meal'}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription style={{ color: MUTED }}>
             {isCustom
               ? 'Enter the details of what you had.'
               : 'Confirm the amount and leave feedback.'}
           </DialogDescription>
         </DialogHeader>
 
-        {/* Suggestion summary pill */}
         {option && (
-          <div className="rounded-lg bg-secondary p-3">
-            <p className="font-medium text-card-foreground">{option.menuItemName ?? '—'}</p>
-            <p className="text-sm text-muted-foreground">{option.restaurantName ?? '—'}</p>
+          <div
+            className="rounded-xl p-3"
+            style={{ background: LUMEN, border: `1px solid ${LUMEN_DK}` }}
+          >
+            <p style={{ color: VAST, fontWeight: 500 }}>{option.menuItemName ?? '—'}</p>
+            <p className="text-[12px]" style={{ color: MUTED }}>
+              {option.restaurantName ?? '—'}
+            </p>
           </div>
         )}
 
-        {/* Mount the right form — key forces full remount on mode change */}
         {isCustom ? (
           <CustomForm key="custom" onSave={onSave} isSaving={isSaving} />
         ) : (

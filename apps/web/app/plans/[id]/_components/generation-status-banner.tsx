@@ -1,27 +1,19 @@
 'use client';
 
 import { AlertCircle, Loader2, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { motion } from 'motion/react';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
 import { cn } from '@/lib/utils';
 import type { BudgetPlanDetail } from '@repo/shared';
+
+const PULSE = '#7f1c34';
+const AMBER = '#b8741a';
+const WHITE = '#ffffff';
 
 interface GenerationStatusBannerProps {
   plan: BudgetPlanDetail;
 }
 
-/**
- * Single-purpose status strip that sits above the timeline. Renders only when
- * the latest attempt diverges from the active suggestion plan:
- *
- *  - latestAttempt = pending → amber "we're regenerating in the background".
- *  - latestAttempt = failed AND ≠ activeGeneration → destructive "we couldn't
- *    refresh; the previous plan is still in place" with an inline retry.
- *
- * Any other shape (no attempts yet, latest succeeded, latest superseded) is
- * already conveyed elsewhere — the timeline shows the row, the summary card
- * shows the right CTA — so we render nothing to avoid stacking redundant UI.
- */
 export function GenerationStatusBanner({ plan }: GenerationStatusBannerProps) {
   const generate = useGenerateMealPlan();
   const latest = plan.latestAttempt;
@@ -34,10 +26,10 @@ export function GenerationStatusBanner({ plan }: GenerationStatusBannerProps) {
   if (latest.status === 'pending') {
     return (
       <BannerShell tone="pending">
-        <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+        <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium">AI is refreshing your meal plan…</p>
-          <p className="text-xs opacity-80 mt-0.5">
+          <p className="text-[14px] font-medium">AI is refreshing your meal plan…</p>
+          <p className="mt-0.5 text-[12px] opacity-80">
             {active
               ? 'Your existing suggestions stay in place until the new plan is ready.'
               : 'This usually takes a few seconds.'}
@@ -51,35 +43,37 @@ export function GenerationStatusBanner({ plan }: GenerationStatusBannerProps) {
     const isTimeout = latest.errorCode === 'TIMEOUT';
     return (
       <BannerShell tone="failed">
-        <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium">
+          <p className="text-[14px] font-medium">
             {isTimeout ? 'Generation timed out.' : "We couldn't update your plan."}
           </p>
           {!isTimeout && latest.errorMessage && (
-            <p className="text-xs opacity-80 mt-0.5 line-clamp-2">{latest.errorMessage}</p>
+            <p className="mt-0.5 line-clamp-2 text-[12px] opacity-80">{latest.errorMessage}</p>
           )}
           {isTimeout && (
-            <p className="text-xs opacity-80 mt-0.5">
+            <p className="mt-0.5 text-[12px] opacity-80">
               The AI took too long to respond. Try again to refresh your plan.
             </p>
           )}
           {active && (
-            <p className="text-xs opacity-70 mt-1">
+            <p className="mt-1 text-[12px] opacity-70">
               Your previous plan is still active and safe to use.
             </p>
           )}
         </div>
-        <Button
-          size="sm"
-          variant="outline"
-          className="shrink-0 border-destructive/30 text-destructive hover:bg-destructive/10"
+        <motion.button
           onClick={() => generate.mutate(plan.id)}
           disabled={generate.isPending}
+          whileHover={generate.isPending ? undefined : { background: `${PULSE}10` }}
+          whileTap={generate.isPending ? undefined : { scale: 0.97 }}
+          transition={{ duration: 0.16, ease: 'easeOut' }}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-1.5 text-[12px] font-medium disabled:opacity-40"
+          style={{ background: WHITE, color: PULSE, border: `1px solid ${PULSE}` }}
         >
-          <RefreshCw className={cn('h-3.5 w-3.5 mr-1', generate.isPending && 'animate-spin')} />
+          <RefreshCw className={cn('h-3.5 w-3.5', generate.isPending && 'animate-spin')} />
           Retry
-        </Button>
+        </motion.button>
       </BannerShell>
     );
   }
@@ -94,16 +88,15 @@ function BannerShell({
   tone: 'pending' | 'failed';
   children: React.ReactNode;
 }) {
-  const toneClasses =
-    tone === 'pending'
-      ? 'bg-chart-4/10 border-chart-4/30 text-chart-4'
-      : 'bg-destructive/10 border-destructive/25 text-destructive';
+  const color = tone === 'pending' ? AMBER : PULSE;
   return (
     <div
-      className={cn(
-        'flex items-start gap-3 rounded-lg border px-4 py-3',
-        toneClasses,
-      )}
+      className="flex items-start gap-3 rounded-xl px-4 py-3"
+      style={{
+        background: `${color}10`,
+        border: `1px solid ${color}33`,
+        color,
+      }}
     >
       {children}
     </div>
