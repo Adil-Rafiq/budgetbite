@@ -20,6 +20,8 @@ export const useRecordMealChoice = (planId: string) => {
       queryClient.invalidateQueries({ queryKey: ['budgetPlanContext', planId] });
       queryClient.invalidateQueries({ queryKey: ['mealPlanSuggestions'] });
       queryClient.invalidateQueries({ queryKey: ['mealChoices', planId] });
+      queryClient.invalidateQueries({ queryKey: ['planTimeline', planId] });
+      queryClient.invalidateQueries({ queryKey: ['mealPins', planId] });
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
   });

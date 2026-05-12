@@ -1,6 +1,11 @@
 export { userRepository } from './user.repo.js';
 export { userProfileRepository } from './user-profile.repo.js';
-export { restaurantRepository, type ListRestaurantsFilters } from './restaurant.repo.js';
+export {
+  restaurantRepository,
+  type ListRestaurantsFilters,
+  type ListRestaurantsRow,
+  type RestaurantSort,
+} from './restaurant.repo.js';
 export { menuRepository } from './menu.repo.js';
 export {
   budgetPlanRepository,
@@ -12,6 +17,7 @@ export {
 } from './budget-plan.repo.js';
 export { mealPlanRepository } from './meal-plan.repo.js';
 export { orderRepository } from './order.repo.js';
+export { mealPinRepository, type MealPinWithRefs } from './meal-pin.repo.js';
 export { feedbackRepository } from './feedback.repo.js';
 export { mealTypeRepository } from './meal-type.repo.js';
 export { planContextRepository } from './plan-context.repo.js';

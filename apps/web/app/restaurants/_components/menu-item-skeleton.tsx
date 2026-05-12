@@ -8,8 +8,9 @@ interface MenuItemSkeletonProps {
 
 export function MenuItemSkeleton({ className }: MenuItemSkeletonProps) {
   return (
-    <Card className={cn('border-border', className)}>
-      <CardContent className="flex items-start justify-between gap-4 pt-6">
+    <Card className={cn('border-border overflow-hidden', className)}>
+      <Skeleton className="h-32 w-full rounded-none" />
+      <CardContent className="flex items-start justify-between gap-4 pt-4">
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <Skeleton className="h-4 w-32 rounded-sm" />
           <Skeleton className="h-3 w-full rounded-sm" />

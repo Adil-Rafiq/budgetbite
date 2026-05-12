@@ -10,6 +10,8 @@ import { PlanDetailHeader } from '@/app/plans/[id]/_components/plan-detail-heade
 import { PlanSummaryCard } from '@/app/plans/[id]/_components/plan-summary-card';
 import { GenerationStatusBanner } from '@/app/plans/[id]/_components/generation-status-banner';
 import { GenerationHistoryTimeline } from '@/app/plans/[id]/_components/generation-history-timeline';
+import { PlanTimeline } from '@/app/plans/[id]/_components/plan-timeline';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function PlanDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -77,7 +79,19 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
       <PlanDetailHeader plan={plan} />
       <GenerationStatusBanner plan={plan} />
       <PlanSummaryCard plan={plan} />
-      <GenerationHistoryTimeline planId={plan.id} plan={plan} />
+
+      <Tabs defaultValue="plan" className="gap-4">
+        <TabsList>
+          <TabsTrigger value="plan">Plan</TabsTrigger>
+          <TabsTrigger value="history">Generation history</TabsTrigger>
+        </TabsList>
+        <TabsContent value="plan" className="pt-2">
+          <PlanTimeline plan={plan} />
+        </TabsContent>
+        <TabsContent value="history" className="pt-2">
+          <GenerationHistoryTimeline planId={plan.id} plan={plan} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

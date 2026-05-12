@@ -8,6 +8,7 @@ import type {
 
 import { budgetPlanService } from '../services/budget-plan.service.js';
 import { mealChoiceService } from '../services/meal-choice.service.js';
+import { mealPlanService } from '../services/meal-plan.service.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
 
 // All request parsing happens in the `validate` middleware on the route — these
@@ -97,5 +98,11 @@ export async function listGenerations(req: AuthRequest, res: Response): Promise<
 export async function getGenerationDetail(req: AuthRequest, res: Response): Promise<void> {
   const { id, gid } = req.params as IdParams & { gid: string };
   const result = await budgetPlanService.getGenerationDetail(req.userId!, id, gid);
+  res.json(result);
+}
+
+export async function getPlanTimeline(req: AuthRequest, res: Response): Promise<void> {
+  const { id } = req.params as IdParams;
+  const result = await mealPlanService.getTimeline(req.userId!, id);
   res.json(result);
 }

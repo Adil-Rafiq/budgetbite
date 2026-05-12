@@ -35,19 +35,41 @@ function buildIdCatalogue(restaurants: NearbyRestaurantContext[]): string {
   return lines.join('\n');
 }
 
+/**
+ * Render a "do not regenerate these slots" section. Pinned (date, mealType)
+ * pairs are user-locked overrides served by the read path directly from the
+ * meal_pin table; the LLM's role is to fill the remaining slots around them.
+ * Budget math passed to the prompt is already pre-adjusted for pin spend, so
+ * the model just needs to skip these cells.
+ */
+function buildPinnedSlotsSection(
+  pinnedSlots: { slotDate: string; mealTypeId: string }[],
+  mealTypes: { id: string; key: string; label: string; sortOrder: number }[],
+): string {
+  if (pinnedSlots.length === 0) return 'None — generate for every (date, mealType) pair.';
+  const idToKey = new Map(mealTypes.map((m) => [m.id, m.key] as const));
+  const lines = pinnedSlots
+    .map((p) => `- ${p.slotDate} / ${idToKey.get(p.mealTypeId) ?? p.mealTypeId}`)
+    .sort();
+  return lines.join('\n');
+}
+
 // ─── Prompt: Initial full plan generation ─────────────────────────────────────
 
 export function buildGeneratePlanPrompt(ctx: MealPlannerContext): string {
   const mealTypeKeys = ctx.plan.mealTypes.map((m) => `"${m.key}"`).join(' | ');
   const mealTypeLabels = ctx.plan.mealTypes.map((m) => m.label).join(', ');
-
   return `Generate a complete meal plan for the following budget plan.
 
-## Budget
+## Budget (already pre-adjusted for any pinned slots)
 - Total budget: PKR ${ctx.budget.totalBudget}
 - Plan period: ${ctx.plan.startDate} to ${ctx.plan.endDate} (${ctx.plan.planType})
 - Meals per day: ${mealTypeLabels}
 - Average budget per meal: PKR ${ctx.budget.avgBudgetPerRemainingMeal.toFixed(2)}
+- Pinned slots count: ${ctx.pinnedSlots.length}
+
+## Slots already user-locked (DO NOT regenerate these)
+${buildPinnedSlotsSection(ctx.pinnedSlots, ctx.plan.mealTypes)}
 
 ## User Preferences
 - Price sensitivity: ${ctx.preferences.priceSensitivity}
@@ -107,13 +129,12 @@ Rules:
 export function buildReplanPrompt(ctx: MealPlannerContext, triggerSummary: string): string {
   const mealTypeKeys = ctx.plan.mealTypes.map((m) => `"${m.key}"`).join(' | ');
   const variance = Number(ctx.budget.cumulativeVariance);
-
   return `A user has confirmed a meal that requires rebalancing their remaining plan.
 
 ## What happened
 ${triggerSummary}
 
-## Current Budget State
+## Current Budget State (pre-adjusted for any pinned slots)
 - Total budget: PKR ${ctx.budget.totalBudget}
 - Amount spent so far: PKR ${ctx.budget.amountSpent}
 - Amount remaining: PKR ${ctx.budget.amountRemaining}
@@ -121,6 +142,10 @@ ${triggerSummary}
 - Meals remaining: ${ctx.budget.mealsRemaining}
 - Average budget per remaining meal: PKR ${ctx.budget.avgBudgetPerRemainingMeal.toFixed(2)}
 - Cumulative variance: PKR ${ctx.budget.cumulativeVariance} (${variance >= 0 ? 'underspent — slight headroom available' : 'overspent — compensate with cheaper options'})
+- Pinned slots count: ${ctx.pinnedSlots.length}
+
+## Slots already user-locked (DO NOT regenerate these)
+${buildPinnedSlotsSection(ctx.pinnedSlots, ctx.plan.mealTypes)}
 
 ## User Preferences
 - Price sensitivity: ${ctx.preferences.priceSensitivity}

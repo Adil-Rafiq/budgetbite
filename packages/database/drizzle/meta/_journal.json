@@ -36,6 +36,13 @@
       "when": 1777446598157,
       "tag": "0004_outgoing_jubilee",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1778062339704,
+      "tag": "0005_slow_wong",
+      "breakpoints": true
     }
   ]
 }

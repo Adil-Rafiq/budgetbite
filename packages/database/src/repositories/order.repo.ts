@@ -107,6 +107,64 @@ export const orderRepository = {
   },
 
   /**
+   * Every confirmed choice on a plan, with the linked menu item's name and
+   * the choice's own restaurantName snapshot (already on the row). Drives the
+   * Plan Timeline read so each "logged" cell can render without an extra
+   * round-trip per choice.
+   */
+  async listByPlanWithItem(
+    userId: string,
+    budgetPlanId: string,
+  ): Promise<
+    {
+      id: string;
+      slotDate: string;
+      mealTypeId: string;
+      suggestionId: string | null;
+      restaurantId: string | null;
+      menuItemId: string | null;
+      manualDescription: string | null;
+      actualAmountSpent: string;
+      restaurantName: string | null;
+      menuItemName: string | null;
+    }[]
+  > {
+    const rows = await db.query.mealChoice.findMany({
+      where: (mc, { eq, and }) =>
+        and(eq(mc.userId, userId), eq(mc.budgetPlanId, budgetPlanId)),
+      columns: {
+        id: true,
+        slotDate: true,
+        mealTypeId: true,
+        suggestionId: true,
+        restaurantId: true,
+        menuItemId: true,
+        manualDescription: true,
+        actualAmountSpent: true,
+        restaurantName: true,
+      },
+      with: {
+        menuItem: {
+          columns: { name: true },
+        },
+      },
+    });
+
+    return rows.map((r) => ({
+      id: r.id,
+      slotDate: r.slotDate,
+      mealTypeId: r.mealTypeId,
+      suggestionId: r.suggestionId,
+      restaurantId: r.restaurantId,
+      menuItemId: r.menuItemId,
+      manualDescription: r.manualDescription,
+      actualAmountSpent: r.actualAmountSpent,
+      restaurantName: r.restaurantName,
+      menuItemName: r.menuItem?.name ?? null,
+    }));
+  },
+
+  /**
    * Get a single choice with its mealType label.
    * Used by MealPlannerService to build the trigger summary for replanning.
    */
@@ -122,6 +180,8 @@ export const orderRepository = {
         slotDate: true,
         mealTypeId: true,
         suggestionId: true,
+        restaurantId: true,
+        menuItemId: true,
         manualDescription: true,
         actualAmountSpent: true,
         restaurantName: true,
@@ -145,6 +205,8 @@ export const orderRepository = {
       slotDate: row.slotDate,
       mealTypeId: row.mealTypeId,
       suggestionId: row.suggestionId,
+      restaurantId: row.restaurantId,
+      menuItemId: row.menuItemId,
       manualDescription: row.manualDescription,
       actualAmountSpent: row.actualAmountSpent,
       restaurantName: row.restaurantName,

@@ -7,11 +7,18 @@ import { isoDateStringSchema, uuidSchema } from './common.js';
 /**
  * planId comes from the URL path (`POST /api/budget-plans/:id/choices`) — not
  * the body — so it's intentionally absent here.
+ *
+ * `restaurantId` / `menuItemId` are the structured links to the catalogue. The
+ * server backfills them from the suggestion when only `suggestionId` is
+ * supplied. They remain optional so free-form "manual" entries (typed
+ * description, no catalogue link) keep working unchanged.
  */
 export const recordMealChoiceSchema = z.object({
   slotDate: isoDateStringSchema,
   mealTypeId: uuidSchema,
   suggestionId: uuidSchema.optional(),
+  restaurantId: uuidSchema.optional(),
+  menuItemId: uuidSchema.optional(),
   manualDescription: z.string().max(500).optional(),
   actualAmountSpent: z.coerce.number().min(0),
   restaurantName: z.string().max(200).optional(),
@@ -25,6 +32,8 @@ export const mealChoiceResponseSchema = z.object({
   slotDate: z.string(),
   mealTypeId: uuidSchema,
   suggestionId: uuidSchema.nullable(),
+  restaurantId: uuidSchema.nullable(),
+  menuItemId: uuidSchema.nullable(),
   manualDescription: z.string().nullable(),
   actualAmountSpent: z.number(),
   restaurantName: z.string().nullable(),

@@ -2,6 +2,7 @@ import {
   restaurantRepository,
   menuRepository,
   budgetPlanRepository,
+  mealPinRepository,
   planContextRepository,
   userPreferencesRepository,
   orderRepository,
@@ -19,6 +20,36 @@ const NEARBY_RADIUS_KM = Number(process.env.NEARBY_RADIUS_KM) || 5;
 const MAX_RESTAURANTS = Number(process.env.MAX_RESTAURANTS) || 20;
 const MAX_ITEMS_PER_RESTAURANT = Number(process.env.MAX_ITEMS_PER_RESTAURANT) || 15;
 
+function todayDateString(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Subtract pinned-slot allocation from raw budget state. plan_context tracks
+ * choice-driven spend only — pins are pre-allocations the user has committed
+ * to but not yet logged, so for the LLM (and the FE budget-fit indicator) we
+ * present a budget that already accounts for them.
+ *
+ * Adjusted fields: amountRemaining, mealsRemaining, avgBudgetPerRemainingMeal.
+ * Untouched: amountSpent, mealsConsumed, totalBudget, totalMeals, cumulativeVariance.
+ */
+export function applyPinAdjustment(
+  raw: BudgetStateContext,
+  pinSpend: number,
+  pinCount: number,
+): BudgetStateContext {
+  const amountRemaining = Math.max(0, raw.amountRemaining - pinSpend);
+  const mealsRemaining = Math.max(0, raw.mealsRemaining - pinCount);
+  const avgBudgetPerRemainingMeal =
+    mealsRemaining > 0 ? amountRemaining / mealsRemaining : 0;
+  return {
+    ...raw,
+    amountRemaining,
+    mealsRemaining,
+    avgBudgetPerRemainingMeal,
+  };
+}
+
 /**
  * ContextBuilderService
  *
@@ -29,12 +60,23 @@ const MAX_ITEMS_PER_RESTAURANT = Number(process.env.MAX_ITEMS_PER_RESTAURANT) ||
  */
 export const contextBuilderService = {
   async build(budgetPlanId: string, userId: string): Promise<MealPlannerContext> {
-    const [plan, budgetState, preferences, remainingDates] = await Promise.all([
-      this.fetchPlanMeta(budgetPlanId),
-      this.fetchBudgetState(budgetPlanId),
-      this.fetchUserPreferences(userId),
-      this.fetchRemainingDates(budgetPlanId),
-    ]);
+    const fromDate = todayDateString();
+
+    const [plan, rawBudget, preferences, remainingDates, pinnedSlots, pinAggregate] =
+      await Promise.all([
+        this.fetchPlanMeta(budgetPlanId),
+        this.fetchRawBudgetState(budgetPlanId),
+        this.fetchUserPreferences(userId),
+        this.fetchRemainingDates(budgetPlanId),
+        mealPinRepository.getPinnedSlotsForGeneration(budgetPlanId, fromDate),
+        mealPinRepository.sumFutureForPlan(budgetPlanId, fromDate),
+      ]);
+
+    const budget = applyPinAdjustment(
+      rawBudget,
+      Number(pinAggregate.totalPriceAtPin),
+      pinAggregate.count,
+    );
 
     const userProfile = await this.fetchUserLocation(userId);
     const restaurants = userProfile
@@ -45,7 +87,7 @@ export const contextBuilderService = {
         )
       : [];
 
-    return { plan, budget: budgetState, preferences, restaurants, remainingDates };
+    return { plan, budget, preferences, restaurants, remainingDates, pinnedSlots };
   },
 
   // ─── Private fetchers ──────────────────────────────────────────────────────
@@ -65,7 +107,12 @@ export const contextBuilderService = {
     };
   },
 
-  async fetchBudgetState(budgetPlanId: string): Promise<BudgetStateContext> {
+  /**
+   * Raw budget state straight from plan_context. Callers that pass this to the
+   * LLM or FE should `applyPinAdjustment` first so pinned spend is reflected
+   * in amountRemaining / avgBudgetPerRemainingMeal.
+   */
+  async fetchRawBudgetState(budgetPlanId: string): Promise<BudgetStateContext> {
     const ctx = await planContextRepository.findByPlanId(budgetPlanId);
     if (!ctx) throw new Error(`Plan context for ${budgetPlanId} not found`);
 
@@ -102,6 +149,9 @@ export const contextBuilderService = {
   /**
    * Fetch remaining dates that still need suggestions.
    * A date is "remaining" if it has no confirmed mealChoice yet and is today or in the future.
+   * Pinned slots are NOT removed at the date level here — pins are per
+   * (date, mealType) and are passed separately in `MealPlannerContext.pinnedSlots`
+   * so the LLM can keep generating other meal types on a partially-pinned day.
    */
   async fetchRemainingDates(budgetPlanId: string): Promise<string[]> {
     const plan = await budgetPlanRepository.findById(budgetPlanId);

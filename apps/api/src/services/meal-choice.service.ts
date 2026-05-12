@@ -1,6 +1,13 @@
 import type { MealChoiceResponse, Paginated, RecordMealChoiceInput } from '@repo/shared';
 import { toNumber } from '@repo/shared';
-import { budgetPlanRepository, db, orderRepository, planContextRepository } from '@repo/database';
+import {
+  budgetPlanRepository,
+  db,
+  mealPinRepository,
+  mealPlanRepository,
+  orderRepository,
+  planContextRepository,
+} from '@repo/database';
 
 import { AppError } from '../middleware/error.middleware.js';
 import { mealGenerationService } from './meal-generation.service.js';
@@ -19,6 +26,8 @@ function toMealChoiceResponse(c: {
   slotDate: string;
   mealTypeId: string;
   suggestionId: string | null;
+  restaurantId: string | null;
+  menuItemId: string | null;
   manualDescription: string | null;
   actualAmountSpent: string;
   restaurantName: string | null;
@@ -30,6 +39,8 @@ function toMealChoiceResponse(c: {
     slotDate: c.slotDate,
     mealTypeId: c.mealTypeId,
     suggestionId: c.suggestionId,
+    restaurantId: c.restaurantId,
+    menuItemId: c.menuItemId,
     manualDescription: c.manualDescription,
     actualAmountSpent: toNumber(c.actualAmountSpent),
     restaurantName: c.restaurantName,
@@ -44,11 +55,35 @@ async function loadOwnedActive(userId: string, budgetPlanId: string) {
   return plan;
 }
 
+/**
+ * If the caller supplied `suggestionId` but didn't pass `restaurantId` /
+ * `menuItemId`, lift them off the suggestion. Lets the FE record-choice flow
+ * keep its current minimal shape while we get structured links populated.
+ *
+ * Returns nothing — mutates `out` in place.
+ */
+async function backfillFksFromSuggestion(
+  input: RecordMealChoiceInput,
+  out: { restaurantId: string | null; menuItemId: string | null },
+): Promise<void> {
+  if (!input.suggestionId) return;
+  if (out.restaurantId && out.menuItemId) return;
+  const suggestion = await mealPlanRepository.getSuggestionForChoice(input.suggestionId);
+  if (!suggestion) return;
+  out.restaurantId = out.restaurantId ?? suggestion.restaurantId;
+  out.menuItemId = out.menuItemId ?? suggestion.menuItemId;
+}
+
 export const mealChoiceService = {
   /**
    * Record a confirmed meal choice and apply the delta to plan_context in the
    * same transaction. plan_context is the source of truth for amountSpent,
    * mealsConsumed, amountRemaining, etc. — GET endpoints read from there.
+   *
+   * If the (planId, slotDate, mealTypeId) had a user pin, the pin is deleted
+   * in the same transaction — the choice supersedes the pin. This keeps the
+   * pin-adjusted budget math from double-counting once a pin becomes a real
+   * meal choice.
    */
   async recordChoice(
     userId: string,
@@ -64,6 +99,12 @@ export const mealChoiceService = {
     if (!ctx) throw new AppError(500, 'Plan context missing', 'PLAN_CONTEXT_MISSING');
     const plannedMealBudget = toNumber(ctx.totalBudget) / Math.max(1, ctx.totalMeals);
 
+    const fks = {
+      restaurantId: input.restaurantId ?? null,
+      menuItemId: input.menuItemId ?? null,
+    };
+    await backfillFksFromSuggestion(input, fks);
+
     const choice = await db.transaction(async (tx) => {
       const inserted = await orderRepository.create(
         {
@@ -72,6 +113,8 @@ export const mealChoiceService = {
           slotDate: input.slotDate,
           mealTypeId: input.mealTypeId,
           suggestionId: input.suggestionId ?? null,
+          restaurantId: fks.restaurantId,
+          menuItemId: fks.menuItemId,
           manualDescription: input.manualDescription ?? null,
           actualAmountSpent: String(input.actualAmountSpent),
           restaurantName: input.restaurantName ?? null,
@@ -87,6 +130,10 @@ export const mealChoiceService = {
         },
         tx,
       );
+
+      // Choice supersedes pin on the same slot. Idempotent — returns 0 when
+      // there is no pin to delete.
+      await mealPinRepository.deleteBySlot(budgetPlanId, input.slotDate, input.mealTypeId, tx);
 
       return inserted;
     });

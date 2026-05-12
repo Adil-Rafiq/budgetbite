@@ -73,17 +73,30 @@ export interface PlanMetaContext {
   planType: 'weekly' | 'monthly';
   startDate: string;
   endDate: string;
-  mealTypes: { key: string; label: string; sortOrder: number }[];
+  mealTypes: { id: string; key: string; label: string; sortOrder: number }[];
 }
 
 /** Full context object assembled by ContextBuilderService before every LLM call */
 export interface MealPlannerContext {
   plan: PlanMetaContext;
+  /**
+   * Budget state pre-adjusted for any user-pinned future slots: pin count is
+   * subtracted from mealsRemaining and pin spend from amountRemaining, then
+   * avgBudgetPerRemainingMeal is recomputed. Same shape the FE sees from
+   * GET /api/budget-plans/active so the AI and the budget-fit indicator stay
+   * in lockstep.
+   */
   budget: BudgetStateContext;
   preferences: UserPreferencesContext;
   restaurants: NearbyRestaurantContext[];
   /** ISO date strings for the remaining days that still need suggestions */
   remainingDates: string[];
+  /**
+   * (slotDate, mealTypeId) pairs the user has already pinned. The LLM must
+   * not regenerate these slots — they're rendered to the user from the
+   * meal_pin table directly. Empty array when no pins exist.
+   */
+  pinnedSlots: { slotDate: string; mealTypeId: string }[];
 }
 
 // ─── LLM Output shapes ────────────────────────────────────────────────────────

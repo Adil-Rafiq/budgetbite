@@ -21,6 +21,12 @@ export const suggestionOptionSchema = z.object({
   description: z.string().optional(),
   estimatedPrice: z.number(),
   notes: z.string().optional(),
+  /**
+   * Where this option came from. 'pin' rows are user-locked overrides served
+   * by mealPlanService.getSuggestionsForDay — the FE renders them with a
+   * "Pinned" badge in place of the AI's suggestion.
+   */
+  source: z.enum(['suggestion', 'pin']).optional(),
 });
 
 export const suggestionSlotSchema = z.object({
