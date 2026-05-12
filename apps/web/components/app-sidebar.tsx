@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { motion } from 'motion/react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
+import { LogoIcon } from '@/components/icons';
 
 const LUMEN = '#ffffeb';
 const LUMEN_DK = '#e4e4d0';
@@ -58,19 +59,7 @@ export function AppSidebar() {
           className="inline-flex h-8 w-8 items-center justify-center rounded-md"
           style={{ background: FATHOM, color: LUMEN }}
         >
-          <svg
-            viewBox="0 0 24 24"
-            width="14"
-            height="14"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3 11v9a1 1 0 0 0 1 1h6v-7h4v7h6a1 1 0 0 0 1-1v-9" />
-            <path d="M1 11 12 3l11 8" />
-          </svg>
+          <LogoIcon />
         </span>
         <span
           style={{
