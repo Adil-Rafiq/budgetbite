@@ -7,14 +7,6 @@ import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { LogoIcon } from '@/components/icons';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
 const navItems = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/plans', label: 'Plans' },
@@ -42,23 +34,12 @@ export function AppSidebar() {
   const spentPercent = totalBudget > 0 ? Math.round((spent / totalBudget) * 100) : 0;
 
   return (
-    <aside
-      className="fixed inset-y-0 hidden lg:flex lg:w-64 lg:flex-col"
-      style={{
-        background: LUMEN,
-        borderRight: `1px solid ${LUMEN_DK}`,
-        color: VAST,
-      }}
-    >
+    <aside className="fixed inset-y-0 hidden border-r border-lumen-dk bg-lumen text-vast lg:flex lg:w-64 lg:flex-col">
       <Link
         href="/dashboard"
-        className="flex items-center gap-2.5 px-6 py-6"
-        style={{ borderBottom: `1px solid ${LUMEN_DK}` }}
+        className="flex items-center gap-2.5 border-b border-lumen-dk px-6 py-6"
       >
-        <span
-          className="inline-flex h-8 w-8 items-center justify-center rounded-md"
-          style={{ background: FATHOM, color: LUMEN }}
-        >
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-fathom text-lumen">
           <LogoIcon />
         </span>
         <span
@@ -74,8 +55,8 @@ export function AppSidebar() {
       </Link>
 
       <div
-        className="px-6 pt-5 pb-2 text-[10px] uppercase"
-        style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.22em' }}
+        className="px-6 pt-5 pb-2 text-[10px] uppercase text-soft"
+        style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
       >
         navigation
       </div>
@@ -86,23 +67,16 @@ export function AppSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-[14px] transition-colors ${
-                isActive ? '' : 'hover:bg-[#ffffeb] hover:text-[#1a1a1a]'
+              className={`group flex items-center gap-3 rounded-lg border px-3 py-2 text-[14px] transition-colors ${
+                isActive
+                  ? 'border-lumen-dk bg-white font-medium text-vast shadow-[0_1px_0_rgba(0,0,0,0.03)]'
+                  : 'border-transparent bg-transparent font-normal text-ink hover:bg-lumen hover:text-vast'
               }`}
-              style={{
-                background: isActive ? WHITE : 'transparent',
-                color: isActive ? VAST : MUTED,
-                border: `1px solid ${isActive ? LUMEN_DK : 'transparent'}`,
-                fontWeight: isActive ? 500 : 400,
-                boxShadow: isActive ? '0 1px 0 rgba(0,0,0,0.03)' : 'none',
-              }}
             >
               <span
-                className="inline-block h-1.5 w-1.5 rounded-full transition-colors group-hover:bg-[#a6a691]"
-                style={{
-                  background: isActive ? FATHOM : 'transparent',
-                  border: isActive ? 'none' : `1px solid ${SOFT}`,
-                }}
+                className={`inline-block h-1.5 w-1.5 rounded-full transition-colors group-hover:bg-soft ${
+                  isActive ? 'border-0 bg-fathom' : 'border border-soft bg-transparent'
+                }`}
               />
               {item.label}
             </Link>
@@ -112,22 +86,19 @@ export function AppSidebar() {
 
       <div className="mt-auto flex flex-col gap-3 px-4 pb-4 pt-6">
         {active && (
-          <div
-            className="rounded-xl p-4"
-            style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
-          >
+          <div className="rounded-xl border border-lumen-dk bg-white p-4">
             <div className="flex items-center justify-between">
               <span
-                className="text-[10px] uppercase"
-                style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+                className="text-[10px] uppercase text-soft"
+                style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
               >
                 {active.plan.planType} budget
               </span>
               <span
+                className="text-fathom"
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: 11,
-                  color: FATHOM,
                   fontWeight: 600,
                 }}
               >
@@ -135,62 +106,44 @@ export function AppSidebar() {
               </span>
             </div>
             <div
-              className="mt-3"
+              className="mt-3 text-vast"
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 22,
                 fontWeight: 600,
                 letterSpacing: '-0.02em',
-                color: VAST,
               }}
             >
               ₨ {remaining.toLocaleString()}
             </div>
-            <div className="mt-1 text-[11px]" style={{ color: MUTED }}>
+            <div className="mt-1 text-[11px] text-ink">
               left of ₨ {totalBudget.toLocaleString()}
             </div>
-            <div
-              className="mt-3 h-1.5 w-full overflow-hidden rounded-full"
-              style={{ background: LUMEN_DK }}
-            >
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-lumen-dk">
               <motion.div
-                className="h-full rounded-full"
+                className={`h-full rounded-full ${spentPercent >= 90 ? 'bg-pulse' : 'bg-fathom'}`}
                 initial={{ width: '0%' }}
                 animate={{ width: `${Math.min(100, spentPercent)}%` }}
                 transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-                style={{
-                  background: spentPercent >= 90 ? '#7f1c34' : FATHOM,
-                }}
               />
             </div>
           </div>
         )}
 
-        <div
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5"
-          style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
-        >
+        <div className="flex items-center gap-3 rounded-xl border border-lumen-dk bg-white px-3 py-2.5">
           <span
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[11px]"
-            style={{
-              background: FATHOM,
-              color: LUMEN,
-              fontFamily: 'var(--font-mono)',
-              fontWeight: 600,
-            }}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-fathom text-[11px] text-lumen"
+            style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}
           >
             {initials(user?.name)}
           </span>
           <div className="flex min-w-0 flex-col">
-            <span
-              className="truncate text-[13px]"
-              style={{ color: VAST, fontWeight: 500 }}
-            >
+            <span className="truncate text-[13px] font-medium text-vast">
               {user?.name ?? '—'}
             </span>
             <span
-              className="truncate text-[11px]"
-              style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+              className="truncate text-[11px] text-soft"
+              style={{ fontFamily: 'var(--font-mono)' }}
             >
               {user?.email ?? ''}
             </span>

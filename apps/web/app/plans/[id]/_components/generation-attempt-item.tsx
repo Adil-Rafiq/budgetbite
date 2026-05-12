@@ -23,43 +23,49 @@ import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
 import { GenerationSuggestionsGrid } from './generation-suggestions-grid';
 import type { BudgetGeneration } from '@repo/shared';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const AMBER = '#b8741a';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
+type Tone = 'amber' | 'fathom' | 'pulse' | 'soft';
 
 interface StatusVisual {
   Icon: LucideIcon;
-  tint: string;
+  tone: Tone;
   label: (gen: BudgetGeneration) => string;
 }
 
 const STATUS_VISUALS: Record<BudgetGeneration['status'], StatusVisual> = {
   pending: {
     Icon: Loader2,
-    tint: AMBER,
+    tone: 'amber',
     label: () => 'Generating…',
   },
   succeeded: {
     Icon: CheckCircle2,
-    tint: FATHOM,
+    tone: 'fathom',
     label: (gen) => `Succeeded ${formatDistanceToNow(gen.generatedAt, { addSuffix: true })}`,
   },
   failed: {
     Icon: AlertCircle,
-    tint: PULSE,
+    tone: 'pulse',
     label: (gen) => `Failed ${formatDistanceToNow(gen.generatedAt, { addSuffix: true })}`,
   },
   superseded: {
     Icon: MinusCircle,
-    tint: SOFT,
+    tone: 'soft',
     label: () => 'Discarded — replaced by a newer attempt',
   },
+};
+
+const TONE_DOT: Record<Tone, string> = {
+  amber: 'bg-amber/20 border-amber',
+  fathom: 'bg-fathom/20 border-fathom',
+  pulse: 'bg-pulse/20 border-pulse',
+  soft: 'bg-soft/20 border-soft',
+};
+
+const TONE_ICON: Record<Tone, string> = {
+  amber: 'text-amber',
+  fathom: 'text-fathom',
+  pulse: 'text-pulse',
+  soft: 'text-soft',
 };
 
 interface GenerationAttemptItemProps {
@@ -96,41 +102,30 @@ export function GenerationAttemptItem({
     >
       <span
         aria-hidden
-        className="absolute left-2 top-3 inline-block h-4 w-4 rounded-full"
-        style={{
-          background: `${visual.tint}22`,
-          border: `2px solid ${visual.tint}`,
-          boxShadow: `0 0 0 4px ${LUMEN}`,
-        }}
+        className={`absolute left-2 top-3 inline-block h-4 w-4 rounded-full border-2 shadow-[0_0_0_4px_var(--color-lumen)] ${TONE_DOT[visual.tone]}`}
       />
 
       <div
-        className="flex flex-col gap-2 rounded-xl p-4 transition"
-        style={{
-          background: WHITE,
-          border: `1px solid ${open ? `${FATHOM}55` : LUMEN_DK}`,
-        }}
+        className={`flex flex-col gap-2 rounded-xl border bg-white p-4 transition ${
+          open ? 'border-fathom/35' : 'border-lumen-dk'
+        }`}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-start gap-2.5">
             <visual.Icon
-              className={cn('mt-0.5 h-4 w-4 shrink-0', isPending && 'animate-spin')}
-              style={{ color: visual.tint }}
+              className={cn(
+                'mt-0.5 h-4 w-4 shrink-0',
+                isPending && 'animate-spin',
+                TONE_ICON[visual.tone],
+              )}
             />
             <div className="flex min-w-0 flex-col">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-[14px] font-medium" style={{ color: VAST }}>
-                  {visual.label(generation)}
-                </p>
+                <p className="text-[14px] font-medium text-vast">{visual.label(generation)}</p>
                 {isActive && (
                   <span
-                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] uppercase"
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      background: `${FATHOM}14`,
-                      color: FATHOM,
-                      letterSpacing: '0.18em',
-                    }}
+                    className="inline-flex items-center gap-1 rounded-full bg-fathom/[0.08] px-2 py-0.5 text-[10px] uppercase text-fathom"
+                    style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
                   >
                     <Sparkles className="h-3 w-3" />
                     Active
@@ -138,8 +133,8 @@ export function GenerationAttemptItem({
                 )}
               </div>
               <span
-                className="mt-0.5 text-[11px]"
-                style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+                className="mt-0.5 text-[11px] text-ink"
+                style={{ fontFamily: 'var(--font-mono)' }}
                 title={format(generation.generatedAt, 'PPpp')}
               >
                 {format(generation.generatedAt, 'MMM d, yyyy · HH:mm')}
@@ -165,7 +160,7 @@ export function GenerationAttemptItem({
                 <Pill
                   variant="ghost"
                   size="xs"
-                  className={cn(open && 'bg-[#ffffeb] border-[#cfcfb8]')}
+                  className={cn(open && 'border-[#cfcfb8] bg-lumen')}
                   style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   <ChevronDown
@@ -179,14 +174,7 @@ export function GenerationAttemptItem({
         </div>
 
         {isFailed && generation.errorMessage && (
-          <div
-            className="rounded-lg p-3 text-[12px]"
-            style={{
-              background: 'rgba(127,28,52,0.06)',
-              border: `1px solid ${PULSE}22`,
-              color: PULSE,
-            }}
-          >
+          <div className="rounded-lg border border-pulse/20 bg-pulse/[0.06] p-3 text-[12px] text-pulse">
             <span className="font-medium">
               {generation.errorCode ?? 'GENERATION_FAILED'}:
             </span>{' '}
@@ -196,11 +184,8 @@ export function GenerationAttemptItem({
       </div>
 
       {isSucceeded && (
-        <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
-          <div
-            className="mt-3 ml-2 rounded-xl p-4"
-            style={{ background: LUMEN, border: `1px dashed ${LUMEN_DK}` }}
-          >
+        <CollapsibleContent className="data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
+          <div className="ml-2 mt-3 rounded-xl border border-dashed border-lumen-dk bg-lumen p-4">
             {open && <GenerationSuggestionsGrid planId={planId} generationId={generation.id} />}
           </div>
         </CollapsibleContent>

@@ -6,9 +6,6 @@ import { Pill } from '@/components/ui/pill';
 import { cn } from '@/lib/utils';
 import type { BudgetPlanDetail } from '@repo/shared';
 
-const PULSE = '#7f1c34';
-const AMBER = '#b8741a';
-
 interface GenerationStatusBannerProps {
   plan: BudgetPlanDetail;
 }
@@ -85,15 +82,13 @@ function BannerShell({
   tone: 'pending' | 'failed';
   children: React.ReactNode;
 }) {
-  const color = tone === 'pending' ? AMBER : PULSE;
+  const toneClass =
+    tone === 'pending'
+      ? 'border-amber/20 bg-amber/10 text-amber'
+      : 'border-pulse/20 bg-pulse/10 text-pulse';
   return (
     <div
-      className="flex items-start gap-3 rounded-xl px-4 py-3"
-      style={{
-        background: `${color}10`,
-        border: `1px solid ${color}33`,
-        color,
-      }}
+      className={`flex items-start gap-3 rounded-xl border px-4 py-3 ${toneClass}`}
     >
       {children}
     </div>

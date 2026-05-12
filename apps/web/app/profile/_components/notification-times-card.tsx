@@ -9,14 +9,6 @@ import { useActiveBudgetPlan, useUpdateBudgetPlan } from '@/hooks/use-budget-pla
 import { showToast } from '@/lib/toast';
 import { getErrorMessage } from '@/lib/api/errors';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
 const TIME_PATTERN = /^\d{2}:\d{2}$/;
 
 export function NotificationTimesCard() {
@@ -54,44 +46,29 @@ export function NotificationTimesCard() {
   };
 
   if (isLoading) {
-    return (
-      <div className="h-44 w-full animate-pulse rounded-2xl" style={{ background: LUMEN_DK }} />
-    );
+    return <div className="h-44 w-full animate-pulse rounded-2xl bg-lumen-dk" />;
   }
 
   return (
-    <div
-      className="overflow-hidden rounded-2xl"
-      style={{
-        background: WHITE,
-        border: `1px solid ${LUMEN_DK}`,
-        boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
-      }}
-    >
-      <div
-        className="flex items-center justify-between gap-3 border-b px-5 py-4"
-        style={{ borderColor: LUMEN_DK, background: LUMEN }}
-      >
+    <div className="overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+      <div className="flex items-center justify-between gap-3 border-b border-lumen-dk bg-lumen px-5 py-4">
         <div className="flex min-w-0 items-center gap-3">
-          <div
-            className="flex h-8 w-8 items-center justify-center rounded-lg"
-            style={{ background: `${FATHOM}14`, color: FATHOM }}
-          >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-fathom/[0.08] text-fathom">
             <Bell className="h-4 w-4" />
           </div>
           <div className="flex flex-col">
             <span
-              className="text-[10px] uppercase"
-              style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.22em' }}
+              className="text-[10px] uppercase text-soft"
+              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
             >
               04
             </span>
             <span
+              className="text-vast"
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 15,
                 fontWeight: 600,
-                color: VAST,
                 letterSpacing: '-0.01em',
               }}
             >
@@ -99,21 +76,22 @@ export function NotificationTimesCard() {
             </span>
           </div>
         </div>
-        <p className="hidden text-right text-[12px] sm:block" style={{ color: MUTED, maxWidth: 280 }}>
+        <p className="hidden max-w-[280px] text-right text-[12px] text-ink sm:block">
           {active ? 'When should we remind you?' : 'Create a plan to configure reminders.'}
         </p>
       </div>
 
       <div className="flex flex-col gap-4 p-5">
         {!active ? (
-          <p className="text-[13px]" style={{ color: MUTED }}>
-            No active plan yet.
-          </p>
+          <p className="text-[13px] text-ink">No active plan yet.</p>
         ) : (
           <>
             <div className="flex flex-col gap-2">
               {times.length === 0 && (
-                <p className="text-[12px]" style={{ fontFamily: 'var(--font-mono)', color: SOFT }}>
+                <p
+                  className="text-[12px] text-soft"
+                  style={{ fontFamily: 'var(--font-mono)' }}
+                >
                   no reminders configured. add one below.
                 </p>
               )}
@@ -123,20 +101,15 @@ export function NotificationTimesCard() {
                     type="time"
                     value={t}
                     onChange={(e) => update(i, e.target.value)}
-                    className="w-32"
-                    style={{
-                      background: LUMEN,
-                      borderColor: LUMEN_DK,
-                      color: VAST,
-                      fontFamily: 'var(--font-mono)',
-                    }}
+                    className="w-32 border-lumen-dk bg-lumen text-vast"
+                    style={{ fontFamily: 'var(--font-mono)' }}
                   />
                   <Pill
                     variant="subtle"
                     size="iconSm"
                     onClick={() => remove(i)}
                     aria-label="Remove reminder"
-                    style={{ color: MUTED }}
+                    className="text-ink"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Pill>

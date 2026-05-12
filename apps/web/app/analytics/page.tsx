@@ -27,22 +27,17 @@ import { useBudgetPlans } from '@/hooks/use-budget-plan';
 import { useListActiveMealTypes } from '@/hooks/use-meal-type';
 import { useMealHistory, useSpendingAnalytics } from '@/hooks/use-analytics';
 
-// ─── Wispr palette ───────────────────────────────────────────────────────────
-
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
 const FATHOM = '#034f46';
 const PULSE = '#7f1c34';
 const AMBER = '#b8741a';
 const GLOW = '#ffa946';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
+const VAST = '#1a1a1a';
 const SOFT = '#a6a691';
+const MUTED = '#71716a';
+const LUMEN = '#ffffeb';
+const LUMEN_DK = '#e4e4d0';
+const WHITE = '#ffffff';
 
-// Ordered tint pool for meal-type slices/dots. Both the pie chart and the
-// history-table row dots index into this by meal-type position, so they stay
-// in sync regardless of which meal types the user has configured.
 const mealTypePalette = [FATHOM, AMBER, PULSE, VAST, GLOW, SOFT, MUTED];
 
 const chartTooltipStyle = {
@@ -55,8 +50,6 @@ const chartTooltipStyle = {
 } as const;
 
 const chartAxisTick = { fontSize: 11, fill: MUTED, fontFamily: 'var(--font-mono)' } as const;
-
-// ─── Types + helpers ─────────────────────────────────────────────────────────
 
 type RangeKind = 'week' | 'month' | 'custom';
 
@@ -93,8 +86,6 @@ const formatPKRCompact = (value: number) => {
   return String(value);
 };
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
 function Panel({
   code,
   title,
@@ -105,30 +96,20 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      className="overflow-hidden rounded-2xl"
-      style={{
-        background: WHITE,
-        border: `1px solid ${LUMEN_DK}`,
-        boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
-      }}
-    >
-      <div
-        className="flex items-center justify-between border-b px-5 py-3.5"
-        style={{ borderColor: LUMEN_DK, background: LUMEN }}
-      >
+    <div className="overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+      <div className="flex items-center justify-between border-b border-lumen-dk bg-lumen px-5 py-3.5">
         <span
-          className="text-[10px] uppercase"
-          style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.22em' }}
+          className="text-[10px] uppercase text-soft"
+          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
         >
           {code}
         </span>
         <span
+          className="text-vast"
           style={{
             fontFamily: 'var(--font-display)',
             fontSize: 14,
             fontWeight: 600,
-            color: VAST,
             letterSpacing: '-0.01em',
           }}
         >
@@ -160,8 +141,6 @@ function RangeButton({
     </Pill>
   );
 }
-
-// ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function AnalyticsPage() {
   const [range, setRange] = useState<Range>(thisMonth());
@@ -205,8 +184,6 @@ export default function AnalyticsPage() {
 
   const mealTypesById = useMemo(() => new Map(mealTypes.map((mt) => [mt.id, mt])), [mealTypes]);
 
-  // Stable color for each meal type based on its position in the user's
-  // configured list. Drives both the pie chart and the history table dot.
   const colorByMealTypeId = useMemo(() => {
     const map = new Map<string, string>();
     mealTypes.forEach((mt, i) => {
@@ -241,333 +218,308 @@ export default function AnalyticsPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8">
       <FadeUp>
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-col gap-2">
-          <div
-            className="text-[10px] uppercase"
-            style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
-          >
-            spend · /analytics
-          </div>
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(28px, 3.6vw, 40px)',
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.05,
-              color: VAST,
-            }}
-          >
-            Understand the week.
-          </h1>
-          <p className="text-[14px]" style={{ color: MUTED, maxWidth: 540 }}>
-            Patterns in spend, meal mix, and budget drift — over time.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <RangeButton active={range.kind === 'week'} onClick={() => setRange(thisWeek())}>
-            Week
-          </RangeButton>
-          <RangeButton active={range.kind === 'month'} onClick={() => setRange(thisMonth())}>
-            Month
-          </RangeButton>
-          {range.kind === 'custom' ? (
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-2">
             <div
-              className="flex items-center gap-1 rounded-full px-2 py-1"
-              style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
+              className="text-[10px] uppercase text-fathom"
+              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
             >
-              <input
-                type="date"
-                value={range.startDate}
-                onChange={(e) => setCustomStart(e.target.value)}
-                className="w-32 bg-transparent text-[12px] outline-none"
-                style={{ fontFamily: 'var(--font-mono)', color: VAST }}
-              />
-              <span className="text-[11px]" style={{ color: SOFT, fontFamily: 'var(--font-mono)' }}>
-                →
-              </span>
-              <input
-                type="date"
-                value={range.endDate}
-                onChange={(e) => setCustomEnd(e.target.value)}
-                className="w-32 bg-transparent text-[12px] outline-none"
-                style={{ fontFamily: 'var(--font-mono)', color: VAST }}
-              />
+              spend · /analytics
             </div>
-          ) : (
-            <RangeButton
-              active={false}
-              onClick={() =>
-                setRange({
-                  kind: 'custom',
-                  startDate: range.startDate,
-                  endDate: range.endDate,
-                })
-              }
+            <h1
+              className="text-vast"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(28px, 3.6vw, 40px)',
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.05,
+              }}
             >
-              Custom
+              Understand the week.
+            </h1>
+            <p className="max-w-[540px] text-[14px] text-ink">
+              Patterns in spend, meal mix, and budget drift — over time.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <RangeButton active={range.kind === 'week'} onClick={() => setRange(thisWeek())}>
+              Week
             </RangeButton>
-          )}
-        </div>
-      </header>
+            <RangeButton active={range.kind === 'month'} onClick={() => setRange(thisMonth())}>
+              Month
+            </RangeButton>
+            {range.kind === 'custom' ? (
+              <div className="flex items-center gap-1 rounded-full border border-lumen-dk bg-white px-2 py-1">
+                <input
+                  type="date"
+                  value={range.startDate}
+                  onChange={(e) => setCustomStart(e.target.value)}
+                  className="w-32 bg-transparent text-[12px] text-vast outline-none"
+                  style={{ fontFamily: 'var(--font-mono)' }}
+                />
+                <span
+                  className="text-[11px] text-soft"
+                  style={{ fontFamily: 'var(--font-mono)' }}
+                >
+                  →
+                </span>
+                <input
+                  type="date"
+                  value={range.endDate}
+                  onChange={(e) => setCustomEnd(e.target.value)}
+                  className="w-32 bg-transparent text-[12px] text-vast outline-none"
+                  style={{ fontFamily: 'var(--font-mono)' }}
+                />
+              </div>
+            ) : (
+              <RangeButton
+                active={false}
+                onClick={() =>
+                  setRange({
+                    kind: 'custom',
+                    startDate: range.startDate,
+                    endDate: range.endDate,
+                  })
+                }
+              >
+                Custom
+              </RangeButton>
+            )}
+          </div>
+        </header>
       </FadeUp>
 
       <Stagger className="grid gap-4 lg:grid-cols-2 lg:gap-5" delay={0.1} stagger={0.08}>
-        {/* Spending over time */}
         <StaggerItem>
-        <Panel code="01" title="Spending over time">
-          <div className="h-64">
-            {spendingQuery.isLoading ? (
-              <ChartSkeleton variant="line" />
-            ) : spendingQuery.error ? (
-              <p className="text-[13px]" style={{ color: PULSE }}>
-                Could not load spending.
-              </p>
-            ) : spendingChartData.length === 0 ? (
-              <p className="text-[13px]" style={{ color: MUTED }}>
-                No spending in this range.
-              </p>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={spendingChartData}
-                  margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
-                >
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={LUMEN_DK} />
-                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={chartAxisTick} />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={chartAxisTick}
-                    tickFormatter={formatPKRCompact}
-                    width={40}
-                  />
-                  <Tooltip
-                    cursor={{ stroke: LUMEN_DK, strokeDasharray: '3 3' }}
-                    contentStyle={chartTooltipStyle}
-                    formatter={(value: number) => [formatPKR(value), 'Spent']}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="amount"
-                    stroke={FATHOM}
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 5, fill: FATHOM, strokeWidth: 0 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </Panel>
-        </StaggerItem>
-
-        {/* Budget vs actual */}
-        <StaggerItem>
-        <Panel code="02" title="Budget vs actual">
-          <div className="h-64">
-            {plansQuery.isLoading ? (
-              <ChartSkeleton variant="bar" />
-            ) : budgetVsActual.length === 0 ? (
-              <p className="text-[13px]" style={{ color: MUTED }}>
-                No budget plans yet.
-              </p>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={budgetVsActual}
-                  barCategoryGap="28%"
-                  barGap={4}
-                  margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
-                >
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={LUMEN_DK} />
-                  <XAxis dataKey="label" axisLine={false} tickLine={false} tick={chartAxisTick} />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={chartAxisTick}
-                    tickFormatter={formatPKRCompact}
-                    width={40}
-                  />
-                  <Tooltip
-                    cursor={{ fill: LUMEN, opacity: 0.6 }}
-                    contentStyle={chartTooltipStyle}
-                    formatter={(value: number) => [formatPKR(value)]}
-                  />
-                  <Legend
-                    iconType="circle"
-                    iconSize={8}
-                    wrapperStyle={{
-                      paddingTop: 12,
-                      fontSize: 11,
-                      fontFamily: 'var(--font-mono)',
-                      color: MUTED,
-                    }}
-                  />
-                  <Bar
-                    dataKey="budget"
-                    fill={SOFT}
-                    radius={[6, 6, 0, 0]}
-                    maxBarSize={36}
-                    name="Budget"
-                  />
-                  <Bar
-                    dataKey="actual"
-                    fill={FATHOM}
-                    radius={[6, 6, 0, 0]}
-                    maxBarSize={36}
-                    name="Actual"
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </Panel>
-        </StaggerItem>
-
-        {/* Meal type breakdown */}
-        <StaggerItem>
-        <Panel code="03" title="Breakdown by meal type">
-          <div className="flex h-64 items-center justify-center">
-            {historyQuery.isLoading ? (
-              <ChartSkeleton variant="pie" />
-            ) : breakdown.length === 0 ? (
-              <p className="text-[13px]" style={{ color: MUTED }}>
-                No meals in this range.
-              </p>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={breakdown}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={90}
-                    innerRadius={50}
-                    strokeWidth={2}
-                    stroke={WHITE}
+          <Panel code="01" title="Spending over time">
+            <div className="h-64">
+              {spendingQuery.isLoading ? (
+                <ChartSkeleton variant="line" />
+              ) : spendingQuery.error ? (
+                <p className="text-[13px] text-pulse">Could not load spending.</p>
+              ) : spendingChartData.length === 0 ? (
+                <p className="text-[13px] text-ink">No spending in this range.</p>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={spendingChartData}
+                    margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
                   >
-                    {breakdown.map((entry, i) => (
-                      <Cell key={i} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={chartTooltipStyle}
-                    formatter={(value: number) => [formatPKR(value)]}
-                  />
-                  <Legend
-                    iconType="circle"
-                    iconSize={8}
-                    wrapperStyle={{
-                      paddingTop: 12,
-                      fontSize: 11,
-                      fontFamily: 'var(--font-mono)',
-                      color: MUTED,
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </Panel>
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={LUMEN_DK} />
+                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={chartAxisTick} />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={chartAxisTick}
+                      tickFormatter={formatPKRCompact}
+                      width={40}
+                    />
+                    <Tooltip
+                      cursor={{ stroke: LUMEN_DK, strokeDasharray: '3 3' }}
+                      contentStyle={chartTooltipStyle}
+                      formatter={(value: number) => [formatPKR(value), 'Spent']}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="amount"
+                      stroke={FATHOM}
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 5, fill: FATHOM, strokeWidth: 0 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </Panel>
         </StaggerItem>
 
-        {/* History */}
         <StaggerItem>
-        <Panel code="04" title="Meal history">
-          <div className="overflow-auto">
-            {historyQuery.isLoading ? (
-              <TableSkeleton rows={5} columns={4} />
-            ) : history.length === 0 ? (
-              <p className="text-[13px]" style={{ color: MUTED }}>
-                No meals logged in this range.
-              </p>
-            ) : (
-              <div className="flex flex-col">
-                <div
-                  className="grid grid-cols-[64px_1fr_auto] gap-3 border-b py-2 text-[10px] uppercase"
-                  style={{
-                    borderColor: LUMEN_DK,
-                    fontFamily: 'var(--font-mono)',
-                    color: SOFT,
-                    letterSpacing: '0.18em',
-                  }}
-                >
-                  <span>Date</span>
-                  <span>Meal · place</span>
-                  <span className="text-right">Amount</span>
-                </div>
-                {history.map((item, i) => {
-                  const mt = mealTypesById.get(item.mealTypeId);
-                  const label = mt?.label ?? 'Meal';
-                  const tint = colorByMealTypeId.get(item.mealTypeId) ?? FATHOM;
-                  return (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{
-                        duration: 0.35,
-                        delay: Math.min(i * 0.03, 0.4),
-                        ease: [0.22, 1, 0.36, 1],
+          <Panel code="02" title="Budget vs actual">
+            <div className="h-64">
+              {plansQuery.isLoading ? (
+                <ChartSkeleton variant="bar" />
+              ) : budgetVsActual.length === 0 ? (
+                <p className="text-[13px] text-ink">No budget plans yet.</p>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={budgetVsActual}
+                    barCategoryGap="28%"
+                    barGap={4}
+                    margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={LUMEN_DK} />
+                    <XAxis dataKey="label" axisLine={false} tickLine={false} tick={chartAxisTick} />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={chartAxisTick}
+                      tickFormatter={formatPKRCompact}
+                      width={40}
+                    />
+                    <Tooltip
+                      cursor={{ fill: LUMEN, opacity: 0.6 }}
+                      contentStyle={chartTooltipStyle}
+                      formatter={(value: number) => [formatPKR(value)]}
+                    />
+                    <Legend
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{
+                        paddingTop: 12,
+                        fontSize: 11,
+                        fontFamily: 'var(--font-mono)',
+                        color: MUTED,
                       }}
-                      whileHover={{ background: 'rgba(255,255,235,0.6)' }}
-                      className="grid grid-cols-[64px_1fr_auto] items-center gap-3 py-3"
-                      style={{
-                        borderTop: i === 0 ? 'none' : `1px solid ${LUMEN_DK}`,
-                      }}
+                    />
+                    <Bar
+                      dataKey="budget"
+                      fill={SOFT}
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={36}
+                      name="Budget"
+                    />
+                    <Bar
+                      dataKey="actual"
+                      fill={FATHOM}
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={36}
+                      name="Actual"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </Panel>
+        </StaggerItem>
+
+        <StaggerItem>
+          <Panel code="03" title="Breakdown by meal type">
+            <div className="flex h-64 items-center justify-center">
+              {historyQuery.isLoading ? (
+                <ChartSkeleton variant="pie" />
+              ) : breakdown.length === 0 ? (
+                <p className="text-[13px] text-ink">No meals in this range.</p>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={breakdown}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={90}
+                      innerRadius={50}
+                      strokeWidth={2}
+                      stroke={WHITE}
                     >
-                      <span
-                        className="text-[12px]"
-                        style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+                      {breakdown.map((entry, i) => (
+                        <Cell key={i} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={chartTooltipStyle}
+                      formatter={(value: number) => [formatPKR(value)]}
+                    />
+                    <Legend
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{
+                        paddingTop: 12,
+                        fontSize: 11,
+                        fontFamily: 'var(--font-mono)',
+                        color: MUTED,
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </Panel>
+        </StaggerItem>
+
+        <StaggerItem>
+          <Panel code="04" title="Meal history">
+            <div className="overflow-auto">
+              {historyQuery.isLoading ? (
+                <TableSkeleton rows={5} columns={4} />
+              ) : history.length === 0 ? (
+                <p className="text-[13px] text-ink">No meals logged in this range.</p>
+              ) : (
+                <div className="flex flex-col">
+                  <div
+                    className="grid grid-cols-[64px_1fr_auto] gap-3 border-b border-lumen-dk py-2 text-[10px] uppercase text-soft"
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      letterSpacing: '0.18em',
+                    }}
+                  >
+                    <span>Date</span>
+                    <span>Meal · place</span>
+                    <span className="text-right">Amount</span>
+                  </div>
+                  {history.map((item, i) => {
+                    const mt = mealTypesById.get(item.mealTypeId);
+                    const label = mt?.label ?? 'Meal';
+                    const tint = colorByMealTypeId.get(item.mealTypeId) ?? FATHOM;
+                    return (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          duration: 0.35,
+                          delay: Math.min(i * 0.03, 0.4),
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
+                        whileHover={{ background: 'rgba(255,255,235,0.6)' }}
+                        className={`grid grid-cols-[64px_1fr_auto] items-center gap-3 py-3 ${
+                          i === 0 ? '' : 'border-t border-lumen-dk'
+                        }`}
                       >
-                        {format(new Date(item.slotDate), 'MMM d')}
-                      </span>
-                      <div className="flex min-w-0 flex-col">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="inline-flex h-1.5 w-1.5 rounded-full"
-                            style={{ background: tint }}
-                          />
-                          <span
-                            className="text-[10px] uppercase"
-                            style={{
-                              fontFamily: 'var(--font-mono)',
-                              color: SOFT,
-                              letterSpacing: '0.18em',
-                            }}
-                          >
-                            {label}
+                        <span
+                          className="text-[12px] text-ink"
+                          style={{ fontFamily: 'var(--font-mono)' }}
+                        >
+                          {format(new Date(item.slotDate), 'MMM d')}
+                        </span>
+                        <div className="flex min-w-0 flex-col">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="inline-flex h-1.5 w-1.5 rounded-full"
+                              style={{ background: tint }}
+                            />
+                            <span
+                              className="text-[10px] uppercase text-soft"
+                              style={{
+                                fontFamily: 'var(--font-mono)',
+                                letterSpacing: '0.18em',
+                              }}
+                            >
+                              {label}
+                            </span>
+                          </div>
+                          <span className="truncate text-[13px] font-medium text-vast">
+                            {item.restaurantName ?? item.manualDescription ?? '—'}
                           </span>
                         </div>
                         <span
-                          className="truncate text-[13px]"
-                          style={{ color: VAST, fontWeight: 500 }}
+                          className="text-right text-[14px] font-semibold tabular-nums text-vast"
+                          style={{ fontFamily: 'var(--font-display)' }}
                         >
-                          {item.restaurantName ?? item.manualDescription ?? '—'}
+                          ₨ {item.actualAmountSpent.toLocaleString()}
                         </span>
-                      </div>
-                      <span
-                        className="text-right text-[14px] tabular-nums"
-                        style={{
-                          fontFamily: 'var(--font-display)',
-                          fontWeight: 600,
-                          color: VAST,
-                        }}
-                      >
-                        ₨ {item.actualAmountSpent.toLocaleString()}
-                      </span>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </Panel>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </Panel>
         </StaggerItem>
       </Stagger>
     </div>

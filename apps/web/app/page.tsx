@@ -19,16 +19,6 @@ const mono = JetBrains_Mono({
   weight: ['400', '500', '600'],
 });
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const FOCUS = '#2d62ff';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-const HAIR = 'rgba(26,26,26,0.08)';
-
 const steps = [
   {
     n: '01',
@@ -69,19 +59,13 @@ export default function LandingPage() {
 
   return (
     <div
-      className={`${body.variable} ${display.variable} ${mono.variable} min-h-screen antialiased`}
-      style={{ fontFamily: 'var(--font-body)', background: LUMEN, color: VAST }}
+      className={`${body.variable} ${display.variable} ${mono.variable} min-h-screen bg-lumen text-vast antialiased`}
+      style={{ fontFamily: 'var(--font-body)' }}
     >
-      <header
-        className="sticky top-0 z-40 border-b backdrop-blur"
-        style={{ background: 'rgba(255,255,235,0.82)', borderColor: HAIR }}
-      >
+      <header className="sticky top-0 z-40 border-b border-vast/8 bg-lumen/[0.82] backdrop-blur">
         <nav className="mx-auto flex max-w-[1180px] items-center justify-between px-8 py-4">
           <Link href="/" className="flex items-center gap-2.5">
-            <span
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md"
-              style={{ background: FATHOM, color: LUMEN }}
-            >
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-fathom text-lumen">
               <LogoIcon />
             </span>
             <span
@@ -96,14 +80,14 @@ export default function LandingPage() {
             </span>
           </Link>
           <div
-            className="hidden items-center gap-8 md:flex"
-            style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: MUTED }}
+            className="hidden items-center gap-8 text-ink md:flex"
+            style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}
           >
             <a href="#how">How it works</a>
             <a href="#privacy">Privacy</a>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-[13px]" style={{ color: VAST }}>
+            <Link href="/login" className="text-[13px] text-vast">
               Log in
             </Link>
             <Pill asChild size="sm">
@@ -129,15 +113,10 @@ export default function LandingPage() {
 
         <div className="mx-auto max-w-[820px] text-center">
           <div
-            className="mx-auto inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px]"
-            style={{
-              fontFamily: 'var(--font-mono)',
-              borderColor: LUMEN_DK,
-              background: WHITE,
-              color: MUTED,
-            }}
+            className="mx-auto inline-flex items-center gap-2 rounded-full border border-lumen-dk bg-white px-3 py-1 text-[11px] text-ink"
+            style={{ fontFamily: 'var(--font-mono)' }}
           >
-            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: FATHOM }} />
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-fathom" />
             Real menus · Real prices · Real budgets
           </div>
 
@@ -153,12 +132,9 @@ export default function LandingPage() {
           >
             Eat well, on a budget,
             <br />
-            <span style={{ color: FATHOM }}>without the planning.</span>
+            <span className="text-fathom">without the planning.</span>
           </h1>
-          <p
-            className="mx-auto mt-7 max-w-[58ch] text-[18px] leading-[1.55]"
-            style={{ color: MUTED }}
-          >
+          <p className="mx-auto mt-7 max-w-[58ch] text-[18px] leading-[1.55] text-ink">
             BudgetBite plans your meals from real menus near you, within your budget.
             You handle the ordering; we log what you paid and re-plan when spending drifts.
           </p>
@@ -176,8 +152,8 @@ export default function LandingPage() {
           </div>
 
           <div
-            className="mt-5 text-[12px]"
-            style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+            className="mt-5 text-[12px] text-soft"
+            style={{ fontFamily: 'var(--font-mono)' }}
           >
             No card · Sign in with Google or GitHub
           </div>
@@ -185,38 +161,30 @@ export default function LandingPage() {
 
         <div className="mt-20">
           <div
-            className="overflow-hidden rounded-[14px]"
+            className="overflow-hidden rounded-[14px] border border-lumen-dk bg-white"
             style={{
-              background: WHITE,
               boxShadow:
                 '0 1px 0 rgba(0,0,0,0.04), 0 30px 80px -20px rgba(26,26,26,0.18), 0 8px 30px -10px rgba(26,26,26,0.08)',
-              border: `1px solid ${LUMEN_DK}`,
             }}
           >
-            <div
-              className="flex items-center gap-2 border-b px-4 py-3"
-              style={{ borderColor: LUMEN_DK, background: LUMEN }}
-            >
+            <div className="flex items-center gap-2 border-b border-lumen-dk bg-lumen px-4 py-3">
               <span className="flex gap-1.5">
                 <span className="block h-3 w-3 rounded-full" style={{ background: '#ff5f57' }} />
                 <span className="block h-3 w-3 rounded-full" style={{ background: '#febc2e' }} />
                 <span className="block h-3 w-3 rounded-full" style={{ background: '#28c840' }} />
               </span>
               <span
-                className="ml-3 text-[11px]"
-                style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+                className="ml-3 text-[11px] text-ink"
+                style={{ fontFamily: 'var(--font-mono)' }}
               >
                 budgetbite.app — Plan · Week 19
               </span>
             </div>
             <div className="grid grid-cols-12">
-              <aside
-                className="col-span-12 border-r p-5 md:col-span-3"
-                style={{ borderColor: LUMEN_DK, background: LUMEN }}
-              >
+              <aside className="col-span-12 border-r border-lumen-dk bg-lumen p-5 md:col-span-3">
                 <div
-                  className="text-[10px] uppercase tracking-[0.18em]"
-                  style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+                  className="text-[10px] uppercase tracking-[0.18em] text-ink"
+                  style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   This week
                 </div>
@@ -232,24 +200,20 @@ export default function LandingPage() {
                     ₨ 6,420
                   </span>
                 </div>
-                <div className="text-[12px]" style={{ color: MUTED }}>
-                  left of ₨ 15,000
-                </div>
-                <div
-                  className="mt-3 h-1.5 w-full overflow-hidden rounded-full"
-                  style={{ background: LUMEN_DK }}
-                >
+                <div className="text-[12px] text-ink">left of ₨ 15,000</div>
+                <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-lumen-dk">
                   <div
                     className="h-full rounded-full"
                     style={{
                       width: `${pct}%`,
-                      background: `linear-gradient(90deg, ${FATHOM}, ${FOCUS})`,
+                      background:
+                        'linear-gradient(90deg, var(--color-fathom), var(--color-focus))',
                     }}
                   />
                 </div>
                 <div
-                  className="mt-2 flex items-center justify-between text-[11px]"
-                  style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+                  className="mt-2 flex items-center justify-between text-[11px] text-ink"
+                  style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   <span>{pct}% spent</span>
                   <span>3 days left</span>
@@ -260,8 +224,8 @@ export default function LandingPage() {
                 <div className="flex flex-wrap items-end justify-between gap-3">
                   <div>
                     <div
-                      className="text-[11px] uppercase tracking-[0.18em]"
-                      style={{ fontFamily: 'var(--font-mono)', color: FATHOM }}
+                      className="text-[11px] uppercase tracking-[0.18em] text-fathom"
+                      style={{ fontFamily: 'var(--font-mono)' }}
                     >
                       Tonight · Thursday
                     </div>
@@ -276,9 +240,9 @@ export default function LandingPage() {
                       }}
                     >
                       Beef Nihari{' '}
-                      <span style={{ color: MUTED, fontWeight: 400 }}>+ naan</span>
+                      <span className="font-normal text-ink">+ naan</span>
                     </h3>
-                    <div className="mt-1 text-[14px]" style={{ color: MUTED }}>
+                    <div className="mt-1 text-[14px] text-ink">
                       Sabri Nihari · Burns Road · 1.2 km
                     </div>
                   </div>
@@ -295,33 +259,32 @@ export default function LandingPage() {
                     return (
                       <div
                         key={day.d}
-                        className="rounded-xl border p-3"
-                        style={{
-                          borderColor: isTonight ? FATHOM : LUMEN_DK,
-                          background: isTonight ? 'rgba(3,79,70,0.06)' : WHITE,
-                        }}
+                        className={`rounded-xl border p-3 ${
+                          isTonight
+                            ? 'border-fathom bg-fathom/[0.06]'
+                            : 'border-lumen-dk bg-white'
+                        }`}
                       >
                         <div
-                          className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]"
-                          style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+                          className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-ink"
+                          style={{ fontFamily: 'var(--font-mono)' }}
                         >
                           <span>{day.d}</span>
-                          {isLogged && <span style={{ color: FATHOM }}>✓</span>}
-                          {isTonight && <span style={{ color: FATHOM }}>●</span>}
+                          {isLogged && <span className="text-fathom">✓</span>}
+                          {isTonight && <span className="text-fathom">●</span>}
                         </div>
                         <div
-                          className="mt-3 text-[13px] leading-[1.25]"
-                          style={{ fontWeight: 500, color: isLogged ? MUTED : VAST }}
+                          className={`mt-3 text-[13px] font-medium leading-[1.25] ${
+                            isLogged ? 'text-ink' : 'text-vast'
+                          }`}
                         >
                           {day.meal}
                         </div>
                         <div
-                          className="mt-4 text-[14px] tabular-nums"
-                          style={{
-                            fontFamily: 'var(--font-display)',
-                            fontWeight: 600,
-                            color: isLogged ? MUTED : VAST,
-                          }}
+                          className={`mt-4 text-[14px] font-semibold tabular-nums ${
+                            isLogged ? 'text-ink' : 'text-vast'
+                          }`}
+                          style={{ fontFamily: 'var(--font-display)' }}
                         >
                           ₨ {day.pkr.toLocaleString()}
                         </div>
@@ -335,17 +298,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section
-        id="how"
-        className="border-t"
-        style={{ borderColor: LUMEN_DK, background: WHITE }}
-      >
+      <section id="how" className="border-t border-lumen-dk bg-white">
         <div className="mx-auto max-w-[1180px] px-8 py-24">
           <div className="grid grid-cols-12 items-end gap-8">
             <div className="col-span-12 lg:col-span-5">
               <div
-                className="text-[11px] uppercase tracking-[0.22em]"
-                style={{ fontFamily: 'var(--font-mono)', color: FATHOM }}
+                className="text-[11px] uppercase tracking-[0.22em] text-fathom"
+                style={{ fontFamily: 'var(--font-mono)' }}
               >
                 How it works
               </div>
@@ -359,11 +318,11 @@ export default function LandingPage() {
                   letterSpacing: '-0.025em',
                 }}
               >
-                Four steps. <span style={{ color: MUTED }}>No more.</span>
+                Four steps. <span className="text-ink">No more.</span>
               </h2>
             </div>
             <div className="col-span-12 lg:col-span-7 lg:col-start-6">
-              <p className="text-[17px] leading-[1.55]" style={{ color: MUTED }}>
+              <p className="text-[17px] leading-[1.55] text-ink">
                 BudgetBite is intentionally small. One screen, one button, one budget.
                 The AI is a helper, not a chat partner — it works inline and gets out
                 of the way.
@@ -375,13 +334,11 @@ export default function LandingPage() {
             {steps.map((s) => (
               <li key={s.n} className="grid grid-cols-[auto_1fr] gap-6">
                 <div
-                  className="tabular-nums"
+                  className="font-medium tabular-nums text-fathom"
                   style={{
                     fontFamily: 'var(--font-display)',
                     fontSize: 36,
                     lineHeight: 1,
-                    color: FATHOM,
-                    fontWeight: 500,
                   }}
                 >
                   {s.n}
@@ -398,7 +355,7 @@ export default function LandingPage() {
                   >
                     {s.title}
                   </h3>
-                  <p className="mt-3 text-[15px] leading-[1.6]" style={{ color: MUTED }}>
+                  <p className="mt-3 text-[15px] leading-[1.6] text-ink">
                     {s.body}
                   </p>
                 </div>
@@ -408,12 +365,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="privacy" className="border-t" style={{ borderColor: LUMEN_DK }}>
+      <section id="privacy" className="border-t border-lumen-dk">
         <div className="mx-auto grid max-w-[1180px] grid-cols-12 gap-8 px-8 py-24">
           <div className="col-span-12 lg:col-span-5">
             <div
-              className="text-[11px] uppercase tracking-[0.22em]"
-              style={{ fontFamily: 'var(--font-mono)', color: FATHOM }}
+              className="text-[11px] uppercase tracking-[0.22em] text-fathom"
+              style={{ fontFamily: 'var(--font-mono)' }}
             >
               Privacy
             </div>
@@ -428,7 +385,7 @@ export default function LandingPage() {
               }}
             >
               Your meals stay{' '}
-              <span style={{ color: MUTED }}>between you and your plan.</span>
+              <span className="text-ink">between you and your plan.</span>
             </h2>
           </div>
           <ul className="col-span-12 space-y-4 lg:col-span-7 lg:col-start-6">
@@ -438,11 +395,14 @@ export default function LandingPage() {
               'AI calls send the current plan and your pins. They do not include your name, email, or order history.',
               'BudgetBite does not place orders. It never sees your ordering accounts or payment details.',
             ].map((line) => (
-              <li key={line} className="flex items-start gap-3 text-[15px]" style={{ color: VAST }}>
+              <li
+                key={line}
+                className="flex items-start gap-3 text-[15px] text-vast"
+              >
                 <span
                   aria-hidden
-                  className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full"
-                  style={{ background: FATHOM, color: LUMEN, fontSize: 11, lineHeight: 1 }}
+                  className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-fathom text-lumen"
+                  style={{ fontSize: 11, lineHeight: 1 }}
                 >
                   ✓
                 </span>
@@ -453,7 +413,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="border-t" style={{ borderColor: LUMEN_DK, background: WHITE }}>
+      <section className="border-t border-lumen-dk bg-white">
         <div className="mx-auto max-w-[1180px] px-8 py-28 text-center">
           <h2
             style={{
@@ -465,12 +425,9 @@ export default function LandingPage() {
             }}
           >
             Plan your meals{' '}
-            <span style={{ color: FATHOM }}>in two minutes.</span>
+            <span className="text-fathom">in two minutes.</span>
           </h2>
-          <p
-            className="mx-auto mt-6 max-w-[54ch] text-[17px] leading-[1.6]"
-            style={{ color: MUTED }}
-          >
+          <p className="mx-auto mt-6 max-w-[54ch] text-[17px] leading-[1.6] text-ink">
             Set a budget, pin a few restaurants you trust, and let the planner do the
             rest. You can change engines and re-roll any day at any time.
           </p>
@@ -488,14 +445,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="border-t" style={{ borderColor: LUMEN_DK, background: LUMEN }}>
+      <footer className="border-t border-lumen-dk bg-lumen">
         <div className="mx-auto flex max-w-[1180px] flex-col gap-10 px-8 py-14 md:flex-row md:items-start md:justify-between md:gap-8">
           <div className="md:max-w-[420px]">
             <div className="flex items-center gap-2.5">
-              <span
-                className="inline-flex h-6 w-6 items-center justify-center rounded-md"
-                style={{ background: FATHOM, color: LUMEN }}
-              >
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-fathom text-lumen">
                 <LogoIcon size={12} />
               </span>
               <span
@@ -509,19 +463,19 @@ export default function LandingPage() {
                 BudgetBite
               </span>
             </div>
-            <p className="mt-3 text-[13px] leading-[1.6]" style={{ color: MUTED }}>
+            <p className="mt-3 text-[13px] leading-[1.6] text-ink">
               A meal-planning app for people who eat out and want to stay on budget.
             </p>
           </div>
 
           <div>
             <div
-              className="text-[10px] uppercase tracking-[0.22em]"
-              style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+              className="text-[10px] uppercase tracking-[0.22em] text-ink"
+              style={{ fontFamily: 'var(--font-mono)' }}
             >
               Product
             </div>
-            <ul className="mt-4 space-y-2 text-[13px]" style={{ color: VAST }}>
+            <ul className="mt-4 space-y-2 text-[13px] text-vast">
               <li>
                 <a href="#how">How it works</a>
               </li>
@@ -545,13 +499,10 @@ export default function LandingPage() {
         </div>
 
         <div
-          className="border-t"
-          style={{ borderColor: LUMEN_DK, fontFamily: 'var(--font-mono)' }}
+          className="border-t border-lumen-dk"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
-          <div
-            className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-3 px-8 py-5 text-[11px]"
-            style={{ color: MUTED }}
-          >
+          <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-3 px-8 py-5 text-[11px] text-ink">
             <span>© 2026 BudgetBite</span>
             <span>
               Built by{' '}
@@ -559,8 +510,8 @@ export default function LandingPage() {
                 href="https://github.com/Adil-Rafiq"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:underline"
-                style={{ color: VAST, textUnderlineOffset: 2 }}
+                className="text-vast hover:underline"
+                style={{ textUnderlineOffset: 2 }}
               >
                 Adil Rafiq
               </a>

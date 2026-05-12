@@ -19,25 +19,12 @@ import { logSuggestionSchema, logCustomSchema } from '../_schemas/log-meal.schem
 import type { LogSuggestionForm, LogCustomForm } from '../_schemas/log-meal.schema';
 import type { LogModalState, SavePayload } from '../_hooks/use-meal-slots';
 
-// ─── Wispr palette ────────────────────────────────────────────────────────────
-
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const AMBER = '#b8741a';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
+const labelClass = 'text-[10px] uppercase text-soft';
 const labelStyle: React.CSSProperties = {
   fontFamily: 'var(--font-mono)',
-  color: SOFT,
   letterSpacing: '0.18em',
 };
-const inputStyle = { background: LUMEN, borderColor: LUMEN_DK, color: VAST };
-
-// ─── Shared feedback fields ───────────────────────────────────────────────────
+const inputClass = 'bg-lumen border-lumen-dk text-vast';
 
 function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
   control,
@@ -47,7 +34,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
   return (
     <>
       <div className="flex flex-col gap-2">
-        <Label className="text-[10px] uppercase" style={labelStyle}>
+        <Label className={labelClass} style={labelStyle}>
           Rating
         </Label>
         <Controller
@@ -66,10 +53,11 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
                     aria-label={`Rate ${i + 1} stars`}
                   >
                     <Star
-                      className="h-6 w-6 transition-colors"
+                      className={`h-6 w-6 transition-colors ${
+                        filled ? 'text-amber' : 'text-lumen-dk'
+                      }`}
                       style={{
-                        color: filled ? AMBER : LUMEN_DK,
-                        fill: filled ? AMBER : 'transparent',
+                        fill: filled ? 'var(--color-amber)' : 'transparent',
                       }}
                     />
                   </button>
@@ -81,7 +69,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label className="text-[10px] uppercase" style={labelStyle}>
+        <Label className={labelClass} style={labelStyle}>
           Did you enjoy it?
         </Label>
         <Controller
@@ -94,13 +82,12 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
                 <button
                   type="button"
                   onClick={() => field.onChange(v === true ? null : true)}
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] transition"
-                  style={{
-                    border: `1px solid ${v === true ? FATHOM : LUMEN_DK}`,
-                    background: v === true ? 'rgba(3,79,70,0.08)' : 'transparent',
-                    color: v === true ? FATHOM : MUTED,
-                    fontFamily: 'var(--font-mono)',
-                  }}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] transition ${
+                    v === true
+                      ? 'border-fathom bg-fathom/[0.08] text-fathom'
+                      : 'border-lumen-dk bg-transparent text-ink'
+                  }`}
+                  style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   <ThumbsUp className="h-3.5 w-3.5" />
                   Yes
@@ -108,13 +95,12 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
                 <button
                   type="button"
                   onClick={() => field.onChange(v === false ? null : false)}
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] transition"
-                  style={{
-                    border: `1px solid ${v === false ? PULSE : LUMEN_DK}`,
-                    background: v === false ? 'rgba(127,28,52,0.08)' : 'transparent',
-                    color: v === false ? PULSE : MUTED,
-                    fontFamily: 'var(--font-mono)',
-                  }}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] transition ${
+                    v === false
+                      ? 'border-pulse bg-pulse/[0.08] text-pulse'
+                      : 'border-lumen-dk bg-transparent text-ink'
+                  }`}
+                  style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   <ThumbsDown className="h-3.5 w-3.5" />
                   No
@@ -126,9 +112,9 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="comment" className="text-[10px] uppercase" style={labelStyle}>
+        <Label htmlFor="comment" className={labelClass} style={labelStyle}>
           Comment{' '}
-          <span className="ml-1 normal-case" style={{ letterSpacing: 0, color: SOFT }}>
+          <span className="ml-1 normal-case text-soft" style={{ letterSpacing: 0 }}>
             (optional)
           </span>
         </Label>
@@ -140,8 +126,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
               id="comment"
               placeholder="Anything to note about this meal?"
               rows={2}
-              className="resize-none"
-              style={inputStyle}
+              className={`resize-none ${inputClass}`}
               {...field}
               value={(field.value as string) ?? ''}
             />
@@ -151,8 +136,6 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
     </>
   );
 }
-
-// ─── Pill buttons ─────────────────────────────────────────────────────────────
 
 function PrimaryPill({
   children,
@@ -168,8 +151,6 @@ function PrimaryPill({
     </Pill>
   );
 }
-
-// ─── Suggestion form ──────────────────────────────────────────────────────────
 
 function SuggestionForm({
   estimatedPrice,
@@ -201,22 +182,21 @@ function SuggestionForm({
       className="flex flex-col gap-4"
     >
       <div className="flex flex-col gap-2">
-        <Label htmlFor="actual-amount" className="text-[10px] uppercase" style={labelStyle}>
+        <Label htmlFor="actual-amount" className={labelClass} style={labelStyle}>
           Actual amount spent (PKR)
         </Label>
         <Input
           id="actual-amount"
           type="number"
           {...register('actualAmountSpent', { valueAsNumber: true })}
+          className={`${inputClass} font-semibold`}
           style={{
-            ...inputStyle,
             fontFamily: 'var(--font-display)',
             fontSize: 18,
-            fontWeight: 600,
           }}
         />
         {errors.actualAmountSpent && (
-          <p className="text-[11px]" style={{ color: PULSE, fontFamily: 'var(--font-mono)' }}>
+          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
             {errors.actualAmountSpent.message}
           </p>
         )}
@@ -228,8 +208,6 @@ function SuggestionForm({
     </form>
   );
 }
-
-// ─── Custom form ──────────────────────────────────────────────────────────────
 
 function CustomForm({ onSave, isSaving }: { onSave: (p: SavePayload) => void; isSaving: boolean }) {
   const {
@@ -255,56 +233,55 @@ function CustomForm({ onSave, isSaving }: { onSave: (p: SavePayload) => void; is
       className="flex flex-col gap-4"
     >
       <div className="flex flex-col gap-2">
-        <Label htmlFor="restaurant-name" className="text-[10px] uppercase" style={labelStyle}>
+        <Label htmlFor="restaurant-name" className={labelClass} style={labelStyle}>
           Restaurant name
         </Label>
         <Input
           id="restaurant-name"
           placeholder="e.g. Burns Road Nihari"
           {...register('restaurantName')}
-          style={inputStyle}
+          className={inputClass}
         />
         {errors.restaurantName && (
-          <p className="text-[11px]" style={{ color: PULSE, fontFamily: 'var(--font-mono)' }}>
+          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
             {errors.restaurantName.message}
           </p>
         )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="manual-desc" className="text-[10px] uppercase" style={labelStyle}>
+        <Label htmlFor="manual-desc" className={labelClass} style={labelStyle}>
           What did you have?
         </Label>
         <Input
           id="manual-desc"
           placeholder="e.g. Nihari with naan"
           {...register('manualDescription')}
-          style={inputStyle}
+          className={inputClass}
         />
         {errors.manualDescription && (
-          <p className="text-[11px]" style={{ color: PULSE, fontFamily: 'var(--font-mono)' }}>
+          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
             {errors.manualDescription.message}
           </p>
         )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="custom-amount" className="text-[10px] uppercase" style={labelStyle}>
+        <Label htmlFor="custom-amount" className={labelClass} style={labelStyle}>
           Actual amount spent (PKR)
         </Label>
         <Input
           id="custom-amount"
           type="number"
           {...register('actualAmountSpent', { valueAsNumber: true })}
+          className={`${inputClass} font-semibold`}
           style={{
-            ...inputStyle,
             fontFamily: 'var(--font-display)',
             fontSize: 18,
-            fontWeight: 600,
           }}
         />
         {errors.actualAmountSpent && (
-          <p className="text-[11px]" style={{ color: PULSE, fontFamily: 'var(--font-mono)' }}>
+          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
             {errors.actualAmountSpent.message}
           </p>
         )}
@@ -316,8 +293,6 @@ function CustomForm({ onSave, isSaving }: { onSave: (p: SavePayload) => void; is
     </form>
   );
 }
-
-// ─── Modal shell ──────────────────────────────────────────────────────────────
 
 interface Props {
   state: LogModalState;
@@ -335,23 +310,23 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
       <DialogContent className="max-h-[90vh] max-w-sm overflow-y-auto">
         <DialogHeader>
           <div
-            className="text-[10px] uppercase"
-            style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+            className="text-[10px] uppercase text-fathom"
+            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
           >
             {isCustom ? 'custom · /log' : 'choose · /log'}
           </div>
           <DialogTitle
+            className="text-vast"
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: 22,
               fontWeight: 600,
               letterSpacing: '-0.02em',
-              color: VAST,
             }}
           >
             {isCustom ? 'Log custom meal' : 'Log your meal'}
           </DialogTitle>
-          <DialogDescription style={{ color: MUTED }}>
+          <DialogDescription className="text-ink">
             {isCustom
               ? 'Enter the details of what you had.'
               : 'Confirm the amount and leave feedback.'}
@@ -359,14 +334,9 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
         </DialogHeader>
 
         {option && (
-          <div
-            className="rounded-xl p-3"
-            style={{ background: LUMEN, border: `1px solid ${LUMEN_DK}` }}
-          >
-            <p style={{ color: VAST, fontWeight: 500 }}>{option.menuItemName ?? '—'}</p>
-            <p className="text-[12px]" style={{ color: MUTED }}>
-              {option.restaurantName ?? '—'}
-            </p>
+          <div className="rounded-xl border border-lumen-dk bg-lumen p-3">
+            <p className="font-medium text-vast">{option.menuItemName ?? '—'}</p>
+            <p className="text-[12px] text-ink">{option.restaurantName ?? '—'}</p>
           </div>
         )}
 

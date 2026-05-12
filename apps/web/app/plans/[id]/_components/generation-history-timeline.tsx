@@ -8,15 +8,6 @@ import { Pill } from '@/components/ui/pill';
 import { GenerationAttemptItem } from './generation-attempt-item';
 import type { BudgetGeneration, BudgetPlanDetail } from '@repo/shared';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
 interface GenerationHistoryTimelineProps {
   planId: string;
   plan: BudgetPlanDetail;
@@ -26,17 +17,13 @@ function TimelineSkeleton() {
   return (
     <div className="relative">
       <div
-        className="absolute left-4 top-2 bottom-2 w-px"
-        style={{ background: LUMEN_DK }}
+        className="absolute left-4 bottom-2 top-2 w-px bg-lumen-dk"
         aria-hidden
       />
       <div className="flex flex-col gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="pl-10">
-            <div
-              className="h-20 w-full animate-pulse rounded-xl"
-              style={{ background: LUMEN }}
-            />
+            <div className="h-20 w-full animate-pulse rounded-xl bg-lumen" />
           </div>
         ))}
       </div>
@@ -46,10 +33,7 @@ function TimelineSkeleton() {
 
 function TimelineError({ message }: { message: string }) {
   return (
-    <div
-      className="flex items-center gap-2 rounded-xl p-3 text-[13px]"
-      style={{ background: 'rgba(127,28,52,0.06)', border: `1px solid ${PULSE}33`, color: PULSE }}
-    >
+    <div className="flex items-center gap-2 rounded-xl border border-pulse/20 bg-pulse/[0.06] p-3 text-[13px] text-pulse">
       <span style={{ fontFamily: 'var(--font-mono)' }}>!</span>
       <span>{message}</span>
     </div>
@@ -59,24 +43,13 @@ function TimelineError({ message }: { message: string }) {
 function TimelineEmpty({ planId }: { planId: string }) {
   const generate = useGenerateMealPlan();
   return (
-    <div
-      className="flex flex-col items-center gap-3 rounded-2xl p-8 text-center"
-      style={{ background: WHITE, border: `1px dashed ${LUMEN_DK}` }}
-    >
-      <div
-        className="flex h-10 w-10 items-center justify-center rounded-full"
-        style={{ background: `${FATHOM}14`, color: FATHOM }}
-      >
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-lumen-dk bg-white p-8 text-center">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-fathom/[0.08] text-fathom">
         <Sparkles className="h-5 w-5" />
       </div>
       <div>
-        <p
-          className="text-[14px] font-medium"
-          style={{ color: VAST }}
-        >
-          No plans generated yet
-        </p>
-        <p className="mt-1 text-[12px]" style={{ color: MUTED }}>
+        <p className="text-[14px] font-medium text-vast">No plans generated yet</p>
+        <p className="mt-1 text-[12px] text-ink">
           Kick off your first AI-curated meal plan to see suggestions for every day.
         </p>
       </div>
@@ -103,18 +76,18 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
       <div className="flex items-end justify-between">
         <div className="flex flex-col gap-1">
           <span
-            className="text-[10px] uppercase"
-            style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+            className="text-[10px] uppercase text-fathom"
+            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
           >
             /history
           </span>
           <h2
+            className="text-vast"
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: 22,
               fontWeight: 600,
               letterSpacing: '-0.02em',
-              color: VAST,
             }}
           >
             Generation history
@@ -122,8 +95,8 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
         </div>
         {total > 0 && (
           <span
-            className="text-[11px]"
-            style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+            className="text-[11px] text-soft"
+            style={{ fontFamily: 'var(--font-mono)' }}
           >
             {total} attempt{total === 1 ? '' : 's'}
           </span>
@@ -166,8 +139,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
 
       <div className="relative">
         <div
-          className="absolute left-[15px] top-2 bottom-2 w-px"
-          style={{ background: LUMEN_DK }}
+          className="absolute left-[15px] bottom-2 top-2 w-px bg-lumen-dk"
           aria-hidden
         />
         <ol className="flex flex-col gap-3">
@@ -187,8 +159,8 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
 
       {data?.meta && total > items.length && (
         <p
-          className="text-center text-[11px]"
-          style={{ fontFamily: 'var(--font-mono)', color: SOFT }}
+          className="text-center text-[11px] text-soft"
+          style={{ fontFamily: 'var(--font-mono)' }}
         >
           showing the latest {items.length} of {total} attempts
         </p>

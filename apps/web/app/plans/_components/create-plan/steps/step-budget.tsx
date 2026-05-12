@@ -10,12 +10,11 @@ import {
 } from '@/components/ui/select';
 import { useCreatePlanContext } from '@/app/plans/_context/create-plan-context';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const PULSE = '#7f1c34';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
+const labelClass = 'text-[10px] uppercase text-soft';
+const labelStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)',
+  letterSpacing: '0.18em',
+};
 
 export const StepBudgetDetails = () => {
   const { steps } = useCreatePlanContext();
@@ -24,10 +23,7 @@ export const StepBudgetDetails = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <Label
-          className="text-[10px] uppercase"
-          style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
-        >
+        <Label className={labelClass} style={labelStyle}>
           Plan type
         </Label>
         <Select value={values.planType} onValueChange={actions.setPlanType}>
@@ -41,11 +37,7 @@ export const StepBudgetDetails = () => {
         </Select>
       </div>
       <div className="flex flex-col gap-2">
-        <Label
-          htmlFor="budget"
-          className="text-[10px] uppercase"
-          style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
-        >
+        <Label htmlFor="budget" className={labelClass} style={labelStyle}>
           Total budget (PKR)
         </Label>
         <Input
@@ -54,20 +46,18 @@ export const StepBudgetDetails = () => {
           min={1}
           value={values.totalBudget}
           onChange={(event) => actions.setTotalBudget(Number(event.target.value))}
-          style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: VAST }}
+          className="font-semibold text-vast"
+          style={{ fontFamily: 'var(--font-display)', fontSize: 18 }}
         />
         {errors.totalBudget ? (
-          <p className="text-[11px]" style={{ color: PULSE, fontFamily: 'var(--font-mono)' }}>
+          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
             {errors.totalBudget}
           </p>
         ) : null}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label
-          className="text-[10px] uppercase"
-          style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
-        >
+        <Label className={labelClass} style={labelStyle}>
           Meal types
         </Label>
         <div className="flex flex-wrap gap-2">
@@ -76,12 +66,11 @@ export const StepBudgetDetails = () => {
             return (
               <label
                 key={type.id}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-1.5 transition"
-                style={{
-                  background: checked ? VAST : LUMEN,
-                  color: checked ? LUMEN : VAST,
-                  border: `1px solid ${checked ? VAST : LUMEN_DK}`,
-                }}
+                className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 transition ${
+                  checked
+                    ? 'border-vast bg-vast text-lumen'
+                    : 'border-lumen-dk bg-lumen text-vast'
+                }`}
               >
                 <Checkbox
                   checked={checked}
@@ -99,19 +88,14 @@ export const StepBudgetDetails = () => {
           })}
         </div>
         {errors.mealTypeIds ? (
-          <p className="text-[11px]" style={{ color: PULSE, fontFamily: 'var(--font-mono)' }}>
+          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
             {errors.mealTypeIds}
           </p>
         ) : null}
       </div>
       <div
-        className="rounded-lg p-3 text-[12px]"
-        style={{
-          background: LUMEN,
-          border: `1px solid ${LUMEN_DK}`,
-          color: MUTED,
-          fontFamily: 'var(--font-mono)',
-        }}
+        className="rounded-lg border border-lumen-dk bg-lumen p-3 text-[12px] text-ink"
+        style={{ fontFamily: 'var(--font-mono)' }}
       >
         meals/day = {values.mealsPerDay} · based on selected types
       </div>

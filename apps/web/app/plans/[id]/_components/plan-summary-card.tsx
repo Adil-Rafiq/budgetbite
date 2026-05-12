@@ -7,16 +7,6 @@ import { cn } from '@/lib/utils';
 import { Pill } from '@/components/ui/pill';
 import type { BudgetPlanDetail } from '@repo/shared';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const AMBER = '#b8741a';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
-
 interface PlanSummaryCardProps {
   plan: BudgetPlanDetail;
 }
@@ -39,45 +29,37 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
   const canTrigger = !isPending && !isTerminalPlan;
   const disabled = !canTrigger || generate.isPending;
 
-  const varianceTint =
+  const varianceTone =
     ctx.cumulativeVariance >= 0
-      ? FATHOM
+      ? 'text-fathom'
       : ctx.cumulativeVariance < -total * 0.1
-        ? PULSE
-        : AMBER;
+        ? 'text-pulse'
+        : 'text-amber';
 
   return (
-    <div
-      className="overflow-hidden rounded-2xl"
-      style={{
-        background: WHITE,
-        border: `1px solid ${LUMEN_DK}`,
-        boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
-      }}
-    >
+    <div className="overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]">
       <div className="flex flex-col gap-5 p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-1">
             <div
-              className="text-[10px] uppercase"
-              style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.22em' }}
+              className="text-[10px] uppercase text-soft"
+              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
             >
               budget summary
             </div>
             <p
-              className="leading-tight"
+              className="leading-tight text-vast"
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 32,
                 fontWeight: 600,
                 letterSpacing: '-0.02em',
-                color: VAST,
               }}
             >
               {fmtPkr(remaining)}
               <span
-                className="ml-2 text-[13px]"
-                style={{ fontFamily: 'var(--font-body)', fontWeight: 400, color: MUTED }}
+                className="ml-2 text-[13px] font-normal text-ink"
+                style={{ fontFamily: 'var(--font-body)' }}
               >
                 of {fmtPkr(total)} left
               </span>
@@ -106,23 +88,21 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
 
         <div className="flex flex-col gap-2">
           <div
-            className="flex items-center justify-between text-[12px]"
-            style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+            className="flex items-center justify-between text-[12px] text-ink"
+            style={{ fontFamily: 'var(--font-mono)' }}
           >
             <span>{fmtPkr(spent)} spent</span>
-            <span style={{ color: VAST, fontWeight: 600 }}>{spentPercent}%</span>
+            <span className="font-semibold text-vast">{spentPercent}%</span>
           </div>
-          <div
-            className="h-1.5 w-full overflow-hidden rounded-full"
-            style={{ background: LUMEN_DK }}
-          >
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-lumen-dk">
             <motion.div
               className="h-full rounded-full"
               initial={{ width: '0%' }}
               animate={{ width: `${spentPercent}%` }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
               style={{
-                background: `linear-gradient(90deg, ${FATHOM}, ${AMBER})`,
+                background:
+                  'linear-gradient(90deg, var(--color-fathom), var(--color-amber))',
               }}
             />
           </div>
@@ -145,28 +125,23 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
                 ? `+${fmtPkr(Math.round(ctx.cumulativeVariance))}`
                 : `−${fmtPkr(Math.round(Math.abs(ctx.cumulativeVariance)))}`
             }
-            tint={varianceTint}
+            toneClass={varianceTone}
           />
         </div>
 
         {plan.mealTypes.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
             <span
-              className="mr-1 text-[10px] uppercase"
-              style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+              className="mr-1 text-[10px] uppercase text-soft"
+              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
             >
               tracking
             </span>
             {plan.mealTypes.map((mt) => (
               <span
                 key={mt.id}
-                className="rounded-full px-2.5 py-0.5 text-[10px] capitalize"
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  background: LUMEN,
-                  color: VAST,
-                  border: `1px solid ${LUMEN_DK}`,
-                }}
+                className="rounded-full border border-lumen-dk bg-lumen px-2.5 py-0.5 text-[10px] capitalize text-vast"
+                style={{ fontFamily: 'var(--font-mono)' }}
               >
                 {mt.label}
               </span>
@@ -181,30 +156,26 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
 function SummaryStat({
   label,
   value,
-  tint,
+  toneClass,
 }: {
   label: string;
   value: string;
-  tint?: string;
+  toneClass?: string;
 }) {
   return (
-    <div
-      className="rounded-lg p-3"
-      style={{ background: LUMEN, border: `1px solid ${LUMEN_DK}` }}
-    >
+    <div className="rounded-lg border border-lumen-dk bg-lumen p-3">
       <p
-        className="text-[9px] uppercase"
-        style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+        className="text-[9px] uppercase text-soft"
+        style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
       >
         {label}
       </p>
       <p
-        className="mt-0.5"
+        className={`mt-0.5 ${toneClass ?? 'text-vast'}`}
         style={{
           fontFamily: 'var(--font-display)',
           fontSize: 15,
           fontWeight: 600,
-          color: tint ?? VAST,
           letterSpacing: '-0.01em',
         }}
       >

@@ -7,15 +7,7 @@ import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { CountUp, Stagger, StaggerItem } from '@/components/motion';
 import { Pill } from '@/components/ui/pill';
 
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
-const VAST = '#1a1a1a';
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const AMBER = '#b8741a';
-const WHITE = '#ffffff';
-const MUTED = '#71716a';
-const SOFT = '#a6a691';
+type Tone = 'fathom' | 'amber' | 'pulse';
 
 const getDaysLeft = (endDateStr: string): number => {
   const today = new Date();
@@ -37,22 +29,10 @@ const getSpendingHealth = (spent: number, total: number): 'good' | 'warning' | '
 
 function StatCardSkeleton() {
   return (
-    <div
-      className="rounded-2xl p-5"
-      style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
-    >
-      <div
-        className="h-3 w-16 rounded animate-pulse"
-        style={{ background: LUMEN }}
-      />
-      <div
-        className="mt-4 h-7 w-28 rounded animate-pulse"
-        style={{ background: LUMEN }}
-      />
-      <div
-        className="mt-2 h-3 w-20 rounded animate-pulse"
-        style={{ background: LUMEN }}
-      />
+    <div className="rounded-2xl border border-lumen-dk bg-white p-5">
+      <div className="h-3 w-16 animate-pulse rounded bg-lumen" />
+      <div className="mt-4 h-7 w-28 animate-pulse rounded bg-lumen" />
+      <div className="mt-2 h-3 w-20 animate-pulse rounded bg-lumen" />
     </div>
   );
 }
@@ -69,10 +49,7 @@ function SummaryCardsSkeleton() {
 
 function SummaryCardsError({ message }: { message: string }) {
   return (
-    <div
-      className="flex items-center gap-3 rounded-xl p-4 text-[13px]"
-      style={{ background: 'rgba(127,28,52,0.06)', border: `1px solid ${PULSE}`, color: PULSE }}
-    >
+    <div className="flex items-center gap-3 rounded-xl border border-pulse bg-pulse/[0.06] p-4 text-[13px] text-pulse">
       <span style={{ fontFamily: 'var(--font-mono)' }}>!</span>
       {message}
     </div>
@@ -81,29 +58,26 @@ function SummaryCardsError({ message }: { message: string }) {
 
 function NoPlanMessage() {
   return (
-    <div
-      className="flex flex-col gap-4 rounded-2xl p-6 sm:flex-row sm:items-center sm:justify-between"
-      style={{ background: WHITE, border: `1px solid ${LUMEN_DK}` }}
-    >
+    <div className="flex flex-col gap-4 rounded-2xl border border-lumen-dk bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col gap-1">
         <div
-          className="text-[10px] uppercase"
-          style={{ fontFamily: 'var(--font-mono)', color: FATHOM, letterSpacing: '0.22em' }}
+          className="text-[10px] uppercase text-fathom"
+          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
         >
           no active plan
         </div>
         <p
+          className="text-vast"
           style={{
             fontFamily: 'var(--font-display)',
             fontSize: 22,
             fontWeight: 600,
             letterSpacing: '-0.01em',
-            color: VAST,
           }}
         >
           Set this week&apos;s budget to get started.
         </p>
-        <p className="text-[13px]" style={{ color: MUTED }}>
+        <p className="text-[13px] text-ink">
           Two minutes. We&apos;ll plan the meals.
         </p>
       </div>
@@ -122,53 +96,53 @@ interface CardProps {
   label: string;
   value: ReactNode;
   sub: string;
-  accent: string;
+  tone: Tone;
   glyph: string;
 }
 
-function StatCard({ code, label, value, sub, accent, glyph }: CardProps) {
+const TONE_CLASS: Record<Tone, string> = {
+  fathom: 'bg-fathom/[0.08] text-fathom',
+  amber: 'bg-amber/[0.08] text-amber',
+  pulse: 'bg-pulse/[0.08] text-pulse',
+};
+
+function StatCard({ code, label, value, sub, tone, glyph }: CardProps) {
   return (
     <motion.div
-      className="relative overflow-hidden rounded-2xl p-5"
+      className="relative overflow-hidden rounded-2xl border border-lumen-dk bg-white p-5 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
       whileHover={{ y: -2, boxShadow: '0 6px 18px rgba(0,0,0,0.06)' }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      style={{
-        background: WHITE,
-        border: `1px solid ${LUMEN_DK}`,
-        boxShadow: '0 1px 0 rgba(0,0,0,0.02)',
-      }}
     >
       <div className="flex items-start justify-between">
         <span
-          className="text-[10px] uppercase"
-          style={{ fontFamily: 'var(--font-mono)', color: SOFT, letterSpacing: '0.18em' }}
+          className="text-[10px] uppercase text-soft"
+          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
         >
           {code} · {label}
         </span>
         <span
-          className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[12px]"
-          style={{ background: `${accent}14`, color: accent, fontFamily: 'var(--font-mono)' }}
+          className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[12px] ${TONE_CLASS[tone]}`}
+          style={{ fontFamily: 'var(--font-mono)' }}
           aria-hidden
         >
           {glyph}
         </span>
       </div>
       <div
-        className="mt-4 truncate"
+        className="mt-4 truncate text-vast"
         style={{
           fontFamily: 'var(--font-display)',
           fontSize: 26,
           fontWeight: 600,
           letterSpacing: '-0.02em',
-          color: VAST,
           lineHeight: 1.05,
         }}
       >
         {value}
       </div>
       <div
-        className="mt-1 truncate text-[12px]"
-        style={{ fontFamily: 'var(--font-mono)', color: MUTED }}
+        className="mt-1 truncate text-[12px] text-ink"
+        style={{ fontFamily: 'var(--font-mono)' }}
       >
         {sub}
       </div>
@@ -188,7 +162,7 @@ export function SummaryCards() {
 
   const daysLeft = getDaysLeft(activePlan.endDate);
   const health = getSpendingHealth(ctx.amountSpent, ctx.totalBudget);
-  const spentAccent = health === 'good' ? FATHOM : health === 'warning' ? AMBER : PULSE;
+  const spentTone: Tone = health === 'good' ? 'fathom' : health === 'warning' ? 'amber' : 'pulse';
 
   const cards: CardProps[] = [
     {
@@ -196,7 +170,7 @@ export function SummaryCards() {
       label: 'total budget',
       value: <CountUp value={ctx.totalBudget} prefix="₨ " />,
       sub: `${activePlan.planType} plan`,
-      accent: FATHOM,
+      tone: 'fathom',
       glyph: '◉',
     },
     {
@@ -204,7 +178,7 @@ export function SummaryCards() {
       label: 'spent',
       value: <CountUp value={ctx.amountSpent} prefix="₨ " />,
       sub: `${ctx.mealsConsumed} of ${ctx.totalMeals} meals`,
-      accent: spentAccent,
+      tone: spentTone,
       glyph: '↓',
     },
     {
@@ -212,7 +186,7 @@ export function SummaryCards() {
       label: 'remaining',
       value: <CountUp value={ctx.amountRemaining} prefix="₨ " />,
       sub: `₨ ${Math.round(ctx.avgBudgetPerRemainingMeal).toLocaleString()} / meal`,
-      accent: FATHOM,
+      tone: 'fathom',
       glyph: '⊙',
     },
     {
@@ -224,7 +198,7 @@ export function SummaryCards() {
         </>
       ),
       sub: `ends ${activePlan.endDate}`,
-      accent: AMBER,
+      tone: 'amber',
       glyph: '⌖',
     },
   ];
