@@ -43,6 +43,7 @@
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.90.21",
     "@vercel/analytics": "1.6.1",
+    "@vercel/speed-insights": "^2.0.0",
     "@xstate/react": "^6.1.0",
     "autoprefixer": "^10.4.20",
     "better-auth": "^1.4.19",
