@@ -16,7 +16,7 @@ pnpm + Turborepo monorepo (`pnpm-workspace.yaml` covers `apps/*` and `packages/*
 - `packages/database` — Drizzle schema, migrations, and repositories (Neon Postgres). The **only** module that touches the DB. Services in `apps/api` import repositories from `@repo/database`; never the schema or `db` directly for queries.
 - `packages/ai` — LLM provider abstraction. `createLLMProvider()` switches between Anthropic / OpenAI / Gemini based on `AI_PROVIDER`. Prompts live under `src/prompts/`.
 - `packages/shared` — Zod schemas + inferred TS types shared between API and web (request/response contracts, validation).
-- `packages/ui`, `packages/eslint-config`, `packages/typescript-config` — shared infra.
+- `packages/eslint-config`, `packages/typescript-config` — shared infra.
 
 ## Common commands
 

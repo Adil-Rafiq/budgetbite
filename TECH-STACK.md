@@ -154,7 +154,6 @@ Scraped restaurant rows include `latitude`/`longitude` so the API can do proximi
 | **`packages/database`**       | Drizzle schema, migrations, and **repositories** (Neon). The only module that touches the DB.              |
 | **`packages/shared`**         | Zod schemas + inferred TS types shared by API and web (request/response contracts, validation, AI types). |
 | **`packages/ai`**             | LLM provider abstraction (`createLLMProvider`) + prompts. Exports `./providers` and `./prompts`.            |
-| **`packages/ui`**             | Shared React components.                                                                                   |
 | **`packages/eslint-config`**  | Shared ESLint config (`--max-warnings 0`).                                                                  |
 | **`packages/typescript-config`** | Shared `tsconfig` bases.                                                                                |
 

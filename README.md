@@ -24,7 +24,6 @@ packages/
   database/    Drizzle schema, migrations, repositories (Neon). The only module that talks to the DB.
   ai/          LLM provider abstraction + prompts
   shared/      Zod schemas + inferred TS types shared by API and web
-  ui/          Shared React components
   eslint-config/, typescript-config/
 ```
 
