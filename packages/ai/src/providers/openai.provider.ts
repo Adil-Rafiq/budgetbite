@@ -1,10 +1,5 @@
 import OpenAI from 'openai';
-import type {
-  LLMFinishReason,
-  LLMMessage,
-  LLMRequestOptions,
-  LLMResponse,
-} from '@repo/shared';
+import type { LLMFinishReason, LLMMessage, LLMRequestOptions, LLMResponse } from '@repo/shared';
 import { BaseLLMProvider } from './base.provider.js';
 
 export class OpenAIProvider extends BaseLLMProvider {

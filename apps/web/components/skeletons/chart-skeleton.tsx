@@ -28,10 +28,7 @@ export function ChartSkeleton({ variant, className }: ChartSkeletonProps) {
   if (variant === 'pie') {
     return (
       <div
-        className={cn(
-          'flex h-full w-full flex-col items-center justify-center gap-3',
-          className,
-        )}
+        className={cn('flex h-full w-full flex-col items-center justify-center gap-3', className)}
       >
         <div className="relative">
           <div className="size-36 animate-pulse rounded-full bg-lumen" />
@@ -52,10 +49,7 @@ export function ChartSkeleton({ variant, className }: ChartSkeletonProps) {
         <div className="flex flex-1 items-end justify-between gap-3 px-2">
           {BAR_HEIGHTS_A.map((h, i) => (
             <div key={i} className="flex h-full flex-1 items-end justify-center gap-1">
-              <div
-                className="w-3 animate-pulse rounded-sm bg-lumen"
-                style={{ height: h }}
-              />
+              <div className="w-3 animate-pulse rounded-sm bg-lumen" style={{ height: h }} />
               <div
                 className="w-3 animate-pulse rounded-sm bg-lumen-dk opacity-60"
                 style={{ height: BAR_HEIGHTS_B[i] }}

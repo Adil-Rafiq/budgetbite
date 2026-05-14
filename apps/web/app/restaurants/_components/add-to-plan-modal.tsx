@@ -180,9 +180,7 @@ export function AddToPlanModal({
         </div>
 
         {!planId ? (
-          <p className="text-[13px] text-ink">
-            Start a budget plan first to add meals to it.
-          </p>
+          <p className="text-[13px] text-ink">Start a budget plan first to add meals to it.</p>
         ) : (
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
@@ -243,10 +241,7 @@ export function AddToPlanModal({
                     fontSize: 18,
                   }}
                 />
-                <p
-                  className="text-[11px] text-soft"
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                >
+                <p className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
                   pre-filled from menu. adjust to actual.
                 </p>
               </div>
@@ -280,11 +275,7 @@ export function AddToPlanModal({
           >
             Cancel
           </Pill>
-          <Pill
-            size="sm"
-            onClick={handleSubmit}
-            disabled={!planId || !mealTypeId || isSaving}
-          >
+          <Pill size="sm" onClick={handleSubmit} disabled={!planId || !mealTypeId || isSaving}>
             {isSaving
               ? 'Saving…'
               : isPastOrToday

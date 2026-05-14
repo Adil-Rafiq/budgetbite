@@ -10,13 +10,7 @@ interface FadeUpProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
   y?: number;
 }
 
-export function FadeUp({
-  children,
-  delay = 0,
-  duration = 0.45,
-  y = 12,
-  ...rest
-}: FadeUpProps) {
+export function FadeUp({ children, delay = 0, duration = 0.45, y = 12, ...rest }: FadeUpProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y }}

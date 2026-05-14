@@ -299,9 +299,7 @@ export function MealSlots() {
                   </p>
                   <p className="text-[12px] text-ink">{option.restaurantName ?? '—'}</p>
                   {option.description && (
-                    <p className="mt-0.5 line-clamp-2 text-[12px] text-ink">
-                      {option.description}
-                    </p>
+                    <p className="mt-0.5 line-clamp-2 text-[12px] text-ink">{option.description}</p>
                   )}
                   {option.notes && (
                     <p
@@ -359,9 +357,7 @@ export function MealSlots() {
                   >
                     Log your own
                   </p>
-                  <p className="text-[12px] text-ink">
-                    Had something else? Enter it manually.
-                  </p>
+                  <p className="text-[12px] text-ink">Had something else? Enter it manually.</p>
                 </div>
               </div>
               <Pill
@@ -394,10 +390,7 @@ interface StatusPillProps {
 }
 
 function StatusPill({ tone, label, glyph }: StatusPillProps) {
-  const toneClass =
-    tone === 'fathom'
-      ? 'bg-fathom/10 text-fathom'
-      : 'bg-amber/10 text-amber';
+  const toneClass = tone === 'fathom' ? 'bg-fathom/10 text-fathom' : 'bg-amber/10 text-amber';
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase ${toneClass}`}
@@ -432,10 +425,7 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle: string })
         </h2>
       </div>
       {subtitle && (
-        <span
-          className="text-[12px] text-ink"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
+        <span className="text-[12px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
           {subtitle}
         </span>
       )}

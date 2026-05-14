@@ -27,10 +27,6 @@ router.get(
 );
 
 /** Get a restaurant's menu items. Public. Returns MenuItem[]. */
-router.get(
-  '/:id/menu',
-  validate({ params: idParams }),
-  asyncHandler(restaurantController.getMenu),
-);
+router.get('/:id/menu', validate({ params: idParams }), asyncHandler(restaurantController.getMenu));
 
 export default router;

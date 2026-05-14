@@ -46,10 +46,7 @@ export const mealPlanRepository = {
           ),
         );
 
-      const [inserted] = await tx
-        .insert(mealPlanGeneration)
-        .values({ budgetPlanId })
-        .returning();
+      const [inserted] = await tx.insert(mealPlanGeneration).values({ budgetPlanId }).returning();
 
       if (!inserted) throw new Error('MealPlanGeneration insert failed');
       return inserted;
@@ -68,9 +65,7 @@ export const mealPlanRepository = {
     const updated = await exec
       .update(mealPlanGeneration)
       .set({ status: 'succeeded', completedAt: new Date() })
-      .where(
-        and(eq(mealPlanGeneration.id, generationId), eq(mealPlanGeneration.status, 'pending')),
-      )
+      .where(and(eq(mealPlanGeneration.id, generationId), eq(mealPlanGeneration.status, 'pending')))
       .returning({ id: mealPlanGeneration.id });
     return updated.length > 0;
   },
@@ -93,9 +88,7 @@ export const mealPlanRepository = {
         errorCode,
         errorMessage,
       })
-      .where(
-        and(eq(mealPlanGeneration.id, generationId), eq(mealPlanGeneration.status, 'pending')),
-      )
+      .where(and(eq(mealPlanGeneration.id, generationId), eq(mealPlanGeneration.status, 'pending')))
       .returning({ id: mealPlanGeneration.id });
     return updated.length > 0;
   },

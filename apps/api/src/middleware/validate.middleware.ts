@@ -11,11 +11,7 @@ import type { AuthRequest } from './auth.middleware.js';
  * ZodError is forwarded to errorMiddleware which formats it as
  * `{ error, code: 'VALIDATION_ERROR' }`.
  */
-export function validate(schemas: {
-  params?: ZodType;
-  query?: ZodType;
-  body?: ZodType;
-}) {
+export function validate(schemas: { params?: ZodType; query?: ZodType; body?: ZodType }) {
   return (req: AuthRequest, _res: Response, next: NextFunction): void => {
     try {
       if (schemas.params) req.params = schemas.params.parse(req.params) as typeof req.params;

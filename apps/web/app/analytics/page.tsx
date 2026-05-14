@@ -259,10 +259,7 @@ export default function AnalyticsPage() {
                   className="w-32 bg-transparent text-[12px] text-vast outline-none"
                   style={{ fontFamily: 'var(--font-mono)' }}
                 />
-                <span
-                  className="text-[11px] text-soft"
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                >
+                <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
                   →
                 </span>
                 <input

@@ -70,21 +70,13 @@ export function PlansPageHeader() {
           </p>
         </div>
 
-        <Pill
-          size="md"
-          onClick={handleNewPlanClick}
-          className="self-start sm:self-auto"
-        >
+        <Pill size="md" onClick={handleNewPlanClick} className="self-start sm:self-auto">
           New plan
           <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>+</span>
         </Pill>
       </header>
 
-      <CreatePlanDialog
-        open={open}
-        onOpenChange={setOpen}
-        replaceActivePlanId={replaceTargetId}
-      />
+      <CreatePlanDialog open={open} onOpenChange={setOpen} replaceActivePlanId={replaceTargetId} />
 
       <AlertDialog open={confirmReplaceOpen} onOpenChange={setConfirmReplaceOpen}>
         <AlertDialogContent>

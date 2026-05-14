@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  animate,
-  useInView,
-  useMotionValue,
-  useTransform,
-  motion,
-} from 'motion/react';
+import { animate, useInView, useMotionValue, useTransform, motion } from 'motion/react';
 import { useEffect, useRef } from 'react';
 
 interface CountUpProps {

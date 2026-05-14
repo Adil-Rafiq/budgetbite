@@ -28,10 +28,7 @@ const mono = JetBrains_Mono({
 });
 
 const verifySchema = z.object({
-  otp: z
-    .string()
-    .length(6, 'Code must be 6 digits')
-    .regex(/^\d+$/, 'Code must be numbers only'),
+  otp: z.string().length(6, 'Code must be 6 digits').regex(/^\d+$/, 'Code must be numbers only'),
 });
 
 type VerifyInput = z.infer<typeof verifySchema>;
@@ -172,13 +169,9 @@ function VerifyEmailForm() {
             Check your email.
           </h1>
           <p className="mt-3 text-[15px] leading-[1.55] text-ink">
-            We sent a 6-digit code to{' '}
-            <span className="font-medium text-vast">{email}</span>
+            We sent a 6-digit code to <span className="font-medium text-vast">{email}</span>
           </p>
-          <p
-            className="mt-1 text-[11px] text-ink"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
+          <p className="mt-1 text-[11px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
             expires in 10 minutes.
           </p>
         </div>
@@ -198,10 +191,7 @@ function VerifyEmailForm() {
               }}
             />
             {errors.otp && (
-              <p
-                className="text-[12px] text-pulse"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
+              <p className="text-[12px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
                 {errors.otp.message}
               </p>
             )}

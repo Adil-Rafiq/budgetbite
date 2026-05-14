@@ -34,10 +34,7 @@ export function RecentActivity() {
             Recent activity
           </h2>
         </div>
-        <span
-          className="text-[11px] text-ink"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
+        <span className="text-[11px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
           last 5 entries
         </span>
       </div>
@@ -55,18 +52,13 @@ export function RecentActivity() {
             ))}
           </div>
         ) : error ? (
-          <p className="p-5 text-[13px] text-pulse">
-            Could not load recent activity.
-          </p>
+          <p className="p-5 text-[13px] text-pulse">Could not load recent activity.</p>
         ) : !planId ? (
           <p className="p-5 text-[13px] text-ink">No active plan yet.</p>
         ) : !data?.data.length ? (
           <div className="flex flex-col items-start gap-1 p-5">
             <p className="text-[13px] font-medium text-vast">Nothing logged yet.</p>
-            <p
-              className="text-[12px] text-ink"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
+            <p className="text-[12px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
               choose a meal above to start tracking.
             </p>
           </div>
@@ -101,9 +93,7 @@ export function RecentActivity() {
                           {label}
                         </span>
                       </div>
-                      <span className="truncate text-[14px] font-medium text-vast">
-                        {name}
-                      </span>
+                      <span className="truncate text-[14px] font-medium text-vast">{name}</span>
                       <span className="truncate text-[12px] text-ink">{restaurant}</span>
                     </div>
                   </div>

@@ -67,9 +67,7 @@ export const StepBudgetDetails = () => {
               <label
                 key={type.id}
                 className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 transition ${
-                  checked
-                    ? 'border-vast bg-vast text-lumen'
-                    : 'border-lumen-dk bg-lumen text-vast'
+                  checked ? 'border-vast bg-vast text-lumen' : 'border-lumen-dk bg-lumen text-vast'
                 }`}
               >
                 <Checkbox
@@ -77,10 +75,7 @@ export const StepBudgetDetails = () => {
                   onCheckedChange={() => actions.toggleMealType(type.id)}
                   className="hidden"
                 />
-                <span
-                  className="text-[12px] capitalize"
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                >
+                <span className="text-[12px] capitalize" style={{ fontFamily: 'var(--font-mono)' }}>
                   {type.label}
                 </span>
               </label>

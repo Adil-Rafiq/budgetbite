@@ -130,8 +130,7 @@ export const orderRepository = {
     }[]
   > {
     const rows = await db.query.mealChoice.findMany({
-      where: (mc, { eq, and }) =>
-        and(eq(mc.userId, userId), eq(mc.budgetPlanId, budgetPlanId)),
+      where: (mc, { eq, and }) => and(eq(mc.userId, userId), eq(mc.budgetPlanId, budgetPlanId)),
       columns: {
         id: true,
         slotDate: true,

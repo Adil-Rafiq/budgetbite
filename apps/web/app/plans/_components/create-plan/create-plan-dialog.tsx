@@ -55,8 +55,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
               className="h-full rounded-full transition-all"
               style={{
                 width: `${progress}%`,
-                background:
-                  'linear-gradient(90deg, var(--color-fathom), var(--color-vast))',
+                background: 'linear-gradient(90deg, var(--color-fathom), var(--color-vast))',
               }}
             />
           </div>

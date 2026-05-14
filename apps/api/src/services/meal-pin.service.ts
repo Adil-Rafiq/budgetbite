@@ -1,10 +1,6 @@
 import type { CreateMealPinInput, ListMealPinsQuery, MealPinResponse } from '@repo/shared';
 import { toNumber } from '@repo/shared';
-import {
-  budgetPlanRepository,
-  mealPinRepository,
-  type MealPinWithRefs,
-} from '@repo/database';
+import { budgetPlanRepository, mealPinRepository, type MealPinWithRefs } from '@repo/database';
 
 import { AppError } from '../middleware/error.middleware.js';
 
@@ -58,11 +54,7 @@ export const mealPinService = {
     await loadOwnedActive(userId, budgetPlanId);
 
     if (input.slotDate < todayDateString()) {
-      throw new AppError(
-        400,
-        'Pin slotDate must be today or in the future',
-        'PIN_SLOT_IN_PAST',
-      );
+      throw new AppError(400, 'Pin slotDate must be today or in the future', 'PIN_SLOT_IN_PAST');
     }
 
     const menu = await mealPinRepository.getCurrentMenuItemPrice(input.menuItemId);

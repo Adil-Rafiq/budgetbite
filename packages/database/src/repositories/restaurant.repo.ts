@@ -138,7 +138,10 @@ export const restaurantRepository = {
   },
 
   async count(
-    filters: Pick<ListRestaurantsFilters, 'maxDistanceKm' | 'userLat' | 'userLng' | 'minRating' | 'q'> = {},
+    filters: Pick<
+      ListRestaurantsFilters,
+      'maxDistanceKm' | 'userLat' | 'userLng' | 'minRating' | 'q'
+    > = {},
   ): Promise<number> {
     const { maxDistanceKm, userLat, userLng, minRating, q } = filters;
     const distanceExpr =
@@ -149,8 +152,7 @@ export const restaurantRepository = {
       conditions.push(sql`${distanceExpr} <= ${maxDistanceKm}`);
     if (q && q.trim().length > 0) conditions.push(ilike(restaurant.name, `%${q.trim()}%`));
     const base = db.select({ count: sql<number>`count(*)::int` }).from(restaurant);
-    const [row] =
-      conditions.length > 0 ? await base.where(and(...conditions)) : await base;
+    const [row] = conditions.length > 0 ? await base.where(and(...conditions)) : await base;
     return row?.count ?? 0;
   },
 

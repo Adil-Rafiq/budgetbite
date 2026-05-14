@@ -1,13 +1,7 @@
 import { and, desc, eq, gte, sql } from 'drizzle-orm';
 
 import { db, type DbOrTx } from '../db.js';
-import {
-  mealPin,
-  menuItem,
-  restaurant,
-  type MealPin,
-  type NewMealPin,
-} from '../schema/index.js';
+import { mealPin, menuItem, restaurant, type MealPin, type NewMealPin } from '../schema/index.js';
 
 export type MealPinWithRefs = MealPin & {
   restaurant: { id: string; name: string };

@@ -12,11 +12,7 @@ export function TableSkeleton({ rows = 5, columns = 4, className }: TableSkeleto
   const widths = (i: number) => COLUMN_WIDTHS[i % COLUMN_WIDTHS.length];
 
   return (
-    <div
-      className={cn('flex w-full flex-col gap-3', className)}
-      role="status"
-      aria-label="Loading"
-    >
+    <div className={cn('flex w-full flex-col gap-3', className)} role="status" aria-label="Loading">
       <div className="flex items-center gap-4 border-b border-lumen-dk pb-2">
         {Array.from({ length: columns }).map((_, i) => (
           <div key={i} className={cn('flex-1', i === columns - 1 && 'flex justify-end')}>

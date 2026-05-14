@@ -39,8 +39,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
   const avgPerMeal = activePlan?.budgetState.avgBudgetPerRemainingMeal ?? 0;
   const amountRemaining = activePlan?.budgetState.amountRemaining ?? 0;
   const mealsRemaining = activePlan?.budgetState.mealsRemaining ?? 0;
-  const foodpandaUrl =
-    r?.externalId && r?.slug ? buildFoodpandaUrl(r.externalId, r.slug) : null;
+  const foodpandaUrl = r?.externalId && r?.slug ? buildFoodpandaUrl(r.externalId, r.slug) : null;
 
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
@@ -171,10 +170,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
             </h2>
           </div>
           {menuQuery.data && (
-            <span
-              className="text-[11px] text-soft"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
+            <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
               {menuQuery.data.length} item{menuQuery.data.length === 1 ? '' : 's'}
             </span>
           )}
@@ -223,9 +219,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="truncate text-[14px] font-medium text-vast">
-                            {item.name}
-                          </p>
+                          <p className="truncate text-[14px] font-medium text-vast">{item.name}</p>
                           {fit && (
                             <span
                               className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] uppercase ${FIT_PILL[fit].className}`}

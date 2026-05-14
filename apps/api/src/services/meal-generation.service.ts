@@ -1,9 +1,4 @@
-import {
-  budgetPlanRepository,
-  db,
-  mealPlanRepository,
-  mealTypeRepository,
-} from '@repo/database';
+import { budgetPlanRepository, db, mealPlanRepository, mealTypeRepository } from '@repo/database';
 import type { NewMealSuggestion } from '@repo/database';
 import {
   aiPlanOutputSchema,
@@ -14,11 +9,7 @@ import {
   type NearbyRestaurantContext,
 } from '@repo/shared';
 import { ZodError } from 'zod';
-import {
-  SYSTEM_PROMPT,
-  buildGeneratePlanPrompt,
-  buildReplanPrompt,
-} from '@repo/ai/prompts';
+import { SYSTEM_PROMPT, buildGeneratePlanPrompt, buildReplanPrompt } from '@repo/ai/prompts';
 
 import { AppError } from '../middleware/error.middleware.js';
 import { llm } from '../lib/llm.js';
@@ -115,11 +106,7 @@ export const mealGenerationService = {
     const ctx = await contextBuilderService.build(planId, userId);
 
     if (ctx.remainingDates.length === 0) {
-      throw new AppError(
-        400,
-        'No remaining dates to plan for',
-        'NO_REMAINING_DATES',
-      );
+      throw new AppError(400, 'No remaining dates to plan for', 'NO_REMAINING_DATES');
     }
     if (ctx.restaurants.length === 0) {
       throw new AppError(
@@ -142,11 +129,7 @@ export const mealGenerationService = {
     const ctx = await contextBuilderService.build(planId, userId);
 
     if (ctx.remainingDates.length === 0) {
-      throw new AppError(
-        400,
-        'No remaining dates to replan for',
-        'NO_REMAINING_DATES',
-      );
+      throw new AppError(400, 'No remaining dates to replan for', 'NO_REMAINING_DATES');
     }
     if (ctx.restaurants.length === 0) {
       throw new AppError(
@@ -167,10 +150,7 @@ export const mealGenerationService = {
    */
   kickoffGenerationAsync(userId: string, planId: string): void {
     void this.generate(userId, planId).catch((err) => {
-      console.error(
-        `[mealGenerationService] auto-generate failed for plan=${planId}`,
-        err,
-      );
+      console.error(`[mealGenerationService] auto-generate failed for plan=${planId}`, err);
     });
   },
 
@@ -180,10 +160,7 @@ export const mealGenerationService = {
    */
   kickoffReplanAsync(userId: string, planId: string, triggerSummary: string): void {
     void this.replan(userId, planId, triggerSummary).catch((err) => {
-      console.error(
-        `[mealGenerationService] auto-replan failed for plan=${planId}`,
-        err,
-      );
+      console.error(`[mealGenerationService] auto-replan failed for plan=${planId}`, err);
     });
   },
 };
@@ -230,9 +207,7 @@ async function runGeneration({
       // generate for pinned (date, mealType) cells, drop any rows that match
       // before persisting. The read path always favors pins anyway, but
       // dropping here keeps the suggestion table free of dead rows.
-      pinnedSlotKeys: new Set(
-        ctx.pinnedSlots.map((p) => `${p.slotDate}|${p.mealTypeId}`),
-      ),
+      pinnedSlotKeys: new Set(ctx.pinnedSlots.map((p) => `${p.slotDate}|${p.mealTypeId}`)),
     };
 
     // ─── 2. Call the LLM with a retry-on-validation-failure loop ───────────
@@ -265,12 +240,9 @@ async function runGeneration({
 
       if (response.finishReason === 'length') {
         if (isLastAttempt) {
-          throw new AppError(
-            502,
-            'AI response truncated by token limit',
-            'AI_RESPONSE_TRUNCATED',
-            { cause: new Error(`max_tokens=${maxTokens} reached`) },
-          );
+          throw new AppError(502, 'AI response truncated by token limit', 'AI_RESPONSE_TRUNCATED', {
+            cause: new Error(`max_tokens=${maxTokens} reached`),
+          });
         }
         const nextMaxTokens = Math.ceil(maxTokens * TRUNCATION_TOKEN_MULTIPLIER);
         console.warn(

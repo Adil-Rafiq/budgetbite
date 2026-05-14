@@ -28,7 +28,7 @@ const steps = [
   {
     n: '02',
     title: 'Let the AI plan',
-    body: 'It fills the plan with meals that fit the budget and lean on your pinned restaurants. Don\'t like one? Swap it.',
+    body: "It fills the plan with meals that fit the budget and lean on your pinned restaurants. Don't like one? Swap it.",
   },
   {
     n: '03',
@@ -135,8 +135,8 @@ export default function LandingPage() {
             <span className="text-fathom">without the planning.</span>
           </h1>
           <p className="mx-auto mt-7 max-w-[58ch] text-[18px] leading-[1.55] text-ink">
-            BudgetBite plans your meals from real menus near you, within your budget.
-            You handle the ordering; we log what you paid and re-plan when spending drifts.
+            BudgetBite plans your meals from real menus near you, within your budget. You handle the
+            ordering; we log what you paid and re-plan when spending drifts.
           </p>
 
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
@@ -151,10 +151,7 @@ export default function LandingPage() {
             </Pill>
           </div>
 
-          <div
-            className="mt-5 text-[12px] text-soft"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
+          <div className="mt-5 text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
             No card · Sign in with Google or GitHub
           </div>
         </div>
@@ -206,8 +203,7 @@ export default function LandingPage() {
                     className="h-full rounded-full"
                     style={{
                       width: `${pct}%`,
-                      background:
-                        'linear-gradient(90deg, var(--color-fathom), var(--color-focus))',
+                      background: 'linear-gradient(90deg, var(--color-fathom), var(--color-focus))',
                     }}
                   />
                 </div>
@@ -239,16 +235,19 @@ export default function LandingPage() {
                         letterSpacing: '-0.02em',
                       }}
                     >
-                      Beef Nihari{' '}
-                      <span className="font-normal text-ink">+ naan</span>
+                      Beef Nihari <span className="font-normal text-ink">+ naan</span>
                     </h3>
                     <div className="mt-1 text-[14px] text-ink">
                       Sabri Nihari · Burns Road · 1.2 km
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Pill variant="ghost" size="xs">Re-roll</Pill>
-                    <Pill variant="accent" size="xs">Order on Foodpanda →</Pill>
+                    <Pill variant="ghost" size="xs">
+                      Re-roll
+                    </Pill>
+                    <Pill variant="accent" size="xs">
+                      Order on Foodpanda →
+                    </Pill>
                   </div>
                 </div>
 
@@ -260,9 +259,7 @@ export default function LandingPage() {
                       <div
                         key={day.d}
                         className={`rounded-xl border p-3 ${
-                          isTonight
-                            ? 'border-fathom bg-fathom/[0.06]'
-                            : 'border-lumen-dk bg-white'
+                          isTonight ? 'border-fathom bg-fathom/[0.06]' : 'border-lumen-dk bg-white'
                         }`}
                       >
                         <div
@@ -323,9 +320,8 @@ export default function LandingPage() {
             </div>
             <div className="col-span-12 lg:col-span-7 lg:col-start-6">
               <p className="text-[17px] leading-[1.55] text-ink">
-                BudgetBite is intentionally small. One screen, one button, one budget.
-                The AI is a helper, not a chat partner — it works inline and gets out
-                of the way.
+                BudgetBite is intentionally small. One screen, one button, one budget. The AI is a
+                helper, not a chat partner — it works inline and gets out of the way.
               </p>
             </div>
           </div>
@@ -355,9 +351,7 @@ export default function LandingPage() {
                   >
                     {s.title}
                   </h3>
-                  <p className="mt-3 text-[15px] leading-[1.6] text-ink">
-                    {s.body}
-                  </p>
+                  <p className="mt-3 text-[15px] leading-[1.6] text-ink">{s.body}</p>
                 </div>
               </li>
             ))}
@@ -384,8 +378,7 @@ export default function LandingPage() {
                 letterSpacing: '-0.025em',
               }}
             >
-              Your meals stay{' '}
-              <span className="text-ink">between you and your plan.</span>
+              Your meals stay <span className="text-ink">between you and your plan.</span>
             </h2>
           </div>
           <ul className="col-span-12 space-y-4 lg:col-span-7 lg:col-start-6">
@@ -395,10 +388,7 @@ export default function LandingPage() {
               'AI calls send the current plan and your pins. They do not include your name, email, or order history.',
               'BudgetBite does not place orders. It never sees your ordering accounts or payment details.',
             ].map((line) => (
-              <li
-                key={line}
-                className="flex items-start gap-3 text-[15px] text-vast"
-              >
+              <li key={line} className="flex items-start gap-3 text-[15px] text-vast">
                 <span
                   aria-hidden
                   className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-fathom text-lumen"
@@ -424,12 +414,11 @@ export default function LandingPage() {
               letterSpacing: '-0.03em',
             }}
           >
-            Plan your meals{' '}
-            <span className="text-fathom">in two minutes.</span>
+            Plan your meals <span className="text-fathom">in two minutes.</span>
           </h2>
           <p className="mx-auto mt-6 max-w-[54ch] text-[17px] leading-[1.6] text-ink">
-            Set a budget, pin a few restaurants you trust, and let the planner do the
-            rest. You can change engines and re-roll any day at any time.
+            Set a budget, pin a few restaurants you trust, and let the planner do the rest. You can
+            change engines and re-roll any day at any time.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <Pill asChild size="lg">
@@ -498,10 +487,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div
-          className="border-t border-lumen-dk"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
+        <div className="border-t border-lumen-dk" style={{ fontFamily: 'var(--font-mono)' }}>
           <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-3 px-8 py-5 text-[11px] text-ink">
             <span>© 2026 BudgetBite</span>
             <span>

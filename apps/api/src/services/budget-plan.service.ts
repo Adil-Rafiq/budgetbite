@@ -180,13 +180,9 @@ export const budgetPlanService = {
       if (!existing) return;
       const flipped = await budgetPlanRepository.completeIfExpiredById(existing.id, today, tx);
       if (flipped) return; // expired -> completed; user is free to create
-      throw new AppError(
-        409,
-        'You already have an active plan',
-        'PLAN_ALREADY_ACTIVE',
-        undefined,
-        { existingPlanId: existing.id },
-      );
+      throw new AppError(409, 'You already have an active plan', 'PLAN_ALREADY_ACTIVE', undefined, {
+        existingPlanId: existing.id,
+      });
     });
 
     await budgetPlanRepository.createWithRelations(

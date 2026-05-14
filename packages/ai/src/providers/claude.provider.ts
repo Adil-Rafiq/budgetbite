@@ -1,10 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type {
-  LLMFinishReason,
-  LLMMessage,
-  LLMRequestOptions,
-  LLMResponse,
-} from '@repo/shared';
+import type { LLMFinishReason, LLMMessage, LLMRequestOptions, LLMResponse } from '@repo/shared';
 import { BaseLLMProvider } from './base.provider.js';
 
 export class ClaudeProvider extends BaseLLMProvider {

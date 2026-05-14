@@ -49,16 +49,20 @@ There is no test runner configured yet.
 ## Architecture notes that aren't obvious from one file
 
 ### Auth is better-auth, not NextAuth
+
 Despite what `TECH-STACK.md` says about NextAuth, the actual implementation uses **better-auth** on both sides. The API mounts `app.all('/api/auth/{*any}', toNodeHandler(auth))` (`apps/api/src/index.ts`) and the web app calls those routes via the better-auth client (`apps/web/lib/auth-client.ts`). Session is a cookie (`better-auth.session_token`); `apps/web/proxy.ts` (Next 16's middleware) gates routes by checking that cookie. The user schema is **generated** from the better-auth config — do not hand-edit `packages/database/src/schema/auth.ts`; instead change `apps/api/src/lib/auth.ts` and run `pnpm db:generate`.
 
 ### Two-tier admin auth
+
 Admin routes (`/api/admin/*`) accept either:
+
 1. `X-API-Key: $ADMIN_API_KEY` (used by the scraper, service-to-service), or
 2. A logged-in user whose better-auth `role === 'admin'`.
 
 This is implemented in `apps/api/src/middleware/admin.middleware.ts`. The `role` field is added to better-auth via `additionalFields` in `apps/api/src/lib/auth.ts`. See `apps/api/DESIGN.md` §"Admin / Scraper API" for the full scheme.
 
 ### Layered architecture is enforced by convention
+
 - **Routes** validate with Zod (via `validate({ body, query, params })` middleware) and dispatch to controllers.
 - **Controllers** read `req`/`res` only — no DB, no business logic. They call services and shape responses.
 - **Services** contain business logic. They use repositories from `@repo/database`. They throw `AppError(statusCode, message, code)` for known failure cases — do not return error tuples.
@@ -67,18 +71,23 @@ This is implemented in `apps/api/src/middleware/admin.middleware.ts`. The `role`
 Per `TODO.md`: do NOT use `try/catch` in AI-related code — let `AppError`s bubble to `errorMiddleware`. The error middleware (`apps/api/src/middleware/error.middleware.ts`) handles `AppError`, `ZodError`, and unknown errors (returns generic 500).
 
 ### Numeric column round-tripping
+
 Drizzle returns `numeric`/`decimal` columns as **strings**. Services convert at the boundary: write side stringifies (`String(input.latitude)`), read side coerces to number (`Number(restaurant.latitude)`). Look at `restaurant.service.ts` for the pattern. Do not let strings leak past services.
 
 ### AI provider abstraction
+
 Code that calls the LLM should depend on the `LLMProvider` interface from `@repo/shared`, not a specific SDK. `createLLMProvider()` in `packages/ai/src/providers/index.ts` reads `AI_PROVIDER` (`anthropic` | `openai` | `google`) and `AI_MODEL_NAME` / `AI_API_KEY`. Default in `.env.example` is `google` + `gemini-2.5-flash` (free tier, no card required — see `TECH-STACK.md` §5).
 
 ### Shared validation lives in `@repo/shared`
+
 Zod schemas (e.g. `listRestaurantsSchema`, `uuidSchema`, `CreateRestaurantInput`) are defined once in `packages/shared/src/schemas/` and consumed by both API routes and web forms. When adding a new endpoint, add the schema there first, then import from `@repo/shared` in both apps.
 
 ### Onboarding state machine
+
 The web onboarding flow uses XState (`apps/web/app/onboarding/_hooks/use-onboarding.ts`). New onboarding steps go in `apps/web/app/onboarding/_components/steps/` and need to be wired into the machine, not just rendered conditionally.
 
 ### Web → API routing
+
 The web app uses `ky` (`apps/web/lib/api/client.ts`) pointing at `NEXT_PUBLIC_API_URL` (default `http://localhost:3001`). It sends credentials so the better-auth cookie reaches the API. There is no Next API route layer in front of the Express API.
 
 ## Environment

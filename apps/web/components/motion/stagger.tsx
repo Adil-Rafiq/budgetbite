@@ -9,12 +9,7 @@ interface StaggerProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
   stagger?: number;
 }
 
-export function Stagger({
-  children,
-  delay = 0,
-  stagger = 0.06,
-  ...rest
-}: StaggerProps) {
+export function Stagger({ children, delay = 0, stagger = 0.06, ...rest }: StaggerProps) {
   return (
     <motion.div
       initial="hidden"
