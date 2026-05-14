@@ -69,6 +69,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://drift:placeholder@localhost:5432/drift?sslmode=disable
           DIRECT_DATABASE_URL: postgresql://drift:placeholder@localhost:5432/drift?sslmode=disable
+          RESEND_API_KEY: re_placeholder
         run: |
           pnpm db:generate
           if [ -n "$(git status --porcelain packages/database)" ]; then
