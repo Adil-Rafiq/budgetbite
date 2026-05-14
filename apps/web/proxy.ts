@@ -7,8 +7,12 @@ const authRoutes = ['/login', '/register', '/verify-email']; // redirect to dash
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // check session cookie
-  const sessionCookie = req.cookies.get('better-auth.session_token')?.value;
+  // check session cookie — better-auth prefixes the cookie name with
+  // `__Secure-` when it's set with the Secure attribute (i.e. HTTPS prod),
+  // so we have to look for either name.
+  const sessionCookie =
+    req.cookies.get('better-auth.session_token')?.value ??
+    req.cookies.get('__Secure-better-auth.session_token')?.value;
   const isAuthenticated = !!sessionCookie;
 
   const isPublicRoute =
