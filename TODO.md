@@ -3,7 +3,7 @@
 ## In Progress
 
 ## Up Next
-
+- [ ] Update Google Auth Provider
 - [ ] Fix budget generating suggestions for a generation
 - [ ] Add logic checks in services
 - [ ] Remove any `try-catch` from the AI related code. Use `AppError` instead
