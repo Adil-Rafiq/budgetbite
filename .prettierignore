@@ -13,6 +13,7 @@ coverage
 *.log
 .env
 .env.local
+apps/web/next-env.d.ts
 
 # Database
 **/migrations/*.sql
