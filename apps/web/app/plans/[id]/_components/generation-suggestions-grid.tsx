@@ -28,10 +28,7 @@ function GridSkeleton() {
           <div className="h-5 w-32 animate-pulse rounded bg-lumen-dk" />
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, slotIdx) => (
-              <div
-                key={slotIdx}
-                className="h-40 w-full animate-pulse rounded-xl bg-lumen-dk"
-              />
+              <div key={slotIdx} className="h-40 w-full animate-pulse rounded-xl bg-lumen-dk" />
             ))}
           </div>
         </div>
@@ -78,9 +75,7 @@ function SlotCard({ slot }: { slot: SuggestionSlot }) {
                 <p className="truncate text-[13px] font-medium text-vast">
                   {option.menuItemName ?? '—'}
                 </p>
-                <p className="truncate text-[11px] text-ink">
-                  {option.restaurantName ?? '—'}
-                </p>
+                <p className="truncate text-[11px] text-ink">{option.restaurantName ?? '—'}</p>
               </div>
               <span
                 className="shrink-0 text-right text-[13px] font-semibold tabular-nums text-fathom"

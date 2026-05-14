@@ -58,9 +58,7 @@ export const BudgetStep = () => {
             style={{ fontFamily: 'var(--font-display)' }}
           />
         </div>
-        {errors.totalBudget && (
-          <p className="text-[11px] text-pulse">{errors.totalBudget}</p>
-        )}
+        {errors.totalBudget && <p className="text-[11px] text-pulse">{errors.totalBudget}</p>}
       </div>
 
       <div className="flex flex-col gap-3">
@@ -98,9 +96,7 @@ export const BudgetStep = () => {
             );
           })}
         </div>
-        {errors.mealTypeIds && (
-          <p className="text-[11px] text-pulse">{errors.mealTypeIds}</p>
-        )}
+        {errors.mealTypeIds && <p className="text-[11px] text-pulse">{errors.mealTypeIds}</p>}
       </div>
 
       <div className="rounded-xl border border-lumen-dk bg-lumen p-4 text-[13px] text-vast">

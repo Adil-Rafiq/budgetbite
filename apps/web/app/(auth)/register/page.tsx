@@ -155,11 +155,7 @@ export default function RegisterPage() {
             BudgetBite
           </span>
         </Link>
-        <Link
-          href="/"
-          className="text-[12px] text-ink"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
+        <Link href="/" className="text-[12px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
           ← back to home
         </Link>
       </header>
@@ -198,11 +194,7 @@ export default function RegisterPage() {
               '0 1px 0 rgba(0,0,0,0.04), 0 30px 80px -30px rgba(26,26,26,0.18), 0 8px 30px -10px rgba(26,26,26,0.06)',
           }}
         >
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            autoComplete="on"
-            className="flex flex-col gap-5"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} autoComplete="on" className="flex flex-col gap-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label htmlFor="firstName" className={labelClass} style={labelStyle}>
@@ -248,9 +240,7 @@ export default function RegisterPage() {
                 className={inputClass}
                 {...register('email')}
               />
-              {errors.email && (
-                <p className="text-[12px] text-pulse">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-[12px] text-pulse">{errors.email.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -281,13 +271,16 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <p
-              className="text-[11px] text-soft"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
+            <p className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
               By creating an account you agree to our{' '}
-              <a href="#" className="text-fathom">terms</a> and{' '}
-              <a href="#" className="text-fathom">privacy policy</a>.
+              <a href="#" className="text-fathom">
+                terms
+              </a>{' '}
+              and{' '}
+              <a href="#" className="text-fathom">
+                privacy policy
+              </a>
+              .
             </p>
 
             <Pill
@@ -296,7 +289,9 @@ export default function RegisterPage() {
               disabled={isSubmitting || oauthLoading !== null}
               className="mt-1 w-full"
             >
-              {isSubmitting ? 'Creating account…' : (
+              {isSubmitting ? (
+                'Creating account…'
+              ) : (
                 <>
                   Create account
                   <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>

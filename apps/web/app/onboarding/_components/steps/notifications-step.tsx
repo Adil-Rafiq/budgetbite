@@ -41,9 +41,7 @@ export const NotificationsStep = () => {
               >
                 {slot.label.slice(0, 1).toUpperCase()}
               </span>
-              <span className="text-[14px] font-medium capitalize text-vast">
-                {slot.label}
-              </span>
+              <span className="text-[14px] font-medium capitalize text-vast">{slot.label}</span>
             </div>
             <input
               type="time"

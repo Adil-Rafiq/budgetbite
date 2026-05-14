@@ -137,13 +137,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
   );
 }
 
-function PrimaryPill({
-  children,
-  disabled,
-}: {
-  children: React.ReactNode;
-  disabled: boolean;
-}) {
+function PrimaryPill({ children, disabled }: { children: React.ReactNode; disabled: boolean }) {
   return (
     <Pill type="submit" size="md" disabled={disabled} className="w-full">
       {children}

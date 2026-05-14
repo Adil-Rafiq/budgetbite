@@ -17,9 +17,7 @@ export const mealPinApi = {
       .json<ListMealPinsResponse>(),
 
   create: (planId: string, input: CreateMealPinInput) =>
-    apiClient
-      .post(`api/budget-plans/${planId}/meal-pins`, { json: input })
-      .json<MealPinResponse>(),
+    apiClient.post(`api/budget-plans/${planId}/meal-pins`, { json: input }).json<MealPinResponse>(),
 
   delete: (planId: string, pinId: string) =>
     apiClient.delete(`api/budget-plans/${planId}/meal-pins/${pinId}`).then(() => undefined),

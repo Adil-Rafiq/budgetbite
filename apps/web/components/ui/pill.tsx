@@ -23,8 +23,7 @@ const pillVariants = cva(
           'border border-[#1a1a1a] bg-transparent text-[#1a1a1a] hover:bg-black/[0.04] hover:-translate-y-px focus-visible:ring-[#1a1a1a]/30',
         ghost:
           'border border-[#e4e4d0] bg-white text-[#1a1a1a] hover:bg-[#ffffeb] hover:border-[#cfcfb8] focus-visible:ring-[#1a1a1a]/20',
-        subtle:
-          'bg-transparent text-[#1a1a1a] hover:bg-[#ffffeb] focus-visible:ring-[#1a1a1a]/20',
+        subtle: 'bg-transparent text-[#1a1a1a] hover:bg-[#ffffeb] focus-visible:ring-[#1a1a1a]/20',
         danger:
           'border border-[#7f1c34] bg-white text-[#7f1c34] hover:bg-[#7f1c34]/[0.06] hover:-translate-y-px focus-visible:ring-[#7f1c34]/30',
       },
@@ -48,8 +47,7 @@ export type PillVariant = NonNullable<VariantProps<typeof pillVariants>['variant
 export type PillSize = NonNullable<VariantProps<typeof pillVariants>['size']>;
 
 export interface PillProps
-  extends ComponentPropsWithoutRef<'button'>,
-    VariantProps<typeof pillVariants> {
+  extends ComponentPropsWithoutRef<'button'>, VariantProps<typeof pillVariants> {
   asChild?: boolean;
 }
 

@@ -87,9 +87,7 @@ function BannerShell({
       ? 'border-amber/20 bg-amber/10 text-amber'
       : 'border-pulse/20 bg-pulse/10 text-pulse';
   return (
-    <div
-      className={`flex items-start gap-3 rounded-xl border px-4 py-3 ${toneClass}`}
-    >
+    <div className={`flex items-start gap-3 rounded-xl border px-4 py-3 ${toneClass}`}>
       {children}
     </div>
   );

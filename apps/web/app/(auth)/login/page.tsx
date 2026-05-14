@@ -97,9 +97,10 @@ export default function LoginPage() {
 
     showToast({
       title: 'Login successful',
-      description: nextPath === '/dashboard'
-        ? 'Welcome back! Redirecting to dashboard...'
-        : 'Welcome back! Let’s finish setting up your account.',
+      description:
+        nextPath === '/dashboard'
+          ? 'Welcome back! Redirecting to dashboard...'
+          : 'Welcome back! Let’s finish setting up your account.',
       variant: 'success',
     });
 
@@ -157,11 +158,7 @@ export default function LoginPage() {
             BudgetBite
           </span>
         </Link>
-        <Link
-          href="/"
-          className="text-[12px] text-ink"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
+        <Link href="/" className="text-[12px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
           ← back to home
         </Link>
       </header>
@@ -188,9 +185,7 @@ export default function LoginPage() {
           >
             Welcome <span className="text-fathom">back.</span>
           </h1>
-          <p className="mt-3 text-[15px] leading-[1.55] text-ink">
-            Pick up where you left off.
-          </p>
+          <p className="mt-3 text-[15px] leading-[1.55] text-ink">Pick up where you left off.</p>
         </div>
 
         <div
@@ -200,11 +195,7 @@ export default function LoginPage() {
               '0 1px 0 rgba(0,0,0,0.04), 0 30px 80px -30px rgba(26,26,26,0.18), 0 8px 30px -10px rgba(26,26,26,0.06)',
           }}
         >
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            autoComplete="on"
-            className="flex flex-col gap-5"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} autoComplete="on" className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="email"
@@ -221,9 +212,7 @@ export default function LoginPage() {
                 className={inputClass}
                 {...register('email')}
               />
-              {errors.email && (
-                <p className="text-[12px] text-pulse">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-[12px] text-pulse">{errors.email.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -274,7 +263,9 @@ export default function LoginPage() {
               disabled={isSubmitting || oauthLoading !== null}
               className="mt-1 w-full"
             >
-              {isSubmitting ? 'Signing in…' : (
+              {isSubmitting ? (
+                'Signing in…'
+              ) : (
                 <>
                   Sign in
                   <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>

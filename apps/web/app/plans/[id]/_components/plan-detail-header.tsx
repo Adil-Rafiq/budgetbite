@@ -66,10 +66,7 @@ export function PlanDetailHeader({ plan }: { plan: BudgetPlanDetail }) {
               {plan.status}
             </span>
           </div>
-          <p
-            className="text-[13px] text-ink"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
+          <p className="text-[13px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
             {dateRange}
           </p>
         </div>

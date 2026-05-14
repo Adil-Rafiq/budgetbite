@@ -35,10 +35,7 @@ export default function OAuthCallbackPage() {
             signing in
           </span>
         </div>
-        <p
-          className="text-[14px] text-ink"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
+        <p className="text-[14px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
           completing handshake…
         </p>
       </div>

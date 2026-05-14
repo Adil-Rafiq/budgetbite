@@ -40,8 +40,7 @@ export function applyPinAdjustment(
 ): BudgetStateContext {
   const amountRemaining = Math.max(0, raw.amountRemaining - pinSpend);
   const mealsRemaining = Math.max(0, raw.mealsRemaining - pinCount);
-  const avgBudgetPerRemainingMeal =
-    mealsRemaining > 0 ? amountRemaining / mealsRemaining : 0;
+  const avgBudgetPerRemainingMeal = mealsRemaining > 0 ? amountRemaining / mealsRemaining : 0;
   return {
     ...raw,
     amountRemaining,

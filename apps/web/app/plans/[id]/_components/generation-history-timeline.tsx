@@ -16,10 +16,7 @@ interface GenerationHistoryTimelineProps {
 function TimelineSkeleton() {
   return (
     <div className="relative">
-      <div
-        className="absolute left-4 bottom-2 top-2 w-px bg-lumen-dk"
-        aria-hidden
-      />
+      <div className="absolute left-4 bottom-2 top-2 w-px bg-lumen-dk" aria-hidden />
       <div className="flex flex-col gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="pl-10">
@@ -94,10 +91,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
           </h2>
         </div>
         {total > 0 && (
-          <span
-            className="text-[11px] text-soft"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
+          <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
             {total} attempt{total === 1 ? '' : 's'}
           </span>
         )}
@@ -138,10 +132,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
       {header}
 
       <div className="relative">
-        <div
-          className="absolute left-[15px] bottom-2 top-2 w-px bg-lumen-dk"
-          aria-hidden
-        />
+        <div className="absolute left-[15px] bottom-2 top-2 w-px bg-lumen-dk" aria-hidden />
         <ol className="flex flex-col gap-3">
           {items.map((gen: BudgetGeneration) => (
             <li key={gen.id}>
@@ -158,10 +149,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
       </div>
 
       {data?.meta && total > items.length && (
-        <p
-          className="text-center text-[11px] text-soft"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
+        <p className="text-center text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
           showing the latest {items.length} of {total} attempts
         </p>
       )}

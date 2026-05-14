@@ -101,18 +101,14 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
               animate={{ width: `${spentPercent}%` }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
               style={{
-                background:
-                  'linear-gradient(90deg, var(--color-fathom), var(--color-amber))',
+                background: 'linear-gradient(90deg, var(--color-fathom), var(--color-amber))',
               }}
             />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <SummaryStat
-            label="Consumed"
-            value={`${ctx.mealsConsumed}/${ctx.totalMeals}`}
-          />
+          <SummaryStat label="Consumed" value={`${ctx.mealsConsumed}/${ctx.totalMeals}`} />
           <SummaryStat label="Remaining" value={String(ctx.mealsRemaining)} />
           <SummaryStat
             label="Avg / meal"

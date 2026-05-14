@@ -28,10 +28,7 @@ function PlansListSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div
-          key={i}
-          className="rounded-2xl border border-lumen-dk bg-white p-5"
-        >
+        <div key={i} className="rounded-2xl border border-lumen-dk bg-white p-5">
           <div className="flex items-center justify-between">
             <div className="h-3 w-20 animate-pulse rounded bg-lumen" />
             <div className="h-5 w-16 animate-pulse rounded-full bg-lumen" />
@@ -63,10 +60,7 @@ function PlansListEmpty() {
     <div className="rounded-2xl border border-dashed border-lumen-dk bg-white p-8 text-center">
       <p className="text-[14px] text-ink">
         No plans yet.
-        <span
-          className="ml-1.5 text-[12px] text-soft"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
+        <span className="ml-1.5 text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
           create one to get started.
         </span>
       </p>
@@ -129,7 +123,9 @@ export default function PlansList() {
                       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] uppercase ${STATUS_CLASS[tone].pill}`}
                       style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
                     >
-                      <span className={`inline-block h-1.5 w-1.5 rounded-full ${STATUS_CLASS[tone].dot}`} />
+                      <span
+                        className={`inline-block h-1.5 w-1.5 rounded-full ${STATUS_CLASS[tone].dot}`}
+                      />
                       {plan.status}
                     </span>
                   </div>
@@ -235,10 +231,7 @@ export default function PlansList() {
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between pt-2">
-          <p
-            className="text-[11px] text-ink"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
+          <p className="text-[11px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
             page {page + 1} of {totalPages} · {meta.total} total
           </p>
           <div className="flex gap-2">

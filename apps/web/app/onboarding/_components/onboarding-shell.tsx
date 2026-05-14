@@ -69,10 +69,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
             BudgetBite
           </span>
         </Link>
-        <div
-          className="text-[12px] text-ink"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
+        <div className="text-[12px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
           setup · step {String(currentStep + 1).padStart(2, '0')} /{' '}
           {String(ONBOARDING_STEPS.length).padStart(2, '0')}
         </div>
@@ -106,9 +103,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
                   </span>
                 </div>
                 {i < ONBOARDING_STEPS.length - 1 && (
-                  <div
-                    className={`h-px flex-1 ${isDone ? 'bg-fathom' : 'bg-lumen-dk'}`}
-                  />
+                  <div className={`h-px flex-1 ${isDone ? 'bg-fathom' : 'bg-lumen-dk'}`} />
                 )}
               </li>
             );
@@ -141,9 +136,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
             >
               {currentStepData.title}
             </h1>
-            <p className="mt-1.5 text-[14px] text-ink">
-              {currentStepData.description}
-            </p>
+            <p className="mt-1.5 text-[14px] text-ink">{currentStepData.description}</p>
           </div>
 
           <div className="px-7 py-7">{children}</div>
@@ -162,7 +155,9 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
 
           {!isLastStep ? (
             <Pill size="md" onClick={handleContinue} disabled={isSubmitting}>
-              {isSubmitting ? 'Saving…' : (
+              {isSubmitting ? (
+                'Saving…'
+              ) : (
                 <>
                   Continue
                   <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
@@ -171,7 +166,9 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
             </Pill>
           ) : (
             <Pill variant="accent" size="md" onClick={handleFinish} disabled={isSubmitting}>
-              {isSubmitting ? 'Finishing…' : (
+              {isSubmitting ? (
+                'Finishing…'
+              ) : (
                 <>
                   Finish setup
                   <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>

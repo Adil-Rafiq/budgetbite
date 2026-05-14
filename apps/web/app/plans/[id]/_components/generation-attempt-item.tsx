@@ -12,11 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { Pill } from '@/components/ui/pill';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
@@ -175,9 +171,7 @@ export function GenerationAttemptItem({
 
         {isFailed && generation.errorMessage && (
           <div className="rounded-lg border border-pulse/20 bg-pulse/[0.06] p-3 text-[12px] text-pulse">
-            <span className="font-medium">
-              {generation.errorCode ?? 'GENERATION_FAILED'}:
-            </span>{' '}
+            <span className="font-medium">{generation.errorCode ?? 'GENERATION_FAILED'}:</span>{' '}
             {generation.errorMessage}
           </div>
         )}

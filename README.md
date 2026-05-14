@@ -93,20 +93,20 @@ A few things that aren't obvious from one file:
 
 Key vars:
 
-| Var | Purpose |
-| --- | --- |
-| `DATABASE_URL`, `DIRECT_DATABASE_URL` | Neon connection strings (pooled + direct for migrations) |
-| `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` | better-auth session signing + base URL |
-| `GOOGLE_CLIENT_*`, `GITHUB_CLIENT_*` | OAuth providers |
-| `RESEND_API_KEY`, `EMAIL_FROM` | Transactional email (password reset, verification) |
-| `ADMIN_API_KEY` | Shared secret the scraper uses to call admin endpoints |
-| `AI_PROVIDER`, `AI_MODEL_NAME`, `AI_API_KEY` | LLM selection |
-| `AI_GENERATION_TEMPERATURE`, `AI_GENERATION_MAX_TOKENS`, `AI_GENERATION_MAX_RETRIES` | LLM generation tuning |
-| `NEARBY_RADIUS_KM` | Default proximity radius for restaurant filtering |
-| `MAX_RESTAURANTS`, `MAX_ITEMS_PER_RESTAURANT` | Caps passed into the AI context |
-| `REPLAN_CUMULATIVE_DEVIATION_RATIO_THRESHOLD` | When actual spend drifts this far from plan, trigger a re-plan |
-| `AUTO_GENERATE_ON_CREATE` | Generate an initial AI plan on budget-plan creation |
-| `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WEB_URL` | Public origins for the web app |
+| Var                                                                                  | Purpose                                                        |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| `DATABASE_URL`, `DIRECT_DATABASE_URL`                                                | Neon connection strings (pooled + direct for migrations)       |
+| `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`                                              | better-auth session signing + base URL                         |
+| `GOOGLE_CLIENT_*`, `GITHUB_CLIENT_*`                                                 | OAuth providers                                                |
+| `RESEND_API_KEY`, `EMAIL_FROM`                                                       | Transactional email (password reset, verification)             |
+| `ADMIN_API_KEY`                                                                      | Shared secret the scraper uses to call admin endpoints         |
+| `AI_PROVIDER`, `AI_MODEL_NAME`, `AI_API_KEY`                                         | LLM selection                                                  |
+| `AI_GENERATION_TEMPERATURE`, `AI_GENERATION_MAX_TOKENS`, `AI_GENERATION_MAX_RETRIES` | LLM generation tuning                                          |
+| `NEARBY_RADIUS_KM`                                                                   | Default proximity radius for restaurant filtering              |
+| `MAX_RESTAURANTS`, `MAX_ITEMS_PER_RESTAURANT`                                        | Caps passed into the AI context                                |
+| `REPLAN_CUMULATIVE_DEVIATION_RATIO_THRESHOLD`                                        | When actual spend drifts this far from plan, trigger a re-plan |
+| `AUTO_GENERATE_ON_CREATE`                                                            | Generate an initial AI plan on budget-plan creation            |
+| `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WEB_URL`                                         | Public origins for the web app                                 |
 
 ## Conventions
 

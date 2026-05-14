@@ -66,9 +66,7 @@ export const LocationStep = () => {
             className={inputClass}
             style={inputStyle}
           />
-          {errors.latitude && (
-            <p className="text-[11px] text-pulse">{errors.latitude}</p>
-          )}
+          {errors.latitude && <p className="text-[11px] text-pulse">{errors.latitude}</p>}
         </div>
         <div className="flex flex-col gap-2">
           <label htmlFor="longitude" className={labelClass} style={labelStyle}>
@@ -85,9 +83,7 @@ export const LocationStep = () => {
             className={inputClass}
             style={inputStyle}
           />
-          {errors.longitude && (
-            <p className="text-[11px] text-pulse">{errors.longitude}</p>
-          )}
+          {errors.longitude && <p className="text-[11px] text-pulse">{errors.longitude}</p>}
         </div>
       </div>
 

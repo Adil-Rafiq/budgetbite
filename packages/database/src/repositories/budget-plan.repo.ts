@@ -210,10 +210,7 @@ export const budgetPlanRepository = {
    * the precondition gate; the partial unique index on (userId WHERE
    * status='active') is the final backstop.
    */
-  async findActiveByUserIdForUpdate(
-    userId: string,
-    tx: DbOrTx,
-  ): Promise<BudgetPlan | undefined> {
+  async findActiveByUserIdForUpdate(userId: string, tx: DbOrTx): Promise<BudgetPlan | undefined> {
     const [row] = await tx
       .select()
       .from(budgetPlan)

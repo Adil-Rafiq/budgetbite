@@ -88,10 +88,7 @@ export function NotificationTimesCard() {
           <>
             <div className="flex flex-col gap-2">
               {times.length === 0 && (
-                <p
-                  className="text-[12px] text-soft"
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                >
+                <p className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
                   no reminders configured. add one below.
                 </p>
               )}
@@ -122,11 +119,7 @@ export function NotificationTimesCard() {
                 <Plus className="h-3.5 w-3.5" />
                 Add time
               </Pill>
-              <Pill
-                size="xs"
-                onClick={save}
-                disabled={!isDirty || !allValid || isPending}
-              >
+              <Pill size="xs" onClick={save} disabled={!isDirty || !allValid || isPending}>
                 {isPending ? 'Saving…' : 'Save'}
               </Pill>
             </div>

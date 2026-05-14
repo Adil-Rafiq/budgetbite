@@ -77,9 +77,7 @@ function PinnedBody({ option }: { option: SuggestionOption }) {
   return (
     <div className="flex items-start justify-between gap-3 rounded-lg border border-fathom/20 bg-fathom/[0.03] p-3">
       <div className="min-w-0">
-        <p className="truncate text-[13px] font-medium text-vast">
-          {option.menuItemName ?? '—'}
-        </p>
+        <p className="truncate text-[13px] font-medium text-vast">{option.menuItemName ?? '—'}</p>
         {option.restaurantName && (
           <p className="mt-0.5 truncate text-[11px] text-ink">{option.restaurantName}</p>
         )}
@@ -274,10 +272,7 @@ function SectionBanner({ label, count }: { label: string; count: number }) {
       >
         {label}
       </span>
-      <span
-        className="text-[11px] text-soft"
-        style={{ fontFamily: 'var(--font-mono)' }}
-      >
+      <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
         {count} day{count === 1 ? '' : 's'}
       </span>
       <div className="h-px flex-1 bg-lumen-dk" />
@@ -327,10 +322,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
         </h2>
       </div>
       {data && (
-        <span
-          className="text-[11px] text-soft"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
+        <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
           {data.days.length} day{data.days.length === 1 ? '' : 's'}
         </span>
       )}

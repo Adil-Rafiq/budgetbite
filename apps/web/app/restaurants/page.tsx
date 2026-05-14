@@ -138,10 +138,7 @@ export default function RestaurantsPage() {
               className="hidden flex-col items-end gap-0.5 sm:flex"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
-              <p
-                className="text-[11px] uppercase text-soft"
-                style={{ letterSpacing: '0.18em' }}
-              >
+              <p className="text-[11px] uppercase text-soft" style={{ letterSpacing: '0.18em' }}>
                 avg target / meal
               </p>
               <p
@@ -156,7 +153,8 @@ export default function RestaurantsPage() {
                 ₨ {avgPerMeal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </p>
               <p className="text-[11px] text-ink">
-                ₨ {amountRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 })} remaining
+                ₨ {amountRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 })}{' '}
+                remaining
               </p>
             </div>
           )}
@@ -219,10 +217,7 @@ export default function RestaurantsPage() {
                   disabled={!hasLocation}
                 />
                 {!hasLocation && (
-                  <p
-                    className="text-[11px] text-soft"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
+                  <p className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
                     set your location in profile to enable distance.
                   </p>
                 )}
@@ -231,9 +226,7 @@ export default function RestaurantsPage() {
               <div className="flex flex-col gap-2">
                 <Label className={labelClass} style={labelStyle}>
                   Minimum rating:{' '}
-                  <span className="text-fathom">
-                    {minRating === 0 ? 'Any' : `${minRating}+`}
-                  </span>
+                  <span className="text-fathom">{minRating === 0 ? 'Any' : `${minRating}+`}</span>
                 </Label>
                 <Slider
                   value={[minRating]}
@@ -384,10 +377,7 @@ export default function RestaurantsPage() {
               >
                 ← prev
               </Pill>
-              <p
-                className="text-[11px] text-ink"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
+              <p className="text-[11px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
                 page {page + 1}
                 {isFetching ? ' · loading…' : ''}
               </p>

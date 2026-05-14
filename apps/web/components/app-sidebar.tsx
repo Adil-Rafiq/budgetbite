@@ -138,9 +138,7 @@ export function AppSidebar() {
             {initials(user?.name)}
           </span>
           <div className="flex min-w-0 flex-col">
-            <span className="truncate text-[13px] font-medium text-vast">
-              {user?.name ?? '—'}
-            </span>
+            <span className="truncate text-[13px] font-medium text-vast">{user?.name ?? '—'}</span>
             <span
               className="truncate text-[11px] text-soft"
               style={{ fontFamily: 'var(--font-mono)' }}

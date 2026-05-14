@@ -77,9 +77,7 @@ function NoPlanMessage() {
         >
           Set this week&apos;s budget to get started.
         </p>
-        <p className="text-[13px] text-ink">
-          Two minutes. We&apos;ll plan the meals.
-        </p>
+        <p className="text-[13px] text-ink">Two minutes. We&apos;ll plan the meals.</p>
       </div>
       <Pill asChild size="md" className="self-start sm:self-auto">
         <Link href="/plans">

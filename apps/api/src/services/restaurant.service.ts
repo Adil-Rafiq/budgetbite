@@ -43,7 +43,11 @@ async function resolveBudgetFitTarget(userId?: string): Promise<number | null> {
     cumulativeVariance: Number(ctx.cumulativeVariance),
   };
   const pinAggregate = await mealPinRepository.sumFutureForPlan(plan.id, todayDateString());
-  const adjusted = applyPinAdjustment(raw, Number(pinAggregate.totalPriceAtPin), pinAggregate.count);
+  const adjusted = applyPinAdjustment(
+    raw,
+    Number(pinAggregate.totalPriceAtPin),
+    pinAggregate.count,
+  );
   return adjusted.avgBudgetPerRemainingMeal > 0 ? adjusted.avgBudgetPerRemainingMeal : null;
 }
 

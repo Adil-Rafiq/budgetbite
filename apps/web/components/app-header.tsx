@@ -79,10 +79,7 @@ export function AppHeader() {
                   transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
                 />
               </div>
-              <span
-                className="text-ink"
-                style={{ fontFamily: 'var(--font-mono)', fontSize: 10 }}
-              >
+              <span className="text-ink" style={{ fontFamily: 'var(--font-mono)', fontSize: 10 }}>
                 {spentPercent}%
               </span>
             </div>
