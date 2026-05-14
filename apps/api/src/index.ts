@@ -4,6 +4,7 @@ import express from 'express';
 import { toNodeHandler } from 'better-auth/node';
 
 import { auth } from './lib/auth.js';
+import { isAllowedOrigin } from './lib/origins.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
 
 import userRoutes from './routes/user.routes.js';
@@ -21,10 +22,15 @@ const baseUrl = process.env.API_URL || `http://localhost:${port}`;
 
 app.use(
   cors({
-    origin: process.env.WEB_URL || 'http://localhost:3000',
+    origin(origin, callback) {
+      // Server-to-server requests (no Origin header) — e.g. the scraper.
+      if (!origin) return callback(null, true);
+      if (isAllowedOrigin(origin)) return callback(null, true);
+      return callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
   }),
 );
 
