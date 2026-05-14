@@ -22,6 +22,10 @@ cd apps/api
 pnpm run auth:generate
 cd ../..
 
+# better-auth's CLI writes with its own formatting (double quotes); normalize
+# to the repo's prettier config so CI's drift check doesn't trip on quote style.
+pnpm exec prettier --write packages/database/src/schema/auth.ts
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🗄️  Step 2: Generating Drizzle migration"
