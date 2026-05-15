@@ -37,8 +37,12 @@ export const useLocationStep = (profile?: UserProfile | null) => {
 
   // ─── Actions ────────────────────────────────────────────────────────────────
 
-  const setCoordinate = (field: 'latitude' | 'longitude', value: number) => {
-    form.setValue(field, Number.isFinite(value) ? value : undefined, {
+  const setCoordinates = (latitude: number, longitude: number) => {
+    form.setValue('latitude', Number.isFinite(latitude) ? latitude : undefined, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    form.setValue('longitude', Number.isFinite(longitude) ? longitude : undefined, {
       shouldValidate: true,
       shouldDirty: true,
     });
@@ -55,14 +59,7 @@ export const useLocationStep = (profile?: UserProfile | null) => {
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         // Truncate to 4 decimal places — ~11m precision, enough for restaurant proximity
-        form.setValue('latitude', Number(coords.latitude.toFixed(4)), {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
-        form.setValue('longitude', Number(coords.longitude.toFixed(4)), {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
+        setCoordinates(Number(coords.latitude.toFixed(4)), Number(coords.longitude.toFixed(4)));
         setIsDetectingLocation(false);
         showToast.success({ title: 'Location detected!' });
       },
@@ -77,27 +74,14 @@ export const useLocationStep = (profile?: UserProfile | null) => {
     );
   };
 
-  // ─── Watched values ──────────────────────────────────────────────────────
-
-  const latitude = form.watch('latitude');
-  const longitude = form.watch('longitude');
-
   // ─── Exposed API ──────────────────────────────────────────────────────────
 
   return {
     handleSubmit: form.handleSubmit,
-    trigger: form.trigger,
-    isValid: form.formState.isValid,
-    isDirty: form.formState.isDirty,
 
     values: {
-      latitude,
-      longitude,
-    },
-
-    errors: {
-      latitude: form.formState.errors.latitude?.message,
-      longitude: form.formState.errors.longitude?.message,
+      latitude: form.watch('latitude'),
+      longitude: form.watch('longitude'),
     },
 
     state: {
@@ -106,8 +90,7 @@ export const useLocationStep = (profile?: UserProfile | null) => {
 
     actions: {
       detectLocation,
-      setLatitude: (value: number) => setCoordinate('latitude', value),
-      setLongitude: (value: number) => setCoordinate('longitude', value),
+      setCoordinates,
     },
   };
 };
