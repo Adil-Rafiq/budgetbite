@@ -1,6 +1,7 @@
 'use client';
 
 import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-context';
+import { TimePicker } from '@/components/ui/time-picker';
 
 const labelClass = 'text-[11px] uppercase text-ink';
 const labelStyle: React.CSSProperties = {
@@ -49,17 +50,12 @@ export const NotificationsStep = () => {
               <span className="text-[14px] font-medium capitalize text-vast">{slot.label}</span>
             </div>
             <div className="flex items-center gap-2">
-              <input
-                type="time"
+              <TimePicker
                 value={slot.time}
-                onChange={(e) => actions.updateNotificationTime(slot.mealTypeId, e.target.value)}
+                onChange={(next) => actions.updateNotificationTime(slot.mealTypeId, next)}
                 disabled={!slot.enabled}
-                className={`w-[130px] rounded-[10px] border bg-white px-3.5 py-2.5 text-[14px] outline-none transition ${
-                  slot.enabled
-                    ? 'border-lumen-dk text-vast'
-                    : 'border-lumen-dk/60 text-soft line-through'
-                }`}
-                style={{ fontFamily: 'var(--font-mono)' }}
+                size="md"
+                aria-label={`${slot.label} reminder time`}
               />
               <button
                 type="button"

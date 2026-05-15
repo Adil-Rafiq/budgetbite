@@ -1,4 +1,5 @@
 import { useCreatePlanContext } from '@/app/plans/_context/create-plan-context';
+import { TimePicker } from '@/components/ui/time-picker';
 
 export const StepNotifications = () => {
   const { steps } = useCreatePlanContext();
@@ -36,17 +37,12 @@ export const StepNotifications = () => {
               <span className="text-[13px] font-medium capitalize text-vast">{slot.label}</span>
             </div>
             <div className="flex items-center gap-2">
-              <input
-                type="time"
+              <TimePicker
                 value={slot.time}
-                onChange={(e) => actions.updateNotificationTime(slot.mealTypeId, e.target.value)}
+                onChange={(next) => actions.updateNotificationTime(slot.mealTypeId, next)}
                 disabled={!slot.enabled}
-                className={`w-[105px] rounded-[8px] border bg-white px-2.5 py-1.5 text-[12px] outline-none transition ${
-                  slot.enabled
-                    ? 'border-lumen-dk text-vast'
-                    : 'border-lumen-dk/60 text-soft line-through'
-                }`}
-                style={{ fontFamily: 'var(--font-mono)' }}
+                size="sm"
+                aria-label={`${slot.label} reminder time`}
               />
               <button
                 type="button"

@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Bell, Plus, Trash2 } from 'lucide-react';
 
-import { Input } from '@/components/ui/input';
 import { Pill } from '@/components/ui/pill';
+import { TimePicker } from '@/components/ui/time-picker';
 import { useActiveBudgetPlan, useUpdateBudgetPlan } from '@/hooks/use-budget-plan';
 import { showToast } from '@/lib/toast';
 import { getErrorMessage } from '@/lib/api/errors';
@@ -101,15 +101,12 @@ export function NotificationTimesCard() {
               )}
               {slots.map((slot, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <Input
-                    type="time"
+                  <TimePicker
                     value={slot.time}
-                    onChange={(e) => updateTime(i, e.target.value)}
+                    onChange={(next) => updateTime(i, next)}
                     disabled={!slot.enabled}
-                    className={`w-32 border-lumen-dk bg-lumen ${
-                      slot.enabled ? 'text-vast' : 'text-soft line-through'
-                    }`}
-                    style={{ fontFamily: 'var(--font-mono)' }}
+                    size="md"
+                    aria-label={`Reminder ${i + 1} time`}
                   />
                   <Pill
                     variant={slot.enabled ? 'primary' : 'ghost'}
