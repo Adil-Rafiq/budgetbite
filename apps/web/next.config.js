@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+import process from 'process';
 
 // When set, all /api/* requests hitting this Next.js app are proxied to the
 // given origin. This is how we keep the browser talking to a single origin
