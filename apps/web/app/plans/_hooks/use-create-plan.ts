@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useMachine } from '@xstate/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCancelBudgetPlan, useCreateBudgetPlan } from '@/hooks/use-budget-plan';
@@ -11,6 +12,8 @@ import { useBudgetStep } from '@/app/plans/_hooks/use-budget-step';
 import { useNotificationStep } from '@/app/plans/_hooks/use-notification-step';
 import type { BudgetPlanPreferencesInput } from '@/app/plans/types';
 import { getErrorMessage, isPlanAlreadyActive } from '@/lib/api/errors';
+
+export type MealTypesStatus = 'loading' | 'error' | 'empty' | 'ready';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -45,7 +48,26 @@ export const useCreatePlan = (replaceActivePlanId: string | null = null) => {
   const queryClient = useQueryClient();
   const { mutateAsync: createBudgetPlan } = useCreateBudgetPlan();
   const { mutateAsync: cancelBudgetPlan } = useCancelBudgetPlan();
-  const { data: activeMealTypes = [] } = useListActiveMealTypes();
+  const mealTypesQuery = useListActiveMealTypes();
+  const activeMealTypes = mealTypesQuery.data ?? [];
+
+  const mealTypesStatus: MealTypesStatus = mealTypesQuery.isLoading
+    ? 'loading'
+    : mealTypesQuery.isError
+      ? 'error'
+      : activeMealTypes.length === 0
+        ? 'empty'
+        : 'ready';
+
+  // One toast per error transition. Retries that also fail will toast again.
+  useEffect(() => {
+    if (mealTypesStatus === 'error') {
+      showToast.error({
+        title: 'Could not load meal types',
+        description: 'Try again, or come back in a moment.',
+      });
+    }
+  }, [mealTypesStatus]);
 
   // ─── Step hooks ─────────────────────────────────────────────────────────
 
@@ -66,6 +88,9 @@ export const useCreatePlan = (replaceActivePlanId: string | null = null) => {
   const progress = ((currentStep + 1) / CREATE_PLAN_STEPS.length) * 100;
   const currentStepData = CREATE_PLAN_STEPS[currentStep];
   const isLastStep = currentStep === CREATE_PLAN_STEPS.length - 1;
+
+  // Both steps of this dialog (budget, notifications) depend on meal types.
+  const canAdvance = mealTypesStatus === 'ready';
 
   // ─── Step handlers ───────────────────────────────────────────────────────
 
@@ -95,7 +120,7 @@ export const useCreatePlan = (replaceActivePlanId: string | null = null) => {
           ...budget,
           mealsPerDay: budget.mealTypeIds.length,
           ...getPlanDateRange(budget.planType),
-          notificationTimes: notificationSlots.map((s) => s.time),
+          notificationTimes: notificationSlots.map((s) => ({ time: s.time, enabled: s.enabled })),
         });
       } catch (err) {
         // Race fallback: another tab created an active plan between our
@@ -151,6 +176,14 @@ export const useCreatePlan = (replaceActivePlanId: string | null = null) => {
     currentStepData,
     isLastStep,
     isSubmitting,
+    canAdvance,
+
+    mealTypes: {
+      status: mealTypesStatus,
+      refetch: () => {
+        void mealTypesQuery.refetch();
+      },
+    },
 
     steps: {
       budget: budgetStep,

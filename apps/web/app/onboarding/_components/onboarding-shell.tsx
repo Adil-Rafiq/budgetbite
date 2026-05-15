@@ -34,6 +34,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
     actions: { handleContinue, handleBack, handleFinish },
     isLastStep,
     isSubmitting,
+    canAdvance,
   } = useOnboardingContext();
 
   if (!currentStepData) return null;
@@ -154,7 +155,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
           </Pill>
 
           {!isLastStep ? (
-            <Pill size="md" onClick={handleContinue} disabled={isSubmitting}>
+            <Pill size="md" onClick={handleContinue} disabled={isSubmitting || !canAdvance}>
               {isSubmitting ? (
                 'Saving…'
               ) : (
@@ -165,7 +166,12 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
               )}
             </Pill>
           ) : (
-            <Pill variant="accent" size="md" onClick={handleFinish} disabled={isSubmitting}>
+            <Pill
+              variant="accent"
+              size="md"
+              onClick={handleFinish}
+              disabled={isSubmitting || !canAdvance}
+            >
               {isSubmitting ? (
                 'Finishing…'
               ) : (

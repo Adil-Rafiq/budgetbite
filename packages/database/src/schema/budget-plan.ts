@@ -30,7 +30,7 @@ export const budgetPlan = pgTable(
     startDate: date('start_date', { mode: 'string' }).notNull(),
     endDate: date('end_date', { mode: 'string' }).notNull(),
     mealsPerDay: integer('meals_per_day').notNull(),
-    notificationTimes: jsonb('notification_times').$type<string[]>(),
+    notificationTimes: jsonb('notification_times').$type<{ time: string; enabled: boolean }[]>(),
     status: text('status', { enum: ['active', 'completed', 'cancelled'] })
       .notNull()
       .default('active'),

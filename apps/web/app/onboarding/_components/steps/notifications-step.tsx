@@ -19,7 +19,8 @@ export const NotificationsStep = () => {
           Reminder times
         </label>
         <p className="text-[13px] text-ink">
-          A single nudge per meal, at the time you choose. Off until you flip them on in settings.
+          A single nudge per meal, at the time you choose. Toggle off any meal you don&apos;t want a
+          reminder for.
         </p>
       </div>
 
@@ -31,7 +32,11 @@ export const NotificationsStep = () => {
               i === 0 ? '' : 'border-t border-lumen-dk'
             } ${i % 2 === 0 ? 'bg-white' : 'bg-lumen-dk/25'}`}
           >
-            <div className="flex items-center gap-3">
+            <div
+              className={`flex items-center gap-3 transition-opacity ${
+                slot.enabled ? '' : 'opacity-50'
+              }`}
+            >
               <span
                 className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-fathom/10 text-[12px] text-fathom"
                 style={{
@@ -43,13 +48,36 @@ export const NotificationsStep = () => {
               </span>
               <span className="text-[14px] font-medium capitalize text-vast">{slot.label}</span>
             </div>
-            <input
-              type="time"
-              value={slot.time}
-              onChange={(e) => actions.updateNotificationTime(slot.mealTypeId, e.target.value)}
-              className="w-[140px] rounded-[10px] border border-lumen-dk bg-white px-3.5 py-2.5 text-[14px] text-vast outline-none"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            />
+            <div className="flex items-center gap-2">
+              <input
+                type="time"
+                value={slot.time}
+                onChange={(e) => actions.updateNotificationTime(slot.mealTypeId, e.target.value)}
+                disabled={!slot.enabled}
+                className={`w-[130px] rounded-[10px] border bg-white px-3.5 py-2.5 text-[14px] outline-none transition ${
+                  slot.enabled
+                    ? 'border-lumen-dk text-vast'
+                    : 'border-lumen-dk/60 text-soft line-through'
+                }`}
+                style={{ fontFamily: 'var(--font-mono)' }}
+              />
+              <button
+                type="button"
+                onClick={() => actions.toggleNotificationEnabled(slot.mealTypeId)}
+                aria-pressed={slot.enabled}
+                aria-label={
+                  slot.enabled ? `Disable ${slot.label} reminder` : `Enable ${slot.label} reminder`
+                }
+                className={`rounded-full px-3 py-1.5 text-[11px] font-semibold transition active:scale-[0.96] ${
+                  slot.enabled
+                    ? 'bg-fathom text-lumen hover:bg-fathom/90'
+                    : 'border border-lumen-dk bg-white text-soft hover:border-fathom/40 hover:text-ink'
+                }`}
+                style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.1em' }}
+              >
+                {slot.enabled ? 'ON' : 'OFF'}
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -67,9 +95,9 @@ export const NotificationsStep = () => {
             ◉
           </span>
           <div>
-            <div className="font-medium">You can turn these on later</div>
+            <div className="font-medium">Quiet by default</div>
             <div className="mt-0.5 text-[12px] text-ink">
-              We never send marketing or social pings. Only the one nudge per meal you ask for.
+              We only send the reminders you opt in to. Toggle any meal off any time from settings.
             </div>
           </div>
         </div>

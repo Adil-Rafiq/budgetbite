@@ -20,7 +20,8 @@ type Props = {
 
 export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = null }: Props) {
   const createPlan = useCreatePlan(replaceActivePlanId);
-  const { currentStep, currentStepData, progress, isLastStep, isSubmitting, actions } = createPlan;
+  const { currentStep, currentStepData, progress, isLastStep, isSubmitting, canAdvance, actions } =
+    createPlan;
   const stepNumber = String(currentStep + 1).padStart(2, '0');
 
   return (
@@ -72,7 +73,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
             <Pill
               size="sm"
               onClick={isLastStep ? actions.handleSubmit : actions.handleNext}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !canAdvance}
             >
               {isLastStep ? (isSubmitting ? 'Creating…' : 'Create plan') : 'Next'}
               <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>

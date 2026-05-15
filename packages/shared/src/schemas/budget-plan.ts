@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 import {
   isoDateStringSchema,
+  notificationTimeSchema,
   paginatedSchema,
   paginationSchema,
-  timeOfDayStringSchema,
   uuidSchema,
 } from './common.js';
 import { mealTypeSummarySchema } from './meal-type.js';
@@ -21,7 +21,7 @@ export const createBudgetPlanSchema = z
     endDate: isoDateStringSchema,
     mealsPerDay: z.coerce.number().int().min(1).max(5),
     mealTypeIds: z.array(uuidSchema).min(1),
-    notificationTimes: z.array(timeOfDayStringSchema).optional(),
+    notificationTimes: z.array(notificationTimeSchema).optional(),
   })
   .refine((data) => data.mealTypeIds.length === data.mealsPerDay, {
     message: 'mealTypeIds length must match mealsPerDay',
@@ -38,7 +38,7 @@ export const createBudgetPlanSchema = z
 // cancelled→active by accident.
 export const updateBudgetPlanSchema = z.object({
   totalBudget: z.coerce.number().positive().optional(),
-  notificationTimes: z.array(timeOfDayStringSchema).optional(),
+  notificationTimes: z.array(notificationTimeSchema).optional(),
 });
 
 /**
@@ -74,7 +74,7 @@ export const budgetPlanSchema = z.object({
   endDate: isoDateStringSchema,
   mealsPerDay: z.coerce.number().int().min(1).max(5),
   mealTypeIds: z.array(uuidSchema).min(1),
-  notificationTimes: z.array(timeOfDayStringSchema).optional(),
+  notificationTimes: z.array(notificationTimeSchema).optional(),
   status: z.enum(['active', 'completed', 'cancelled']),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

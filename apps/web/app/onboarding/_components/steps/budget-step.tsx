@@ -9,7 +9,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 export const BudgetStep = () => {
-  const { steps } = useOnboardingContext();
+  const { steps, mealTypes } = useOnboardingContext();
   const { values, actions, errors, mealTypeOptions } = steps.budget;
 
   return (
@@ -65,38 +65,83 @@ export const BudgetStep = () => {
         <label className={labelClass} style={labelStyle}>
           Meal types
         </label>
-        <div className="flex flex-wrap gap-2">
-          {mealTypeOptions.map((type) => {
-            const checked = values.selectedMealTypeIds.includes(type.id);
-            return (
-              <button
-                key={type.id}
-                type="button"
-                onClick={() => actions.toggleMealType(type.id)}
-                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] capitalize transition ${
-                  checked
-                    ? 'border-fathom bg-fathom/8 font-medium text-fathom'
-                    : 'border-lumen-dk bg-white font-normal text-vast'
-                }`}
-              >
-                <span
-                  className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-lumen ${
-                    checked ? 'bg-fathom' : 'bg-white'
-                  }`}
-                  style={{
-                    border: `1.5px solid var(--color-${checked ? 'fathom' : 'lumen-dk'})`,
-                    fontSize: 9,
-                    lineHeight: 1,
-                  }}
-                >
-                  {checked && '✓'}
-                </span>
-                {type.label}
-              </button>
-            );
-          })}
-        </div>
-        {errors.mealTypeIds && <p className="text-[11px] text-pulse">{errors.mealTypeIds}</p>}
+
+        {mealTypes.status === 'loading' && (
+          <div className="flex flex-wrap gap-2" aria-busy="true" aria-label="Loading meal types">
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-[38px] w-24 animate-pulse rounded-full border border-lumen-dk bg-lumen"
+              />
+            ))}
+          </div>
+        )}
+
+        {mealTypes.status === 'error' && (
+          <div
+            role="alert"
+            className="flex flex-col items-start gap-2 rounded-xl border border-pulse/30 bg-pulse/5 p-4 text-[13px]"
+          >
+            <div className="font-medium text-pulse">Couldn&apos;t load meal types</div>
+            <div className="text-[12px] text-ink">
+              Check your connection and try again. If this keeps happening, please contact support.
+            </div>
+            <button
+              type="button"
+              onClick={mealTypes.refetch}
+              className="text-[12px] font-medium text-fathom underline underline-offset-2"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        {mealTypes.status === 'empty' && (
+          <div className="rounded-xl border border-lumen-dk bg-lumen p-4 text-[13px] text-vast">
+            <div className="font-medium">No meal types available yet</div>
+            <div className="mt-0.5 text-[12px] text-ink">
+              An admin still needs to configure these. Please reach out to support so we can get you
+              set up.
+            </div>
+          </div>
+        )}
+
+        {mealTypes.status === 'ready' && (
+          <>
+            <div className="flex flex-wrap gap-2">
+              {mealTypeOptions.map((type) => {
+                const checked = values.selectedMealTypeIds.includes(type.id);
+                return (
+                  <button
+                    key={type.id}
+                    type="button"
+                    onClick={() => actions.toggleMealType(type.id)}
+                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] capitalize transition ${
+                      checked
+                        ? 'border-fathom bg-fathom/8 font-medium text-fathom'
+                        : 'border-lumen-dk bg-white font-normal text-vast'
+                    }`}
+                  >
+                    <span
+                      className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-lumen ${
+                        checked ? 'bg-fathom' : 'bg-white'
+                      }`}
+                      style={{
+                        border: `1.5px solid var(--color-${checked ? 'fathom' : 'lumen-dk'})`,
+                        fontSize: 9,
+                        lineHeight: 1,
+                      }}
+                    >
+                      {checked && '✓'}
+                    </span>
+                    {type.label}
+                  </button>
+                );
+              })}
+            </div>
+            {errors.mealTypeIds && <p className="text-[11px] text-pulse">{errors.mealTypeIds}</p>}
+          </>
+        )}
       </div>
 
       <div className="rounded-xl border border-lumen-dk bg-lumen p-4 text-[13px] text-vast">
