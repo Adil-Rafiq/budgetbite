@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMachine } from '@xstate/react';
 import { useUpdateProfile, useUser } from '@/hooks/use-user';
@@ -13,6 +14,8 @@ import { useBudgetStep } from '@/app/onboarding/_hooks/use-budget-step';
 import { useNotificationStep } from '@/app/onboarding/_hooks/use-notification-step';
 import type { BudgetPlanPreferencesInput } from '@/app/onboarding/types';
 import { getErrorMessage } from '@/lib/api/errors';
+
+export type MealTypesStatus = 'loading' | 'error' | 'empty' | 'ready';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -49,7 +52,26 @@ export const useOnboarding = () => {
   const { data: session } = useUser();
   const { mutateAsync: updateProfile } = useUpdateProfile();
   const { mutateAsync: createBudgetPlan } = useCreateBudgetPlan();
-  const { data: activeMealTypes = [] } = useListActiveMealTypes();
+  const mealTypesQuery = useListActiveMealTypes();
+  const activeMealTypes = mealTypesQuery.data ?? [];
+
+  const mealTypesStatus: MealTypesStatus = mealTypesQuery.isLoading
+    ? 'loading'
+    : mealTypesQuery.isError
+      ? 'error'
+      : activeMealTypes.length === 0
+        ? 'empty'
+        : 'ready';
+
+  // One toast per error transition. Retries that fail will toast again.
+  useEffect(() => {
+    if (mealTypesStatus === 'error') {
+      showToast.error({
+        title: 'Could not load meal types',
+        description: 'Try again, or come back in a moment.',
+      });
+    }
+  }, [mealTypesStatus]);
 
   // ─── Step hooks ─────────────────────────────────────────────────────────
 
@@ -73,6 +95,10 @@ export const useOnboarding = () => {
   const currentStepData = ONBOARDING_STEPS[currentStep];
   const isLastStep = currentStep === ONBOARDING_STEPS.length - 1;
   const isSubmitting = isSubmittingLocation || isSubmittingFinish;
+
+  // Steps after location depend on meal types being loaded.
+  const requiresMealTypes = currentStep !== 0;
+  const canAdvance = !requiresMealTypes || mealTypesStatus === 'ready';
 
   // ─── Step handlers ───────────────────────────────────────────────────────
 
@@ -148,6 +174,14 @@ export const useOnboarding = () => {
     currentStepData,
     isLastStep,
     isSubmitting,
+    canAdvance,
+
+    mealTypes: {
+      status: mealTypesStatus,
+      refetch: () => {
+        void mealTypesQuery.refetch();
+      },
+    },
 
     steps: {
       location: locationStep,

@@ -17,7 +17,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 export const StepBudgetDetails = () => {
-  const { steps } = useCreatePlanContext();
+  const { steps, mealTypes } = useCreatePlanContext();
   const { values, actions, errors, mealTypeOptions } = steps.budget;
 
   return (
@@ -60,33 +60,83 @@ export const StepBudgetDetails = () => {
         <Label className={labelClass} style={labelStyle}>
           Meal types
         </Label>
-        <div className="flex flex-wrap gap-2">
-          {mealTypeOptions.map((type) => {
-            const checked = values.selectedMealTypeIds.includes(type.id);
-            return (
-              <label
-                key={type.id}
-                className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 transition ${
-                  checked ? 'border-vast bg-vast text-lumen' : 'border-lumen-dk bg-lumen text-vast'
-                }`}
-              >
-                <Checkbox
-                  checked={checked}
-                  onCheckedChange={() => actions.toggleMealType(type.id)}
-                  className="hidden"
-                />
-                <span className="text-[12px] capitalize" style={{ fontFamily: 'var(--font-mono)' }}>
-                  {type.label}
-                </span>
-              </label>
-            );
-          })}
-        </div>
-        {errors.mealTypeIds ? (
-          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
-            {errors.mealTypeIds}
-          </p>
-        ) : null}
+
+        {mealTypes.status === 'loading' && (
+          <div className="flex flex-wrap gap-2" aria-busy="true" aria-label="Loading meal types">
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-[30px] w-20 animate-pulse rounded-full border border-lumen-dk bg-lumen"
+              />
+            ))}
+          </div>
+        )}
+
+        {mealTypes.status === 'error' && (
+          <div
+            role="alert"
+            className="flex flex-col items-start gap-2 rounded-lg border border-pulse/30 bg-pulse/5 p-3 text-[12px]"
+          >
+            <div className="font-medium text-pulse">Couldn&apos;t load meal types</div>
+            <div className="text-[11px] text-ink">
+              Check your connection and try again. If this keeps happening, please contact support.
+            </div>
+            <button
+              type="button"
+              onClick={mealTypes.refetch}
+              className="text-[11px] font-medium text-fathom underline underline-offset-2"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        {mealTypes.status === 'empty' && (
+          <div className="rounded-lg border border-lumen-dk bg-lumen p-3 text-[12px] text-vast">
+            <div className="font-medium">No meal types available yet</div>
+            <div className="mt-0.5 text-[11px] text-ink">
+              An admin still needs to configure these. Please reach out to support so we can get you
+              set up.
+            </div>
+          </div>
+        )}
+
+        {mealTypes.status === 'ready' && (
+          <>
+            <div className="flex flex-wrap gap-2">
+              {mealTypeOptions.map((type) => {
+                const checked = values.selectedMealTypeIds.includes(type.id);
+                return (
+                  <label
+                    key={type.id}
+                    className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 transition ${
+                      checked
+                        ? 'border-vast bg-vast text-lumen'
+                        : 'border-lumen-dk bg-lumen text-vast'
+                    }`}
+                  >
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={() => actions.toggleMealType(type.id)}
+                      className="hidden"
+                    />
+                    <span
+                      className="text-[12px] capitalize"
+                      style={{ fontFamily: 'var(--font-mono)' }}
+                    >
+                      {type.label}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+            {errors.mealTypeIds ? (
+              <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
+                {errors.mealTypeIds}
+              </p>
+            ) : null}
+          </>
+        )}
       </div>
       <div
         className="rounded-lg border border-lumen-dk bg-lumen p-3 text-[12px] text-ink"
