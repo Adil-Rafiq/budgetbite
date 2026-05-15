@@ -63,9 +63,7 @@ export function TimePicker({
           style={{ fontFamily: 'var(--font-mono)' }}
         >
           <span className="tabular-nums">{`${hh}:${mm}`}</span>
-          <Clock
-            className={cn('shrink-0 opacity-60', size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5')}
-          />
+          <Clock className={cn('shrink-0 opacity-60', size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5')} />
         </button>
       </PopoverPrimitive.Trigger>
 
@@ -96,13 +94,7 @@ export function TimePicker({
         <div className="flex">
           <TimeColumn label="Hour" items={HOURS} selected={hh} onSelect={setHour} open={open} />
           <div className="w-px bg-lumen-dk" />
-          <TimeColumn
-            label="Min"
-            items={MINUTES}
-            selected={mm}
-            onSelect={setMinute}
-            open={open}
-          />
+          <TimeColumn label="Min" items={MINUTES} selected={mm} onSelect={setMinute} open={open} />
         </div>
       </PopoverPrimitive.Content>
     </PopoverPrimitive.Root>
