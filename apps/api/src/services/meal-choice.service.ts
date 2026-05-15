@@ -31,6 +31,7 @@ function toMealChoiceResponse(c: {
   manualDescription: string | null;
   actualAmountSpent: string;
   restaurantName: string | null;
+  menuItemName?: string | null;
   createdAt: Date;
 }): MealChoiceResponse {
   return {
@@ -44,6 +45,7 @@ function toMealChoiceResponse(c: {
     manualDescription: c.manualDescription,
     actualAmountSpent: toNumber(c.actualAmountSpent),
     restaurantName: c.restaurantName,
+    menuItemName: c.menuItemName ?? null,
     createdAt: c.createdAt,
   };
 }
@@ -169,7 +171,6 @@ export const mealChoiceService = {
     opts: { limit: number; offset: number },
   ): Promise<Paginated<MealChoiceResponse>> {
     // FIXME: verify the budgetPlanId belongs to the current user
-    // FIXME: right now the query does not return the meal name, only the restaurant name is returned
     const [rows, total] = await Promise.all([
       orderRepository.listByUserAndPlanWithPagination(userId, budgetPlanId, opts),
       orderRepository.countByPlan(userId, budgetPlanId),

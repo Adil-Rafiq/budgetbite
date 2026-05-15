@@ -61,14 +61,61 @@ export const orderRepository = {
     userId: string,
     budgetPlanId: string,
     opts: { limit: number; offset: number },
-  ): Promise<MealChoice[]> {
-    return db
-      .select()
-      .from(mealChoice)
-      .where(and(eq(mealChoice.userId, userId), eq(mealChoice.budgetPlanId, budgetPlanId)))
-      .orderBy(desc(mealChoice.slotDate), desc(mealChoice.createdAt))
-      .limit(opts.limit)
-      .offset(opts.offset);
+  ): Promise<
+    {
+      id: string;
+      budgetPlanId: string;
+      slotDate: string;
+      mealTypeId: string;
+      suggestionId: string | null;
+      restaurantId: string | null;
+      menuItemId: string | null;
+      manualDescription: string | null;
+      actualAmountSpent: string;
+      restaurantName: string | null;
+      menuItemName: string | null;
+      createdAt: Date;
+    }[]
+  > {
+    const rows = await db.query.mealChoice.findMany({
+      where: (mc, { eq, and }) => and(eq(mc.userId, userId), eq(mc.budgetPlanId, budgetPlanId)),
+      orderBy: (mc, { desc }) => [desc(mc.slotDate), desc(mc.createdAt)],
+      limit: opts.limit,
+      offset: opts.offset,
+      columns: {
+        id: true,
+        budgetPlanId: true,
+        slotDate: true,
+        mealTypeId: true,
+        suggestionId: true,
+        restaurantId: true,
+        menuItemId: true,
+        manualDescription: true,
+        actualAmountSpent: true,
+        restaurantName: true,
+        createdAt: true,
+      },
+      with: {
+        menuItem: {
+          columns: { name: true },
+        },
+      },
+    });
+
+    return rows.map((r) => ({
+      id: r.id,
+      budgetPlanId: r.budgetPlanId,
+      slotDate: r.slotDate,
+      mealTypeId: r.mealTypeId,
+      suggestionId: r.suggestionId,
+      restaurantId: r.restaurantId,
+      menuItemId: r.menuItemId,
+      manualDescription: r.manualDescription,
+      actualAmountSpent: r.actualAmountSpent,
+      restaurantName: r.restaurantName,
+      menuItemName: r.menuItem?.name ?? null,
+      createdAt: r.createdAt,
+    }));
   },
 
   async countByPlan(userId: string, budgetPlanId: string): Promise<number> {

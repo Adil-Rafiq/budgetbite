@@ -37,6 +37,7 @@ export const mealChoiceResponseSchema = z.object({
   manualDescription: z.string().nullable(),
   actualAmountSpent: z.number(),
   restaurantName: z.string().nullable(),
+  menuItemName: z.string().nullable(),
   createdAt: z.coerce.date(),
 });
 

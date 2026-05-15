@@ -67,7 +67,7 @@ export function RecentActivity() {
             {data.data.map((item, i) => {
               const mt = mealTypesById.get(item.mealTypeId);
               const label = mt?.label ?? 'Meal';
-              const name = item.manualDescription ?? 'Suggested meal';
+              const name = item.menuItemName ?? item.manualDescription ?? '—';
               const restaurant = item.restaurantName ?? '—';
 
               return (
