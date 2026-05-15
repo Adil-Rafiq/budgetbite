@@ -61,7 +61,7 @@ export function useMealSlots() {
       if (choice.slotDate !== today) continue;
       map[choice.mealTypeId] = {
         id: choice.id,
-        menuItemName: choice.manualDescription ?? null,
+        menuItemName: choice.menuItemName,
         restaurantName: choice.restaurantName,
         actualAmountSpent: choice.actualAmountSpent,
         isCustom: choice.suggestionId === null,
