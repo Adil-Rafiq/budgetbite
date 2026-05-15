@@ -5,18 +5,15 @@ import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-conte
 import { DEFAULT_COORDINATES } from '@/app/onboarding/constants';
 import { Pill } from '@/components/ui/pill';
 
-const LocationMap = dynamic(
-  () => import('@/components/location-map').then((m) => m.LocationMap),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex flex-col gap-2">
-        <div className="h-[44px] w-full animate-pulse rounded-[10px] border border-lumen-dk bg-lumen" />
-        <div className="h-[280px] w-full animate-pulse rounded-[14px] border border-lumen-dk bg-lumen" />
-      </div>
-    ),
-  },
-);
+const LocationMap = dynamic(() => import('@/components/location-map').then((m) => m.LocationMap), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-col gap-2">
+      <div className="h-[44px] w-full animate-pulse rounded-[10px] border border-lumen-dk bg-lumen" />
+      <div className="h-[280px] w-full animate-pulse rounded-[14px] border border-lumen-dk bg-lumen" />
+    </div>
+  ),
+});
 
 export const LocationStep = () => {
   const { steps } = useOnboardingContext();

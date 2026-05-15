@@ -21,18 +21,15 @@ import { getErrorMessage } from '@/lib/api/errors';
 import { DEFAULT_COORDINATES } from '@/app/onboarding/constants';
 import { NotificationTimesCard } from '@/app/profile/_components/notification-times-card';
 
-const LocationMap = dynamic(
-  () => import('@/components/location-map').then((m) => m.LocationMap),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex flex-col gap-2">
-        <div className="h-[44px] w-full animate-pulse rounded-[10px] border border-lumen-dk bg-lumen" />
-        <div className="h-[280px] w-full animate-pulse rounded-[14px] border border-lumen-dk bg-lumen" />
-      </div>
-    ),
-  },
-);
+const LocationMap = dynamic(() => import('@/components/location-map').then((m) => m.LocationMap), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-col gap-2">
+      <div className="h-[44px] w-full animate-pulse rounded-[10px] border border-lumen-dk bg-lumen" />
+      <div className="h-[280px] w-full animate-pulse rounded-[14px] border border-lumen-dk bg-lumen" />
+    </div>
+  ),
+});
 
 const accountSchema = z.object({
   firstName: z.string().trim().min(1, 'First name is required'),

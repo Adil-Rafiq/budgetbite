@@ -66,9 +66,7 @@ export const NotificationsStep = () => {
                 onClick={() => actions.toggleNotificationEnabled(slot.mealTypeId)}
                 aria-pressed={slot.enabled}
                 aria-label={
-                  slot.enabled
-                    ? `Disable ${slot.label} reminder`
-                    : `Enable ${slot.label} reminder`
+                  slot.enabled ? `Disable ${slot.label} reminder` : `Enable ${slot.label} reminder`
                 }
                 className={`rounded-full px-3 py-1.5 text-[11px] font-semibold transition active:scale-[0.96] ${
                   slot.enabled
