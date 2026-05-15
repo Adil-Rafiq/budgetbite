@@ -75,7 +75,7 @@ function NoPlanMessage() {
             letterSpacing: '-0.01em',
           }}
         >
-          Set this week&apos;s budget to get started.
+          Set a budget to get started.
         </p>
         <p className="text-[13px] text-ink">Two minutes. We&apos;ll plan the meals.</p>
       </div>

@@ -27,7 +27,7 @@ export default function DashboardPage() {
             Welcome back.
           </h1>
           <p className="max-w-[540px] text-[14px] text-ink">
-            Your budget, your meals, your week — at a glance.
+            Your budget, your meals, your plan — at a glance.
             <span
               className="ml-1.5 text-[12px] text-soft"
               style={{ fontFamily: 'var(--font-mono)' }}
