@@ -120,7 +120,7 @@ export const useCreatePlan = (replaceActivePlanId: string | null = null) => {
           ...budget,
           mealsPerDay: budget.mealTypeIds.length,
           ...getPlanDateRange(budget.planType),
-          notificationTimes: notificationSlots.map((s) => s.time),
+          notificationTimes: notificationSlots.map((s) => ({ time: s.time, enabled: s.enabled })),
         });
       } catch (err) {
         // Race fallback: another tab created an active plan between our

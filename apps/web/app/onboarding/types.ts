@@ -30,6 +30,7 @@ export type BudgetPlanPreferencesInput = z.infer<typeof budgetPlanPreferencesSch
 export const notificationSlotSchema = z.object({
   mealTypeId: z.string().uuid(),
   time: z.string().regex(/^\d{2}:\d{2}$/),
+  enabled: z.boolean(),
 });
 
 export type NotificationSlotInput = z.infer<typeof notificationSlotSchema>;

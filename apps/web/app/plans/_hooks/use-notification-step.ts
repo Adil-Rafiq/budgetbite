@@ -25,19 +25,28 @@ const buildSlotsForMealTypes = (
   const ids =
     selectedMealTypeIds.length > 0 ? selectedMealTypeIds : current.map((slot) => slot.mealTypeId);
 
-  return ids.map((mealTypeId) => ({
-    mealTypeId,
-    time: current.find((slot) => slot.mealTypeId === mealTypeId)?.time ?? '',
-  }));
+  return ids.map((mealTypeId) => {
+    const existing = current.find((slot) => slot.mealTypeId === mealTypeId);
+    return {
+      mealTypeId,
+      time: existing?.time ?? '',
+      enabled: existing?.enabled ?? true,
+    };
+  });
 };
 
 /**
- * Returns true if two slot arrays are identical in order, id, and time.
+ * Returns true if two slot arrays are identical in order, id, time, and enabled.
  * Used to avoid unnecessary form updates that would trigger re-renders.
  */
 const areSlotsEqual = (a: NotificationSlot[], b: NotificationSlot[]): boolean =>
   a.length === b.length &&
-  a.every((slot, i) => slot.mealTypeId === b[i]?.mealTypeId && slot.time === b[i]?.time);
+  a.every(
+    (slot, i) =>
+      slot.mealTypeId === b[i]?.mealTypeId &&
+      slot.time === b[i]?.time &&
+      slot.enabled === b[i]?.enabled,
+  );
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
@@ -77,6 +86,17 @@ export const useNotificationStep = (
     );
   };
 
+  const toggleNotificationEnabled = (mealTypeId: string) => {
+    const current = form.getValues('notificationSlots');
+    form.setValue(
+      'notificationSlots',
+      current.map((slot) =>
+        slot.mealTypeId === mealTypeId ? { ...slot, enabled: !slot.enabled } : slot,
+      ),
+      { shouldDirty: true },
+    );
+  };
+
   // ─── Watched values ──────────────────────────────────────────────────────
 
   const notificationSlots = form.watch('notificationSlots');
@@ -85,6 +105,7 @@ export const useNotificationStep = (
   const slots = notificationSlots.map((slot) => ({
     mealTypeId: slot.mealTypeId,
     time: slot.time,
+    enabled: slot.enabled,
     label: mealTypeOptions.find((opt) => opt.id === slot.mealTypeId)?.label ?? 'Meal slot',
   }));
 
@@ -108,6 +129,7 @@ export const useNotificationStep = (
 
     actions: {
       updateNotificationTime,
+      toggleNotificationEnabled,
     },
   };
 };

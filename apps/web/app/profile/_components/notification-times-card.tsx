@@ -11,31 +11,38 @@ import { getErrorMessage } from '@/lib/api/errors';
 
 const TIME_PATTERN = /^\d{2}:\d{2}$/;
 
+type Slot = { time: string; enabled: boolean };
+
 export function NotificationTimesCard() {
   const { data: active, isLoading } = useActiveBudgetPlan();
   const planId = active?.plan.id ?? '';
-  const initialTimes = active?.plan.notificationTimes ?? [];
+  const initialSlots: Slot[] = active?.plan.notificationTimes ?? [];
 
   const { mutateAsync: updatePlan, isPending } = useUpdateBudgetPlan(planId);
 
-  const [times, setTimes] = useState<string[]>(initialTimes);
+  const [slots, setSlots] = useState<Slot[]>(initialSlots);
 
   useEffect(() => {
-    setTimes(active?.plan.notificationTimes ?? []);
+    setSlots(active?.plan.notificationTimes ?? []);
   }, [active?.plan.notificationTimes]);
 
   const isDirty =
-    times.length !== initialTimes.length || times.some((t, i) => t !== initialTimes[i]);
-  const allValid = times.every((t) => TIME_PATTERN.test(t));
+    slots.length !== initialSlots.length ||
+    slots.some(
+      (s, i) => s.time !== initialSlots[i]?.time || s.enabled !== initialSlots[i]?.enabled,
+    );
+  const allValid = slots.every((s) => TIME_PATTERN.test(s.time));
 
-  const add = () => setTimes((prev) => [...prev, '08:00']);
-  const remove = (idx: number) => setTimes((prev) => prev.filter((_, i) => i !== idx));
-  const update = (idx: number, value: string) =>
-    setTimes((prev) => prev.map((t, i) => (i === idx ? value : t)));
+  const add = () => setSlots((prev) => [...prev, { time: '08:00', enabled: true }]);
+  const remove = (idx: number) => setSlots((prev) => prev.filter((_, i) => i !== idx));
+  const updateTime = (idx: number, time: string) =>
+    setSlots((prev) => prev.map((s, i) => (i === idx ? { ...s, time } : s)));
+  const toggleEnabled = (idx: number) =>
+    setSlots((prev) => prev.map((s, i) => (i === idx ? { ...s, enabled: !s.enabled } : s)));
 
   const save = async () => {
     try {
-      await updatePlan({ notificationTimes: times });
+      await updatePlan({ notificationTimes: slots });
       showToast.success({ title: 'Notification times updated' });
     } catch (err) {
       showToast.error({
@@ -87,20 +94,33 @@ export function NotificationTimesCard() {
         ) : (
           <>
             <div className="flex flex-col gap-2">
-              {times.length === 0 && (
+              {slots.length === 0 && (
                 <p className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
                   no reminders configured. add one below.
                 </p>
               )}
-              {times.map((t, i) => (
+              {slots.map((slot, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <Input
                     type="time"
-                    value={t}
-                    onChange={(e) => update(i, e.target.value)}
-                    className="w-32 border-lumen-dk bg-lumen text-vast"
+                    value={slot.time}
+                    onChange={(e) => updateTime(i, e.target.value)}
+                    disabled={!slot.enabled}
+                    className={`w-32 border-lumen-dk bg-lumen ${
+                      slot.enabled ? 'text-vast' : 'text-soft line-through'
+                    }`}
                     style={{ fontFamily: 'var(--font-mono)' }}
                   />
+                  <Pill
+                    variant={slot.enabled ? 'primary' : 'ghost'}
+                    size="xs"
+                    onClick={() => toggleEnabled(i)}
+                    aria-pressed={slot.enabled}
+                    aria-label={slot.enabled ? 'Disable reminder' : 'Enable reminder'}
+                    className="min-w-[52px] justify-center"
+                  >
+                    {slot.enabled ? 'On' : 'Off'}
+                  </Pill>
                   <Pill
                     variant="subtle"
                     size="iconSm"

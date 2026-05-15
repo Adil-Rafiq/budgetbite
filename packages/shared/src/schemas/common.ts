@@ -29,6 +29,20 @@ export const isoDateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expe
 /** HH:MM 24-hour time (used for notificationTimes on budget plans). */
 export const timeOfDayStringSchema = z.string().regex(/^\d{2}:\d{2}$/, 'Expected HH:MM');
 
+/**
+ * One per-meal reminder entry stored on `budget_plan.notification_times`.
+ * Positional: index N corresponds to the meal_type at sortOrder N for the plan.
+ * `enabled: false` means the user has muted that meal's reminder; delivery
+ * code should skip it. The time still has to be a valid HH:MM either way so
+ * flipping enabled back on doesn't require re-typing.
+ */
+export const notificationTimeSchema = z.object({
+  time: timeOfDayStringSchema,
+  enabled: z.boolean(),
+});
+
+export type NotificationTime = z.infer<typeof notificationTimeSchema>;
+
 // ─── Pagination ───────────────────────────────────────────────────────────────
 
 export type PaginationQuery = z.infer<typeof paginationSchema>;

@@ -137,7 +137,10 @@ export const useOnboarding = () => {
             ...budget,
             mealsPerDay: budget.mealTypeIds.length,
             ...getPlanDateRange(budget.planType),
-            notificationTimes: notificationSlots.map((slot) => slot.time),
+            notificationTimes: notificationSlots.map((slot) => ({
+              time: slot.time,
+              enabled: slot.enabled,
+            })),
           });
 
           send({ type: 'FINISH_SUBMIT_SUCCESS' });
