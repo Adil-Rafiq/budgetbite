@@ -38,6 +38,7 @@ interface LocationMapProps {
   latitude: number;
   longitude: number;
   onCoordinatesChange: (latitude: number, longitude: number) => void;
+  height?: number;
 }
 
 function MapController({ latitude, longitude }: { latitude: number; longitude: number }) {
@@ -69,7 +70,12 @@ function MapReady({ onReady }: { onReady: (map: L.Map) => void }) {
   return null;
 }
 
-export function LocationMap({ latitude, longitude, onCoordinatesChange }: LocationMapProps) {
+export function LocationMap({
+  latitude,
+  longitude,
+  onCoordinatesChange,
+  height = 280,
+}: LocationMapProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<NominatimResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -273,7 +279,7 @@ export function LocationMap({ latitude, longitude, onCoordinatesChange }: Locati
           zoom={13}
           scrollWheelZoom={true}
           zoomControl={false}
-          style={{ height: '280px', width: '100%', background: '#ffffeb' }}
+          style={{ height: `${height}px`, width: '100%', background: '#ffffeb' }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'

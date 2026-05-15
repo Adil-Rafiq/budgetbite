@@ -6,7 +6,7 @@ import { DEFAULT_COORDINATES } from '@/app/onboarding/constants';
 import { Pill } from '@/components/ui/pill';
 
 const LocationMap = dynamic(
-  () => import('@/app/onboarding/_components/location-map').then((m) => m.LocationMap),
+  () => import('@/components/location-map').then((m) => m.LocationMap),
   {
     ssr: false,
     loading: () => (

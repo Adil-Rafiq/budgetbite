@@ -7,16 +7,32 @@ import { z } from 'zod';
 import { LogOut, Lock, MapPin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import dynamic from 'next/dynamic';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 
 import { useUpdateProfile, useUser } from '@/hooks/use-user';
+import { useDetectLocation } from '@/hooks/use-detect-location';
 import { authClient } from '@/lib/auth-client';
 import { showToast } from '@/lib/toast';
 import { getErrorMessage } from '@/lib/api/errors';
+import { DEFAULT_COORDINATES } from '@/app/onboarding/constants';
 import { NotificationTimesCard } from '@/app/profile/_components/notification-times-card';
+
+const LocationMap = dynamic(
+  () => import('@/components/location-map').then((m) => m.LocationMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex flex-col gap-2">
+        <div className="h-[44px] w-full animate-pulse rounded-[10px] border border-lumen-dk bg-lumen" />
+        <div className="h-[280px] w-full animate-pulse rounded-[14px] border border-lumen-dk bg-lumen" />
+      </div>
+    ),
+  },
+);
 
 const accountSchema = z.object({
   firstName: z.string().trim().min(1, 'First name is required'),
@@ -142,8 +158,8 @@ export default function ProfilePage() {
 
   const initialLocation = useMemo<LocationInput>(
     () => ({
-      latitude: user?.profile?.latitude ?? 0,
-      longitude: user?.profile?.longitude ?? 0,
+      latitude: user?.profile?.latitude ?? DEFAULT_COORDINATES.latitude,
+      longitude: user?.profile?.longitude ?? DEFAULT_COORDINATES.longitude,
     }),
     [user],
   );
@@ -170,6 +186,18 @@ export default function ProfilePage() {
   }, [user]);
 
   const [signingOut, setSigningOut] = useState(false);
+
+  const setLocationCoordinates = (latitude: number, longitude: number) => {
+    locationForm.setValue('latitude', latitude, { shouldDirty: true, shouldValidate: true });
+    locationForm.setValue('longitude', longitude, { shouldDirty: true, shouldValidate: true });
+  };
+
+  const { detect: detectLocation, isDetecting: isDetectingLocation } = useDetectLocation({
+    onSuccess: setLocationCoordinates,
+  });
+
+  const mapLatitude = locationForm.watch('latitude') ?? DEFAULT_COORDINATES.latitude;
+  const mapLongitude = locationForm.watch('longitude') ?? DEFAULT_COORDINATES.longitude;
 
   const onSaveAccount = async (values: AccountInput) => {
     const fullName = `${values.firstName} ${values.lastName}`.trim();
@@ -369,42 +397,36 @@ export default function ProfilePage() {
           onSubmit={locationForm.handleSubmit(onSaveLocation)}
           noValidate
         >
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="lat" className={labelClass} style={labelStyle}>
-                Latitude
-              </Label>
-              <Input
-                id="lat"
-                type="number"
-                step="0.0001"
-                {...locationForm.register('latitude', { valueAsNumber: true })}
-                className={inputClass}
-              />
-              {locationForm.formState.errors.latitude && (
-                <p className="text-[11px] text-pulse" style={errStyle}>
-                  {locationForm.formState.errors.latitude.message}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="lng" className={labelClass} style={labelStyle}>
-                Longitude
-              </Label>
-              <Input
-                id="lng"
-                type="number"
-                step="0.0001"
-                {...locationForm.register('longitude', { valueAsNumber: true })}
-                className={inputClass}
-              />
-              {locationForm.formState.errors.longitude && (
-                <p className="text-[11px] text-pulse" style={errStyle}>
-                  {locationForm.formState.errors.longitude.message}
-                </p>
-              )}
-            </div>
-          </div>
+          <Pill
+            type="button"
+            variant="accent"
+            size="md"
+            className="self-start"
+            onClick={detectLocation}
+            disabled={isDetectingLocation}
+          >
+            {isDetectingLocation ? (
+              <>
+                <span
+                  className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-lumen"
+                  style={{ borderTopColor: 'transparent' }}
+                />
+                Detecting…
+              </>
+            ) : (
+              <>
+                <span style={{ fontFamily: 'var(--font-mono)' }}>◉</span>
+                Use my current location
+              </>
+            )}
+          </Pill>
+
+          <LocationMap
+            latitude={mapLatitude}
+            longitude={mapLongitude}
+            onCoordinatesChange={setLocationCoordinates}
+          />
+
           <Pill
             type="submit"
             variant="ghost"
