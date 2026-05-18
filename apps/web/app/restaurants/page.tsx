@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Search, Star } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Search, Star, X } from 'lucide-react';
 
 import type { RestaurantSort } from '@repo/shared';
 import { classifyBudgetFit } from '@repo/shared';
@@ -30,21 +31,37 @@ import { RestaurantCardSkeleton } from './_components/restaurant-card-skeleton';
 const PAGE_SIZE = 24;
 const SEARCH_DEBOUNCE_MS = 300;
 
+const DEFAULT_MAX_DISTANCE = 10;
+const DEFAULT_MIN_RATING = 0;
+const DEFAULT_SORT = 'auto' as const;
+
+const DISTANCE_PRESETS = [1, 3, 5, 10, 30] as const;
+const RATING_PRESETS = [
+  { value: 0, label: 'Any' },
+  { value: 3.5, label: '3.5+' },
+  { value: 4, label: '4+' },
+  { value: 4.5, label: '4.5+' },
+] as const;
+
+type SortValue = RestaurantSort | 'auto';
+
 type FitTone = 'green' | 'amber' | 'red';
 const FIT_TONE: Record<FitTone, { dot: string; pill: string; label: string }> = {
-  green: { dot: 'bg-fathom', pill: 'bg-fathom/[0.08] text-fathom', label: 'Fits budget' },
-  amber: { dot: 'bg-amber', pill: 'bg-amber/[0.08] text-amber', label: 'Tight' },
-  red: { dot: 'bg-pulse', pill: 'bg-pulse/[0.08] text-pulse', label: 'Over budget' },
+  green: { dot: 'bg-fathom', pill: 'bg-fathom/[0.10] text-fathom', label: 'Fits budget' },
+  amber: { dot: 'bg-amber', pill: 'bg-amber/[0.12] text-amber', label: 'Tight' },
+  red: { dot: 'bg-pulse', pill: 'bg-pulse/[0.10] text-pulse', label: 'Over budget' },
 };
 
-function FitDot({ fit }: { fit: FitTone }) {
+function FitPill({ fit }: { fit: FitTone }) {
   const v = FIT_TONE[fit];
   return (
     <span
-      className={`inline-block h-2 w-2 rounded-full ${v.dot}`}
-      aria-label={v.label}
-      title={v.label}
-    />
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] uppercase ${v.pill}`}
+      style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
+    >
+      <span className={`inline-block h-1.5 w-1.5 rounded-full ${v.dot}`} />
+      {v.label}
+    </span>
   );
 }
 
@@ -54,6 +71,19 @@ const labelStyle: React.CSSProperties = {
   letterSpacing: '0.18em',
 };
 const inputClass = 'bg-lumen border-lumen-dk text-vast';
+
+function formatCount(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}m`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
+  return String(n);
+}
+
+function parseNumberParam(raw: string | null, fallback: number, min: number, max: number): number {
+  if (raw == null) return fallback;
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+}
 
 export default function RestaurantsPage() {
   const { data: user } = useUser();
@@ -65,21 +95,55 @@ export default function RestaurantsPage() {
   const avgPerMeal = activePlan?.budgetState.avgBudgetPerRemainingMeal ?? 0;
   const amountRemaining = activePlan?.budgetState.amountRemaining ?? 0;
 
-  const [maxDistanceKm, setMaxDistanceKm] = useState(10);
-  const [minRating, setMinRating] = useState(0);
-  const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [sort, setSort] = useState<RestaurantSort | 'auto'>('auto');
-  const [page, setPage] = useState(0);
+  // ─── URL state ─────────────────────────────────────────────────────────────
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const urlQ = searchParams.get('q') ?? '';
+  const sort = (searchParams.get('sort') as SortValue | null) ?? DEFAULT_SORT;
+  const maxDistanceKm = parseNumberParam(
+    searchParams.get('maxDistanceKm'),
+    DEFAULT_MAX_DISTANCE,
+    1,
+    30,
+  );
+  const minRating = parseNumberParam(searchParams.get('minRating'), DEFAULT_MIN_RATING, 0, 5);
+  const page = Math.max(0, Number(searchParams.get('page') ?? '0') || 0);
+
+  const updateParams = useCallback(
+    (updates: Record<string, string | null>, opts: { resetPage?: boolean } = {}) => {
+      const { resetPage = true } = opts;
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [k, v] of Object.entries(updates)) {
+        if (v == null || v === '') params.delete(k);
+        else params.set(k, v);
+      }
+      if (resetPage && !('page' in updates)) params.delete('page');
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [searchParams, router, pathname],
+  );
+
+  // Search input — local for instant typing, debounced into the URL.
+  const [searchInput, setSearchInput] = useState(urlQ);
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(searchInput.trim()), SEARCH_DEBOUNCE_MS);
+    const t = setTimeout(() => {
+      if (searchInput.trim() !== urlQ) {
+        updateParams({ q: searchInput.trim() || null });
+      }
+    }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(t);
-  }, [searchInput]);
+  }, [searchInput, urlQ, updateParams]);
 
+  // External URL changes (back/forward, "clear all"): re-sync input.
   useEffect(() => {
-    setPage(0);
-  }, [debouncedSearch, sort, maxDistanceKm, minRating, userLat, userLng]);
+    setSearchInput((prev) => (prev.trim() === urlQ ? prev : urlQ));
+  }, [urlQ]);
+
+  const hasLocation = userLat != null && userLng != null;
 
   const resolvedSort: RestaurantSort | undefined = useMemo(() => {
     if (sort === 'auto') return undefined;
@@ -93,23 +157,71 @@ export default function RestaurantsPage() {
       offset: page * PAGE_SIZE,
       userLat: userLat ?? undefined,
       userLng: userLng ?? undefined,
-      maxDistanceKm: userLat != null && userLng != null ? maxDistanceKm : undefined,
+      maxDistanceKm: hasLocation ? maxDistanceKm : undefined,
       minRating: minRating > 0 ? minRating : undefined,
-      q: debouncedSearch || undefined,
+      q: urlQ || undefined,
       sort: resolvedSort,
     }),
-    [userLat, userLng, maxDistanceKm, minRating, debouncedSearch, resolvedSort, page],
+    [userLat, userLng, hasLocation, maxDistanceKm, minRating, urlQ, resolvedSort, page],
   );
 
-  const { data = [], isLoading, error, isFetching } = useRestaurants(query);
+  const { data: result, isLoading, error, isFetching } = useRestaurants(query);
+  const data = result?.data ?? [];
+  const total = result?.meta.total ?? 0;
+  const totalPages = total > 0 ? Math.ceil(total / PAGE_SIZE) : 1;
+  const hasPrev = page > 0;
+  const hasNext = (page + 1) * PAGE_SIZE < total;
 
-  const hasLocation = userLat != null && userLng != null;
-  const isLastPage = data.length < PAGE_SIZE;
+  // Active filter chips
+  type ActiveChip = { key: string; label: string; clear: () => void };
+  const activeChips: ActiveChip[] = [];
+  if (urlQ) {
+    activeChips.push({
+      key: 'q',
+      label: `"${urlQ}"`,
+      clear: () => {
+        setSearchInput('');
+        updateParams({ q: null });
+      },
+    });
+  }
+  if (sort !== DEFAULT_SORT) {
+    const sortLabels: Record<SortValue, string> = {
+      auto: 'Default',
+      distance: 'By distance',
+      rating: 'By rating',
+      'budget-fit': 'Best for budget',
+    };
+    activeChips.push({
+      key: 'sort',
+      label: sortLabels[sort] ?? String(sort),
+      clear: () => updateParams({ sort: null }),
+    });
+  }
+  if (hasLocation && maxDistanceKm !== DEFAULT_MAX_DISTANCE) {
+    activeChips.push({
+      key: 'distance',
+      label: `≤ ${maxDistanceKm} km`,
+      clear: () => updateParams({ maxDistanceKm: null }),
+    });
+  }
+  if (minRating > 0) {
+    activeChips.push({
+      key: 'rating',
+      label: `★ ${minRating}+`,
+      clear: () => updateParams({ minRating: null }),
+    });
+  }
+
+  const clearAll = () => {
+    setSearchInput('');
+    router.replace(pathname, { scroll: false });
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8">
       <FadeUp>
-        <header className="flex items-end justify-between gap-3">
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-2">
             <div
               className="text-[10px] uppercase text-fathom"
@@ -135,7 +247,7 @@ export default function RestaurantsPage() {
           </div>
           {hasActivePlan && avgPerMeal > 0 && (
             <div
-              className="hidden flex-col items-end gap-0.5 sm:flex"
+              className="flex flex-col items-start gap-0.5 sm:items-end"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
               <p className="text-[11px] uppercase text-soft" style={{ letterSpacing: '0.18em' }}>
@@ -185,7 +297,10 @@ export default function RestaurantsPage() {
                 <Label htmlFor="sort" className={labelClass} style={labelStyle}>
                   Sort
                 </Label>
-                <Select value={sort} onValueChange={(v) => setSort(v as RestaurantSort | 'auto')}>
+                <Select
+                  value={sort}
+                  onValueChange={(v) => updateParams({ sort: v === DEFAULT_SORT ? null : v })}
+                >
                   <SelectTrigger id="sort" className={`w-full ${inputClass}`}>
                     <SelectValue placeholder="Default" />
                   </SelectTrigger>
@@ -210,12 +325,35 @@ export default function RestaurantsPage() {
                 </Label>
                 <Slider
                   value={[maxDistanceKm]}
-                  onValueChange={(vals) => setMaxDistanceKm(vals[0] ?? 10)}
+                  onValueChange={(vals) =>
+                    updateParams({ maxDistanceKm: String(vals[0] ?? DEFAULT_MAX_DISTANCE) })
+                  }
                   min={1}
                   max={30}
                   step={1}
                   disabled={!hasLocation}
                 />
+                <div className="flex flex-wrap gap-1.5">
+                  {DISTANCE_PRESETS.map((km) => {
+                    const active = maxDistanceKm === km;
+                    return (
+                      <button
+                        key={km}
+                        type="button"
+                        disabled={!hasLocation}
+                        onClick={() => updateParams({ maxDistanceKm: String(km) })}
+                        className={`rounded-full border px-2.5 py-0.5 text-[11px] transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                          active
+                            ? 'border-fathom bg-fathom/[0.08] text-fathom'
+                            : 'border-lumen-dk bg-lumen text-ink hover:border-fathom/40'
+                        }`}
+                        style={{ fontFamily: 'var(--font-mono)' }}
+                      >
+                        {km}km
+                      </button>
+                    );
+                  })}
+                </div>
                 {!hasLocation && (
                   <p className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
                     set your location in profile to enable distance.
@@ -230,16 +368,77 @@ export default function RestaurantsPage() {
                 </Label>
                 <Slider
                   value={[minRating]}
-                  onValueChange={(vals) => setMinRating(vals[0] ?? 0)}
+                  onValueChange={(vals) =>
+                    updateParams({
+                      minRating:
+                        (vals[0] ?? DEFAULT_MIN_RATING) === DEFAULT_MIN_RATING
+                          ? null
+                          : String(vals[0]),
+                    })
+                  }
                   min={0}
                   max={5}
                   step={0.5}
                 />
+                <div className="flex flex-wrap gap-1.5">
+                  {RATING_PRESETS.map(({ value, label }) => {
+                    const active = minRating === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() =>
+                          updateParams({ minRating: value === 0 ? null : String(value) })
+                        }
+                        className={`rounded-full border px-2.5 py-0.5 text-[11px] transition-colors ${
+                          active
+                            ? 'border-fathom bg-fathom/[0.08] text-fathom'
+                            : 'border-lumen-dk bg-lumen text-ink hover:border-fathom/40'
+                        }`}
+                        style={{ fontFamily: 'var(--font-mono)' }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </FadeUp>
+
+      {activeChips.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span
+            className="text-[10px] uppercase text-soft"
+            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
+          >
+            active ·
+          </span>
+          {activeChips.map((chip) => (
+            <button
+              key={chip.key}
+              type="button"
+              onClick={chip.clear}
+              className="inline-flex items-center gap-1 rounded-full border border-lumen-dk bg-white px-2.5 py-1 text-[11px] text-vast transition-colors hover:border-pulse/40 hover:text-pulse"
+              style={{ fontFamily: 'var(--font-mono)' }}
+              aria-label={`Remove ${chip.label}`}
+            >
+              {chip.label}
+              <X className="h-3 w-3" />
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={clearAll}
+            className="ml-1 text-[11px] text-soft underline-offset-2 hover:text-pulse hover:underline"
+            style={{ fontFamily: 'var(--font-mono)' }}
+          >
+            clear all
+          </button>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -253,9 +452,11 @@ export default function RestaurantsPage() {
         </p>
       ) : data.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-lumen-dk bg-white p-8 text-center text-[13px] text-ink">
-          {debouncedSearch
+          {urlQ
             ? 'No restaurants match your search.'
-            : 'No restaurants found — try widening your radius.'}
+            : activeChips.length > 0
+              ? 'No restaurants match your filters — try clearing one.'
+              : 'No restaurants found — try widening your radius.'}
         </div>
       ) : (
         <>
@@ -270,6 +471,10 @@ export default function RestaurantsPage() {
                     })
                   : null;
               const code = String(idx + 1 + page * PAGE_SIZE).padStart(2, '0');
+              const showAvg =
+                r.avgItemPrice != null &&
+                r.minItemPrice != null &&
+                Math.round(r.avgItemPrice) !== Math.round(r.minItemPrice);
               return (
                 <StaggerItem key={r.id}>
                   <Link href={`/restaurants/${r.id}`} className="group block h-full">
@@ -287,16 +492,21 @@ export default function RestaurantsPage() {
                         </span>
                         {r.rating != null && (
                           <div
-                            className="flex shrink-0 items-center gap-1"
+                            className="flex shrink-0 items-baseline gap-1"
                             style={{ fontFamily: 'var(--font-mono)' }}
                           >
                             <Star
-                              className="h-3.5 w-3.5 text-amber"
+                              className="h-3.5 w-3.5 self-center text-amber"
                               style={{ fill: 'var(--color-amber)' }}
                             />
                             <span className="text-[13px] font-medium text-vast">
                               {r.rating.toFixed(1)}
                             </span>
+                            {r.ratingCount > 0 && (
+                              <span className="text-[11px] text-soft">
+                                · {formatCount(r.ratingCount)}
+                              </span>
+                            )}
                           </div>
                         )}
                       </div>
@@ -321,43 +531,57 @@ export default function RestaurantsPage() {
                         {r.deliveryFee != null && <span>₨ {r.deliveryFee} fee</span>}
                       </div>
 
-                      <div className="mt-auto flex items-end justify-between gap-2 pt-4">
-                        {r.minItemPrice != null ? (
-                          <div className="flex flex-col gap-0.5">
+                      <div className="mt-auto flex flex-col gap-2 pt-4">
+                        {fit && <FitPill fit={fit} />}
+                        <div className="flex items-end justify-between gap-2">
+                          {r.minItemPrice != null ? (
+                            <div className="flex flex-col gap-0.5">
+                              <span
+                                className="text-[10px] uppercase text-soft"
+                                style={{
+                                  fontFamily: 'var(--font-mono)',
+                                  letterSpacing: '0.18em',
+                                }}
+                              >
+                                from
+                              </span>
+                              <span
+                                className="text-vast"
+                                style={{
+                                  fontFamily: 'var(--font-display)',
+                                  fontSize: 16,
+                                  fontWeight: 600,
+                                }}
+                              >
+                                ₨ {r.minItemPrice.toLocaleString()}
+                              </span>
+                              {showAvg && (
+                                <span
+                                  className="text-[11px] text-soft"
+                                  style={{ fontFamily: 'var(--font-mono)' }}
+                                >
+                                  avg ₨{' '}
+                                  {Math.round(r.avgItemPrice as number).toLocaleString()}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
                             <span
-                              className="flex items-center gap-1.5 text-[10px] uppercase text-soft"
-                              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
+                              className="text-[11px] text-soft"
+                              style={{ fontFamily: 'var(--font-mono)' }}
                             >
-                              {fit && <FitDot fit={fit} />}
-                              from
+                              no menu yet
                             </span>
+                          )}
+                          {r.minimumOrder != null && (
                             <span
-                              className="text-vast"
-                              style={{
-                                fontFamily: 'var(--font-display)',
-                                fontSize: 16,
-                                fontWeight: 600,
-                              }}
+                              className="text-[11px] text-ink"
+                              style={{ fontFamily: 'var(--font-mono)' }}
                             >
-                              ₨ {r.minItemPrice.toLocaleString()}
+                              min ₨ {r.minimumOrder}
                             </span>
-                          </div>
-                        ) : (
-                          <span
-                            className="text-[11px] text-soft"
-                            style={{ fontFamily: 'var(--font-mono)' }}
-                          >
-                            no menu yet
-                          </span>
-                        )}
-                        {r.minimumOrder != null && (
-                          <span
-                            className="text-[11px] text-ink"
-                            style={{ fontFamily: 'var(--font-mono)' }}
-                          >
-                            min ₨ {r.minimumOrder}
-                          </span>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </motion.div>
                   </Link>
@@ -366,26 +590,26 @@ export default function RestaurantsPage() {
             })}
           </Stagger>
 
-          {(page > 0 || !isLastPage) && (
-            <div className="flex items-center justify-between gap-3">
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between gap-3 pt-2">
               <Pill
                 variant="ghost"
                 size="xs"
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
-                disabled={page === 0 || isFetching}
+                onClick={() => updateParams({ page: String(page - 1) }, { resetPage: false })}
+                disabled={!hasPrev || isFetching}
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
                 ← prev
               </Pill>
               <p className="text-[11px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
-                page {page + 1}
+                page {page + 1} of {totalPages} · {total} total
                 {isFetching ? ' · loading…' : ''}
               </p>
               <Pill
                 variant="ghost"
                 size="xs"
-                onClick={() => setPage((p) => p + 1)}
-                disabled={isLastPage || isFetching}
+                onClick={() => updateParams({ page: String(page + 1) }, { resetPage: false })}
+                disabled={!hasNext || isFetching}
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
                 next →
