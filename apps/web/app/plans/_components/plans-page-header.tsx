@@ -60,7 +60,7 @@ export function PlansPageHeader() {
             Budget plans.
           </h1>
           <p className="max-w-[540px] text-[14px] text-ink">
-            Past and present food budgets — at a glance.
+            Past and present — at a glance.
             <span
               className="ml-1.5 text-[12px] text-soft"
               style={{ fontFamily: 'var(--font-mono)' }}
@@ -99,8 +99,7 @@ export function PlansPageHeader() {
               Replace active plan?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-ink">
-              You already have an active plan running. Cancel it and start a new one? Your existing
-              suggestions and choices will be preserved.
+              You already have an active plan. Cancel it and start a new one?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -114,7 +113,7 @@ export function PlansPageHeader() {
               onClick={handleConfirmReplace}
               className="rounded-full bg-vast px-5 py-2 text-[13px] font-medium text-lumen transition-colors hover:bg-[#2a2a2a] active:scale-[0.97]"
             >
-              Cancel &amp; create new
+              Replace plan
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

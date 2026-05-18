@@ -10,6 +10,11 @@ import { Pill } from '@/components/ui/pill';
 const formatDate = (dateStr: string, opts?: Intl.DateTimeFormatOptions) =>
   new Date(dateStr).toLocaleDateString('en-PK', opts);
 
+const formatPkr = (n: number) =>
+  n >= 1000 ? `₨ ${(n / 1000).toFixed(1)}k` : `₨ ${Math.round(n)}`;
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
 type StatusTone = 'fathom' | 'soft' | 'pulse';
 
 const statusTone: Record<string, StatusTone> = {
@@ -100,6 +105,15 @@ export default function PlansList() {
           const tone = statusTone[plan.status] ?? 'soft';
           const code = String(idx + 1 + page * PAGE_SIZE).padStart(2, '0');
 
+          const now = Date.now();
+          const startMs = new Date(plan.startDate).getTime();
+          const endMs = new Date(plan.endDate).getTime();
+          const elapsedToMs = Math.min(now, endMs);
+          const daysElapsed = Math.max(1, Math.ceil((elapsedToMs - startMs) / MS_PER_DAY));
+          const daysLeft =
+            plan.status === 'active' ? Math.max(0, Math.ceil((endMs - now) / MS_PER_DAY)) : 0;
+          const dailyAvg = spent / daysElapsed;
+
           return (
             <StaggerItem key={plan.id}>
               <Link
@@ -117,7 +131,7 @@ export default function PlansList() {
                       className="text-[10px] uppercase text-soft"
                       style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
                     >
-                      {code} · {plan.planType}
+                      {code}
                     </span>
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] uppercase ${STATUS_CLASS[tone].pill}`}
@@ -159,7 +173,7 @@ export default function PlansList() {
                     >
                       <span>₨ {spent.toLocaleString()} spent</span>
                       <span className="font-semibold text-vast">
-                        ₨ {plan.totalBudget.toLocaleString()}
+                        of ₨ {plan.totalBudget.toLocaleString()}
                       </span>
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-lumen-dk">
@@ -178,12 +192,12 @@ export default function PlansList() {
 
                   <div className="mt-4 grid grid-cols-3 gap-2">
                     {[
-                      { label: 'Budget', value: `${(plan.totalBudget / 1000).toFixed(0)}k` },
-                      { label: 'Spent', value: `${(spent / 1000).toFixed(1)}k` },
                       {
-                        label: 'Left',
-                        value: remaining > 0 ? `${(remaining / 1000).toFixed(1)}k` : '0',
+                        label: 'Remaining',
+                        value: remaining > 0 ? formatPkr(remaining) : '₨ 0',
                       },
+                      { label: 'Daily avg', value: formatPkr(dailyAvg) },
+                      { label: 'Days left', value: String(daysLeft) },
                     ].map(({ label, value }) => (
                       <div
                         key={label}
@@ -203,7 +217,7 @@ export default function PlansList() {
                             fontWeight: 600,
                           }}
                         >
-                          ₨ {value}
+                          {value}
                         </p>
                       </div>
                     ))}
