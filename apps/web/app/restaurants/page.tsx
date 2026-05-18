@@ -287,7 +287,7 @@ export default function RestaurantsPage() {
                     id="search"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    placeholder="e.g. Nihari"
+                    placeholder="e.g. KFC"
                     className={`pl-9 ${inputClass}`}
                   />
                 </div>
@@ -578,7 +578,7 @@ export default function RestaurantsPage() {
                               className="text-[11px] text-ink"
                               style={{ fontFamily: 'var(--font-mono)' }}
                             >
-                              min ₨ {r.minimumOrder}
+                              min order ₨ {r.minimumOrder}
                             </span>
                           )}
                         </div>

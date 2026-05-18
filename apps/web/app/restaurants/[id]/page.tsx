@@ -208,7 +208,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                 )}
                 {distanceKm != null && <span>{distanceKm.toFixed(1)} km away</span>}
                 {r.deliveryFee != null && <span>delivery ₨ {r.deliveryFee}</span>}
-                {r.minimumOrder != null && <span>min ₨ {r.minimumOrder}</span>}
+                {r.minimumOrder != null && <span>min order ₨ {r.minimumOrder}</span>}
               </div>
             </div>
 
