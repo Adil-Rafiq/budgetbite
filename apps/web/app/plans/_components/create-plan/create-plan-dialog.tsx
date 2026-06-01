@@ -10,6 +10,7 @@ import { useCreatePlan } from '@/app/plans/_hooks/use-create-plan';
 import { CreatePlanProvider } from '@/app/plans/_context/create-plan-context';
 import { StepBudgetDetails } from '@/app/plans/_components/create-plan/steps/step-budget';
 import { StepNotifications } from '@/app/plans/_components/create-plan/steps/step-notification';
+import { StepPreview } from '@/app/plans/_components/create-plan/steps/step-preview';
 import { Pill } from '@/components/ui/pill';
 
 type Props = {
@@ -19,7 +20,9 @@ type Props = {
 };
 
 export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = null }: Props) {
-  const createPlan = useCreatePlan(replaceActivePlanId);
+  const createPlan = useCreatePlan(replaceActivePlanId, {
+    onSuccess: () => onOpenChange(false),
+  });
   const { currentStep, currentStepData, progress, isLastStep, isSubmitting, canAdvance, actions } =
     createPlan;
   const stepNumber = String(currentStep + 1).padStart(2, '0');
@@ -63,6 +66,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
 
           {currentStep === 0 && <StepBudgetDetails />}
           {currentStep === 1 && <StepNotifications />}
+          {currentStep === 2 && <StepPreview />}
 
           <DialogFooter>
             {currentStep > 0 && (

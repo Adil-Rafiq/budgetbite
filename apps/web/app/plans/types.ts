@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { LucideIcon } from 'lucide-react';
 
-export type CreatePlanStepId = 'budget' | 'notifications';
+export type CreatePlanStepId = 'budget' | 'notifications' | 'preview';
 
 export type CreatePlanStep = {
   id: CreatePlanStepId;

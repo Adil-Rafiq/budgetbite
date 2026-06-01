@@ -42,7 +42,14 @@ const getPlanDateRange = (planType: BudgetPlanPreferencesInput['planType']) => {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
-export const useCreatePlan = (replaceActivePlanId: string | null = null) => {
+interface UseCreatePlanOptions {
+  onSuccess?: () => void;
+}
+
+export const useCreatePlan = (
+  replaceActivePlanId: string | null = null,
+  { onSuccess }: UseCreatePlanOptions = {},
+) => {
   // ─── Data dependencies ──────────────────────────────────────────────────
 
   const queryClient = useQueryClient();
@@ -143,6 +150,7 @@ export const useCreatePlan = (replaceActivePlanId: string | null = null) => {
 
       send({ type: 'SUBMIT_SUCCESS' });
       showToast.success({ title: 'Budget plan created!', description: '...' });
+      onSuccess?.();
     } catch (err) {
       send({ type: 'SUBMIT_FAILURE' });
       showToast.error({
