@@ -17,8 +17,8 @@ L.Icon.Default.mergeOptions({
 const wisprIcon = L.divIcon({
   className: 'wispr-pin',
   html: `<svg width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M14 0C6.27 0 0 6.27 0 14c0 9.5 14 22 14 22s14-12.5 14-22C28 6.27 21.73 0 14 0z" fill="#034f46"/>
-    <circle cx="14" cy="14" r="5" fill="#ffffeb"/>
+    <path d="M14 0C6.27 0 0 6.27 0 14c0 9.5 14 22 14 22s14-12.5 14-22C28 6.27 21.73 0 14 0z" fill="#0f766e"/>
+    <circle cx="14" cy="14" r="5" fill="#fafaf7"/>
   </svg>`,
   iconSize: [28, 36],
   iconAnchor: [14, 36],
@@ -279,7 +279,7 @@ export function LocationMap({
           zoom={13}
           scrollWheelZoom={true}
           zoomControl={false}
-          style={{ height: `${height}px`, width: '100%', background: '#ffffeb' }}
+          style={{ height: `${height}px`, width: '100%', background: 'var(--color-lumen)' }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'

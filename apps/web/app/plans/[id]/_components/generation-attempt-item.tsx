@@ -156,7 +156,7 @@ export function GenerationAttemptItem({
                 <Pill
                   variant="ghost"
                   size="xs"
-                  className={cn(open && 'border-[#cfcfb8] bg-lumen')}
+                  className={cn(open && 'border-soft bg-lumen')}
                   style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   <ChevronDown

@@ -111,7 +111,7 @@ export function PlansPageHeader() {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmReplace}
-              className="rounded-full bg-vast px-5 py-2 text-[13px] font-medium text-lumen transition-colors hover:bg-[#2a2a2a] active:scale-[0.97]"
+              className="rounded-full bg-vast px-5 py-2 text-[13px] font-medium text-lumen transition-colors hover:bg-vast/85 active:scale-[0.97]"
             >
               Replace plan
             </AlertDialogAction>

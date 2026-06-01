@@ -106,7 +106,7 @@ export default function LandingPage() {
           className="pointer-events-none absolute left-1/2 top-8 -z-10 h-[440px] w-[820px] -translate-x-1/2 rounded-full"
           style={{
             background:
-              'radial-gradient(closest-side, rgba(3,79,70,0.18), rgba(255,169,70,0.14) 55%, transparent 75%)',
+              'radial-gradient(closest-side, color-mix(in srgb, var(--color-fathom) 18%, transparent), color-mix(in srgb, var(--color-glow) 14%, transparent) 55%, transparent 75%)',
             filter: 'blur(20px)',
           }}
         />
