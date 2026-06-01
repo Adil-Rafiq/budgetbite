@@ -1,4 +1,4 @@
-import { Bell, BellOff, CalendarDays, Utensils, Wallet } from 'lucide-react';
+import { Bell, BellOff, CalendarDays, Utensils } from 'lucide-react';
 import { format } from 'date-fns';
 import { useCreatePlanContext } from '@/app/plans/_context/create-plan-context';
 
@@ -25,10 +25,7 @@ const getRange = (planType: 'weekly' | 'monthly') => {
   } else {
     end.setMonth(end.getMonth() + 1);
   }
-  const days = Math.max(
-    1,
-    Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)),
-  );
+  const days = Math.max(1, Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
   return { start, end, days };
 };
 
@@ -133,9 +130,7 @@ export const StepPreview = () => {
                 }`}
               >
                 <span className="capitalize">{slot.label}</span>
-                <span style={monoStyle}>
-                  {slot.enabled ? formatTime(slot.time) : 'off'}
-                </span>
+                <span style={monoStyle}>{slot.enabled ? formatTime(slot.time) : 'off'}</span>
               </div>
             ))}
           </div>

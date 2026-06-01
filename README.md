@@ -25,15 +25,15 @@ BudgetBite picks meals from menus that have been scraped from local delivery app
 
 ## Tech stack
 
-| Area      | Choice                                                                         |
-| --------- | ------------------------------------------------------------------------------ |
-| Web       | Next.js 16 (App Router), React 19, Tailwind 4, shadcn/ui, TanStack Query, ky   |
-| API       | Node 22, Express 5, TypeScript (ESM), Zod, better-auth                         |
-| Database  | Neon (serverless Postgres) + Drizzle ORM                                       |
-| AI        | `LLMProvider` abstraction — Gemini / Anthropic / OpenAI, picked via env        |
-| Scraper   | Python + Playwright + SeleniumBase (admin-auth, service-to-service)            |
-| Auth      | better-auth on both ends (email + OTP, Google OAuth, GitHub OAuth)             |
-| Tooling   | pnpm 10 + Turborepo, ESLint (`--max-warnings 0`), Prettier, XState 5           |
+| Area     | Choice                                                                       |
+| -------- | ---------------------------------------------------------------------------- |
+| Web      | Next.js 16 (App Router), React 19, Tailwind 4, shadcn/ui, TanStack Query, ky |
+| API      | Node 22, Express 5, TypeScript (ESM), Zod, better-auth                       |
+| Database | Neon (serverless Postgres) + Drizzle ORM                                     |
+| AI       | `LLMProvider` abstraction — Gemini / Anthropic / OpenAI, picked via env      |
+| Scraper  | Python + Playwright + SeleniumBase (admin-auth, service-to-service)          |
+| Auth     | better-auth on both ends (email + OTP, Google OAuth, GitHub OAuth)           |
+| Tooling  | pnpm 10 + Turborepo, ESLint (`--max-warnings 0`), Prettier, XState 5         |
 
 Full rationale: [`TECH-STACK.md`](TECH-STACK.md). Product spec: [`apps/api/REQUIREMENTS.md`](apps/api/REQUIREMENTS.md). Agent-facing notes: [`CLAUDE.md`](CLAUDE.md).
 

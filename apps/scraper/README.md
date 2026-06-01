@@ -50,9 +50,9 @@ python -m src.main
 
 Required env (in `apps/scraper/.env`):
 
-| Var             | Purpose                                |
-| --------------- | -------------------------------------- |
-| `API_URL`       | Base URL of the BudgetBite API         |
-| `ADMIN_API_KEY` | Must match the API's `ADMIN_API_KEY`   |
+| Var             | Purpose                              |
+| --------------- | ------------------------------------ |
+| `API_URL`       | Base URL of the BudgetBite API       |
+| `ADMIN_API_KEY` | Must match the API's `ADMIN_API_KEY` |
 
 Run only against a local API you control unless you have explicit permission to do otherwise.
