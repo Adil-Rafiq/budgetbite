@@ -193,7 +193,12 @@ export default function ProfilePage() {
   if (isLoading || !user) {
     return (
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-        <div className="h-28 w-full animate-pulse rounded-3xl bg-lumen-dk" />
+        <div className="flex flex-col gap-2">
+          <div className="h-3 w-32 animate-pulse rounded bg-lumen-dk" />
+          <div className="h-9 w-40 animate-pulse rounded bg-lumen-dk" />
+          <div className="h-4 w-56 animate-pulse rounded bg-lumen-dk" />
+        </div>
+        <div className="h-24 w-full animate-pulse rounded-2xl bg-lumen-dk" />
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <div className="h-64 w-full animate-pulse rounded-2xl bg-lumen-dk" />
           <div className="h-64 w-full animate-pulse rounded-2xl bg-lumen-dk" />
@@ -208,42 +213,50 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-      {/* Hero identity card */}
-      <section className="relative overflow-hidden rounded-3xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+      {/* Page header — matches the rest of the app */}
+      <header className="flex flex-col gap-2">
         <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
+          className="text-[10px] uppercase text-fathom"
+          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
+        >
+          account · /profile
+        </div>
+        <h1
+          className="text-vast"
           style={{
-            background:
-              'radial-gradient(540px circle at 0% 0%, color-mix(in srgb, var(--color-fathom) 12%, transparent), transparent 55%)',
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(28px, 3.6vw, 40px)',
+            fontWeight: 600,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.05,
           }}
-        />
-        <div className="relative flex flex-wrap items-center gap-5 px-6 py-7 sm:px-8 sm:py-8">
+        >
+          Profile.
+        </h1>
+        <p className="text-[14px] text-ink">Account, location, reminders.</p>
+      </header>
+
+      {/* Identity card */}
+      <section className="rounded-2xl border border-lumen-dk bg-white p-5 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+        <div className="flex flex-wrap items-center gap-4">
           <div
-            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-fathom text-[22px] font-semibold text-lumen shadow-[0_8px_24px_-12px_rgba(0,0,0,0.3)]"
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-fathom text-[18px] font-semibold text-lumen"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {initials(firstName, lastName)}
           </div>
-          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-            <div
-              className="text-[10px] uppercase text-fathom"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-            >
-              account · /profile
-            </div>
-            <h1
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <span
               className="truncate text-vast"
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(24px, 3vw, 32px)',
+                fontSize: 18,
                 fontWeight: 600,
-                letterSpacing: '-0.02em',
-                lineHeight: 1.1,
+                letterSpacing: '-0.01em',
               }}
             >
               {user.name || '—'}
-            </h1>
+            </span>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink">
               <span className="truncate">{user.email}</span>
               {user.emailVerified && (
