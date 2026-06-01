@@ -560,8 +560,7 @@ export default function RestaurantsPage() {
                                   className="text-[11px] text-soft"
                                   style={{ fontFamily: 'var(--font-mono)' }}
                                 >
-                                  avg ₨{' '}
-                                  {Math.round(r.avgItemPrice as number).toLocaleString()}
+                                  avg ₨ {Math.round(r.avgItemPrice as number).toLocaleString()}
                                 </span>
                               )}
                             </div>

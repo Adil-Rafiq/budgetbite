@@ -58,8 +58,7 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): nu
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-const formatPkr = (n: number) =>
-  `₨ ${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+const formatPkr = (n: number) => `₨ ${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 
 const labelClass = 'text-[10px] uppercase text-soft';
 const labelStyle: React.CSSProperties = {
@@ -290,10 +289,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
             </h2>
           </div>
           {menuStats && (
-            <span
-              className="text-[11px] text-soft"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
+            <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
               {menuStats.count} item{menuStats.count === 1 ? '' : 's'} · {formatPkr(menuStats.min)}{' '}
               – {formatPkr(menuStats.max)} · avg {formatPkr(menuStats.avg)}
             </span>
