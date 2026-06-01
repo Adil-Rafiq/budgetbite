@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search, Star, X } from 'lucide-react';
@@ -85,7 +85,7 @@ function parseNumberParam(raw: string | null, fallback: number, min: number, max
   return Math.min(max, Math.max(min, n));
 }
 
-export default function RestaurantsPage() {
+function RestaurantsPageInner() {
   const { data: user } = useUser();
   const userLat = user?.profile?.latitude;
   const userLng = user?.profile?.longitude;
@@ -618,5 +618,13 @@ export default function RestaurantsPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function RestaurantsPage() {
+  return (
+    <Suspense fallback={null}>
+      <RestaurantsPageInner />
+    </Suspense>
   );
 }
