@@ -1,4 +1,4 @@
-import { Wallet, Bell } from 'lucide-react';
+import { Wallet, Bell, ClipboardCheck } from 'lucide-react';
 import type { CreatePlanStep } from '@/app/plans/types';
 
 export const CREATE_PLAN_STEPS: readonly CreatePlanStep[] = [
@@ -13,5 +13,11 @@ export const CREATE_PLAN_STEPS: readonly CreatePlanStep[] = [
     icon: Bell,
     title: 'Notification times',
     description: 'When should we remind you to order?',
+  },
+  {
+    id: 'preview',
+    icon: ClipboardCheck,
+    title: 'Review and confirm',
+    description: 'Double-check the details before we create your plan.',
   },
 ] as const;

@@ -170,7 +170,6 @@ export const mealChoiceService = {
     budgetPlanId: string,
     opts: { limit: number; offset: number },
   ): Promise<Paginated<MealChoiceResponse>> {
-    // FIXME: verify the budgetPlanId belongs to the current user
     const [rows, total] = await Promise.all([
       orderRepository.listByUserAndPlanWithPagination(userId, budgetPlanId, opts),
       orderRepository.countByPlan(userId, budgetPlanId),

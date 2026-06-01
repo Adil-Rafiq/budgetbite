@@ -34,7 +34,7 @@ export const createBudgetPlanMachine = setup({
 
   context: {
     step: 0,
-    totalSteps: 2,
+    totalSteps: 3,
   },
 
   states: {
