@@ -196,7 +196,7 @@ function DayCard({ day }: { day: PlanTimelineDay }) {
   }, [day.slots]);
 
   const containerClass = isToday
-    ? 'overflow-hidden rounded-2xl border-[1.5px] border-fathom bg-white shadow-[0_0_0_4px_rgba(3,79,70,0.07)]'
+    ? 'overflow-hidden rounded-2xl border-[1.5px] border-fathom bg-white shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-fathom)_7%,transparent)]'
     : isPast
       ? 'overflow-hidden rounded-2xl border border-lumen-dk bg-lumen'
       : 'overflow-hidden rounded-2xl border border-lumen-dk bg-white';

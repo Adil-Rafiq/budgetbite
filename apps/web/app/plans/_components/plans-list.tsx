@@ -10,8 +10,7 @@ import { Pill } from '@/components/ui/pill';
 const formatDate = (dateStr: string, opts?: Intl.DateTimeFormatOptions) =>
   new Date(dateStr).toLocaleDateString('en-PK', opts);
 
-const formatPkr = (n: number) =>
-  n >= 1000 ? `₨ ${(n / 1000).toFixed(1)}k` : `₨ ${Math.round(n)}`;
+const formatPkr = (n: number) => (n >= 1000 ? `₨ ${(n / 1000).toFixed(1)}k` : `₨ ${Math.round(n)}`);
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 

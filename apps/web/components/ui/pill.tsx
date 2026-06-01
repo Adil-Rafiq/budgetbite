@@ -8,7 +8,7 @@ const pillVariants = cva(
   [
     'inline-flex items-center justify-center gap-2 rounded-full font-medium select-none',
     'transition-all duration-150 ease-out',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ffffeb]',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-lumen',
     'disabled:pointer-events-none disabled:opacity-40',
     'active:scale-[0.97]',
   ].join(' '),
@@ -16,16 +16,16 @@ const pillVariants = cva(
     variants: {
       variant: {
         primary:
-          'bg-[#1a1a1a] text-[#ffffeb] hover:bg-[#2a2a2a] hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] focus-visible:ring-[#1a1a1a]/40',
+          'bg-vast text-lumen hover:bg-vast/85 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] focus-visible:ring-vast/40',
         accent:
-          'bg-[#034f46] text-[#ffffeb] hover:bg-[#02403a] hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] focus-visible:ring-[#034f46]/40',
+          'bg-fathom text-lumen hover:bg-fathom/90 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.18)] focus-visible:ring-fathom/40',
         outline:
-          'border border-[#1a1a1a] bg-transparent text-[#1a1a1a] hover:bg-black/[0.04] hover:-translate-y-px focus-visible:ring-[#1a1a1a]/30',
+          'border border-vast bg-transparent text-vast hover:bg-black/[0.04] hover:-translate-y-px focus-visible:ring-vast/30',
         ghost:
-          'border border-[#e4e4d0] bg-white text-[#1a1a1a] hover:bg-[#ffffeb] hover:border-[#cfcfb8] focus-visible:ring-[#1a1a1a]/20',
-        subtle: 'bg-transparent text-[#1a1a1a] hover:bg-[#ffffeb] focus-visible:ring-[#1a1a1a]/20',
+          'border border-lumen-dk bg-white text-vast hover:bg-lumen hover:border-soft focus-visible:ring-vast/20',
+        subtle: 'bg-transparent text-vast hover:bg-lumen focus-visible:ring-vast/20',
         danger:
-          'border border-[#7f1c34] bg-white text-[#7f1c34] hover:bg-[#7f1c34]/[0.06] hover:-translate-y-px focus-visible:ring-[#7f1c34]/30',
+          'border border-pulse bg-white text-pulse hover:bg-pulse/[0.06] hover:-translate-y-px focus-visible:ring-pulse/30',
       },
       size: {
         xs: 'px-3 py-1.5 text-[12px] gap-1.5',

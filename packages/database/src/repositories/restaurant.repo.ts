@@ -1,4 +1,4 @@
-import { sql, and, eq, gte, ilike } from 'drizzle-orm';
+import { sql, and, eq, getTableName, gte, ilike } from 'drizzle-orm';
 
 import { db } from '../db.js';
 import { menuItem, restaurant, type NewRestaurant, type Restaurant } from '../schema/index.js';
@@ -77,15 +77,20 @@ export const restaurantRepository = {
     // Per-restaurant menu aggregates (correlated subqueries). LEFT JOIN +
     // GROUP BY would also work but the subquery shape keeps `restaurant.*`
     // cleanly typed without spelling out every column on the SELECT.
+    // Drizzle's `sql` template strips table qualifiers from column refs
+    // (so `${restaurant.id}` renders as just `"id"` and binds to
+    // `menu_item.id` inside the subquery). Build the qualified outer ref
+    // by hand so the correlation actually fires.
+    const outerRestaurantId = sql.raw(`"${getTableName(restaurant)}"."id"`);
     const minPriceExpr = sql<string | null>`(
       SELECT MIN(${menuItem.price}::numeric)::text
       FROM ${menuItem}
-      WHERE ${menuItem.restaurantId} = ${restaurant.id}
+      WHERE ${menuItem.restaurantId} = ${outerRestaurantId}
     )`;
     const avgPriceExpr = sql<string | null>`(
       SELECT AVG(${menuItem.price}::numeric)::text
       FROM ${menuItem}
-      WHERE ${menuItem.restaurantId} = ${restaurant.id}
+      WHERE ${menuItem.restaurantId} = ${outerRestaurantId}
     )`;
 
     const conditions = [];

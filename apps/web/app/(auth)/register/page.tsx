@@ -134,7 +134,7 @@ export default function RegisterPage() {
         className="pointer-events-none absolute left-1/2 top-32 -z-0 h-[360px] w-[700px] -translate-x-1/2 rounded-full"
         style={{
           background:
-            'radial-gradient(closest-side, rgba(3,79,70,0.14), rgba(255,169,70,0.10) 55%, transparent 75%)',
+            'radial-gradient(closest-side, color-mix(in srgb, var(--color-fathom) 14%, transparent), color-mix(in srgb, var(--color-glow) 10%, transparent) 55%, transparent 75%)',
           filter: 'blur(20px)',
         }}
       />

@@ -1,9 +1,9 @@
 import { apiClient } from '@/lib/api/client';
 import type {
   ListRestaurantsQuery,
+  ListRestaurantsResponse,
   MenuItem,
   Restaurant,
-  RestaurantWithDistance,
 } from '@repo/shared';
 
 function stripUndefined<T extends Record<string, unknown>>(
@@ -20,7 +20,7 @@ export const restaurantApi = {
   list: (query: Partial<ListRestaurantsQuery>) =>
     apiClient
       .get('api/restaurants', { searchParams: stripUndefined(query) })
-      .json<RestaurantWithDistance[]>(),
+      .json<ListRestaurantsResponse>(),
 
   getById: (id: string) => apiClient.get(`api/restaurants/${id}`).json<Restaurant>(),
 

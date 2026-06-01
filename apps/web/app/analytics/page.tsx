@@ -27,15 +27,15 @@ import { useBudgetPlans } from '@/hooks/use-budget-plan';
 import { useListActiveMealTypes } from '@/hooks/use-meal-type';
 import { useMealHistory, useSpendingAnalytics } from '@/hooks/use-analytics';
 
-const FATHOM = '#034f46';
-const PULSE = '#7f1c34';
-const AMBER = '#b8741a';
-const GLOW = '#ffa946';
-const VAST = '#1a1a1a';
-const SOFT = '#a6a691';
-const MUTED = '#71716a';
-const LUMEN = '#ffffeb';
-const LUMEN_DK = '#e4e4d0';
+const FATHOM = 'var(--color-fathom)';
+const PULSE = 'var(--color-pulse)';
+const AMBER = 'var(--color-amber)';
+const GLOW = 'var(--color-glow)';
+const VAST = 'var(--color-vast)';
+const SOFT = 'var(--color-soft)';
+const MUTED = 'var(--color-ink)';
+const LUMEN = 'var(--color-lumen)';
+const LUMEN_DK = 'var(--color-lumen-dk)';
 const WHITE = '#ffffff';
 
 const mealTypePalette = [FATHOM, AMBER, PULSE, VAST, GLOW, SOFT, MUTED];
@@ -441,7 +441,7 @@ export default function AnalyticsPage() {
 
         <StaggerItem>
           <Panel code="04" title="Meal history">
-            <div className="overflow-auto">
+            <div className="max-h-[360px] overflow-auto pr-2">
               {historyQuery.isLoading ? (
                 <TableSkeleton rows={5} columns={4} />
               ) : history.length === 0 ? (
@@ -449,7 +449,7 @@ export default function AnalyticsPage() {
               ) : (
                 <div className="flex flex-col">
                   <div
-                    className="grid grid-cols-[64px_1fr_auto] gap-3 border-b border-lumen-dk py-2 text-[10px] uppercase text-soft"
+                    className="sticky top-0 z-10 grid grid-cols-[64px_1fr_auto] gap-3 border-b border-lumen-dk bg-white py-2 text-[10px] uppercase text-soft"
                     style={{
                       fontFamily: 'var(--font-mono)',
                       letterSpacing: '0.18em',
@@ -473,7 +473,9 @@ export default function AnalyticsPage() {
                           delay: Math.min(i * 0.03, 0.4),
                           ease: [0.22, 1, 0.36, 1],
                         }}
-                        whileHover={{ background: 'rgba(255,255,235,0.6)' }}
+                        whileHover={{
+                          background: 'color-mix(in srgb, var(--color-lumen) 60%, transparent)',
+                        }}
                         className={`grid grid-cols-[64px_1fr_auto] items-center gap-3 py-3 ${
                           i === 0 ? '' : 'border-t border-lumen-dk'
                         }`}

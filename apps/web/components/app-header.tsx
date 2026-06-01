@@ -1,10 +1,22 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
+import { LogOut, User as UserIcon } from 'lucide-react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { LogoIcon } from '@/components/icons';
+import { authClient } from '@/lib/auth-client';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 function initials(name: string | undefined): string {
   if (!name) return '•';
@@ -15,13 +27,25 @@ function initials(name: string | undefined): string {
 }
 
 export function AppHeader() {
+  const router = useRouter();
   const { data: active } = useActiveBudgetPlan();
   const { data: user } = useUser();
+  const [signingOut, setSigningOut] = useState(false);
 
   const totalBudget = active?.plan.totalBudget ?? 0;
   const spent = active?.plan.spentAmount ?? 0;
   const remaining = Math.max(0, totalBudget - spent);
   const spentPercent = totalBudget > 0 ? Math.round((spent / totalBudget) * 100) : 0;
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    try {
+      await authClient.signOut();
+      router.push('/login');
+    } finally {
+      setSigningOut(false);
+    }
+  };
 
   return (
     <header
@@ -84,13 +108,53 @@ export function AppHeader() {
               </span>
             </div>
           )}
-          <span
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-fathom text-[12px] text-lumen"
-            style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}
-            title={user?.name ?? ''}
-          >
-            {initials(user?.name)}
-          </span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-fathom text-[12px] text-lumen transition-all hover:shadow-[0_4px_12px_-4px_rgba(0,0,0,0.25)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fathom/40 focus-visible:ring-offset-2 focus-visible:ring-offset-lumen"
+                style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}
+                aria-label={user?.name ? `Account menu for ${user.name}` : 'Account menu'}
+              >
+                {initials(user?.name)}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={8} className="min-w-[220px]">
+              {user && (
+                <>
+                  <DropdownMenuLabel className="flex flex-col gap-0.5 py-2">
+                    <span className="truncate text-[13px] font-medium text-vast">
+                      {user.name || '—'}
+                    </span>
+                    <span
+                      className="truncate text-[11px] text-soft"
+                      style={{ fontFamily: 'var(--font-mono)' }}
+                    >
+                      {user.email}
+                    </span>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              <DropdownMenuItem asChild>
+                <Link href="/profile">
+                  <UserIcon className="h-4 w-4" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                variant="destructive"
+                onSelect={() => {
+                  handleSignOut();
+                }}
+                disabled={signingOut}
+              >
+                <LogOut className="h-4 w-4" />
+                {signingOut ? 'Signing out…' : 'Sign out'}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

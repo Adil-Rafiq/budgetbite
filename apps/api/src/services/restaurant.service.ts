@@ -72,28 +72,43 @@ export const restaurantService = {
     const budgetFitTarget =
       query.sort === 'budget-fit' ? await resolveBudgetFitTarget(userId) : null;
 
-    const results = await restaurantRepository.list({
-      limit: query.limit,
-      offset: query.offset,
+    const baseFilters = {
       maxDistanceKm: query.maxDistanceKm,
       userLat: lat,
       userLng: lng,
       minRating: query.minRating,
       q: query.q,
-      sort: query.sort,
-      budgetFitTarget: budgetFitTarget ?? undefined,
-    });
-    return results.map((r) => ({
-      ...r.restaurant,
-      latitude: r.restaurant.latitude != null ? Number(r.restaurant.latitude) : null,
-      longitude: r.restaurant.longitude != null ? Number(r.restaurant.longitude) : null,
-      deliveryFee: r.restaurant.deliveryFee != null ? Number(r.restaurant.deliveryFee) : null,
-      minimumOrder: r.restaurant.minimumOrder != null ? Number(r.restaurant.minimumOrder) : null,
-      rating: r.restaurant.rating != null ? Number(r.restaurant.rating) : null,
-      distanceKm: r.distanceKm != null ? Number(r.distanceKm) : undefined,
-      minItemPrice: r.minItemPrice,
-      avgItemPrice: r.avgItemPrice,
-    }));
+    };
+
+    const [results, total] = await Promise.all([
+      restaurantRepository.list({
+        ...baseFilters,
+        limit: query.limit,
+        offset: query.offset,
+        sort: query.sort,
+        budgetFitTarget: budgetFitTarget ?? undefined,
+      }),
+      restaurantRepository.count(baseFilters),
+    ]);
+
+    return {
+      data: results.map((r) => ({
+        ...r.restaurant,
+        latitude: r.restaurant.latitude != null ? Number(r.restaurant.latitude) : null,
+        longitude: r.restaurant.longitude != null ? Number(r.restaurant.longitude) : null,
+        deliveryFee: r.restaurant.deliveryFee != null ? Number(r.restaurant.deliveryFee) : null,
+        minimumOrder: r.restaurant.minimumOrder != null ? Number(r.restaurant.minimumOrder) : null,
+        rating: r.restaurant.rating != null ? Number(r.restaurant.rating) : null,
+        distanceKm: r.distanceKm != null ? Number(r.distanceKm) : undefined,
+        minItemPrice: r.minItemPrice,
+        avgItemPrice: r.avgItemPrice,
+      })),
+      meta: {
+        total,
+        limit: query.limit,
+        offset: query.offset,
+      },
+    };
   },
 
   async getById(id: string) {

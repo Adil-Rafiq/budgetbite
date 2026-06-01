@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { paginationSchema, uuidSchema } from './common.js';
+import { paginatedSchema, paginationSchema, uuidSchema } from './common.js';
 
 // ─── Inputs ─────────────────────────────────────────────────────────────────
 
@@ -60,6 +60,8 @@ export const restaurantWithDistanceSchema = restaurantSchema.extend({
   avgItemPrice: z.number().nullable().optional(),
 });
 
+export const listRestaurantsResponseSchema = paginatedSchema(restaurantWithDistanceSchema);
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type ListRestaurantsQuery = z.infer<typeof listRestaurantsSchema>;
@@ -68,3 +70,4 @@ export type CreateRestaurantInput = z.infer<typeof createRestaurantSchema>;
 export type UpdateRestaurantInput = z.infer<typeof updateRestaurantSchema>;
 export type Restaurant = z.infer<typeof restaurantSchema>;
 export type RestaurantWithDistance = z.infer<typeof restaurantWithDistanceSchema>;
+export type ListRestaurantsResponse = z.infer<typeof listRestaurantsResponseSchema>;
