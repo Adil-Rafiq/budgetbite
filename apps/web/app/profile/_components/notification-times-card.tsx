@@ -8,6 +8,7 @@ import { TimePicker } from '@/components/ui/time-picker';
 import { useActiveBudgetPlan, useUpdateBudgetPlan } from '@/hooks/use-budget-plan';
 import { showToast } from '@/lib/toast';
 import { getErrorMessage } from '@/lib/api/errors';
+import { Section } from '@/app/profile/_components/section';
 
 const TIME_PATTERN = /^\d{2}:\d{2}$/;
 
@@ -53,42 +54,14 @@ export function NotificationTimesCard() {
   };
 
   if (isLoading) {
-    return <div className="h-44 w-full animate-pulse rounded-2xl bg-lumen-dk" />;
+    return <div className="h-64 w-full animate-pulse rounded-2xl bg-lumen-dk" />;
   }
 
-  return (
-    <div className="overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]">
-      <div className="flex items-center justify-between gap-3 border-b border-lumen-dk bg-lumen px-5 py-4">
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-fathom/[0.08] text-fathom">
-            <Bell className="h-4 w-4" />
-          </div>
-          <div className="flex flex-col">
-            <span
-              className="text-[10px] uppercase text-soft"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-            >
-              04
-            </span>
-            <span
-              className="text-vast"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 15,
-                fontWeight: 600,
-                letterSpacing: '-0.01em',
-              }}
-            >
-              Notification times
-            </span>
-          </div>
-        </div>
-        <p className="hidden max-w-[280px] text-right text-[12px] text-ink sm:block">
-          {active ? 'When should we remind you?' : 'Create a plan to configure reminders.'}
-        </p>
-      </div>
+  const hint = active ? 'When should we remind you?' : 'Create a plan to configure reminders.';
 
-      <div className="flex flex-col gap-4 p-5">
+  return (
+    <Section icon={Bell} title="Notification times" hint={hint}>
+      <div className="flex flex-col gap-4">
         {!active ? (
           <p className="text-[13px] text-ink">No active plan yet.</p>
         ) : (
@@ -143,6 +116,6 @@ export function NotificationTimesCard() {
           </>
         )}
       </div>
-    </div>
+    </Section>
   );
 }
