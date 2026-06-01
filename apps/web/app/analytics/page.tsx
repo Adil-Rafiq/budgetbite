@@ -441,7 +441,7 @@ export default function AnalyticsPage() {
 
         <StaggerItem>
           <Panel code="04" title="Meal history">
-            <div className="overflow-auto">
+            <div className="max-h-[360px] overflow-auto pr-2">
               {historyQuery.isLoading ? (
                 <TableSkeleton rows={5} columns={4} />
               ) : history.length === 0 ? (
@@ -449,7 +449,7 @@ export default function AnalyticsPage() {
               ) : (
                 <div className="flex flex-col">
                   <div
-                    className="grid grid-cols-[64px_1fr_auto] gap-3 border-b border-lumen-dk py-2 text-[10px] uppercase text-soft"
+                    className="sticky top-0 z-10 grid grid-cols-[64px_1fr_auto] gap-3 border-b border-lumen-dk bg-white py-2 text-[10px] uppercase text-soft"
                     style={{
                       fontFamily: 'var(--font-mono)',
                       letterSpacing: '0.18em',
