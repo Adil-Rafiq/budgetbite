@@ -4,6 +4,18 @@
 
 ## Up Next
 
+- [ ] Fix user flow & error handling for plan generation when onboarding/location is incomplete or no restaurants are nearby
+  - Problem: Users can create a plan before completing onboarding or setting their location. Attempting to generate meal suggestions then either does nothing in the UI or fails with a console error like "No nearby restaurants available..." and the user receives no clear feedback.
+  - Desired behavior: If required profile data (onboarding, location) is missing, or there are no nearby restaurants, the UI should prevent generation and show a clear, user-friendly message explaining what to do (e.g., "Please complete onboarding and set your location" or "No nearby restaurants found—try changing your location or adding restaurants").
+  - Acceptance criteria:
+    - Creating a plan without completed onboarding/location should show an inline warning and a link/button to complete onboarding or set location.
+    - Clicking "Generate meal suggestions" with incomplete profile/location must show the warning and not call the generation service.
+    - If generation fails due to no nearby restaurants, show a clear error to the user and log the cause for debugging.
+    - No unhandled console errors should occur when generation is attempted.
+  - Implementation notes:
+    - Add front-end guard that checks profile.onboarded and profile.location before calling plan generation API.
+    - API should validate required fields and return a structured AppError when preconditions aren't met.
+    - Surface API error messages in the UI in a friendly format; avoid exposing raw console errors to users.
 - [ ] Fix budget generating suggestions for a generation
 - [ ] Add logic checks in services
 - [ ] Remove any `try-catch` from the AI related code. Use `AppError` instead
