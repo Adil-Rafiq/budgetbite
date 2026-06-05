@@ -53,3 +53,4 @@
 - [x] Convert queries that use complex joins to use `relations` instead
 - [x] Update Google Auth Provider
 - [x] Analytics page
+- [x] Add API cold-start wakeup banner for Render free-tier delays

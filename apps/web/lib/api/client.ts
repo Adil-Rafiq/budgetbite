@@ -1,11 +1,25 @@
 import ky, { HTTPError } from 'ky';
+import { markApiWakeupError, markApiWakeupFinish, markApiWakeupStart } from '@/lib/api/wakeup';
 
 export const apiClient = ky.create({
   prefixUrl: process.env.NEXT_PUBLIC_API_URL,
   credentials: 'include',
   hooks: {
+    beforeRequest: [
+      () => {
+        markApiWakeupStart();
+      },
+    ],
+    afterResponse: [
+      (_request, _options, response) => {
+        markApiWakeupFinish();
+        return response;
+      },
+    ],
     beforeError: [
       async (error) => {
+        markApiWakeupError();
+
         const { response } = error;
         if (response) {
           try {
