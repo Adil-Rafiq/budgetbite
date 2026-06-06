@@ -138,4 +138,11 @@ Key vars:
 
 ## License
 
-[MIT](LICENSE) — feel free to fork, learn from, or build on this. The scraper has additional usage notes in [`apps/scraper/README.md`](apps/scraper/README.md); please read them before running it.
+[Elastic License 2.0](LICENSE)
+
+This project is source-available under the Elastic License 2.0. You are free
+to read, run, and modify it, but you may not offer it as a hosted or managed
+service. See the [LICENSE](LICENSE) file for full terms.
+
+The scraper has additional usage notes in [`apps/scraper/README.md`](apps/scraper/README.md);
+please read them before running it.

@@ -12,7 +12,7 @@ If you fork this repo:
 - No scraped data is bundled in this repository.
 - You are responsible for complying with the laws and ToS that apply to you.
 
-The maintainers offer no warranty and accept no responsibility for misuse. See the repository root `LICENSE` for the MIT terms covering the code itself.
+The maintainers offer no warranty and accept no responsibility for misuse. See the repository root `LICENSE` for the Elastic License 2.0 terms covering the code itself.
 
 ## How it fits the rest of the stack
 
