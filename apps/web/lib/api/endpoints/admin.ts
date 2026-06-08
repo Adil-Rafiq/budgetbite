@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api/client';
-import type { ListRestaurantsQuery, ListRestaurantsResponse } from '@repo/shared';
+import type { ListRestaurantsQuery, ListRestaurantsResponse, MealType } from '@repo/shared';
 
 function stripUndefined<T extends Record<string, unknown>>(
   obj: T,
@@ -20,5 +20,13 @@ export const adminApi = {
   deleteRestaurant: async (id: string): Promise<void> => {
     // 204 No Content — don't parse a body.
     await apiClient.delete(`api/admin/restaurants/${id}`);
+  },
+
+  // Admin meal-types list includes inactive rows (unlike the public endpoint).
+  listMealTypes: () => apiClient.get('api/admin/meal-types').json<MealType[]>(),
+
+  deleteMealType: async (id: string): Promise<void> => {
+    // 204 No Content; 409 if a plan still references it.
+    await apiClient.delete(`api/admin/meal-types/${id}`);
   },
 };
