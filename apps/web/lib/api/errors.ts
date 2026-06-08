@@ -7,6 +7,14 @@ export const getErrorMessage = (err: unknown, fallback = 'Something went wrong')
   return fallback;
 };
 
+/**
+ * Read the API's machine-readable error code (e.g. `NO_NEARBY_RESTAURANTS`).
+ * The ky `beforeError` hook in `client.ts` stashes the response body's `code`
+ * onto the error so callers can branch without string-matching the message.
+ */
+export const getErrorCode = (err: unknown): string | undefined =>
+  err instanceof HTTPError ? (err as HTTPError & { code?: string }).code : undefined;
+
 export const isNotFound = (err: unknown): boolean =>
   err instanceof HTTPError && err.response.status === 404;
 
