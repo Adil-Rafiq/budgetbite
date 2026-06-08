@@ -1,8 +1,10 @@
 'use client';
 
-import { RefreshCw, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { MapPin, RefreshCw, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
+import { useUser } from '@/hooks/use-user';
 import { cn } from '@/lib/utils';
 import { Pill } from '@/components/ui/pill';
 import type { BudgetPlanDetail } from '@repo/shared';
@@ -15,6 +17,18 @@ const fmtPkr = (n: number) => `₨ ${n.toLocaleString()}`;
 
 export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
   const generate = useGenerateMealPlan();
+  const { data: user, isLoading: isUserLoading } = useUser();
+
+  // Generation needs a saved location to find nearby restaurants. We treat a
+  // present lat/lng as "onboarding complete" since the location step is what
+  // populates it. Block the call client-side so the user gets actionable
+  // guidance instead of a back-end rejection.
+  const profile = user?.profile;
+  const hasLocation =
+    typeof profile?.latitude === 'number' && typeof profile?.longitude === 'number';
+  // Only treat location as missing once we've actually loaded the user — avoid
+  // flashing the warning (or blocking) while the profile is still in flight.
+  const needsLocation = !isUserLoading && !!user && !hasLocation;
 
   const ctx = plan.context;
   const spent = ctx.amountSpent;
@@ -27,7 +41,12 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
   const isPending = plan.latestAttempt?.status === 'pending';
   const isTerminalPlan = plan.status === 'cancelled' || plan.status === 'completed';
   const canTrigger = !isPending && !isTerminalPlan;
-  const disabled = !canTrigger || generate.isPending;
+  const disabled = !canTrigger || generate.isPending || needsLocation;
+
+  const handleGenerate = () => {
+    if (needsLocation) return; // guarded by `disabled`, but never call the API without a location
+    generate.mutate(plan.id);
+  };
 
   const varianceTone =
     ctx.cumulativeVariance >= 0
@@ -66,12 +85,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
             </p>
           </div>
 
-          <Pill
-            size="md"
-            onClick={() => generate.mutate(plan.id)}
-            disabled={disabled}
-            className="shrink-0"
-          >
+          <Pill size="md" onClick={handleGenerate} disabled={disabled} className="shrink-0">
             {hasActiveGen ? (
               <>
                 <RefreshCw className={cn('h-4 w-4', generate.isPending && 'animate-spin')} />
@@ -85,6 +99,22 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
             )}
           </Pill>
         </div>
+
+        {needsLocation && (
+          <div className="flex items-start gap-3 rounded-xl border border-amber/20 bg-amber/10 px-4 py-3 text-amber">
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-[14px] font-medium">Set your location to generate a plan</p>
+              <p className="mt-0.5 text-[12px] opacity-80">
+                We use it to find restaurants near you. Finish onboarding to add your location, then
+                come back to generate suggestions.
+              </p>
+            </div>
+            <Pill asChild variant="ghost" size="xs" className="shrink-0">
+              <Link href="/onboarding">Complete setup</Link>
+            </Pill>
+          </div>
+        )}
 
         <div className="flex flex-col gap-2">
           <div

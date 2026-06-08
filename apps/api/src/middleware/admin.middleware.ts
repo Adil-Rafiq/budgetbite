@@ -1,9 +1,15 @@
 import type { Response, NextFunction } from 'express';
+import { can, type Permission, type Role } from '@repo/shared';
 import { auth } from '../lib/auth.js';
 import { AppError } from './error.middleware.js';
 import type { AuthRequest } from './auth.middleware.js';
 
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
+
+const hasServiceKey = (req: AuthRequest): boolean => {
+  const apiKey = req.headers['x-api-key'];
+  return typeof apiKey === 'string' && !!ADMIN_API_KEY && apiKey === ADMIN_API_KEY;
+};
 
 const getSessionUser = async (req: AuthRequest) => {
   const session = await auth.api.getSession({ headers: req.headers as unknown as Headers });
@@ -51,8 +57,7 @@ export async function requireAdminOrService(
   next: NextFunction,
 ): Promise<void> {
   // scraper / service via API key
-  const apiKey = req.headers['x-api-key'];
-  if (typeof apiKey === 'string' && ADMIN_API_KEY && apiKey === ADMIN_API_KEY) {
+  if (hasServiceKey(req)) {
     next();
     return;
   }
@@ -73,3 +78,32 @@ export async function requireAdminOrService(
   attachUser(req, user);
   next();
 }
+
+/**
+ * Permission-gated guard backed by the @repo/shared role matrix. The service
+ * API key bypasses the matrix (full-trust scraper). Otherwise the session
+ * user's role must grant `permission`.
+ */
+export const requirePermission =
+  (permission: Permission) =>
+  async (req: AuthRequest, _res: Response, next: NextFunction): Promise<void> => {
+    if (hasServiceKey(req)) {
+      next();
+      return;
+    }
+
+    const user = await getSessionUser(req);
+
+    if (!user) {
+      next(new AppError(401, 'Unauthorized', 'UNAUTHORIZED'));
+      return;
+    }
+
+    if (!can(user.role as Role, permission)) {
+      next(new AppError(403, 'Insufficient permissions', 'FORBIDDEN'));
+      return;
+    }
+
+    attachUser(req, user);
+    next();
+  };

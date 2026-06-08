@@ -61,7 +61,10 @@ export function AppSidebar() {
         navigation
       </div>
       <nav className="flex flex-col gap-1 px-3">
-        {navItems.map((item) => {
+        {(user?.role === 'admin'
+          ? [...navItems, { href: '/admin', label: 'Admin' }]
+          : navItems
+        ).map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
           return (
             <Link

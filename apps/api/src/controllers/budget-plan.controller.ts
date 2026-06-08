@@ -78,14 +78,11 @@ export async function recordChoice(req: AuthRequest, res: Response): Promise<voi
 
 export async function generateMealPlan(req: AuthRequest, res: Response): Promise<void> {
   const { id } = req.params as IdParams;
-  const result = await budgetPlanService.generateMealPlan(req.userId!, id);
-  if (result === null) {
-    // This attempt was superseded by a newer kickoff before it could finish —
-    // the FE should poll the plan detail to see the latest attempt's status.
-    res.status(202).json({ status: 'superseded' });
-    return;
-  }
-  res.status(201).json(result);
+  // Returns 202 immediately with the pending generation's id; the LLM runs in
+  // the background and the FE polls for the outcome. Precondition failures
+  // (e.g. NO_NEARBY_RESTAURANTS) still surface synchronously as a 4xx.
+  const kickoff = await budgetPlanService.generateMealPlan(req.userId!, id);
+  res.status(202).json(kickoff);
 }
 
 export async function listGenerations(req: AuthRequest, res: Response): Promise<void> {
