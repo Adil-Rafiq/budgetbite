@@ -15,13 +15,14 @@ import { AppError } from '../middleware/error.middleware.js';
 import { llm } from '../lib/llm.js';
 import { contextBuilderService } from './context-builder.service.js';
 
-export interface GenerationResult {
+/**
+ * Returned once the pending row exists and the LLM call is running in the
+ * background. Callers poll the generation's status for the outcome.
+ */
+export interface GenerationKickoff {
   generationId: string;
   budgetPlanId: string;
   generatedAt: Date;
-  suggestionCount: number;
-  planSummary: string;
-  estimatedTotalCost: number;
 }
 
 /**
@@ -89,19 +90,20 @@ class RetriableLLMError extends Error {
  *  context build -> prompt -> llm.complete -> JSON parse + validate ->
  *  cross-check ids against context -> persist generation + suggestions atomically.
  *
- * Two synchronous entry points (`generate`, `replan`) throw AppError on
- * failure so HTTP handlers can return a meaningful 502. Two async fire-and-
- * forget wrappers (`kickoffGenerationAsync`, `kickoffReplanAsync`) swallow and
- * log errors so they can be safely chained from non-AI request paths
- * (plan create, meal-choice record).
+ * `generate` / `replan` validate preconditions (throwing AppError, e.g. 400
+ * NO_NEARBY_RESTAURANTS) and insert the pending row, then hand the LLM call to
+ * the background and return a kickoff. The FE polls for the result; failures are
+ * written to the row, not thrown. `kickoffGenerationAsync` / `kickoffReplanAsync`
+ * additionally swallow the setup errors for non-AI request paths (plan create,
+ * meal-choice record).
  */
 export const mealGenerationService = {
   /**
-   * Synchronous entry: throws on real failures (mapped to HTTP 502 by the
-   * route). Returns `null` when this attempt was superseded mid-flight by a
-   * newer kickoff — caller should treat as a no-op (HTTP 202).
+   * Validates preconditions (throws 400 for NO_REMAINING_DATES /
+   * NO_NEARBY_RESTAURANTS), inserts the pending row, then runs the LLM in the
+   * background — returns as soon as the row exists so the request never blocks.
    */
-  async generate(userId: string, planId: string): Promise<GenerationResult | null> {
+  async generate(userId: string, planId: string): Promise<GenerationKickoff> {
     await assertPlanOwnership(userId, planId);
     const ctx = await contextBuilderService.build(planId, userId);
 
@@ -117,14 +119,10 @@ export const mealGenerationService = {
     }
 
     const prompt = buildGeneratePlanPrompt(ctx);
-    return runGeneration({ planId, ctx, prompt, mode: 'generate' });
+    return startGeneration({ planId, ctx, prompt, mode: 'generate' });
   },
 
-  async replan(
-    userId: string,
-    planId: string,
-    triggerSummary: string,
-  ): Promise<GenerationResult | null> {
+  async replan(userId: string, planId: string, triggerSummary: string): Promise<GenerationKickoff> {
     await assertPlanOwnership(userId, planId);
     const ctx = await contextBuilderService.build(planId, userId);
 
@@ -140,7 +138,7 @@ export const mealGenerationService = {
     }
 
     const prompt = buildReplanPrompt(ctx, triggerSummary);
-    return runGeneration({ planId, ctx, prompt, mode: 'replan' });
+    return startGeneration({ planId, ctx, prompt, mode: 'replan' });
   },
 
   /**
@@ -180,20 +178,43 @@ interface RunArgs {
   mode: 'generate' | 'replan';
 }
 
-async function runGeneration({
-  planId,
-  ctx,
-  prompt,
-  mode,
-}: RunArgs): Promise<GenerationResult | null> {
-  const startedAt = Date.now();
+/**
+ * Insert the pending row up-front (superseding any prior pending attempt, so a
+ * newer kickoff wins) and hand the LLM call to the background, returning as soon
+ * as the row exists. The detached promise runs to completion on a long-lived
+ * process; a restart mid-flight is reconciled by the 5-minute pending-generation
+ * janitor (see budget-plan.service).
+ */
+async function startGeneration(args: RunArgs): Promise<GenerationKickoff> {
+  const generation = await mealPlanRepository.createGenerationSupersedingPrior(args.planId);
 
-  // ─── 0. Insert pending row up-front, supersede any prior pending ──────────
-  // Doing this BEFORE the LLM call gives the FE a queryable status the moment
-  // a kickoff begins, and the supersede write makes a newer kickoff for the
-  // same plan win automatically — older in-flight LLM calls discard their
-  // results via the conditional success/fail markers below.
-  const generation = await mealPlanRepository.createGenerationSupersedingPrior(planId);
+  // Fire-and-forget. executeGeneration writes failures to the row rather than
+  // rethrowing; this .catch only guards against an unexpected throw.
+  void executeGeneration(generation.id, args).catch((err) => {
+    console.error(
+      `[mealGenerationService:${args.mode}] background generation crashed for plan=${args.planId}`,
+      err,
+    );
+  });
+
+  return {
+    generationId: generation.id,
+    budgetPlanId: args.planId,
+    generatedAt: generation.generatedAt,
+  };
+}
+
+/**
+ * Background half: call the LLM (with the retry-on-validation loop), then
+ * persist suggestions + flip status atomically. Detached from the request, so
+ * it NEVER rethrows — failures are written to the row via markGenerationFailed
+ * for the FE to poll, and a superseded attempt is a silent no-op.
+ */
+async function executeGeneration(
+  generationId: string,
+  { planId, ctx, prompt, mode }: RunArgs,
+): Promise<void> {
+  const startedAt = Date.now();
 
   try {
     // ─── 1. Build context lookups ───────────────────────────────────────────
@@ -256,7 +277,7 @@ async function runGeneration({
       }
 
       try {
-        const validated = parseAndValidate(response.text, generation.id, validators);
+        const validated = parseAndValidate(response.text, generationId, validators);
         plan = validated.plan;
         rows = validated.rows;
         break;
@@ -296,7 +317,7 @@ async function runGeneration({
     // SupersededError to roll the suggestion insert back. No orphan rows.
     await db.transaction(async (tx) => {
       await mealPlanRepository.insertSuggestions(rows, tx);
-      const applied = await mealPlanRepository.markGenerationSucceeded(generation.id, tx);
+      const applied = await mealPlanRepository.markGenerationSucceeded(generationId, tx);
       if (!applied) throw new SupersededError();
     });
 
@@ -306,7 +327,7 @@ async function runGeneration({
       `[mealGenerationService:${mode}] success`,
       JSON.stringify({
         planId,
-        generationId: generation.id,
+        generationId,
         provider: response.provider,
         model: response.model,
         inputTokens: response.inputTokens ?? null,
@@ -317,40 +338,28 @@ async function runGeneration({
         latencyMs,
       }),
     );
-
-    return {
-      generationId: generation.id,
-      budgetPlanId: planId,
-      generatedAt: generation.generatedAt,
-      suggestionCount: rows.length,
-      planSummary: plan.planSummary,
-      estimatedTotalCost: plan.estimatedTotalCost,
-    };
   } catch (err) {
     if (err instanceof SupersededError) {
       console.info(
-        `[mealGenerationService:${mode}] generation=${generation.id} superseded mid-flight; result dropped`,
+        `[mealGenerationService:${mode}] generation=${generationId} superseded mid-flight; result dropped`,
       );
-      return null;
+      return;
     }
 
-    // Mark the row as failed before re-throwing so the FE polling sees the
-    // status flip on its next tick. Conditional WHERE status='pending' so we
-    // never overwrite a 'superseded' marker (e.g. if a newer kickoff arrived
-    // between the LLM error and this update).
+    // Detached, so persist the failure instead of rethrowing — FE polling sees
+    // the flip. Conditional WHERE status='pending' so we never clobber a
+    // 'superseded' marker from a newer kickoff.
     const errorCode = err instanceof AppError && err.code ? err.code : 'AI_GENERATION_FAILED';
     const errorMessage = err instanceof Error ? err.message : null;
     try {
-      await mealPlanRepository.markGenerationFailed(generation.id, errorCode, errorMessage);
+      await mealPlanRepository.markGenerationFailed(generationId, errorCode, errorMessage);
     } catch (markErr) {
       // Logging only — never let a marker write hide the original error.
       console.error(
-        `[mealGenerationService:${mode}] markGenerationFailed for generation=${generation.id} threw`,
+        `[mealGenerationService:${mode}] markGenerationFailed for generation=${generationId} threw`,
         markErr,
       );
     }
-
-    throw err;
   }
 }
 

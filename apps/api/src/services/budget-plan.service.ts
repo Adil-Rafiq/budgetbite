@@ -28,7 +28,7 @@ import {
 
 import { AppError } from '../middleware/error.middleware.js';
 import { applyPinAdjustment } from './context-builder.service.js';
-import { mealGenerationService, type GenerationResult } from './meal-generation.service.js';
+import { mealGenerationService, type GenerationKickoff } from './meal-generation.service.js';
 import { toOption, type SuggestionRow } from './meal-plan.service.js';
 
 // 5 minutes — pending generations older than this are considered crashed
@@ -330,7 +330,7 @@ export const budgetPlanService = {
     return toBudgetPlanResponse(reloaded);
   },
 
-  async generateMealPlan(userId: string, planId: string): Promise<GenerationResult | null> {
+  async generateMealPlan(userId: string, planId: string): Promise<GenerationKickoff> {
     return mealGenerationService.generate(userId, planId);
   },
 

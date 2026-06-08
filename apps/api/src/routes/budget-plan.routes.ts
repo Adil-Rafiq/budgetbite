@@ -80,7 +80,7 @@ router.post(
   asyncHandler(budgetPlanController.recordChoice),
 );
 
-/** Create a new meal_plan_generation for this plan (kick off AI suggestions). Returns { generationId, budgetPlanId, generatedAt }. */
+/** Kick off AI suggestions. Returns 202 with { generationId, budgetPlanId, generatedAt }; the LLM runs in the background and the FE polls for the result. */
 router.post(
   '/:id/meal-plan/generate',
   validate({ params: idParams }),
