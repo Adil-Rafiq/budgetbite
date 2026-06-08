@@ -149,13 +149,13 @@ export const useCreatePlan = (
       }
 
       send({ type: 'SUBMIT_SUCCESS' });
-      showToast.success({ title: 'Budget plan created!', description: '...' });
+      showToast.success({ title: 'Budget plan created!' });
       onSuccess?.();
     } catch (err) {
       send({ type: 'SUBMIT_FAILURE' });
       showToast.error({
         title: 'Failed to create budget plan',
-        description: getErrorMessage(err, '...'),
+        description: getErrorMessage(err, 'Something went wrong. Please try again.'),
       });
     }
   };
