@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Trash2 } from 'lucide-react';
-import { can } from '@repo/shared';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { can, type Restaurant } from '@repo/shared';
 import { useUser } from '@/hooks/use-user';
 import { useAdminRestaurants, useDeleteAdminRestaurant } from '@/hooks/use-admin-restaurants';
+import { RestaurantFormModal } from '../../_components/restaurant-form-modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
@@ -35,7 +36,9 @@ const money = (n: number | null): string => (n == null ? '—' : `₨ ${n.toLoca
 export default function AdminRestaurantsPage() {
   const { data: user } = useUser();
   const canDelete = user ? can(user.role, 'restaurant:delete') : false;
+  const canWrite = user ? can(user.role, 'restaurant:write') : false;
 
+  const [form, setForm] = useState<{ open: boolean; restaurant?: Restaurant }>({ open: false });
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [offset, setOffset] = useState(0);
@@ -86,11 +89,19 @@ export default function AdminRestaurantsPage() {
           placeholder="Search by name…"
           className="max-w-xs bg-white"
         />
-        {total > 0 && (
-          <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
-            {total} total
-          </span>
-        )}
+        <div className="flex items-center gap-3">
+          {total > 0 && (
+            <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+              {total} total
+            </span>
+          )}
+          {canWrite && (
+            <Button size="sm" onClick={() => setForm({ open: true })}>
+              <Plus className="size-4" />
+              Add restaurant
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 rounded-xl border border-lumen-dk bg-white">
@@ -115,7 +126,7 @@ export default function AdminRestaurantsPage() {
                 <TableHead className="text-right">Delivery</TableHead>
                 <TableHead className="text-right">Min order</TableHead>
                 <TableHead>Added</TableHead>
-                {canDelete && <TableHead className="w-10" />}
+                {(canWrite || canDelete) && <TableHead className="w-20" />}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -133,42 +144,56 @@ export default function AdminRestaurantsPage() {
                     <TableCell className="text-soft">
                       {new Date(r.createdAt).toLocaleDateString()}
                     </TableCell>
-                    {canDelete && (
+                    {(canWrite || canDelete) && (
                       <TableCell>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
+                        <div className="flex items-center justify-end gap-1">
+                          {canWrite && (
                             <Button
                               variant="ghost"
                               size="icon-sm"
-                              aria-label={`Delete ${r.name}`}
-                              disabled={isDeleting}
+                              aria-label={`Edit ${r.name}`}
+                              onClick={() => setForm({ open: true, restaurant: r })}
                             >
-                              {isDeleting ? (
-                                <Spinner className="size-4" />
-                              ) : (
-                                <Trash2 className="size-4 text-destructive" />
-                              )}
+                              <Pencil className="size-4 text-ink" />
                             </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete {r.name}?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This removes the restaurant and all of its menu items. This action
-                                cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                className="bg-destructive text-white hover:bg-destructive/90"
-                                onClick={() => deleteRestaurant.mutate(r.id)}
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                          )}
+                          {canDelete && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  aria-label={`Delete ${r.name}`}
+                                  disabled={isDeleting}
+                                >
+                                  {isDeleting ? (
+                                    <Spinner className="size-4" />
+                                  ) : (
+                                    <Trash2 className="size-4 text-destructive" />
+                                  )}
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete {r.name}?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This removes the restaurant and all of its menu items. This
+                                    action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-destructive text-white hover:bg-destructive/90"
+                                    onClick={() => deleteRestaurant.mutate(r.id)}
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
+                        </div>
                       </TableCell>
                     )}
                   </TableRow>
@@ -203,6 +228,15 @@ export default function AdminRestaurantsPage() {
             </Button>
           </div>
         </div>
+      )}
+
+      {form.open && (
+        <RestaurantFormModal
+          key={form.restaurant?.id ?? 'new'}
+          open={form.open}
+          restaurant={form.restaurant}
+          onOpenChange={(open) => setForm((f) => ({ ...f, open }))}
+        />
       )}
     </div>
   );
