@@ -1,10 +1,13 @@
 import { apiClient } from '@/lib/api/client';
 import type {
+  AdminPlanDetail,
+  AdminPlanListResponse,
   AuditLogListResponse,
   CreateMealTypeInput,
   CreateMenuItemInput,
   CreateRestaurantInput,
   ListAuditLogsQuery,
+  ListAdminPlansQuery,
   ListRestaurantsQuery,
   ListRestaurantsResponse,
   ListScraperRunsQuery,
@@ -103,4 +106,13 @@ export const adminApi = {
 
   updateUserRole: (id: string, input: UpdateUserRoleInput) =>
     apiClient.patch(`api/admin/users/${id}/role`, { json: input }).json<User>(),
+
+  // ── Budget plans (read-only) ──
+  listBudgetPlans: (query: Partial<ListAdminPlansQuery>) =>
+    apiClient
+      .get('api/admin/budget-plans', { searchParams: stripUndefined(query) })
+      .json<AdminPlanListResponse>(),
+
+  getBudgetPlan: (id: string) =>
+    apiClient.get(`api/admin/budget-plans/${id}`).json<AdminPlanDetail>(),
 };

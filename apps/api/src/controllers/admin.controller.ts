@@ -4,6 +4,7 @@ import type {
   CreateMenuItemInput,
   CreateRestaurantInput,
   FinishScraperRunInput,
+  ListAdminPlansQuery,
   ListAuditLogsQuery,
   ListRestaurantsQuery,
   ListScraperRunsQuery,
@@ -20,6 +21,7 @@ import { mealTypeService } from '../services/meal-type.service.js';
 import { auditService } from '../services/audit.service.js';
 import { scraperService } from '../services/scraper.service.js';
 import { userService } from '../services/user.service.js';
+import { budgetPlanService } from '../services/budget-plan.service.js';
 import { getActor } from '../lib/audit-actor.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
 
@@ -168,4 +170,17 @@ export async function updateUserRole(req: AuthRequest, res: Response): Promise<v
   const { id } = req.params as IdParams;
   const user = await userService.updateRole(id, req.body as UpdateUserRoleInput, getActor(req));
   res.json(user);
+}
+
+// ─── Budget plans (read-only inspection) ──────────────────────────────────────
+
+export async function listBudgetPlans(req: Request, res: Response): Promise<void> {
+  const result = await budgetPlanService.adminList(req.query as unknown as ListAdminPlansQuery);
+  res.json(result);
+}
+
+export async function getBudgetPlan(req: Request, res: Response): Promise<void> {
+  const { id } = req.params as IdParams;
+  const plan = await budgetPlanService.adminGetById(id);
+  res.json(plan);
 }

@@ -31,6 +31,7 @@ const navItems = [
   { href: '/admin/restaurants', label: 'Restaurants' },
   { href: '/admin/meal-types', label: 'Meal types' },
   { href: '/admin/users', label: 'Users' },
+  { href: '/admin/plans', label: 'Plans' },
   { href: '/admin/ingestion', label: 'Ingestion' },
   { href: '/admin/audit', label: 'Audit log' },
 ];

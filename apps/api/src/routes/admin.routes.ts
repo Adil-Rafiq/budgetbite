@@ -6,6 +6,7 @@ import {
   createMenuItemsSchema,
   createRestaurantSchema,
   finishScraperRunSchema,
+  listAdminPlansQuerySchema,
   listAuditLogsQuerySchema,
   listRestaurantsSchema,
   listScraperRunsQuerySchema,
@@ -197,6 +198,24 @@ router.patch(
   requirePermission('user:write'),
   validate({ params: idParams, body: updateUserRoleSchema }),
   asyncHandler(adminController.updateUserRole),
+);
+
+// ─── Budget plans (read-only inspection) ──────────────────────────────────────
+
+/** List budget plans across all users (newest first), filterable by status. Returns { data, meta }. */
+router.get(
+  '/budget-plans',
+  requirePermission('plan:read'),
+  validate({ query: listAdminPlansQuerySchema }),
+  asyncHandler(adminController.listBudgetPlans),
+);
+
+/** Inspect one plan: context, meal types, generations, and active suggestions. */
+router.get(
+  '/budget-plans/:id',
+  requirePermission('plan:read'),
+  validate({ params: idParams }),
+  asyncHandler(adminController.getBudgetPlan),
 );
 
 export default router;

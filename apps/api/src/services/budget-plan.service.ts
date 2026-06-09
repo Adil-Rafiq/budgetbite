@@ -1,5 +1,9 @@
 import type {
   ActiveBudgetPlanResponse,
+  AdminPlanDetail,
+  AdminPlanGeneration,
+  AdminPlanListItem,
+  AdminPlanSuggestion,
   BudgetGeneration,
   BudgetGenerationDayGroup,
   BudgetGenerationDetailResponse,
@@ -7,6 +11,7 @@ import type {
   BudgetPlanResponse,
   BudgetStateContext,
   CreateBudgetPlanInput,
+  ListAdminPlansQuery,
   ListBudgetGenerationsResponse,
   ListBudgetPlansQuery,
   Paginated,
@@ -21,7 +26,10 @@ import {
   mealPlanRepository,
   mealTypeRepository,
   planContextRepository,
+  userRepository,
+  type AdminPlanListRow,
   type BudgetPlanWithRelations,
+  type LatestGenerationRow,
   type MealPlanGeneration,
   type PlanContextRelationRow,
 } from '@repo/database';
@@ -417,7 +425,124 @@ export const budgetPlanService = {
 
     return { generation: toBudgetGeneration(gen), days };
   },
+
+  // ─── Admin (cross-user, read-only) ──────────────────────────────────────────
+
+  async adminList(query: ListAdminPlansQuery): Promise<Paginated<AdminPlanListItem>> {
+    const [rows, total] = await Promise.all([
+      budgetPlanRepository.listAllForAdmin({
+        status: query.status,
+        limit: query.limit,
+        offset: query.offset,
+      }),
+      budgetPlanRepository.countAllForAdmin(query.status),
+    ]);
+    return {
+      data: rows.map(toAdminPlanListItem),
+      meta: { total, limit: query.limit, offset: query.offset },
+    };
+  },
+
+  async adminGetById(planId: string): Promise<AdminPlanDetail> {
+    const plan = await budgetPlanRepository.findByIdWithRelations(planId, {
+      withContext: true,
+      withMealTypes: true,
+      withLatestGeneration: true,
+    });
+    if (!plan) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
+
+    const [owner, generations] = await Promise.all([
+      userRepository.findById(plan.userId),
+      mealPlanRepository.listGenerations(planId, { limit: 50, offset: 0 }),
+    ]);
+
+    const activeGenerationId = plan.activeGeneration?.id ?? null;
+    const suggestions = activeGenerationId
+      ? await mealPlanRepository.getSuggestionsForGeneration(activeGenerationId)
+      : [];
+
+    return {
+      id: plan.id,
+      user: {
+        id: plan.userId,
+        name: owner?.name ?? '—',
+        email: owner?.email ?? '—',
+      },
+      planType: plan.planType as 'weekly' | 'monthly',
+      totalBudget: toNumber(plan.totalBudget),
+      status: plan.status as 'active' | 'completed' | 'cancelled',
+      startDate: plan.startDate,
+      endDate: plan.endDate,
+      mealsPerDay: plan.mealsPerDay,
+      latestAttempt: plan.latestAttempt ? toAdminGeneration(plan.latestAttempt) : null,
+      createdAt: plan.createdAt,
+      context: plan.planContext
+        ? {
+            totalBudget: toNumber(plan.planContext.totalBudget),
+            amountSpent: toNumber(plan.planContext.amountSpent),
+            amountRemaining: toNumber(plan.planContext.amountRemaining),
+            totalMeals: plan.planContext.totalMeals,
+            mealsConsumed: plan.planContext.mealsConsumed,
+            mealsRemaining: plan.planContext.mealsRemaining,
+            avgBudgetPerRemainingMeal: toNumber(plan.planContext.avgBudgetPerRemainingMeal),
+            cumulativeVariance: toNumber(plan.planContext.cumulativeVariance),
+          }
+        : null,
+      mealTypes: plan.mealTypes ?? [],
+      generations: generations.map(toAdminGeneration),
+      activeGenerationId,
+      suggestions: suggestions.map(toAdminSuggestion),
+    };
+  },
 };
+
+function toAdminGeneration(row: LatestGenerationRow | MealPlanGeneration): AdminPlanGeneration {
+  return {
+    id: row.id,
+    generatedAt: row.generatedAt,
+    status: row.status,
+    errorCode: row.errorCode,
+    errorMessage: row.errorMessage,
+    completedAt: row.completedAt,
+  };
+}
+
+function toAdminPlanListItem(row: AdminPlanListRow): AdminPlanListItem {
+  return {
+    id: row.id,
+    user: { id: row.user.id, name: row.user.name, email: row.user.email },
+    planType: row.planType as 'weekly' | 'monthly',
+    totalBudget: toNumber(row.totalBudget),
+    status: row.status as 'active' | 'completed' | 'cancelled',
+    startDate: row.startDate,
+    endDate: row.endDate,
+    mealsPerDay: row.mealsPerDay,
+    latestAttempt: row.mealGenerations[0] ? toAdminGeneration(row.mealGenerations[0]) : null,
+    createdAt: row.createdAt,
+  };
+}
+
+function toAdminSuggestion(row: {
+  id: string;
+  slotDate: string;
+  optionIndex: number;
+  estimatedPrice: string | null;
+  notes: string | null;
+  mealType: { key: string; label: string };
+  restaurant: { id: string; name: string };
+  menuItem: { id: string; name: string; price: string };
+}): AdminPlanSuggestion {
+  return {
+    id: row.id,
+    slotDate: row.slotDate,
+    optionIndex: row.optionIndex,
+    estimatedPrice: row.estimatedPrice != null ? toNumber(row.estimatedPrice) : 0,
+    notes: row.notes,
+    mealType: { key: row.mealType.key, label: row.mealType.label },
+    restaurant: { id: row.restaurant.id, name: row.restaurant.name },
+    menuItem: { id: row.menuItem.id, name: row.menuItem.name, price: toNumber(row.menuItem.price) },
+  };
+}
 
 function toBudgetGeneration(row: MealPlanGeneration): BudgetGeneration {
   return {

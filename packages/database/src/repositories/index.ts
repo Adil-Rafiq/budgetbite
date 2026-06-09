@@ -14,6 +14,7 @@ export {
   type PlanContextRelationRow,
   type MealTypeOnPlanRow,
   type LatestGenerationRow,
+  type AdminPlanListRow,
 } from './budget-plan.repo.js';
 export { mealPlanRepository } from './meal-plan.repo.js';
 export { orderRepository } from './order.repo.js';
