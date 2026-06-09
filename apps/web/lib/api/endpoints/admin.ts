@@ -8,6 +8,7 @@ import type {
   ListRestaurantsQuery,
   ListRestaurantsResponse,
   ListScraperRunsQuery,
+  ListUsersQuery,
   MealType,
   MenuItem,
   Restaurant,
@@ -15,6 +16,9 @@ import type {
   UpdateMealTypeInput,
   UpdateMenuItemInput,
   UpdateRestaurantInput,
+  UpdateUserRoleInput,
+  User,
+  UserListResponse,
 } from '@repo/shared';
 
 function stripUndefined<T extends Record<string, unknown>>(
@@ -90,4 +94,13 @@ export const adminApi = {
     apiClient
       .get('api/admin/scraper-runs', { searchParams: stripUndefined(query) })
       .json<ScraperRunListResponse>(),
+
+  // ── Users ──
+  listUsers: (query: Partial<ListUsersQuery>) =>
+    apiClient
+      .get('api/admin/users', { searchParams: stripUndefined(query) })
+      .json<UserListResponse>(),
+
+  updateUserRole: (id: string, input: UpdateUserRoleInput) =>
+    apiClient.patch(`api/admin/users/${id}/role`, { json: input }).json<User>(),
 };

@@ -7,16 +7,19 @@ import type {
   ListAuditLogsQuery,
   ListRestaurantsQuery,
   ListScraperRunsQuery,
+  ListUsersQuery,
   StartScraperRunInput,
   UpdateMealTypeInput,
   UpdateMenuItemInput,
   UpdateRestaurantInput,
+  UpdateUserRoleInput,
 } from '@repo/shared';
 
 import { restaurantService } from '../services/restaurant.service.js';
 import { mealTypeService } from '../services/meal-type.service.js';
 import { auditService } from '../services/audit.service.js';
 import { scraperService } from '../services/scraper.service.js';
+import { userService } from '../services/user.service.js';
 import { getActor } from '../lib/audit-actor.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
 
@@ -152,4 +155,17 @@ export async function finishScraperRun(req: Request, res: Response): Promise<voi
   const { id } = req.params as IdParams;
   const run = await scraperService.finish(id, req.body as FinishScraperRunInput);
   res.json(run);
+}
+
+// ─── Users ──────────────────────────────────────────────────────────────────
+
+export async function listUsers(req: Request, res: Response): Promise<void> {
+  const result = await userService.list(req.query as unknown as ListUsersQuery);
+  res.json(result);
+}
+
+export async function updateUserRole(req: AuthRequest, res: Response): Promise<void> {
+  const { id } = req.params as IdParams;
+  const user = await userService.updateRole(id, req.body as UpdateUserRoleInput, getActor(req));
+  res.json(user);
 }

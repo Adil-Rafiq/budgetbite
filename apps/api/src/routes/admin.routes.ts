@@ -9,10 +9,12 @@ import {
   listAuditLogsQuerySchema,
   listRestaurantsSchema,
   listScraperRunsQuerySchema,
+  listUsersQuerySchema,
   startScraperRunSchema,
   updateMealTypeSchema,
   updateMenuItemSchema,
   updateRestaurantSchema,
+  updateUserRoleSchema,
   uuidSchema,
 } from '@repo/shared';
 
@@ -177,6 +179,24 @@ router.patch(
   requirePermission('scraper:write'),
   validate({ params: idParams, body: finishScraperRunSchema }),
   asyncHandler(adminController.finishScraperRun),
+);
+
+// ─── Users ──────────────────────────────────────────────────────────────────
+
+/** List users (newest first), searchable by name/email and filterable by role. Returns { data, meta }. */
+router.get(
+  '/users',
+  requirePermission('user:read'),
+  validate({ query: listUsersQuerySchema }),
+  asyncHandler(adminController.listUsers),
+);
+
+/** Change a user's role. Cannot demote yourself. Returns the updated user. */
+router.patch(
+  '/users/:id/role',
+  requirePermission('user:write'),
+  validate({ params: idParams, body: updateUserRoleSchema }),
+  asyncHandler(adminController.updateUserRole),
 );
 
 export default router;
