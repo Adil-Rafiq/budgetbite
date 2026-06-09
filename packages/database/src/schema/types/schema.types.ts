@@ -11,6 +11,8 @@ import { mealPin } from '../meal-pin.js';
 import { restaurant } from '../restaurant.js';
 import { planContext } from '../plan-context.js';
 import { userPreferences } from '../user-preferences.js';
+import { auditLog } from '../audit-log.js';
+import { scraperRun } from '../scraper-run.js';
 
 // Auth types
 export type User = typeof user.$inferSelect;
@@ -87,3 +89,12 @@ export type UpdatePlanContext = Partial<Omit<NewPlanContext, 'budgetPlanId'>>;
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type NewUserPreferences = typeof userPreferences.$inferInsert;
 export type UpdateUserPreferences = Partial<Omit<NewUserPreferences, 'userId'>>;
+
+// Audit log types
+export type AuditLog = typeof auditLog.$inferSelect;
+export type NewAuditLog = typeof auditLog.$inferInsert;
+
+// Scraper run types
+export type ScraperRun = typeof scraperRun.$inferSelect;
+export type NewScraperRun = typeof scraperRun.$inferInsert;
+export type UpdateScraperRun = Partial<Omit<NewScraperRun, 'id'>>;

@@ -12,4 +12,6 @@ export * from './feedback.js';
 export * from './relations.js';
 export * from './plan-context.js';
 export * from './user-preferences.js';
+export * from './audit-log.js';
+export * from './scraper-run.js';
 export * from './types/schema.types.js';
