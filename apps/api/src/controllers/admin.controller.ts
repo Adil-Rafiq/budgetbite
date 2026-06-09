@@ -11,6 +11,8 @@ import type {
 
 import { restaurantService } from '../services/restaurant.service.js';
 import { mealTypeService } from '../services/meal-type.service.js';
+import { getActor } from '../lib/audit-actor.js';
+import type { AuthRequest } from '../middleware/auth.middleware.js';
 
 type IdParams = { id: string };
 type ItemParams = { id: string; itemId: string };
@@ -35,44 +37,59 @@ export async function getRestaurantByExternalId(req: Request, res: Response): Pr
   res.json(restaurant);
 }
 
-export async function createRestaurant(req: Request, res: Response): Promise<void> {
-  const restaurant = await restaurantService.createRestaurant(req.body as CreateRestaurantInput);
+export async function createRestaurant(req: AuthRequest, res: Response): Promise<void> {
+  const restaurant = await restaurantService.createRestaurant(
+    req.body as CreateRestaurantInput,
+    getActor(req),
+  );
   res.status(201).json(restaurant);
 }
 
-export async function updateRestaurant(req: Request, res: Response): Promise<void> {
+export async function updateRestaurant(req: AuthRequest, res: Response): Promise<void> {
   const { id } = req.params as IdParams;
   const restaurant = await restaurantService.updateRestaurant(
     id,
     req.body as UpdateRestaurantInput,
+    getActor(req),
   );
   res.json(restaurant);
 }
 
-export async function deleteRestaurant(req: Request, res: Response): Promise<void> {
+export async function deleteRestaurant(req: AuthRequest, res: Response): Promise<void> {
   const { id } = req.params as IdParams;
-  await restaurantService.deleteRestaurant(id);
+  await restaurantService.deleteRestaurant(id, getActor(req));
   res.status(204).send();
 }
 
 // ─── Menu items ───────────────────────────────────────────────────────────────
 
-export async function createMenuItems(req: Request, res: Response): Promise<void> {
+export async function listMenuItems(req: Request, res: Response): Promise<void> {
+  const { id } = req.params as IdParams;
+  const items = await restaurantService.getMenu(id);
+  res.json(items);
+}
+
+export async function createMenuItems(req: AuthRequest, res: Response): Promise<void> {
   const { id } = req.params as IdParams;
   const body = req.body as CreateMenuItemInput | CreateMenuItemInput[];
-  const items = await restaurantService.createMenuItems(id, body);
+  const items = await restaurantService.createMenuItems(id, body, getActor(req));
   res.status(201).json(Array.isArray(body) ? items : items[0]);
 }
 
-export async function updateMenuItem(req: Request, res: Response): Promise<void> {
+export async function updateMenuItem(req: AuthRequest, res: Response): Promise<void> {
   const { id, itemId } = req.params as ItemParams;
-  const item = await restaurantService.updateMenuItem(id, itemId, req.body as UpdateMenuItemInput);
+  const item = await restaurantService.updateMenuItem(
+    id,
+    itemId,
+    req.body as UpdateMenuItemInput,
+    getActor(req),
+  );
   res.json(item);
 }
 
-export async function deleteMenuItem(req: Request, res: Response): Promise<void> {
+export async function deleteMenuItem(req: AuthRequest, res: Response): Promise<void> {
   const { id, itemId } = req.params as ItemParams;
-  await restaurantService.deleteMenuItem(id, itemId);
+  await restaurantService.deleteMenuItem(id, itemId, getActor(req));
   res.status(204).send();
 }
 
@@ -83,19 +100,19 @@ export async function listMealTypes(_req: Request, res: Response): Promise<void>
   res.json(types);
 }
 
-export async function createMealType(req: Request, res: Response): Promise<void> {
-  const type = await mealTypeService.create(req.body as CreateMealTypeInput);
+export async function createMealType(req: AuthRequest, res: Response): Promise<void> {
+  const type = await mealTypeService.create(req.body as CreateMealTypeInput, getActor(req));
   res.status(201).json(type);
 }
 
-export async function updateMealType(req: Request, res: Response): Promise<void> {
+export async function updateMealType(req: AuthRequest, res: Response): Promise<void> {
   const { id } = req.params as IdParams;
-  const type = await mealTypeService.update(id, req.body as UpdateMealTypeInput);
+  const type = await mealTypeService.update(id, req.body as UpdateMealTypeInput, getActor(req));
   res.json(type);
 }
 
-export async function deleteMealType(req: Request, res: Response): Promise<void> {
+export async function deleteMealType(req: AuthRequest, res: Response): Promise<void> {
   const { id } = req.params as IdParams;
-  await mealTypeService.delete(id);
+  await mealTypeService.delete(id, getActor(req));
   res.status(204).send();
 }

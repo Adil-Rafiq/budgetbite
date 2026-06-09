@@ -1,12 +1,15 @@
 import { apiClient } from '@/lib/api/client';
 import type {
   CreateMealTypeInput,
+  CreateMenuItemInput,
   CreateRestaurantInput,
   ListRestaurantsQuery,
   ListRestaurantsResponse,
   MealType,
+  MenuItem,
   Restaurant,
   UpdateMealTypeInput,
+  UpdateMenuItemInput,
   UpdateRestaurantInput,
 } from '@repo/shared';
 
@@ -32,9 +35,30 @@ export const adminApi = {
   updateRestaurant: (id: string, input: UpdateRestaurantInput) =>
     apiClient.patch(`api/admin/restaurants/${id}`, { json: input }).json<Restaurant>(),
 
+  getRestaurant: (id: string) => apiClient.get(`api/admin/restaurants/${id}`).json<Restaurant>(),
+
   deleteRestaurant: async (id: string): Promise<void> => {
     // 204 No Content — don't parse a body.
     await apiClient.delete(`api/admin/restaurants/${id}`);
+  },
+
+  // ── Menu items (nested under a restaurant) ──
+  listMenuItems: (restaurantId: string) =>
+    apiClient.get(`api/admin/restaurants/${restaurantId}/menu-items`).json<MenuItem[]>(),
+
+  // Posting a single object returns a single MenuItem (array in → array out).
+  createMenuItem: (restaurantId: string, input: CreateMenuItemInput) =>
+    apiClient
+      .post(`api/admin/restaurants/${restaurantId}/menu-items`, { json: input })
+      .json<MenuItem>(),
+
+  updateMenuItem: (restaurantId: string, itemId: string, input: UpdateMenuItemInput) =>
+    apiClient
+      .patch(`api/admin/restaurants/${restaurantId}/menu-items/${itemId}`, { json: input })
+      .json<MenuItem>(),
+
+  deleteMenuItem: async (restaurantId: string, itemId: string): Promise<void> => {
+    await apiClient.delete(`api/admin/restaurants/${restaurantId}/menu-items/${itemId}`);
   },
 
   // Admin meal-types list includes inactive rows (unlike the public endpoint).

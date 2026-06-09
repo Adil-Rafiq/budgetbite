@@ -74,6 +74,14 @@ router.delete(
 
 // ─── Menu items (nested under restaurant) ────────────────────────────────────
 
+/** List a restaurant's menu items. Admin only. Returns MenuItem[]. */
+router.get(
+  '/restaurants/:id/menu-items',
+  requirePermission('restaurant:read'),
+  validate({ params: idParams }),
+  asyncHandler(adminController.listMenuItems),
+);
+
 /** Bulk-create menu items for a restaurant (dedupes by name). Returns MenuItem | MenuItem[] depending on input. */
 router.post(
   '/restaurants/:id/menu-items',

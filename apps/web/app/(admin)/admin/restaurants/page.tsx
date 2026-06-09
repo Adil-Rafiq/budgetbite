@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { can, type Restaurant } from '@repo/shared';
 import { useUser } from '@/hooks/use-user';
@@ -135,7 +136,11 @@ export default function AdminRestaurantsPage() {
                   deleteRestaurant.isPending && deleteRestaurant.variables === r.id;
                 return (
                   <TableRow key={r.id}>
-                    <TableCell className="font-medium text-vast">{r.name}</TableCell>
+                    <TableCell className="font-medium text-vast">
+                      <Link href={`/admin/restaurants/${r.id}`} className="hover:text-fathom">
+                        {r.name}
+                      </Link>
+                    </TableCell>
                     <TableCell className="text-right text-ink">
                       {r.rating == null ? '—' : r.rating.toFixed(1)}
                     </TableCell>
