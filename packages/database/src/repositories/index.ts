@@ -25,3 +25,4 @@ export { planContextRepository } from './plan-context.repo.js';
 export { userPreferencesRepository } from './user-preferences.repo.js';
 export { auditRepository, type ListAuditLogsFilters } from './audit.repo.js';
 export { scraperRunRepository } from './scraper-run.repo.js';
+export { adminAnalyticsRepository } from './admin-analytics.repo.js';

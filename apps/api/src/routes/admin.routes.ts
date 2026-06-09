@@ -218,4 +218,13 @@ router.get(
   asyncHandler(adminController.getBudgetPlan),
 );
 
+// ─── Analytics ────────────────────────────────────────────────────────────────
+
+/** Data-quality report: restaurants without items / rating, stale rows, bad prices. */
+router.get(
+  '/data-quality',
+  requirePermission('analytics:read'),
+  asyncHandler(adminController.getDataQuality),
+);
+
 export default router;

@@ -3,6 +3,7 @@ import type {
   AdminPlanDetail,
   AdminPlanListResponse,
   AuditLogListResponse,
+  DataQuality,
   CreateMealTypeInput,
   CreateMenuItemInput,
   CreateRestaurantInput,
@@ -115,4 +116,7 @@ export const adminApi = {
 
   getBudgetPlan: (id: string) =>
     apiClient.get(`api/admin/budget-plans/${id}`).json<AdminPlanDetail>(),
+
+  // ── Analytics ──
+  getDataQuality: () => apiClient.get('api/admin/data-quality').json<DataQuality>(),
 };

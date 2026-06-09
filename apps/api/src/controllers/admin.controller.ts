@@ -22,6 +22,7 @@ import { auditService } from '../services/audit.service.js';
 import { scraperService } from '../services/scraper.service.js';
 import { userService } from '../services/user.service.js';
 import { budgetPlanService } from '../services/budget-plan.service.js';
+import { adminAnalyticsService } from '../services/admin-analytics.service.js';
 import { getActor } from '../lib/audit-actor.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
 
@@ -183,4 +184,11 @@ export async function getBudgetPlan(req: Request, res: Response): Promise<void> 
   const { id } = req.params as IdParams;
   const plan = await budgetPlanService.adminGetById(id);
   res.json(plan);
+}
+
+// ─── Analytics ────────────────────────────────────────────────────────────────
+
+export async function getDataQuality(_req: Request, res: Response): Promise<void> {
+  const result = await adminAnalyticsService.dataQuality();
+  res.json(result);
 }

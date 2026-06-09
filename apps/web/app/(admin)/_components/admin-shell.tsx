@@ -33,6 +33,7 @@ const navItems = [
   { href: '/admin/users', label: 'Users' },
   { href: '/admin/plans', label: 'Plans' },
   { href: '/admin/ingestion', label: 'Ingestion' },
+  { href: '/admin/data-quality', label: 'Data quality' },
   { href: '/admin/audit', label: 'Audit log' },
 ];
 

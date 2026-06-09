@@ -22,3 +22,4 @@ export * from './ai-output.js';
 export * from './audit-log.js';
 export * from './scraper-run.js';
 export * from './admin-plan.js';
+export * from './admin-analytics.js';
