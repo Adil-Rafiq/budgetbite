@@ -5,6 +5,7 @@ import {
   createMealTypeSchema,
   createMenuItemsSchema,
   createRestaurantSchema,
+  listAuditLogsQuerySchema,
   listRestaurantsSchema,
   updateMealTypeSchema,
   updateMenuItemSchema,
@@ -137,6 +138,16 @@ router.delete(
   requirePermission('meal-type:delete'),
   validate({ params: idParams }),
   asyncHandler(adminController.deleteMealType),
+);
+
+// ─── Audit log ────────────────────────────────────────────────────────────────
+
+/** List audit-log entries (newest first), filterable by entityType/action. Returns { data, meta }. */
+router.get(
+  '/audit-logs',
+  requirePermission('audit:read'),
+  validate({ query: listAuditLogsQuerySchema }),
+  asyncHandler(adminController.listAuditLogs),
 );
 
 export default router;

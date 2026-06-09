@@ -1,8 +1,10 @@
 import { apiClient } from '@/lib/api/client';
 import type {
+  AuditLogListResponse,
   CreateMealTypeInput,
   CreateMenuItemInput,
   CreateRestaurantInput,
+  ListAuditLogsQuery,
   ListRestaurantsQuery,
   ListRestaurantsResponse,
   MealType,
@@ -74,4 +76,10 @@ export const adminApi = {
     // 204 No Content; 409 if a plan still references it.
     await apiClient.delete(`api/admin/meal-types/${id}`);
   },
+
+  // ── Audit log ──
+  listAuditLogs: (query: Partial<ListAuditLogsQuery>) =>
+    apiClient
+      .get('api/admin/audit-logs', { searchParams: stripUndefined(query) })
+      .json<AuditLogListResponse>(),
 };

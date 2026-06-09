@@ -19,3 +19,4 @@ export * from './meal-pin.js';
 export * from './feedback.js';
 export * from './analytics.js';
 export * from './ai-output.js';
+export * from './audit-log.js';

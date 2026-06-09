@@ -3,6 +3,7 @@ import type {
   CreateMealTypeInput,
   CreateMenuItemInput,
   CreateRestaurantInput,
+  ListAuditLogsQuery,
   ListRestaurantsQuery,
   UpdateMealTypeInput,
   UpdateMenuItemInput,
@@ -11,6 +12,7 @@ import type {
 
 import { restaurantService } from '../services/restaurant.service.js';
 import { mealTypeService } from '../services/meal-type.service.js';
+import { auditService } from '../services/audit.service.js';
 import { getActor } from '../lib/audit-actor.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
 
@@ -115,4 +117,17 @@ export async function deleteMealType(req: AuthRequest, res: Response): Promise<v
   const { id } = req.params as IdParams;
   await mealTypeService.delete(id, getActor(req));
   res.status(204).send();
+}
+
+// ─── Audit log ────────────────────────────────────────────────────────────────
+
+export async function listAuditLogs(req: Request, res: Response): Promise<void> {
+  const query = req.query as unknown as ListAuditLogsQuery;
+  const result = await auditService.list({
+    entityType: query.entityType,
+    action: query.action,
+    limit: query.limit,
+    offset: query.offset,
+  });
+  res.json(result);
 }
