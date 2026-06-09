@@ -7,9 +7,11 @@ import type {
   ListAuditLogsQuery,
   ListRestaurantsQuery,
   ListRestaurantsResponse,
+  ListScraperRunsQuery,
   MealType,
   MenuItem,
   Restaurant,
+  ScraperRunListResponse,
   UpdateMealTypeInput,
   UpdateMenuItemInput,
   UpdateRestaurantInput,
@@ -82,4 +84,10 @@ export const adminApi = {
     apiClient
       .get('api/admin/audit-logs', { searchParams: stripUndefined(query) })
       .json<AuditLogListResponse>(),
+
+  // ── Scraper runs ──
+  listScraperRuns: (query: Partial<ListScraperRunsQuery>) =>
+    apiClient
+      .get('api/admin/scraper-runs', { searchParams: stripUndefined(query) })
+      .json<ScraperRunListResponse>(),
 };

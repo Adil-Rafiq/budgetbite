@@ -5,8 +5,11 @@ import {
   createMealTypeSchema,
   createMenuItemsSchema,
   createRestaurantSchema,
+  finishScraperRunSchema,
   listAuditLogsQuerySchema,
   listRestaurantsSchema,
+  listScraperRunsQuerySchema,
+  startScraperRunSchema,
   updateMealTypeSchema,
   updateMenuItemSchema,
   updateRestaurantSchema,
@@ -148,6 +151,32 @@ router.get(
   requirePermission('audit:read'),
   validate({ query: listAuditLogsQuerySchema }),
   asyncHandler(adminController.listAuditLogs),
+);
+
+// ─── Scraper runs ───────────────────────────────────────────────────────────
+
+/** List scraper runs (newest first). Returns { data, meta }. */
+router.get(
+  '/scraper-runs',
+  requirePermission('scraper:read'),
+  validate({ query: listScraperRunsQuerySchema }),
+  asyncHandler(adminController.listScraperRuns),
+);
+
+/** Open a scraper run (called by the scraper before uploading). Returns the run. */
+router.post(
+  '/scraper-runs',
+  requirePermission('scraper:write'),
+  validate({ body: startScraperRunSchema }),
+  asyncHandler(adminController.startScraperRun),
+);
+
+/** Close a scraper run with status + totals. Returns the updated run. */
+router.patch(
+  '/scraper-runs/:id',
+  requirePermission('scraper:write'),
+  validate({ params: idParams, body: finishScraperRunSchema }),
+  asyncHandler(adminController.finishScraperRun),
 );
 
 export default router;

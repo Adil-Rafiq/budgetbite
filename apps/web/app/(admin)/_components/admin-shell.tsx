@@ -30,6 +30,7 @@ const navItems = [
   { href: '/admin', label: 'Overview' },
   { href: '/admin/restaurants', label: 'Restaurants' },
   { href: '/admin/meal-types', label: 'Meal types' },
+  { href: '/admin/ingestion', label: 'Ingestion' },
   { href: '/admin/audit', label: 'Audit log' },
 ];
 

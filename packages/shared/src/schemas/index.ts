@@ -20,3 +20,4 @@ export * from './feedback.js';
 export * from './analytics.js';
 export * from './ai-output.js';
 export * from './audit-log.js';
+export * from './scraper-run.js';

@@ -3,8 +3,11 @@ import type {
   CreateMealTypeInput,
   CreateMenuItemInput,
   CreateRestaurantInput,
+  FinishScraperRunInput,
   ListAuditLogsQuery,
   ListRestaurantsQuery,
+  ListScraperRunsQuery,
+  StartScraperRunInput,
   UpdateMealTypeInput,
   UpdateMenuItemInput,
   UpdateRestaurantInput,
@@ -13,6 +16,7 @@ import type {
 import { restaurantService } from '../services/restaurant.service.js';
 import { mealTypeService } from '../services/meal-type.service.js';
 import { auditService } from '../services/audit.service.js';
+import { scraperService } from '../services/scraper.service.js';
 import { getActor } from '../lib/audit-actor.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
 
@@ -130,4 +134,22 @@ export async function listAuditLogs(req: Request, res: Response): Promise<void> 
     offset: query.offset,
   });
   res.json(result);
+}
+
+// ─── Scraper runs ───────────────────────────────────────────────────────────
+
+export async function listScraperRuns(req: Request, res: Response): Promise<void> {
+  const result = await scraperService.list(req.query as unknown as ListScraperRunsQuery);
+  res.json(result);
+}
+
+export async function startScraperRun(req: Request, res: Response): Promise<void> {
+  const run = await scraperService.start(req.body as StartScraperRunInput);
+  res.status(201).json(run);
+}
+
+export async function finishScraperRun(req: Request, res: Response): Promise<void> {
+  const { id } = req.params as IdParams;
+  const run = await scraperService.finish(id, req.body as FinishScraperRunInput);
+  res.json(run);
 }
