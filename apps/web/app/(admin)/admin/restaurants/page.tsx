@@ -2,12 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Download, Pencil, Plus, Trash2 } from 'lucide-react';
 import { can, type Restaurant } from '@repo/shared';
 import { useUser } from '@/hooks/use-user';
-import { useAdminRestaurants, useDeleteAdminRestaurant } from '@/hooks/use-admin-restaurants';
+import {
+  useAdminRestaurants,
+  useBulkDeleteAdminRestaurants,
+  useDeleteAdminRestaurant,
+} from '@/hooks/use-admin-restaurants';
 import { RestaurantFormModal } from '../../_components/restaurant-form-modal';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import {
@@ -34,6 +39,11 @@ const PAGE_SIZE = 20;
 
 const money = (n: number | null): string => (n == null ? '—' : `₨ ${n.toLocaleString()}`);
 
+const csvCell = (v: unknown): string => {
+  const s = v == null ? '' : String(v);
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+
 export default function AdminRestaurantsPage() {
   const { data: user } = useUser();
   const canDelete = user ? can(user.role, 'restaurant:delete') : false;
@@ -43,6 +53,7 @@ export default function AdminRestaurantsPage() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [offset, setOffset] = useState(0);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   // Debounce the search box so we don't fire a request per keystroke.
   useEffect(() => {
@@ -53,6 +64,11 @@ export default function AdminRestaurantsPage() {
     return () => clearTimeout(t);
   }, [search]);
 
+  // Clear selection whenever the visible page changes.
+  useEffect(() => {
+    setSelected(new Set());
+  }, [offset, debouncedSearch]);
+
   const { data, isLoading, isError } = useAdminRestaurants({
     limit: PAGE_SIZE,
     offset,
@@ -60,11 +76,62 @@ export default function AdminRestaurantsPage() {
   });
 
   const deleteRestaurant = useDeleteAdminRestaurant();
+  const bulkDelete = useBulkDeleteAdminRestaurants();
 
   const rows = data?.data ?? [];
   const total = data?.meta.total ?? 0;
   const page = Math.floor(offset / PAGE_SIZE) + 1;
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  const allOnPageSelected = rows.length > 0 && rows.every((r) => selected.has(r.id));
+
+  const toggleRow = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const toggleAllOnPage = () =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (rows.every((r) => next.has(r.id))) rows.forEach((r) => next.delete(r.id));
+      else rows.forEach((r) => next.add(r.id));
+      return next;
+    });
+
+  const exportCsv = () => {
+    const header = [
+      'id',
+      'name',
+      'rating',
+      'deliveryFee',
+      'minimumOrder',
+      'ratingCount',
+      'createdAt',
+    ];
+    const lines = rows.map((r) =>
+      [
+        r.id,
+        r.name,
+        r.rating ?? '',
+        r.deliveryFee ?? '',
+        r.minimumOrder ?? '',
+        r.ratingCount,
+        new Date(r.createdAt).toISOString(),
+      ]
+        .map(csvCell)
+        .join(','),
+    );
+    const csv = [header.join(','), ...lines].join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'restaurants.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -91,6 +158,48 @@ export default function AdminRestaurantsPage() {
           className="max-w-xs bg-white"
         />
         <div className="flex items-center gap-3">
+          {canDelete && selected.size > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" disabled={bulkDelete.isPending}>
+                  {bulkDelete.isPending ? (
+                    <Spinner className="size-4" />
+                  ) : (
+                    <Trash2 className="size-4 text-destructive" />
+                  )}
+                  Delete {selected.size}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete {selected.size} restaurants?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This removes each restaurant and all of its menu items. This action cannot be
+                    undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-white hover:bg-destructive/90"
+                    onClick={() =>
+                      bulkDelete.mutate(Array.from(selected), {
+                        onSuccess: () => setSelected(new Set()),
+                      })
+                    }
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          {rows.length > 0 && (
+            <Button variant="outline" size="sm" onClick={exportCsv}>
+              <Download className="size-4" />
+              Export CSV
+            </Button>
+          )}
           {total > 0 && (
             <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
               {total} total
@@ -122,6 +231,15 @@ export default function AdminRestaurantsPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                {canDelete && (
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={allOnPageSelected}
+                      onCheckedChange={toggleAllOnPage}
+                      aria-label="Select all on page"
+                    />
+                  </TableHead>
+                )}
                 <TableHead>Name</TableHead>
                 <TableHead className="text-right">Rating</TableHead>
                 <TableHead className="text-right">Delivery</TableHead>
@@ -135,7 +253,16 @@ export default function AdminRestaurantsPage() {
                 const isDeleting =
                   deleteRestaurant.isPending && deleteRestaurant.variables === r.id;
                 return (
-                  <TableRow key={r.id}>
+                  <TableRow key={r.id} data-state={selected.has(r.id) ? 'selected' : undefined}>
+                    {canDelete && (
+                      <TableCell>
+                        <Checkbox
+                          checked={selected.has(r.id)}
+                          onCheckedChange={() => toggleRow(r.id)}
+                          aria-label={`Select ${r.name}`}
+                        />
+                      </TableCell>
+                    )}
                     <TableCell className="font-medium text-vast">
                       <Link href={`/admin/restaurants/${r.id}`} className="hover:text-fathom">
                         {r.name}

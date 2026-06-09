@@ -1,10 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Pencil, Plus, Trash2 } from 'lucide-react';
 import { can, type MealType } from '@repo/shared';
 import { useUser } from '@/hooks/use-user';
-import { useAdminMealTypes, useDeleteAdminMealType } from '@/hooks/use-admin-meal-types';
+import {
+  useAdminMealTypes,
+  useDeleteAdminMealType,
+  useUpdateAdminMealType,
+} from '@/hooks/use-admin-meal-types';
 import { MealTypeFormModal } from '../../_components/meal-type-form-modal';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -37,8 +41,19 @@ export default function AdminMealTypesPage() {
 
   const { data, isLoading, isError } = useAdminMealTypes();
   const deleteMealType = useDeleteAdminMealType();
+  const updateMealType = useUpdateAdminMealType();
 
   const rows = [...(data ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
+
+  // Reorder by swapping sortOrder with the adjacent row. Two writes; the list
+  // re-sorts on invalidation. No-op at the ends.
+  const move = (index: number, dir: -1 | 1) => {
+    const a = rows[index];
+    const b = rows[index + dir];
+    if (!a || !b) return;
+    updateMealType.mutate({ id: a.id, input: { sortOrder: b.sortOrder } });
+    updateMealType.mutate({ id: b.id, input: { sortOrder: a.sortOrder } });
+  };
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -84,11 +99,11 @@ export default function AdminMealTypesPage() {
                 <TableHead>Key</TableHead>
                 <TableHead>Label</TableHead>
                 <TableHead>Status</TableHead>
-                {(canWrite || canDelete) && <TableHead className="w-20" />}
+                {(canWrite || canDelete) && <TableHead className="w-32" />}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((mt) => {
+              {rows.map((mt, index) => {
                 const isDeleting = deleteMealType.isPending && deleteMealType.variables === mt.id;
                 return (
                   <TableRow key={mt.id}>
@@ -115,6 +130,28 @@ export default function AdminMealTypesPage() {
                     {(canWrite || canDelete) && (
                       <TableCell>
                         <div className="flex items-center justify-end gap-1">
+                          {canWrite && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={`Move ${mt.label} up`}
+                                disabled={index === 0 || updateMealType.isPending}
+                                onClick={() => move(index, -1)}
+                              >
+                                <ChevronUp className="size-4 text-ink" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={`Move ${mt.label} down`}
+                                disabled={index === rows.length - 1 || updateMealType.isPending}
+                                onClick={() => move(index, 1)}
+                              >
+                                <ChevronDown className="size-4 text-ink" />
+                              </Button>
+                            </>
+                          )}
                           {canWrite && (
                             <Button
                               variant="ghost"
