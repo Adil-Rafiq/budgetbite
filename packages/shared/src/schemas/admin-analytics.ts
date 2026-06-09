@@ -22,7 +22,20 @@ export const dataQualitySchema = z.object({
   itemsInvalidPrice: dataQualityGroupSchema,
 });
 
+// ─── Metrics ──────────────────────────────────────────────────────────────────
+
+export const adminMetricsSchema = z.object({
+  users: z.number().int(),
+  admins: z.number().int(),
+  restaurants: z.number().int(),
+  menuItems: z.number().int(),
+  activePlans: z.number().int(),
+  totalGenerations: z.number().int(),
+  signupsLast30Days: z.number().int(),
+});
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type DataQualityGroup = z.infer<typeof dataQualityGroupSchema>;
 export type DataQuality = z.infer<typeof dataQualitySchema>;
+export type AdminMetrics = z.infer<typeof adminMetricsSchema>;

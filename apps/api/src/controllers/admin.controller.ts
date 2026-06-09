@@ -192,3 +192,8 @@ export async function getDataQuality(_req: Request, res: Response): Promise<void
   const result = await adminAnalyticsService.dataQuality();
   res.json(result);
 }
+
+export async function getMetrics(_req: Request, res: Response): Promise<void> {
+  const result = await adminAnalyticsService.metrics();
+  res.json(result);
+}

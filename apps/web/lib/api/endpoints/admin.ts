@@ -1,5 +1,6 @@
 import { apiClient } from '@/lib/api/client';
 import type {
+  AdminMetrics,
   AdminPlanDetail,
   AdminPlanListResponse,
   AuditLogListResponse,
@@ -119,4 +120,6 @@ export const adminApi = {
 
   // ── Analytics ──
   getDataQuality: () => apiClient.get('api/admin/data-quality').json<DataQuality>(),
+
+  getMetrics: () => apiClient.get('api/admin/metrics').json<AdminMetrics>(),
 };

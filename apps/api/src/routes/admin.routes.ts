@@ -227,4 +227,11 @@ router.get(
   asyncHandler(adminController.getDataQuality),
 );
 
+/** Headline counts for the admin overview. */
+router.get(
+  '/metrics',
+  requirePermission('analytics:read'),
+  asyncHandler(adminController.getMetrics),
+);
+
 export default router;

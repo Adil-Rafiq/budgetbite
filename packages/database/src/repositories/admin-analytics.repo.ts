@@ -1,7 +1,7 @@
-import { type SQL, isNull, lt, sql } from 'drizzle-orm';
+import { type SQL, eq, gte, isNull, lt, sql } from 'drizzle-orm';
 
 import { db } from '../db.js';
-import { menuItem, restaurant } from '../schema/index.js';
+import { budgetPlan, mealPlanGeneration, menuItem, restaurant, user } from '../schema/index.js';
 
 const SAMPLE_LIMIT = 50;
 const STALE_DAYS = 30;
@@ -54,6 +54,31 @@ export const adminAnalyticsRepository = {
       restaurantsWithoutRating,
       staleRestaurants,
       itemsInvalidPrice: invalidPrice,
+    };
+  },
+
+  async metrics() {
+    const signupCutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const c = sql<number>`count(*)::int`;
+    const [[users], [admins], [restaurants], [menuItems], [activePlans], [generations], [signups]] =
+      await Promise.all([
+        db.select({ count: c }).from(user),
+        db.select({ count: c }).from(user).where(eq(user.role, 'admin')),
+        db.select({ count: c }).from(restaurant),
+        db.select({ count: c }).from(menuItem),
+        db.select({ count: c }).from(budgetPlan).where(eq(budgetPlan.status, 'active')),
+        db.select({ count: c }).from(mealPlanGeneration),
+        db.select({ count: c }).from(user).where(gte(user.createdAt, signupCutoff)),
+      ]);
+
+    return {
+      users: users?.count ?? 0,
+      admins: admins?.count ?? 0,
+      restaurants: restaurants?.count ?? 0,
+      menuItems: menuItems?.count ?? 0,
+      activePlans: activePlans?.count ?? 0,
+      totalGenerations: generations?.count ?? 0,
+      signupsLast30Days: signups?.count ?? 0,
     };
   },
 };
