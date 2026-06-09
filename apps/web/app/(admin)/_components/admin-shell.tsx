@@ -35,6 +35,7 @@ const navItems = [
   { href: '/admin/ingestion', label: 'Ingestion' },
   { href: '/admin/data-quality', label: 'Data quality' },
   { href: '/admin/audit', label: 'Audit log' },
+  { href: '/admin/config', label: 'Config' },
 ];
 
 function isItemActive(pathname: string, href: string): boolean {

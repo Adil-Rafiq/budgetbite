@@ -23,6 +23,7 @@ import { scraperService } from '../services/scraper.service.js';
 import { userService } from '../services/user.service.js';
 import { budgetPlanService } from '../services/budget-plan.service.js';
 import { adminAnalyticsService } from '../services/admin-analytics.service.js';
+import { configService } from '../services/config.service.js';
 import { getActor } from '../lib/audit-actor.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
 
@@ -196,4 +197,10 @@ export async function getDataQuality(_req: Request, res: Response): Promise<void
 export async function getMetrics(_req: Request, res: Response): Promise<void> {
   const result = await adminAnalyticsService.metrics();
   res.json(result);
+}
+
+// ─── Config ────────────────────────────────────────────────────────────────
+
+export async function getConfig(_req: Request, res: Response): Promise<void> {
+  res.json(configService.effective());
 }

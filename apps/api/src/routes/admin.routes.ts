@@ -234,4 +234,9 @@ router.get(
   asyncHandler(adminController.getMetrics),
 );
 
+// ─── Config ────────────────────────────────────────────────────────────────
+
+/** Effective values of the safe, read-only tuning knobs. No secrets. */
+router.get('/config', requirePermission('config:read'), asyncHandler(adminController.getConfig));
+
 export default router;
