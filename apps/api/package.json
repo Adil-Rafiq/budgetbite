@@ -11,14 +11,15 @@
     "auth:generate": "pnpm dlx auth@latest generate --config ./src/lib/auth.ts --output ../../packages/database/src/schema/auth.ts --yes"
   },
   "dependencies": {
+    "@repo/ai": "workspace:*",
     "@repo/database": "workspace:*",
     "@repo/shared": "workspace:*",
-    "@repo/ai": "workspace:*",
     "bcrypt": "^6.0.0",
     "better-auth": "^1.4.19",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
     "jsonwebtoken": "^9.0.3",
     "resend": "^6.9.3",
     "zod": "^4.3.6"
