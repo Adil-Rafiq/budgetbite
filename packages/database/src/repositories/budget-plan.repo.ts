@@ -56,6 +56,11 @@ export type BudgetPlanWithRelations = BudgetPlan & {
   latestAttempt?: LatestGenerationRow | null;
 };
 
+export type AdminPlanListRow = BudgetPlan & {
+  user: { id: string; name: string; email: string };
+  mealGenerations: LatestGenerationRow[];
+};
+
 export type BudgetPlanIncludeFlags = {
   withContext?: boolean;
   withMealTypes?: boolean;
@@ -383,6 +388,41 @@ export const budgetPlanRepository = {
     const shaped = (rows as RelationRow[]).map((r) => shapeRow(r, include));
     await hydrateGenerationPointers(shaped, include);
     return shaped;
+  },
+
+  // ─── Admin (cross-user) loaders ──────────────────────────────────────────
+
+  /** Newest-first page of plans across all users, each with its owner and
+   *  latest generation attempt. Read-only admin inspection. */
+  async listAllForAdmin(
+    opts: {
+      status?: 'active' | 'completed' | 'cancelled';
+      limit?: number;
+      offset?: number;
+    } = {},
+  ): Promise<AdminPlanListRow[]> {
+    const { status, limit = 20, offset = 0 } = opts;
+    const rows = await db.query.budgetPlan.findMany({
+      where: status ? eq(budgetPlan.status, status) : undefined,
+      orderBy: desc(budgetPlan.createdAt),
+      limit,
+      offset,
+      with: {
+        user: { columns: { id: true, name: true, email: true } },
+        mealGenerations: {
+          columns: generationColumns,
+          orderBy: desc(mealPlanGeneration.generatedAt),
+          limit: 1,
+        },
+      },
+    });
+    return rows as AdminPlanListRow[];
+  },
+
+  async countAllForAdmin(status?: 'active' | 'completed' | 'cancelled'): Promise<number> {
+    const base = db.select({ count: sql<number>`count(*)::int` }).from(budgetPlan);
+    const [row] = status ? await base.where(eq(budgetPlan.status, status)) : await base;
+    return row?.count ?? 0;
   },
 
   async countByUserId(

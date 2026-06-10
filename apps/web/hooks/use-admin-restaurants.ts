@@ -71,3 +71,30 @@ export const useDeleteAdminRestaurant = () => {
     },
   });
 };
+
+export const useBulkDeleteAdminRestaurants = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    // Sequential so we can report partial progress and don't hammer the API.
+    mutationFn: async (ids: string[]) => {
+      let deleted = 0;
+      for (const id of ids) {
+        await adminApi.deleteRestaurant(id);
+        deleted += 1;
+      }
+      return deleted;
+    },
+    onSuccess: (deleted) => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_RESTAURANTS_KEY });
+      showToast.success({ title: `${deleted} restaurant${deleted === 1 ? '' : 's'} deleted` });
+    },
+    onError: (err) => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_RESTAURANTS_KEY });
+      showToast.error({
+        title: 'Bulk delete failed',
+        description: getErrorMessage(err),
+      });
+    },
+  });
+};

@@ -15,6 +15,8 @@ import {
 } from '@repo/database';
 import { AppError } from '../middleware/error.middleware.js';
 import { applyPinAdjustment } from './context-builder.service.js';
+import { auditService } from './audit.service.js';
+import type { AuditActor } from '../lib/audit-actor.js';
 
 function todayDateString(): string {
   return new Date().toISOString().slice(0, 10);
@@ -135,7 +137,7 @@ export const restaurantService = {
   },
 
   // Admin / scraper: create, update, delete restaurants and menu items
-  async createRestaurant(input: CreateRestaurantInput) {
+  async createRestaurant(input: CreateRestaurantInput, actor: AuditActor) {
     const existing = await restaurantRepository.findByExternalId(input.externalId);
     if (existing)
       throw new AppError(409, 'Restaurant with this externalId already exists', 'CONFLICT');
@@ -150,10 +152,17 @@ export const restaurantService = {
       rating: input.rating != null ? String(input.rating) : null,
       ratingCount: input.ratingCount ?? 0,
     });
+    await auditService.record({
+      actor,
+      action: 'restaurant.create',
+      entityType: 'restaurant',
+      entityId: restaurant.id,
+      metadata: { name: restaurant.name, externalId: restaurant.externalId },
+    });
     return this.toRestaurantResponse(restaurant);
   },
 
-  async updateRestaurant(id: string, input: UpdateRestaurantInput) {
+  async updateRestaurant(id: string, input: UpdateRestaurantInput, actor: AuditActor) {
     const existing = await restaurantRepository.findById(id);
     if (!existing) throw new AppError(404, 'Restaurant not found', 'NOT_FOUND');
     if (input.externalId !== undefined) {
@@ -172,16 +181,34 @@ export const restaurantService = {
       ...(input.rating !== undefined && { rating: String(input.rating) }),
       ...(input.ratingCount !== undefined && { ratingCount: input.ratingCount }),
     });
+    await auditService.record({
+      actor,
+      action: 'restaurant.update',
+      entityType: 'restaurant',
+      entityId: id,
+      metadata: { name: restaurant.name },
+    });
     return this.toRestaurantResponse(restaurant);
   },
 
-  async deleteRestaurant(id: string): Promise<void> {
+  async deleteRestaurant(id: string, actor: AuditActor): Promise<void> {
     const existing = await restaurantRepository.findById(id);
     if (!existing) throw new AppError(404, 'Restaurant not found', 'NOT_FOUND');
     await restaurantRepository.delete(id);
+    await auditService.record({
+      actor,
+      action: 'restaurant.delete',
+      entityType: 'restaurant',
+      entityId: id,
+      metadata: { name: existing.name },
+    });
   },
 
-  async createMenuItems(restaurantId: string, input: CreateMenuItemInput | CreateMenuItemInput[]) {
+  async createMenuItems(
+    restaurantId: string,
+    input: CreateMenuItemInput | CreateMenuItemInput[],
+    actor: AuditActor,
+  ) {
     const restaurant = await restaurantRepository.findById(restaurantId);
     if (!restaurant) throw new AppError(404, 'Restaurant not found', 'NOT_FOUND');
     const items = Array.isArray(input) ? input : [input];
@@ -196,10 +223,22 @@ export const restaurantService = {
         imageUrl: item.imageUrl ?? null,
       })),
     );
+    await auditService.record({
+      actor,
+      action: 'menu-item.create',
+      entityType: 'menu-item',
+      entityId: restaurantId,
+      metadata: { restaurantId, count: created.length },
+    });
     return created.map((item) => ({ ...item, price: Number(item.price) }));
   },
 
-  async updateMenuItem(restaurantId: string, itemId: string, input: UpdateMenuItemInput) {
+  async updateMenuItem(
+    restaurantId: string,
+    itemId: string,
+    input: UpdateMenuItemInput,
+    actor: AuditActor,
+  ) {
     const item = await menuRepository.findById(itemId);
     if (!item) throw new AppError(404, 'Menu item not found', 'NOT_FOUND');
     if (item.restaurantId !== restaurantId)
@@ -210,15 +249,29 @@ export const restaurantService = {
       ...(input.price !== undefined && { price: String(input.price) }),
       ...(input.imageUrl !== undefined && { imageUrl: input.imageUrl }),
     });
+    await auditService.record({
+      actor,
+      action: 'menu-item.update',
+      entityType: 'menu-item',
+      entityId: itemId,
+      metadata: { restaurantId, name: updated.name },
+    });
     return { ...updated, price: Number(updated.price) };
   },
 
-  async deleteMenuItem(restaurantId: string, itemId: string): Promise<void> {
+  async deleteMenuItem(restaurantId: string, itemId: string, actor: AuditActor): Promise<void> {
     const item = await menuRepository.findById(itemId);
     if (!item) throw new AppError(404, 'Menu item not found', 'NOT_FOUND');
     if (item.restaurantId !== restaurantId)
       throw new AppError(400, 'Menu item does not belong to this restaurant', 'BAD_REQUEST');
     await menuRepository.delete(itemId);
+    await auditService.record({
+      actor,
+      action: 'menu-item.delete',
+      entityType: 'menu-item',
+      entityId: itemId,
+      metadata: { restaurantId, name: item.name },
+    });
   },
 
   toRestaurantResponse(restaurant: {

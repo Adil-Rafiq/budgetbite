@@ -10,6 +10,14 @@ export const PERMISSIONS = [
   'meal-type:read',
   'meal-type:write',
   'meal-type:delete',
+  'user:read',
+  'user:write',
+  'plan:read',
+  'audit:read',
+  'scraper:read',
+  'scraper:write',
+  'config:read',
+  'analytics:read',
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];

@@ -119,10 +119,11 @@ def upload_restaurant_and_menu(
     restaurant: Restaurant,
     lat: float,
     lng: float,
-) -> None:
+) -> int:
     """
     Upload one scraped restaurant and its menu to the API.
     Creates restaurant (or resolves existing id), then POSTs menu items.
+    Returns the number of menu items uploaded.
     """
     restaurant_id = ensure_restaurant_id(restaurant, lat, lng)
     base = config.api_base_url.rstrip("/")
@@ -131,13 +132,57 @@ def upload_restaurant_and_menu(
     menu = restaurant.get("menu") or []
     if not menu:
         print(f"[INFO] No menu items for {restaurant.get('vendor_id')}, skipping menu upload")
-        return
+        return 0
 
     items_payload = [_menu_item_payload(item) for item in menu]
     status, body = _request("POST", url_menu, items_payload)
     if status not in (200, 201):
         raise RuntimeError(f"Failed to upload menu: {status} {body}")
     print(f"[INFO] Uploaded {len(items_payload)} menu items for restaurant {restaurant_id}")
+    return len(items_payload)
+
+
+def _start_scraper_run(lat: float, lng: float) -> str | None:
+    """
+    Open a scraper run so admins can see ingestion history. Best-effort:
+    a failure here must never block the actual upload, so we log and move on.
+    """
+    base = config.api_base_url.rstrip("/")
+    url = f"{base}/api/admin/scraper-runs"
+    payload = {"source": "foodpanda", "latitude": lat, "longitude": lng}
+    try:
+        status, body = _request("POST", url, payload)
+        if status in (200, 201) and isinstance(body, dict) and "id" in body:
+            return body["id"]
+        print(f"[WARN] Could not open scraper run: {status} {body}")
+    except Exception as e:
+        print(f"[WARN] Could not open scraper run: {e}")
+    return None
+
+
+def _finish_scraper_run(
+    run_id: str | None,
+    status_str: str,
+    restaurants_upserted: int,
+    items_upserted: int,
+    error_message: str | None = None,
+) -> None:
+    """Close a scraper run with status + totals. Best-effort; never raises."""
+    if not run_id:
+        return
+    base = config.api_base_url.rstrip("/")
+    url = f"{base}/api/admin/scraper-runs/{run_id}"
+    payload: dict[str, Any] = {
+        "status": status_str,
+        "restaurantsUpserted": restaurants_upserted,
+        "itemsUpserted": items_upserted,
+    }
+    if error_message:
+        payload["errorMessage"] = error_message[:2000]
+    try:
+        _request("PATCH", url, payload)
+    except Exception as e:
+        print(f"[WARN] Could not close scraper run {run_id}: {e}")
 
 
 def upload_all(restaurants: list[Restaurant], lat: float, lng: float) -> None:
@@ -150,9 +195,18 @@ def upload_all(restaurants: list[Restaurant], lat: float, lng: float) -> None:
         return
 
     print(f"[INFO] Uploading {len(restaurants)} restaurants to {config.api_base_url} ...")
-    for i, restaurant in enumerate(restaurants):
-        try:
-            upload_restaurant_and_menu(restaurant, lat, lng)
-        except Exception as e:
-            print(f"[ERROR] Upload failed for {restaurant.get('vendor_id')}: {e}")
-    print("[DONE] Upload complete")
+    run_id = _start_scraper_run(lat, lng)
+    restaurants_upserted = 0
+    items_upserted = 0
+    try:
+        for i, restaurant in enumerate(restaurants):
+            try:
+                items_upserted += upload_restaurant_and_menu(restaurant, lat, lng)
+                restaurants_upserted += 1
+            except Exception as e:
+                print(f"[ERROR] Upload failed for {restaurant.get('vendor_id')}: {e}")
+        _finish_scraper_run(run_id, "succeeded", restaurants_upserted, items_upserted)
+        print("[DONE] Upload complete")
+    except Exception as e:
+        _finish_scraper_run(run_id, "failed", restaurants_upserted, items_upserted, str(e))
+        raise

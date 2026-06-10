@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { paginatedSchema, paginationSchema } from './common.js';
+
 // ─── Response DTOs ──────────────────────────────────────────────────────────
 
 export const userSchema = z.object({
@@ -32,9 +34,25 @@ export const updateUserProfileSchema = z.object({
   longitude: z.coerce.number().min(-180).max(180).optional(),
 });
 
+// ─── Admin ──────────────────────────────────────────────────────────────────
+
+export const listUsersQuerySchema = paginationSchema.extend({
+  q: z.string().optional(),
+  role: z.enum(['user', 'admin']).optional(),
+});
+
+export const userListResponseSchema = paginatedSchema(userSchema);
+
+export const updateUserRoleSchema = z.object({
+  role: z.enum(['user', 'admin']),
+});
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type User = z.infer<typeof userSchema>;
 export type UserProfile = z.infer<typeof userProfileSchema>;
 export type UserWithProfile = z.infer<typeof userWithProfileSchema>;
 export type UpdateUserProfileInput = z.infer<typeof updateUserProfileSchema>;
+export type ListUsersQuery = z.infer<typeof listUsersQuerySchema>;
+export type UserListResponse = z.infer<typeof userListResponseSchema>;
+export type UpdateUserRoleInput = z.infer<typeof updateUserRoleSchema>;

@@ -5,10 +5,17 @@ import {
   createMealTypeSchema,
   createMenuItemsSchema,
   createRestaurantSchema,
+  finishScraperRunSchema,
+  listAdminPlansQuerySchema,
+  listAuditLogsQuerySchema,
   listRestaurantsSchema,
+  listScraperRunsQuerySchema,
+  listUsersQuerySchema,
+  startScraperRunSchema,
   updateMealTypeSchema,
   updateMenuItemSchema,
   updateRestaurantSchema,
+  updateUserRoleSchema,
   uuidSchema,
 } from '@repo/shared';
 
@@ -74,6 +81,14 @@ router.delete(
 
 // ─── Menu items (nested under restaurant) ────────────────────────────────────
 
+/** List a restaurant's menu items. Admin only. Returns MenuItem[]. */
+router.get(
+  '/restaurants/:id/menu-items',
+  requirePermission('restaurant:read'),
+  validate({ params: idParams }),
+  asyncHandler(adminController.listMenuItems),
+);
+
 /** Bulk-create menu items for a restaurant (dedupes by name). Returns MenuItem | MenuItem[] depending on input. */
 router.post(
   '/restaurants/:id/menu-items',
@@ -130,5 +145,98 @@ router.delete(
   validate({ params: idParams }),
   asyncHandler(adminController.deleteMealType),
 );
+
+// ─── Audit log ────────────────────────────────────────────────────────────────
+
+/** List audit-log entries (newest first), filterable by entityType/action. Returns { data, meta }. */
+router.get(
+  '/audit-logs',
+  requirePermission('audit:read'),
+  validate({ query: listAuditLogsQuerySchema }),
+  asyncHandler(adminController.listAuditLogs),
+);
+
+// ─── Scraper runs ───────────────────────────────────────────────────────────
+
+/** List scraper runs (newest first). Returns { data, meta }. */
+router.get(
+  '/scraper-runs',
+  requirePermission('scraper:read'),
+  validate({ query: listScraperRunsQuerySchema }),
+  asyncHandler(adminController.listScraperRuns),
+);
+
+/** Open a scraper run (called by the scraper before uploading). Returns the run. */
+router.post(
+  '/scraper-runs',
+  requirePermission('scraper:write'),
+  validate({ body: startScraperRunSchema }),
+  asyncHandler(adminController.startScraperRun),
+);
+
+/** Close a scraper run with status + totals. Returns the updated run. */
+router.patch(
+  '/scraper-runs/:id',
+  requirePermission('scraper:write'),
+  validate({ params: idParams, body: finishScraperRunSchema }),
+  asyncHandler(adminController.finishScraperRun),
+);
+
+// ─── Users ──────────────────────────────────────────────────────────────────
+
+/** List users (newest first), searchable by name/email and filterable by role. Returns { data, meta }. */
+router.get(
+  '/users',
+  requirePermission('user:read'),
+  validate({ query: listUsersQuerySchema }),
+  asyncHandler(adminController.listUsers),
+);
+
+/** Change a user's role. Cannot demote yourself. Returns the updated user. */
+router.patch(
+  '/users/:id/role',
+  requirePermission('user:write'),
+  validate({ params: idParams, body: updateUserRoleSchema }),
+  asyncHandler(adminController.updateUserRole),
+);
+
+// ─── Budget plans (read-only inspection) ──────────────────────────────────────
+
+/** List budget plans across all users (newest first), filterable by status. Returns { data, meta }. */
+router.get(
+  '/budget-plans',
+  requirePermission('plan:read'),
+  validate({ query: listAdminPlansQuerySchema }),
+  asyncHandler(adminController.listBudgetPlans),
+);
+
+/** Inspect one plan: context, meal types, generations, and active suggestions. */
+router.get(
+  '/budget-plans/:id',
+  requirePermission('plan:read'),
+  validate({ params: idParams }),
+  asyncHandler(adminController.getBudgetPlan),
+);
+
+// ─── Analytics ────────────────────────────────────────────────────────────────
+
+/** Data-quality report: restaurants without items / rating, stale rows, bad prices. */
+router.get(
+  '/data-quality',
+  requirePermission('analytics:read'),
+  asyncHandler(adminController.getDataQuality),
+);
+
+/** Headline counts for the admin overview. */
+router.get(
+  '/metrics',
+  requirePermission('analytics:read'),
+  asyncHandler(adminController.getMetrics),
+);
+
+// ─── Config ────────────────────────────────────────────────────────────────
+
+/** Effective values of the safe, read-only tuning knobs. No secrets. */
+router.get('/config', requirePermission('config:read'), asyncHandler(adminController.getConfig));
 
 export default router;

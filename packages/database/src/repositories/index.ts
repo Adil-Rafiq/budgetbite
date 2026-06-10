@@ -1,4 +1,4 @@
-export { userRepository } from './user.repo.js';
+export { userRepository, type ListUsersFilters, type UserRole } from './user.repo.js';
 export { userProfileRepository } from './user-profile.repo.js';
 export {
   restaurantRepository,
@@ -14,6 +14,7 @@ export {
   type PlanContextRelationRow,
   type MealTypeOnPlanRow,
   type LatestGenerationRow,
+  type AdminPlanListRow,
 } from './budget-plan.repo.js';
 export { mealPlanRepository } from './meal-plan.repo.js';
 export { orderRepository } from './order.repo.js';
@@ -22,3 +23,6 @@ export { feedbackRepository } from './feedback.repo.js';
 export { mealTypeRepository } from './meal-type.repo.js';
 export { planContextRepository } from './plan-context.repo.js';
 export { userPreferencesRepository } from './user-preferences.repo.js';
+export { auditRepository, type ListAuditLogsFilters } from './audit.repo.js';
+export { scraperRunRepository } from './scraper-run.repo.js';
+export { adminAnalyticsRepository } from './admin-analytics.repo.js';
