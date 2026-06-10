@@ -6,6 +6,7 @@ import { toNodeHandler } from 'better-auth/node';
 import { auth } from './lib/auth.js';
 import { isAllowedOrigin } from './lib/origins.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
+import { apiRateLimiter } from './middleware/rate-limit.middleware.js';
 
 import userRoutes from './routes/user.routes.js';
 import restaurantRoutes from './routes/restaurant.routes.js';
@@ -19,6 +20,11 @@ import adminRoutes from './routes/admin.routes.js';
 const app = express();
 const port = Number(process.env.API_PORT) || 3001;
 const baseUrl = process.env.API_URL || `http://localhost:${port}`;
+
+// Trust exactly the number of proxy hops in front of us (1 on Render, 0 local)
+// so `req.ip` — which the rate limiter keys on — is the real client, not the
+// proxy. Never `true`: it trusts the spoofable client-supplied part of the chain.
+app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS) || 0);
 
 app.use(
   cors({
@@ -41,6 +47,10 @@ app.use(express.json());
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Application routes only. `/api/auth/*` is handled above by better-auth (which
+// has its own rate limiting), and `/health` stays unthrottled for Render pings.
+app.use('/api', apiRateLimiter);
 
 app.use('/api/users', userRoutes);
 app.use('/api/restaurants', restaurantRoutes);
