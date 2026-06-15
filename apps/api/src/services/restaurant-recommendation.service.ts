@@ -23,6 +23,11 @@ function toResponse(rec: RestaurantRecommendation) {
     link: rec.link,
     area: rec.area,
     note: rec.note,
+    items: (rec.items ?? []).map((i) => ({
+      name: i.name,
+      price: i.price,
+      description: i.description ?? null,
+    })),
     latitude: rec.latitude != null ? Number(rec.latitude) : null,
     longitude: rec.longitude != null ? Number(rec.longitude) : null,
     status: rec.status as RecommendationStatus,
@@ -35,6 +40,21 @@ function toResponse(rec: RestaurantRecommendation) {
 
 function toAdminResponse(row: AdminRecommendationRow) {
   return { ...toResponse(row), user: row.user };
+}
+
+/** Collapse duplicate item names (menu_item is unique per restaurant+name). */
+function dedupeItems(
+  items: { name: string; price: number; description?: string | null }[],
+): { name: string; price: number; description: string | null }[] {
+  const map = new Map<string, { name: string; price: number; description: string | null }>();
+  for (const i of items) {
+    map.set(i.name.trim().toLowerCase(), {
+      name: i.name.trim(),
+      price: i.price,
+      description: i.description ?? null,
+    });
+  }
+  return Array.from(map.values());
 }
 
 export const restaurantRecommendationService = {
@@ -59,6 +79,11 @@ export const restaurantRecommendationService = {
       link: input.link ?? null,
       area: input.area ?? null,
       note: input.note ?? null,
+      items: input.items.map((i) => ({
+        name: i.name,
+        price: i.price,
+        description: i.description ?? null,
+      })),
       latitude: profile?.latitude != null ? String(profile.latitude) : null,
       longitude: profile?.longitude != null ? String(profile.longitude) : null,
     });
@@ -101,24 +126,66 @@ export const restaurantRecommendationService = {
       throw new AppError(409, 'This recommendation has already been reviewed', 'ALREADY_REVIEWED');
     }
 
-    const updated = await restaurantRecommendationRepository.update(id, {
-      status: input.status,
-      adminNote: input.adminNote ?? null,
-      createdRestaurantId: input.createdRestaurantId ?? null,
-      reviewedAt: new Date(),
-    });
+    if (input.status === 'rejected') {
+      const updated = await restaurantRecommendationRepository.update(id, {
+        status: 'rejected',
+        adminNote: input.adminNote ?? null,
+        reviewedAt: new Date(),
+      });
+      await auditService.record({
+        actor,
+        action: 'restaurant-recommendation.rejected',
+        entityType: 'restaurant-recommendation',
+        entityId: id,
+        metadata: { name: existing.name },
+      });
+      return toResponse(updated);
+    }
+
+    // Approved: turn it into a real (generic) restaurant + its menu items.
+    if (existing.latitude == null || existing.longitude == null) {
+      throw new AppError(
+        400,
+        "This recommendation has no saved location, so a restaurant can't be created automatically. Add the restaurant manually instead.",
+        'RECOMMENDATION_NO_LOCATION',
+      );
+    }
+
+    const items = dedupeItems(existing.items ?? []);
+    const { restaurant, recommendation } =
+      await restaurantRecommendationRepository.approveWithRestaurant(
+        id,
+        {
+          externalId: null,
+          source: 'community',
+          name: existing.name,
+          slug: null,
+          latitude: existing.latitude,
+          longitude: existing.longitude,
+          deliveryFee: null,
+          minimumOrder: null,
+          rating: null,
+          ratingCount: 0,
+        },
+        items.map((i) => ({
+          name: i.name,
+          price: String(i.price),
+          description: i.description ?? null,
+        })),
+      );
 
     await auditService.record({
       actor,
-      action: `restaurant-recommendation.${input.status}`,
+      action: 'restaurant-recommendation.approved',
       entityType: 'restaurant-recommendation',
       entityId: id,
       metadata: {
         name: existing.name,
-        ...(input.createdRestaurantId && { createdRestaurantId: input.createdRestaurantId }),
+        createdRestaurantId: restaurant.id,
+        itemCount: items.length,
       },
     });
 
-    return toResponse(updated);
+    return toResponse(recommendation);
   },
 };

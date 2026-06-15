@@ -138,11 +138,16 @@ export const restaurantService = {
 
   // Admin / scraper: create, update, delete restaurants and menu items
   async createRestaurant(input: CreateRestaurantInput, actor: AuditActor) {
-    const existing = await restaurantRepository.findByExternalId(input.externalId);
-    if (existing)
-      throw new AppError(409, 'Restaurant with this externalId already exists', 'CONFLICT');
+    // externalId is only meaningful for Foodpanda rows; generic/community
+    // restaurants have none. Only dedupe when one was supplied.
+    if (input.externalId) {
+      const existing = await restaurantRepository.findByExternalId(input.externalId);
+      if (existing)
+        throw new AppError(409, 'Restaurant with this externalId already exists', 'CONFLICT');
+    }
     const restaurant = await restaurantRepository.create({
-      externalId: input.externalId,
+      externalId: input.externalId ?? null,
+      source: input.source ?? (input.externalId ? 'foodpanda' : 'community'),
       name: input.name,
       slug: input.slug ?? null,
       latitude: String(input.latitude),
@@ -276,7 +281,8 @@ export const restaurantService = {
 
   toRestaurantResponse(restaurant: {
     id: string;
-    externalId: string;
+    externalId: string | null;
+    source: string;
     name: string;
     slug: string | null;
     latitude: string;
@@ -291,6 +297,7 @@ export const restaurantService = {
     return {
       id: restaurant.id,
       externalId: restaurant.externalId,
+      source: restaurant.source as 'foodpanda' | 'community',
       name: restaurant.name,
       slug: restaurant.slug,
       latitude: Number(restaurant.latitude),
