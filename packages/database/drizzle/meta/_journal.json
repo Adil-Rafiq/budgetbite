@@ -50,6 +50,13 @@
       "when": 1781005963248,
       "tag": "0006_numerous_lifeguard",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1781507752171,
+      "tag": "0007_parched_lightspeed",
+      "breakpoints": true
     }
   ]
 }
