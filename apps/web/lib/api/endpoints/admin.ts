@@ -4,6 +4,7 @@ import type {
   AdminMetrics,
   AdminPlanDetail,
   AdminPlanListResponse,
+  AdminRestaurantRecommendationListResponse,
   AuditLogListResponse,
   DataQuality,
   CreateMealTypeInput,
@@ -11,6 +12,7 @@ import type {
   CreateRestaurantInput,
   ListAuditLogsQuery,
   ListAdminPlansQuery,
+  ListRestaurantRecommendationsQuery,
   ListRestaurantsQuery,
   ListRestaurantsResponse,
   ListScraperRunsQuery,
@@ -18,6 +20,8 @@ import type {
   MealType,
   MenuItem,
   Restaurant,
+  RestaurantRecommendation,
+  ReviewRestaurantRecommendationInput,
   ScraperRunListResponse,
   UpdateMealTypeInput,
   UpdateMenuItemInput,
@@ -126,4 +130,15 @@ export const adminApi = {
 
   // ── Config (read-only) ──
   getConfig: () => apiClient.get('api/admin/config').json<AdminConfig>(),
+
+  // ── Restaurant recommendations (user submissions) ──
+  listRestaurantRecommendations: (query: Partial<ListRestaurantRecommendationsQuery>) =>
+    apiClient
+      .get('api/admin/restaurant-recommendations', { searchParams: stripUndefined(query) })
+      .json<AdminRestaurantRecommendationListResponse>(),
+
+  reviewRestaurantRecommendation: (id: string, input: ReviewRestaurantRecommendationInput) =>
+    apiClient
+      .patch(`api/admin/restaurant-recommendations/${id}`, { json: input })
+      .json<RestaurantRecommendation>(),
 };

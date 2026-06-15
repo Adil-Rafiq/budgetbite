@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { ArrowLeft, LogOut } from 'lucide-react';
 import { Inter, JetBrains_Mono, Bricolage_Grotesque } from 'next/font/google';
 import { useUser } from '@/hooks/use-user';
+import { useAdminRecommendations } from '@/hooks/use-admin-recommendations';
 import { authClient } from '@/lib/auth-client';
 import { LogoIcon } from '@/components/icons';
 
@@ -30,6 +31,7 @@ const navItems = [
   { href: '/admin', label: 'Overview' },
   { href: '/admin/restaurants', label: 'Restaurants' },
   { href: '/admin/meal-types', label: 'Meal types' },
+  { href: '/admin/recommendations', label: 'Recommendations' },
   { href: '/admin/users', label: 'Users' },
   { href: '/admin/plans', label: 'Plans' },
   { href: '/admin/ingestion', label: 'Ingestion' },
@@ -47,6 +49,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: user } = useUser();
+  const { data: pendingRecs } = useAdminRecommendations({ status: 'pending', limit: 1 });
+  const pendingCount = pendingRecs?.meta.total ?? 0;
   const [signingOut, setSigningOut] = useState(false);
 
   const handleSignOut = async () => {
@@ -117,6 +121,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   }`}
                 />
                 {item.label}
+                {item.href === '/admin/recommendations' && pendingCount > 0 && (
+                  <span
+                    className="ml-auto inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber/15 px-1.5 text-[11px] text-amber"
+                    style={{ fontFamily: 'var(--font-mono)' }}
+                  >
+                    {pendingCount}
+                  </span>
+                )}
               </Link>
             );
           })}
