@@ -14,6 +14,10 @@ export const restaurant = pgTable(
     source: text('source').notNull().default('foodpanda'),
     name: text('name').notNull(),
     slug: text('slug'),
+    // Phone + a generic order/website link — useful for community restaurants
+    // that have no Foodpanda deep-link.
+    phone: text('phone'),
+    orderUrl: text('order_url'),
     latitude: decimal('latitude', { precision: 10, scale: 7 }).notNull(),
     longitude: decimal('longitude', { precision: 10, scale: 7 }).notNull(),
     deliveryFee: decimal('delivery_fee', { precision: 10, scale: 2 }),

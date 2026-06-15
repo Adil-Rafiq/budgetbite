@@ -15,8 +15,10 @@ export const restaurantRecommendation = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),
-    // Optional Foodpanda (or any) link the user pasted to help the admin find it.
+    // Optional order/menu link the user pasted (becomes the restaurant's orderUrl).
     link: text('link'),
+    // Optional contact phone (becomes the restaurant's phone on approval).
+    phone: text('phone'),
     // Optional area / neighbourhood hint.
     area: text('area'),
     // Optional free-text note ("why add this").
