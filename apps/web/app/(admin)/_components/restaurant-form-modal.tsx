@@ -29,19 +29,9 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   restaurant?: Restaurant;
-  /** Prefill values when creating (e.g. from an approved user recommendation). Ignored in edit mode. */
-  defaultValues?: Partial<CreateRestaurantInput>;
-  /** Called with the created restaurant after a successful create. */
-  onCreated?: (restaurant: Restaurant) => void;
 }
 
-export function RestaurantFormModal({
-  open,
-  onOpenChange,
-  restaurant,
-  defaultValues,
-  onCreated,
-}: Props) {
+export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
   const isEdit = !!restaurant;
   const createRestaurant = useCreateAdminRestaurant();
   const updateRestaurant = useUpdateAdminRestaurant();
@@ -55,30 +45,23 @@ export function RestaurantFormModal({
     resolver: zodResolver(createRestaurantSchema),
     defaultValues: {
       externalId: restaurant?.externalId ?? '',
-      name: restaurant?.name ?? defaultValues?.name ?? '',
-      slug: restaurant?.slug ?? defaultValues?.slug ?? undefined,
-      latitude: restaurant?.latitude ?? defaultValues?.latitude ?? undefined,
-      longitude: restaurant?.longitude ?? defaultValues?.longitude ?? undefined,
-      deliveryFee: restaurant?.deliveryFee ?? defaultValues?.deliveryFee ?? undefined,
-      minimumOrder: restaurant?.minimumOrder ?? defaultValues?.minimumOrder ?? undefined,
-      rating: restaurant?.rating ?? defaultValues?.rating ?? undefined,
-      ratingCount: restaurant?.ratingCount ?? defaultValues?.ratingCount ?? undefined,
+      name: restaurant?.name ?? '',
+      slug: restaurant?.slug ?? undefined,
+      latitude: restaurant?.latitude ?? undefined,
+      longitude: restaurant?.longitude ?? undefined,
+      deliveryFee: restaurant?.deliveryFee ?? undefined,
+      minimumOrder: restaurant?.minimumOrder ?? undefined,
+      rating: restaurant?.rating ?? undefined,
+      ratingCount: restaurant?.ratingCount ?? undefined,
     },
   });
 
   const onSubmit = (values: CreateRestaurantInput) => {
+    const onSuccess = () => onOpenChange(false);
     if (isEdit) {
-      updateRestaurant.mutate(
-        { id: restaurant.id, input: values },
-        { onSuccess: () => onOpenChange(false) },
-      );
+      updateRestaurant.mutate({ id: restaurant.id, input: values }, { onSuccess });
     } else {
-      createRestaurant.mutate(values, {
-        onSuccess: (created) => {
-          onOpenChange(false);
-          onCreated?.(created);
-        },
-      });
+      createRestaurant.mutate(values, { onSuccess });
     }
   };
 
@@ -118,7 +101,11 @@ export function RestaurantFormModal({
               <Label htmlFor="externalId" className={labelClass} style={labelStyle}>
                 External ID
               </Label>
-              <Input id="externalId" placeholder="foodpanda id" {...register('externalId')} />
+              <Input
+                id="externalId"
+                placeholder="optional · foodpanda id"
+                {...register('externalId', { setValueAs: optionalString })}
+              />
               {errors.externalId && <p className={errorClass}>{errors.externalId.message}</p>}
             </div>
             <div className="flex flex-col gap-2">

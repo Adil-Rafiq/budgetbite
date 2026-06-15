@@ -7,7 +7,6 @@ import {
   useAdminRecommendations,
   useReviewRecommendation,
 } from '@/hooks/use-admin-recommendations';
-import { RestaurantFormModal } from '../../_components/restaurant-form-modal';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
@@ -70,6 +69,14 @@ export default function AdminRecommendationsPage() {
   const page = Math.floor(offset / PAGE_SIZE) + 1;
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
+  const confirmApprove = () => {
+    if (!approving) return;
+    review.mutate(
+      { id: approving.id, input: { status: 'approved' } },
+      { onSuccess: () => setApproving(null) },
+    );
+  };
+
   const confirmReject = () => {
     if (!rejecting) return;
     review.mutate(
@@ -100,7 +107,8 @@ export default function AdminRecommendationsPage() {
         Recommendations
       </h1>
       <p className="mt-1 text-[14px] text-ink">
-        Restaurants suggested by users. Approve to add one to the catalogue, or reject it.
+        Restaurants suggested by users, with the menu items they provided. Approving creates the
+        restaurant and its menu automatically.
       </p>
 
       <div className="mt-6 flex items-center justify-between gap-3">
@@ -145,7 +153,7 @@ export default function AdminRecommendationsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Restaurant</TableHead>
+                <TableHead>Restaurant &amp; items</TableHead>
                 <TableHead>Submitted by</TableHead>
                 <TableHead>Area</TableHead>
                 <TableHead>Status</TableHead>
@@ -157,19 +165,37 @@ export default function AdminRecommendationsPage() {
               {rows.map((r) => (
                 <TableRow key={r.id}>
                   <TableCell>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col gap-1">
                       <span className="font-medium text-vast">{r.name}</span>
                       {r.link && (
                         <a
                           href={r.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="truncate text-[12px] text-fathom underline-offset-2 hover:underline"
+                          className="text-[12px] text-fathom underline-offset-2 hover:underline"
                         >
                           link
                         </a>
                       )}
-                      {r.note && <span className="mt-0.5 text-[12px] text-soft">{r.note}</span>}
+                      {r.items.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {r.items.slice(0, 6).map((it, idx) => (
+                            <span
+                              key={idx}
+                              className="rounded bg-lumen px-1.5 py-0.5 text-[11px] text-ink"
+                              style={{ fontFamily: 'var(--font-mono)' }}
+                            >
+                              {it.name} ₨{it.price}
+                            </span>
+                          ))}
+                          {r.items.length > 6 && (
+                            <span className="text-[11px] text-soft">
+                              +{r.items.length - 6} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {r.note && <span className="text-[12px] text-soft">{r.note}</span>}
                     </div>
                   </TableCell>
                   <TableCell className="text-ink">
@@ -207,7 +233,7 @@ export default function AdminRecommendationsPage() {
                             disabled={review.isPending}
                             onClick={() => setApproving(r)}
                           >
-                            Approve &amp; add
+                            Approve
                           </Button>
                           <Button
                             variant="outline"
@@ -261,27 +287,30 @@ export default function AdminRecommendationsPage() {
         </div>
       )}
 
-      {/* Approve & add — opens the Create-Restaurant form prefilled from the recommendation. */}
-      {approving && (
-        <RestaurantFormModal
-          open={!!approving}
-          onOpenChange={(open) => {
-            if (!open) setApproving(null);
-          }}
-          defaultValues={{
-            name: approving.name,
-            latitude: approving.latitude ?? undefined,
-            longitude: approving.longitude ?? undefined,
-          }}
-          onCreated={(created) => {
-            review.mutate({
-              id: approving.id,
-              input: { status: 'approved', createdRestaurantId: created.id },
-            });
-            setApproving(null);
-          }}
-        />
-      )}
+      {/* Approve — one click creates the restaurant + its menu items. */}
+      <AlertDialog
+        open={!!approving}
+        onOpenChange={(open) => {
+          if (!open) setApproving(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Approve “{approving?.name}”?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This creates the restaurant and its {approving?.items.length ?? 0} menu item
+              {approving?.items.length === 1 ? '' : 's'}, using the submitter’s saved location. You
+              can edit details afterward on the restaurant page.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmApprove} disabled={review.isPending}>
+              Approve &amp; create
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Reject — optional note. */}
       <AlertDialog
