@@ -81,6 +81,7 @@ export function RecommendRestaurantButton({
     defaultValues: {
       name: '',
       link: undefined,
+      phone: undefined,
       area: undefined,
       note: undefined,
       items: [{ ...EMPTY_ITEM }],
@@ -95,6 +96,7 @@ export function RecommendRestaurantButton({
         reset({
           name: '',
           link: undefined,
+          phone: undefined,
           area: undefined,
           note: undefined,
           items: [{ ...EMPTY_ITEM }],
@@ -149,15 +151,28 @@ export function RecommendRestaurantButton({
 
               <div className="flex flex-col gap-2">
                 <Label htmlFor="rec-link" className={labelClass} style={labelStyle}>
-                  Link (optional)
+                  Order link (optional)
                 </Label>
                 <Input
                   id="rec-link"
                   type="url"
-                  placeholder="https://… (Foodpanda, map, anything)"
+                  placeholder="https://… (Foodpanda, website, map)"
                   {...register('link', { setValueAs: optionalString })}
                 />
                 {errors.link && <p className={errorClass}>{errors.link.message}</p>}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="rec-phone" className={labelClass} style={labelStyle}>
+                  Phone (optional)
+                </Label>
+                <Input
+                  id="rec-phone"
+                  type="tel"
+                  placeholder="e.g. +92 300 1234567"
+                  {...register('phone', { setValueAs: optionalString })}
+                />
+                {errors.phone && <p className={errorClass}>{errors.phone.message}</p>}
               </div>
 
               <div className="flex flex-col gap-2">

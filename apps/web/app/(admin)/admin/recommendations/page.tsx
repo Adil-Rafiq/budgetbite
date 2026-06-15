@@ -177,6 +177,14 @@ export default function AdminRecommendationsPage() {
                           link
                         </a>
                       )}
+                      {r.phone && (
+                        <span
+                          className="text-[12px] text-soft"
+                          style={{ fontFamily: 'var(--font-mono)' }}
+                        >
+                          {r.phone}
+                        </span>
+                      )}
                       {r.items.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {r.items.slice(0, 6).map((it, idx) => (
