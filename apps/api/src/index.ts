@@ -14,6 +14,7 @@ import budgetPlanRoutes from './routes/budget-plan.routes.js';
 import mealPlanRoutes from './routes/meal-plan.routes.js';
 import mealTypeRoutes from './routes/meal-type.routes.js';
 import feedbackRoutes from './routes/feedback.routes.js';
+import restaurantRecommendationRoutes from './routes/restaurant-recommendation.routes.js';
 import analyticsRoutes from './routes/analytics.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 
@@ -58,6 +59,7 @@ app.use('/api/budget-plans', budgetPlanRoutes);
 app.use('/api/meal-plans', mealPlanRoutes);
 app.use('/api/meal-types', mealTypeRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/restaurant-recommendations', restaurantRecommendationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/admin', adminRoutes);
 
