@@ -1,6 +1,7 @@
 import { SummaryCards } from '@/components/dashboard/summary-cards';
 import { MealSlots } from '@/components/dashboard/meal-slots';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
+import { RecommendCard } from '@/components/dashboard/recommend-card';
 import { FadeUp } from '@/components/motion';
 
 export default function DashboardPage() {
@@ -46,6 +47,9 @@ export default function DashboardPage() {
       </FadeUp>
       <FadeUp delay={0.24}>
         <RecentActivity />
+      </FadeUp>
+      <FadeUp delay={0.32}>
+        <RecommendCard />
       </FadeUp>
     </div>
   );

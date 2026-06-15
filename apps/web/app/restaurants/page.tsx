@@ -24,6 +24,7 @@ import { useUser } from '@/hooks/use-user';
 import { useRestaurants } from '@/hooks/use-restaurant';
 import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
 import { Pill } from '@/components/ui/pill';
+import { RecommendRestaurantButton } from '@/components/recommend-restaurant-button';
 import { motion } from 'motion/react';
 
 import { RestaurantCardSkeleton } from './_components/restaurant-card-skeleton';
@@ -245,31 +246,34 @@ function RestaurantsPageInner() {
               Places that deliver to you, ranked for your budget.
             </p>
           </div>
-          {hasActivePlan && avgPerMeal > 0 && (
-            <div
-              className="flex flex-col items-start gap-0.5 sm:items-end"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              <p className="text-[11px] uppercase text-soft" style={{ letterSpacing: '0.18em' }}>
-                avg target / meal
-              </p>
-              <p
-                className="text-vast"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 22,
-                  fontWeight: 600,
-                  letterSpacing: '-0.02em',
-                }}
+          <div className="flex items-center gap-4 sm:items-end">
+            {hasActivePlan && avgPerMeal > 0 && (
+              <div
+                className="flex flex-col items-start gap-0.5 sm:items-end"
+                style={{ fontFamily: 'var(--font-mono)' }}
               >
-                ₨ {avgPerMeal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-              </p>
-              <p className="text-[11px] text-ink">
-                ₨ {amountRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 })}{' '}
-                remaining
-              </p>
-            </div>
-          )}
+                <p className="text-[11px] uppercase text-soft" style={{ letterSpacing: '0.18em' }}>
+                  avg target / meal
+                </p>
+                <p
+                  className="text-vast"
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 22,
+                    fontWeight: 600,
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  ₨ {avgPerMeal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </p>
+                <p className="text-[11px] text-ink">
+                  ₨ {amountRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 })}{' '}
+                  remaining
+                </p>
+              </div>
+            )}
+            <RecommendRestaurantButton />
+          </div>
         </header>
       </FadeUp>
 
