@@ -150,6 +150,8 @@ export const restaurantService = {
       source: input.source ?? (input.externalId ? 'foodpanda' : 'community'),
       name: input.name,
       slug: input.slug ?? null,
+      phone: input.phone ?? null,
+      orderUrl: input.orderUrl ?? null,
       latitude: String(input.latitude),
       longitude: String(input.longitude),
       deliveryFee: input.deliveryFee != null ? String(input.deliveryFee) : null,
@@ -179,6 +181,8 @@ export const restaurantService = {
       ...(input.externalId !== undefined && { externalId: input.externalId }),
       ...(input.name !== undefined && { name: input.name }),
       ...(input.slug !== undefined && { slug: input.slug }),
+      ...(input.phone !== undefined && { phone: input.phone }),
+      ...(input.orderUrl !== undefined && { orderUrl: input.orderUrl }),
       ...(input.latitude !== undefined && { latitude: String(input.latitude) }),
       ...(input.longitude !== undefined && { longitude: String(input.longitude) }),
       ...(input.deliveryFee !== undefined && { deliveryFee: String(input.deliveryFee) }),
@@ -285,6 +289,8 @@ export const restaurantService = {
     source: string;
     name: string;
     slug: string | null;
+    phone: string | null;
+    orderUrl: string | null;
     latitude: string;
     longitude: string;
     deliveryFee: string | null;
@@ -300,6 +306,8 @@ export const restaurantService = {
       source: restaurant.source as 'foodpanda' | 'community',
       name: restaurant.name,
       slug: restaurant.slug,
+      phone: restaurant.phone,
+      orderUrl: restaurant.orderUrl,
       latitude: Number(restaurant.latitude),
       longitude: Number(restaurant.longitude),
       deliveryFee: restaurant.deliveryFee != null ? Number(restaurant.deliveryFee) : null,

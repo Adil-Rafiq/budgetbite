@@ -21,6 +21,7 @@ function toResponse(rec: RestaurantRecommendation) {
     id: rec.id,
     name: rec.name,
     link: rec.link,
+    phone: rec.phone,
     area: rec.area,
     note: rec.note,
     items: (rec.items ?? []).map((i) => ({
@@ -77,6 +78,7 @@ export const restaurantRecommendationService = {
       userId,
       name: input.name,
       link: input.link ?? null,
+      phone: input.phone ?? null,
       area: input.area ?? null,
       note: input.note ?? null,
       items: input.items.map((i) => ({
@@ -160,6 +162,8 @@ export const restaurantRecommendationService = {
           source: 'community',
           name: existing.name,
           slug: null,
+          phone: existing.phone,
+          orderUrl: existing.link,
           latitude: existing.latitude,
           longitude: existing.longitude,
           deliveryFee: null,
