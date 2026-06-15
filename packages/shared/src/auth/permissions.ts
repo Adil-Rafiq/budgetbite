@@ -18,6 +18,8 @@ export const PERMISSIONS = [
   'scraper:write',
   'config:read',
   'analytics:read',
+  'recommendation:read',
+  'recommendation:write',
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
