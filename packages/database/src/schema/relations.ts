@@ -11,6 +11,7 @@ import { mealPlanGeneration, mealSuggestion } from './meal-plan.js';
 import { mealChoice } from './order.js';
 import { mealPin } from './meal-pin.js';
 import { feedback } from './feedback.js';
+import { restaurantRecommendation } from './restaurant-recommendation.js';
 import { budgetPlanMealType } from './budget-plan-meal-type.js';
 
 // User Relations
@@ -22,6 +23,7 @@ export const userRelations = relations(user, ({ many, one }) => ({
   mealChoices: many(mealChoice),
   mealPins: many(mealPin),
   feedbacks: many(feedback),
+  restaurantRecommendations: many(restaurantRecommendation),
 }));
 
 // Session Relations
@@ -183,6 +185,18 @@ export const feedbackRelations = relations(feedback, ({ one }) => ({
   user: one(user, {
     fields: [feedback.userId],
     references: [user.id],
+  }),
+}));
+
+// Restaurant Recommendation Relations
+export const restaurantRecommendationRelations = relations(restaurantRecommendation, ({ one }) => ({
+  user: one(user, {
+    fields: [restaurantRecommendation.userId],
+    references: [user.id],
+  }),
+  createdRestaurant: one(restaurant, {
+    fields: [restaurantRecommendation.createdRestaurantId],
+    references: [restaurant.id],
   }),
 }));
 
