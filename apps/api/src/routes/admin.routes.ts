@@ -8,9 +8,11 @@ import {
   finishScraperRunSchema,
   listAdminPlansQuerySchema,
   listAuditLogsQuerySchema,
+  listRestaurantRecommendationsQuerySchema,
   listRestaurantsSchema,
   listScraperRunsQuerySchema,
   listUsersQuerySchema,
+  reviewRestaurantRecommendationSchema,
   startScraperRunSchema,
   updateMealTypeSchema,
   updateMenuItemSchema,
@@ -198,6 +200,24 @@ router.patch(
   requirePermission('user:write'),
   validate({ params: idParams, body: updateUserRoleSchema }),
   asyncHandler(adminController.updateUserRole),
+);
+
+// ─── Restaurant recommendations (user submissions) ────────────────────────────
+
+/** List user-submitted restaurant recommendations (newest first), filterable by status. Returns { data, meta }. */
+router.get(
+  '/restaurant-recommendations',
+  requirePermission('recommendation:read'),
+  validate({ query: listRestaurantRecommendationsQuerySchema }),
+  asyncHandler(adminController.listRestaurantRecommendations),
+);
+
+/** Review a recommendation (approve/reject, optionally linking the created restaurant). Returns the updated recommendation. */
+router.patch(
+  '/restaurant-recommendations/:id',
+  requirePermission('recommendation:write'),
+  validate({ params: idParams, body: reviewRestaurantRecommendationSchema }),
+  asyncHandler(adminController.reviewRestaurantRecommendation),
 );
 
 // ─── Budget plans (read-only inspection) ──────────────────────────────────────
