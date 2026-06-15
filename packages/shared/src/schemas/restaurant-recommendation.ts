@@ -32,6 +32,7 @@ export const recommendationItemInputSchema = z.object({
 export const createRestaurantRecommendationSchema = z.object({
   name: z.string().trim().min(1).max(300),
   link: z.url().max(2000).optional(),
+  phone: z.string().trim().min(3).max(30).optional(),
   area: z.string().trim().max(200).optional(),
   note: z.string().trim().max(1000).optional(),
   items: z.array(recommendationItemInputSchema).min(1).max(MAX_RECOMMENDATION_ITEMS),
@@ -62,6 +63,7 @@ export const restaurantRecommendationSchema = z.object({
   id: uuidSchema,
   name: z.string(),
   link: z.string().nullable(),
+  phone: z.string().nullable(),
   area: z.string().nullable(),
   note: z.string().nullable(),
   items: z.array(recommendationItemSchema),
