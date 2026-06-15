@@ -17,7 +17,10 @@ export const listRestaurantsSchema = paginationSchema.extend({
 });
 
 export const createRestaurantSchema = z.object({
-  externalId: z.string().min(1).max(200),
+  // Optional: present for Foodpanda (scraped) restaurants, omitted for generic /
+  // community ones. When omitted, the server defaults `source` to 'community'.
+  externalId: z.string().min(1).max(200).optional(),
+  source: z.enum(['foodpanda', 'community']).optional(),
   name: z.string().min(1).max(300),
   slug: z.string().min(1).max(300).optional(),
   latitude: z.coerce.number().min(-90).max(90),
@@ -38,7 +41,9 @@ export const adminGetRestaurantByExternalIdSchema = z.object({
 
 export const restaurantSchema = z.object({
   id: uuidSchema,
-  externalId: z.string().min(1).max(200),
+  /** Foodpanda vendor id; null for generic/community restaurants. */
+  externalId: z.string().min(1).max(200).nullable(),
+  source: z.enum(['foodpanda', 'community']),
   name: z.string().min(1).max(300),
   /** Foodpanda URL slug — drives the "Order on Foodpanda" deep-link. Nullable for legacy rows. */
   slug: z.string().nullable().optional(),
