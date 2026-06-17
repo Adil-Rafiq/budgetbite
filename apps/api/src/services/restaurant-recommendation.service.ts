@@ -7,7 +7,6 @@ import type {
 import { MAX_PENDING_RESTAURANT_RECOMMENDATIONS } from '@repo/shared';
 import {
   restaurantRecommendationRepository,
-  userRepository,
   type AdminRecommendationRow,
   type RestaurantRecommendation,
 } from '@repo/database';
@@ -69,11 +68,9 @@ export const restaurantRecommendationService = {
       );
     }
 
-    // Capture the user's saved location as a starting point for the admin (the
-    // restaurant they're recommending is presumably near them). Best-effort:
-    // the user may not have a location set.
-    const profile = await userRepository.findProfileByUserId(userId);
-
+    // The submitter pins the restaurant's own location (not their own), so the
+    // admin knows exactly where it is and the restaurant is created there on
+    // approval.
     const rec = await restaurantRecommendationRepository.create({
       userId,
       name: input.name,
@@ -86,8 +83,8 @@ export const restaurantRecommendationService = {
         price: i.price,
         description: i.description ?? null,
       })),
-      latitude: profile?.latitude != null ? String(profile.latitude) : null,
-      longitude: profile?.longitude != null ? String(profile.longitude) : null,
+      latitude: String(input.latitude),
+      longitude: String(input.longitude),
     });
     return toResponse(rec);
   },

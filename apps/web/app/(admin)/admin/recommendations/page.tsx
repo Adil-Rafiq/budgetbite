@@ -217,7 +217,21 @@ export default function AdminRecommendationsPage() {
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-soft">{r.area ?? '—'}</TableCell>
+                  <TableCell className="text-soft">
+                    <div className="flex flex-col gap-1">
+                      <span>{r.area ?? '—'}</span>
+                      {r.latitude != null && r.longitude != null && (
+                        <a
+                          href={`https://www.openstreetmap.org/?mlat=${r.latitude}&mlon=${r.longitude}#map=17/${r.latitude}/${r.longitude}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[12px] text-fathom underline-offset-2 hover:underline"
+                        >
+                          view on map
+                        </a>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] ${STATUS_PILL[r.status]}`}

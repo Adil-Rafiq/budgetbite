@@ -24,10 +24,12 @@ export const recommendationItemInputSchema = z.object({
 });
 
 /**
- * What a user submits. Coordinates are NOT taken from the client — the server
- * captures the user's saved profile location at submit time (a restaurant needs
- * lat/lng to be created). Menu items are required because the admin has no other
- * way to know the menu of a local, possibly offline-only restaurant.
+ * What a user submits. The submitter pins the restaurant's own location — it is
+ * NOT assumed to be the user's location, since a restaurant they want to
+ * recommend can be anywhere. The coordinates are required because the restaurant
+ * is created at exactly that spot on approval (proximity is what drives plans).
+ * Menu items are required because the admin has no other way to know the menu of
+ * a local, possibly offline-only restaurant.
  */
 export const createRestaurantRecommendationSchema = z.object({
   name: z.string().trim().min(1).max(300),
@@ -35,6 +37,8 @@ export const createRestaurantRecommendationSchema = z.object({
   phone: z.string().trim().min(3).max(30).optional(),
   area: z.string().trim().max(200).optional(),
   note: z.string().trim().max(1000).optional(),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
   items: z.array(recommendationItemInputSchema).min(1).max(MAX_RECOMMENDATION_ITEMS),
 });
 

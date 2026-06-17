@@ -26,9 +26,9 @@ export const restaurantRecommendation = pgTable(
     // User-submitted menu items: [{ name, price, description? }]. Become real
     // menu_item rows for the created restaurant when an admin approves.
     items: jsonb('items').$type<{ name: string; price: number; description?: string | null }[]>(),
-    // The user's saved coordinates at submit time — a starting point for the
-    // admin (a restaurant needs lat/lng to be created). Null when the user has
-    // no location set; not necessarily the restaurant's exact location.
+    // The restaurant's location, pinned by the submitter (not their own
+    // location — the place can be anywhere). The created restaurant is placed
+    // here on approval. Nullable for legacy rows captured before pinning existed.
     latitude: decimal('latitude', { precision: 10, scale: 7 }),
     longitude: decimal('longitude', { precision: 10, scale: 7 }),
     // 'pending' | 'approved' | 'rejected'.

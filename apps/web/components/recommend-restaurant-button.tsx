@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { z } from 'zod';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,6 +17,9 @@ import {
   useMyRecommendations,
   useSubmitRecommendation,
 } from '@/hooks/use-restaurant-recommendations';
+import { useUser } from '@/hooks/use-user';
+import { useDetectLocation } from '@/hooks/use-detect-location';
+import { DEFAULT_COORDINATES } from '@/app/onboarding/constants';
 import {
   Dialog,
   DialogContent,
@@ -27,7 +31,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Pill } from '@/components/ui/pill';
 import { Textarea } from '@/components/ui/textarea';
+
+const LocationMap = dynamic(() => import('@/components/location-map').then((m) => m.LocationMap), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[220px] w-full animate-pulse rounded-[14px] border border-lumen-dk bg-lumen" />
+  ),
+});
 
 const labelClass = 'text-[10px] uppercase text-soft';
 const labelStyle: React.CSSProperties = {
@@ -60,17 +72,25 @@ export function RecommendRestaurantButton({
 }: Props) {
   const [open, setOpen] = useState(false);
   const { data } = useMyRecommendations({ limit: 20 });
+  const { data: currentUser } = useUser();
   const submit = useSubmitRecommendation();
 
   const mine = data?.data ?? [];
   const pendingCount = mine.filter((r) => r.status === 'pending').length;
   const atCap = pendingCount >= MAX_PENDING_RESTAURANT_RECOMMENDATIONS;
 
+  // Seed the pin at the user's saved location as a convenient starting point —
+  // they then drag/search to the restaurant's actual spot (which may be far off).
+  const seedLat = currentUser?.profile?.latitude ?? DEFAULT_COORDINATES.latitude;
+  const seedLng = currentUser?.profile?.longitude ?? DEFAULT_COORDINATES.longitude;
+
   const {
     register,
     control,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<
     z.input<typeof createRestaurantRecommendationSchema>,
@@ -84,11 +104,33 @@ export function RecommendRestaurantButton({
       phone: undefined,
       area: undefined,
       note: undefined,
+      latitude: DEFAULT_COORDINATES.latitude,
+      longitude: DEFAULT_COORDINATES.longitude,
       items: [{ ...EMPTY_ITEM }],
     },
   });
 
   const { fields, append, remove } = useFieldArray({ control, name: 'items' });
+
+  // Re-seed the pin to the user's location each time the dialog opens.
+  useEffect(() => {
+    if (!open) return;
+    setValue('latitude', seedLat, { shouldValidate: true });
+    setValue('longitude', seedLng, { shouldValidate: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const setCoordinates = (latitude: number, longitude: number) => {
+    setValue('latitude', latitude, { shouldDirty: true, shouldValidate: true });
+    setValue('longitude', longitude, { shouldDirty: true, shouldValidate: true });
+  };
+
+  const { detect: detectLocation, isDetecting } = useDetectLocation({
+    onSuccess: setCoordinates,
+  });
+
+  const mapLatitude = watch('latitude') ?? DEFAULT_COORDINATES.latitude;
+  const mapLongitude = watch('longitude') ?? DEFAULT_COORDINATES.longitude;
 
   const onSubmit = (values: CreateRestaurantRecommendationInput) => {
     submit.mutate(values, {
@@ -99,6 +141,8 @@ export function RecommendRestaurantButton({
           phone: undefined,
           area: undefined,
           note: undefined,
+          latitude: seedLat,
+          longitude: seedLng,
           items: [{ ...EMPTY_ITEM }],
         });
         setOpen(false);
@@ -185,6 +229,49 @@ export function RecommendRestaurantButton({
                   {...register('area', { setValueAs: optionalString })}
                 />
                 {errors.area && <p className={errorClass}>{errors.area.message}</p>}
+              </div>
+
+              {/* Location — the restaurant's own spot, not necessarily the user's. */}
+              <div className="flex flex-col gap-2">
+                <Label className={labelClass} style={labelStyle}>
+                  Where is it?
+                </Label>
+                <p className="text-[12px] text-soft">
+                  Drag the pin or search to mark the restaurant’s location — this is where it’ll
+                  appear for people nearby.
+                </p>
+                <Pill
+                  type="button"
+                  variant="accent"
+                  size="md"
+                  className="self-start"
+                  onClick={detectLocation}
+                  disabled={isDetecting}
+                >
+                  {isDetecting ? (
+                    <>
+                      <span
+                        className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-lumen"
+                        style={{ borderTopColor: 'transparent' }}
+                      />
+                      Detecting…
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontFamily: 'var(--font-mono)' }}>◉</span>
+                      Use my current location
+                    </>
+                  )}
+                </Pill>
+                <LocationMap
+                  latitude={mapLatitude}
+                  longitude={mapLongitude}
+                  onCoordinatesChange={setCoordinates}
+                  height={220}
+                />
+                {(errors.latitude || errors.longitude) && (
+                  <p className={errorClass}>Please mark the restaurant’s location on the map.</p>
+                )}
               </div>
 
               {/* Menu items — at least one required so the admin knows what's served. */}
