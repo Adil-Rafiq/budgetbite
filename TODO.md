@@ -14,6 +14,7 @@
 - [ ] Onboarding page
 - [ ] Dashboard page
 - [ ] Budget plan creation
+- [ ] Menu image upload for restaurant recommendations: instead of typing menu items one by one, let the user upload a photo of the menu. Pass the image to the AI to extract the items (name + price, description if present) and pre-fill the editable items form. The user verifies/edits the extracted items, then submits the recommendation. Should fall back gracefully to manual entry if extraction fails or finds nothing.
 - [ ] Combo meals per slot: a slot should be able to hold multiple menu items (e.g. burger + wings + drink for one lunch) instead of a single item. Today the AI fills each slot with one item, which rarely reflects how a real order is composed. Needs schema change (slot → items[]), AI prompt + response shape update, plan-generation/replan logic, and UI for displaying/logging a multi-item slot and its combined cost.
 
 ## Backlog
