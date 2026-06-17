@@ -14,9 +14,6 @@
 - [ ] Onboarding page
 - [ ] Dashboard page
 - [ ] Budget plan creation
-- [x] The users can add restaurants of their choice with the approval of admin
-- [x] At a time only up to certain number of approval requests for restaurants will be allowed per user
-- [x] Add rate limiting
 - [ ] Combo meals per slot: a slot should be able to hold multiple menu items (e.g. burger + wings + drink for one lunch) instead of a single item. Today the AI fills each slot with one item, which rarely reflects how a real order is composed. Needs schema change (slot → items[]), AI prompt + response shape update, plan-generation/replan logic, and UI for displaying/logging a multi-item slot and its combined cost.
 
 ## Backlog
@@ -27,6 +24,9 @@
 
 ## Done
 
+- [x] The users can add restaurants of their choice with the approval of admin
+- [x] At a time only up to certain number of approval requests for restaurants will be allowed per user
+- [x] Add rate limiting
 - [x] Fix user flow & error handling for plan generation when onboarding/location is incomplete or no restaurants are nearby
 - [x] AI returns invalid plan often times, sometimes uuid is invalid, sometimes the max-token limit is reached etc
 - [x] Auth setup (email + password)
