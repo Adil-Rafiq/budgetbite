@@ -20,6 +20,12 @@ export { mealPlanRepository } from './meal-plan.repo.js';
 export { orderRepository } from './order.repo.js';
 export { mealPinRepository, type MealPinWithRefs } from './meal-pin.repo.js';
 export { feedbackRepository } from './feedback.repo.js';
+export {
+  restaurantRecommendationRepository,
+  type RecommendationStatus,
+  type ListRecommendationsFilters,
+  type AdminRecommendationRow,
+} from './restaurant-recommendation.repo.js';
 export { mealTypeRepository } from './meal-type.repo.js';
 export { planContextRepository } from './plan-context.repo.js';
 export { userPreferencesRepository } from './user-preferences.repo.js';

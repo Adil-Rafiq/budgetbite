@@ -17,6 +17,7 @@ export * from './meal-plan-timeline.js';
 export * from './meal-choice.js';
 export * from './meal-pin.js';
 export * from './feedback.js';
+export * from './restaurant-recommendation.js';
 export * from './analytics.js';
 export * from './ai-output.js';
 export * from './audit-log.js';

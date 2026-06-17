@@ -47,6 +47,8 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
       externalId: restaurant?.externalId ?? '',
       name: restaurant?.name ?? '',
       slug: restaurant?.slug ?? undefined,
+      phone: restaurant?.phone ?? undefined,
+      orderUrl: restaurant?.orderUrl ?? undefined,
       latitude: restaurant?.latitude ?? undefined,
       longitude: restaurant?.longitude ?? undefined,
       deliveryFee: restaurant?.deliveryFee ?? undefined,
@@ -101,7 +103,11 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
               <Label htmlFor="externalId" className={labelClass} style={labelStyle}>
                 External ID
               </Label>
-              <Input id="externalId" placeholder="foodpanda id" {...register('externalId')} />
+              <Input
+                id="externalId"
+                placeholder="optional · foodpanda id"
+                {...register('externalId', { setValueAs: optionalString })}
+              />
               {errors.externalId && <p className={errorClass}>{errors.externalId.message}</p>}
             </div>
             <div className="flex flex-col gap-2">
@@ -114,6 +120,31 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
                 {...register('slug', { setValueAs: optionalString })}
               />
               {errors.slug && <p className={errorClass}>{errors.slug.message}</p>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="phone" className={labelClass} style={labelStyle}>
+                Phone
+              </Label>
+              <Input
+                id="phone"
+                placeholder="optional"
+                {...register('phone', { setValueAs: optionalString })}
+              />
+              {errors.phone && <p className={errorClass}>{errors.phone.message}</p>}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="orderUrl" className={labelClass} style={labelStyle}>
+                Order link
+              </Label>
+              <Input
+                id="orderUrl"
+                placeholder="optional · https://…"
+                {...register('orderUrl', { setValueAs: optionalString })}
+              />
+              {errors.orderUrl && <p className={errorClass}>{errors.orderUrl.message}</p>}
             </div>
           </div>
 

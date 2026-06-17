@@ -3,6 +3,7 @@ import { userProfile } from '../user-profile.js';
 import { budgetPlanMealType } from '../budget-plan-meal-type.js';
 import { budgetPlan } from '../budget-plan.js';
 import { feedback } from '../feedback.js';
+import { restaurantRecommendation } from '../restaurant-recommendation.js';
 import { mealSuggestion, mealPlanGeneration } from '../meal-plan.js';
 import { mealType } from '../meal-type.js';
 import { menuItem } from '../menu-item.js';
@@ -98,3 +99,8 @@ export type NewAuditLog = typeof auditLog.$inferInsert;
 export type ScraperRun = typeof scraperRun.$inferSelect;
 export type NewScraperRun = typeof scraperRun.$inferInsert;
 export type UpdateScraperRun = Partial<Omit<NewScraperRun, 'id'>>;
+
+// Restaurant recommendation types
+export type RestaurantRecommendation = typeof restaurantRecommendation.$inferSelect;
+export type NewRestaurantRecommendation = typeof restaurantRecommendation.$inferInsert;
+export type UpdateRestaurantRecommendation = Partial<Omit<NewRestaurantRecommendation, 'id'>>;

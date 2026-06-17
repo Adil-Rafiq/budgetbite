@@ -6,9 +6,11 @@ import type {
   FinishScraperRunInput,
   ListAdminPlansQuery,
   ListAuditLogsQuery,
+  ListRestaurantRecommendationsQuery,
   ListRestaurantsQuery,
   ListScraperRunsQuery,
   ListUsersQuery,
+  ReviewRestaurantRecommendationInput,
   StartScraperRunInput,
   UpdateMealTypeInput,
   UpdateMenuItemInput,
@@ -20,6 +22,7 @@ import { restaurantService } from '../services/restaurant.service.js';
 import { mealTypeService } from '../services/meal-type.service.js';
 import { auditService } from '../services/audit.service.js';
 import { scraperService } from '../services/scraper.service.js';
+import { restaurantRecommendationService } from '../services/restaurant-recommendation.service.js';
 import { userService } from '../services/user.service.js';
 import { budgetPlanService } from '../services/budget-plan.service.js';
 import { adminAnalyticsService } from '../services/admin-analytics.service.js';
@@ -172,6 +175,28 @@ export async function updateUserRole(req: AuthRequest, res: Response): Promise<v
   const { id } = req.params as IdParams;
   const user = await userService.updateRole(id, req.body as UpdateUserRoleInput, getActor(req));
   res.json(user);
+}
+
+// ─── Restaurant recommendations (user submissions) ────────────────────────────
+
+export async function listRestaurantRecommendations(req: Request, res: Response): Promise<void> {
+  const result = await restaurantRecommendationService.list(
+    req.query as unknown as ListRestaurantRecommendationsQuery,
+  );
+  res.json(result);
+}
+
+export async function reviewRestaurantRecommendation(
+  req: AuthRequest,
+  res: Response,
+): Promise<void> {
+  const { id } = req.params as IdParams;
+  const result = await restaurantRecommendationService.review(
+    id,
+    req.body as ReviewRestaurantRecommendationInput,
+    getActor(req),
+  );
+  res.json(result);
 }
 
 // ─── Budget plans (read-only inspection) ──────────────────────────────────────

@@ -9,6 +9,7 @@ export * from './meal-plan.js';
 export * from './order.js';
 export * from './meal-pin.js';
 export * from './feedback.js';
+export * from './restaurant-recommendation.js';
 export * from './relations.js';
 export * from './plan-context.js';
 export * from './user-preferences.js';

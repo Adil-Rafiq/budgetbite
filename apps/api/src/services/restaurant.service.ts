@@ -138,13 +138,20 @@ export const restaurantService = {
 
   // Admin / scraper: create, update, delete restaurants and menu items
   async createRestaurant(input: CreateRestaurantInput, actor: AuditActor) {
-    const existing = await restaurantRepository.findByExternalId(input.externalId);
-    if (existing)
-      throw new AppError(409, 'Restaurant with this externalId already exists', 'CONFLICT');
+    // externalId is only meaningful for Foodpanda rows; generic/community
+    // restaurants have none. Only dedupe when one was supplied.
+    if (input.externalId) {
+      const existing = await restaurantRepository.findByExternalId(input.externalId);
+      if (existing)
+        throw new AppError(409, 'Restaurant with this externalId already exists', 'CONFLICT');
+    }
     const restaurant = await restaurantRepository.create({
-      externalId: input.externalId,
+      externalId: input.externalId ?? null,
+      source: input.source ?? (input.externalId ? 'foodpanda' : 'community'),
       name: input.name,
       slug: input.slug ?? null,
+      phone: input.phone ?? null,
+      orderUrl: input.orderUrl ?? null,
       latitude: String(input.latitude),
       longitude: String(input.longitude),
       deliveryFee: input.deliveryFee != null ? String(input.deliveryFee) : null,
@@ -174,6 +181,8 @@ export const restaurantService = {
       ...(input.externalId !== undefined && { externalId: input.externalId }),
       ...(input.name !== undefined && { name: input.name }),
       ...(input.slug !== undefined && { slug: input.slug }),
+      ...(input.phone !== undefined && { phone: input.phone }),
+      ...(input.orderUrl !== undefined && { orderUrl: input.orderUrl }),
       ...(input.latitude !== undefined && { latitude: String(input.latitude) }),
       ...(input.longitude !== undefined && { longitude: String(input.longitude) }),
       ...(input.deliveryFee !== undefined && { deliveryFee: String(input.deliveryFee) }),
@@ -276,9 +285,12 @@ export const restaurantService = {
 
   toRestaurantResponse(restaurant: {
     id: string;
-    externalId: string;
+    externalId: string | null;
+    source: string;
     name: string;
     slug: string | null;
+    phone: string | null;
+    orderUrl: string | null;
     latitude: string;
     longitude: string;
     deliveryFee: string | null;
@@ -291,8 +303,11 @@ export const restaurantService = {
     return {
       id: restaurant.id,
       externalId: restaurant.externalId,
+      source: restaurant.source as 'foodpanda' | 'community',
       name: restaurant.name,
       slug: restaurant.slug,
+      phone: restaurant.phone,
+      orderUrl: restaurant.orderUrl,
       latitude: Number(restaurant.latitude),
       longitude: Number(restaurant.longitude),
       deliveryFee: restaurant.deliveryFee != null ? Number(restaurant.deliveryFee) : null,

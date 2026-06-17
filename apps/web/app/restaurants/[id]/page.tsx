@@ -2,7 +2,7 @@
 
 import { useMemo, useState, use } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Search, Star, Utensils } from 'lucide-react';
+import { ExternalLink, Phone, Search, Star, Utensils } from 'lucide-react';
 
 import { classifyBudgetFit } from '@repo/shared';
 import type { BudgetFit, MenuItem } from '@repo/shared';
@@ -211,14 +211,33 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
               </div>
             </div>
 
-            {foodpandaUrl && (
-              <Pill asChild size="sm" className="shrink-0">
-                <a href={foodpandaUrl} target="_blank" rel="noopener noreferrer">
-                  Order on Foodpanda
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
-              </Pill>
-            )}
+            <div className="flex shrink-0 flex-wrap gap-2">
+              {foodpandaUrl ? (
+                <Pill asChild size="sm">
+                  <a href={foodpandaUrl} target="_blank" rel="noopener noreferrer">
+                    Order on Foodpanda
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </Pill>
+              ) : (
+                r.orderUrl && (
+                  <Pill asChild size="sm">
+                    <a href={r.orderUrl} target="_blank" rel="noopener noreferrer">
+                      Order online
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  </Pill>
+                )
+              )}
+              {r.phone && (
+                <Pill asChild variant="ghost" size="sm">
+                  <a href={`tel:${r.phone}`}>
+                    Call
+                    <Phone className="h-3.5 w-3.5" />
+                  </a>
+                </Pill>
+              )}
+            </div>
           </div>
         </div>
       )}
