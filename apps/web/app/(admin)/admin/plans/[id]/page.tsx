@@ -151,7 +151,9 @@ export default function AdminPlanDetailPage() {
                         className="flex items-center justify-between rounded-lg border border-lumen-dk bg-white px-3 py-2"
                       >
                         <div className="flex min-w-0 flex-col">
-                          <span className="truncate text-[14px] text-vast">{s.menuItem.name}</span>
+                          <span className="truncate text-[14px] text-vast">
+                            {s.menuItems.map((mi) => mi.name).join(' + ') || '—'}
+                          </span>
                           <span className="truncate text-[12px] text-soft">
                             {s.mealType.label} · {s.restaurant.name}
                             {s.optionIndex > 0 && ` · option ${s.optionIndex + 1}`}

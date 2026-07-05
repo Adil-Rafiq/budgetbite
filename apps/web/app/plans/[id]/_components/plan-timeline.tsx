@@ -11,6 +11,7 @@ import type {
 
 import { usePlanTimeline } from '@/hooks/use-budget-plan';
 import { getMealTypeVisual } from '@/lib/meal-type-visuals';
+import { optionLabel } from '@/lib/suggestion';
 
 const dayFmt = new Intl.DateTimeFormat('en-PK', {
   weekday: 'long',
@@ -77,7 +78,7 @@ function PinnedBody({ option }: { option: SuggestionOption }) {
   return (
     <div className="flex items-start justify-between gap-3 rounded-lg border border-fathom/20 bg-fathom/[0.03] p-3">
       <div className="min-w-0">
-        <p className="truncate text-[13px] font-medium text-vast">{option.menuItemName ?? '—'}</p>
+        <p className="truncate text-[13px] font-medium text-vast">{optionLabel(option)}</p>
         {option.restaurantName && (
           <p className="mt-0.5 truncate text-[11px] text-ink">{option.restaurantName}</p>
         )}
@@ -114,9 +115,7 @@ function SuggestedBody({ options }: { options: SuggestionOption[] }) {
               {String(i + 1).padStart(2, '0')}
             </span>
             <div className="min-w-0">
-              <p className="truncate text-[13px] font-medium text-vast">
-                {option.menuItemName ?? '—'}
-              </p>
+              <p className="truncate text-[13px] font-medium text-vast">{optionLabel(option)}</p>
               {option.restaurantName && (
                 <p className="mt-0.5 truncate text-[11px] text-ink">{option.restaurantName}</p>
               )}
