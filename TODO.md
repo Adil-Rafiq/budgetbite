@@ -11,7 +11,6 @@
 - [ ] Integrate a logger
 - [ ] Menu image upload for restaurant recommendations: instead of typing menu items one by one, let the user upload a photo of the menu. Pass the image to the AI to extract the items (name + price, description if present) and pre-fill the editable items form. The user verifies/edits the extracted items, then submits the recommendation. Should fall back gracefully to manual entry if extraction fails or finds nothing.
 
-
 ## Backlog
 
 - [ ] Integrate [Three Js](#threejs.org) and [GSAP](#gsap.com). [GSAP](#gsap.com) has a cool [design](#planetono.space)
