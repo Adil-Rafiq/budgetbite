@@ -16,7 +16,12 @@ export {
   type LatestGenerationRow,
   type AdminPlanListRow,
 } from './budget-plan.repo.js';
-export { mealPlanRepository } from './meal-plan.repo.js';
+export {
+  mealPlanRepository,
+  type NewMealSuggestionWithItems,
+  type SuggestionItemRow,
+  type SuggestionWithRelations,
+} from './meal-plan.repo.js';
 export { orderRepository } from './order.repo.js';
 export { mealPinRepository, type MealPinWithRefs } from './meal-pin.repo.js';
 export { feedbackRepository } from './feedback.repo.js';

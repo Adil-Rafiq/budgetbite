@@ -67,11 +67,13 @@ export const adminPlanSuggestionSchema = z.object({
   id: uuidSchema,
   slotDate: z.string(),
   optionIndex: z.number().int(),
+  /** Combined cost of every menu item in the suggested order. */
   estimatedPrice: z.number(),
   notes: z.string().nullable(),
   mealType: z.object({ key: z.string(), label: z.string() }),
   restaurant: z.object({ id: uuidSchema, name: z.string() }),
-  menuItem: z.object({ id: uuidSchema, name: z.string(), price: z.number() }),
+  /** The 1..N menu items composing the suggested order (combos have several). */
+  menuItems: z.array(z.object({ id: uuidSchema, name: z.string(), price: z.number() })),
 });
 
 export const adminPlanDetailSchema = adminPlanListItemSchema.extend({

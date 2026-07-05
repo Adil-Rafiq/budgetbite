@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { localDateString } from '@/lib/date';
 import { useMealPlanSuggestions } from '@/hooks/use-meal-plan';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useRecordMealChoice, useMealChoices } from '@/hooks/use-meal-choice';
@@ -41,7 +42,7 @@ const CLOSED_MODAL: LogModalState = { open: false, mealTypeId: null, mode: null 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export function useMealSlots() {
-  const today = new Date().toISOString().split('T')[0]!;
+  const today = localDateString();
 
   const { data: activePlanData } = useActiveBudgetPlan();
   const planId = activePlanData?.plan.id ?? '';

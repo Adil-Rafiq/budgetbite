@@ -1,5 +1,5 @@
 import { budgetPlanRepository, db, mealPlanRepository, mealTypeRepository } from '@repo/database';
-import type { NewMealSuggestion } from '@repo/database';
+import type { NewMealSuggestionWithItems } from '@repo/database';
 import {
   aiPlanOutputSchema,
   type AIPlanOutput,
@@ -222,7 +222,7 @@ async function executeGeneration(
     const validators: ContextValidators = {
       mealTypeKeyToId: new Map(mealTypes.map((m) => [m.key, m.id] as const)),
       restaurantIds: new Set(ctx.restaurants.map((r) => r.restaurantId)),
-      menuItemIds: buildMenuItemIdSet(ctx.restaurants),
+      menuItemIdsByRestaurant: buildMenuItemIdsByRestaurant(ctx.restaurants),
       remainingDates: new Set(ctx.remainingDates),
       // Defense in depth: even though the prompt instructs the model not to
       // generate for pinned (date, mealType) cells, drop any rows that match
@@ -242,7 +242,7 @@ async function executeGeneration(
     let messages: LLMMessage[] = [baseUserTurn];
     let maxTokens = getGenerationMaxTokens();
     let plan: AIPlanOutput | null = null;
-    let rows: NewMealSuggestion[] = [];
+    let rows: NewMealSuggestionWithItems[] = [];
     let response: LLMResponse | null = null;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -334,6 +334,7 @@ async function executeGeneration(
         outputTokens: response.outputTokens ?? null,
         slotCount: plan.slots.length,
         suggestionCount: rows.length,
+        suggestionItemCount: rows.reduce((n, r) => n + r.items.length, 0),
         estimatedTotalCost: plan.estimatedTotalCost,
         latencyMs,
       }),
@@ -363,12 +364,19 @@ async function executeGeneration(
   }
 }
 
-function buildMenuItemIdSet(restaurants: NearbyRestaurantContext[]): Set<string> {
-  const ids = new Set<string>();
+/**
+ * Per-restaurant menu-item id sets so the validator can enforce that every
+ * item inside a combo belongs to the option's restaurant — not just that the
+ * id exists somewhere in the catalogue.
+ */
+function buildMenuItemIdsByRestaurant(
+  restaurants: NearbyRestaurantContext[],
+): Map<string, Set<string>> {
+  const byRestaurant = new Map<string, Set<string>>();
   for (const r of restaurants) {
-    for (const item of r.menuItems) ids.add(item.menuItemId);
+    byRestaurant.set(r.restaurantId, new Set(r.menuItems.map((i) => i.menuItemId)));
   }
-  return ids;
+  return byRestaurant;
 }
 
 /**
@@ -386,7 +394,7 @@ function stripFences(raw: string): string {
 interface ContextValidators {
   mealTypeKeyToId: Map<string, string>;
   restaurantIds: Set<string>;
-  menuItemIds: Set<string>;
+  menuItemIdsByRestaurant: Map<string, Set<string>>;
   remainingDates: Set<string>;
   /** "{slotDate}|{mealTypeId}" — slots the user has pinned; AI suggestions for these are dropped. */
   pinnedSlotKeys: Set<string>;
@@ -414,7 +422,7 @@ function parseAndValidate(
   rawText: string,
   generationId: string,
   validators: ContextValidators,
-): { plan: AIPlanOutput; rows: NewMealSuggestion[] } {
+): { plan: AIPlanOutput; rows: NewMealSuggestionWithItems[] } {
   let plan: AIPlanOutput;
   try {
     plan = aiPlanOutputSchema.parse(JSON.parse(stripFences(rawText)));
@@ -432,7 +440,7 @@ function parseAndValidate(
     );
   }
 
-  const rows: NewMealSuggestion[] = [];
+  const rows: NewMealSuggestionWithItems[] = [];
   for (const slot of plan.slots) {
     const mealTypeId = validators.mealTypeKeyToId.get(slot.mealTypeKey);
     if (!mealTypeId) {
@@ -463,18 +471,32 @@ function parseAndValidate(
       }
       seenOptionIndices.add(opt.optionIndex);
 
-      if (!validators.restaurantIds.has(opt.restaurantId)) {
+      const restaurantItemIds = validators.menuItemIdsByRestaurant.get(opt.restaurantId);
+      if (!restaurantItemIds) {
         throw new RetriableLLMError(
           `unknown restaurantId ${opt.restaurantId}`,
           `Slot ${slot.slotDate}/${slot.mealTypeKey} option ${opt.optionIndex}: restaurantId "${opt.restaurantId}" is not in the ID catalogue. Replace it with a restaurantId copied verbatim from the catalogue.`,
         );
       }
-      if (!validators.menuItemIds.has(opt.menuItemId)) {
-        throw new RetriableLLMError(
-          `unknown menuItemId ${opt.menuItemId}`,
-          `Slot ${slot.slotDate}/${slot.mealTypeKey} option ${opt.optionIndex}: menuItemId "${opt.menuItemId}" is not in the ID catalogue. Replace it with a menuItemId that appears under restaurantId "${opt.restaurantId}".`,
-        );
+
+      const seenItemIds = new Set<string>();
+      for (const item of opt.items) {
+        if (!restaurantItemIds.has(item.menuItemId)) {
+          throw new RetriableLLMError(
+            `menuItemId ${item.menuItemId} does not belong to restaurant ${opt.restaurantId}`,
+            `Slot ${slot.slotDate}/${slot.mealTypeKey} option ${opt.optionIndex}: menuItemId "${item.menuItemId}" does not appear under restaurantId "${opt.restaurantId}" in the ID catalogue. Every item in an option must be listed under that option's restaurant — replace it with a menuItemId copied verbatim from that restaurant's entries.`,
+          );
+        }
+        if (seenItemIds.has(item.menuItemId)) {
+          throw new RetriableLLMError(
+            `duplicate menuItemId ${item.menuItemId} in ${slot.slotDate}/${slot.mealTypeKey} option ${opt.optionIndex}`,
+            `Slot ${slot.slotDate}/${slot.mealTypeKey} option ${opt.optionIndex}: menuItemId "${item.menuItemId}" appears more than once in the same order. List each menu item at most once per option.`,
+          );
+        }
+        seenItemIds.add(item.menuItemId);
       }
+
+      const comboTotal = opt.items.reduce((sum, item) => sum + item.estimatedPrice, 0);
 
       rows.push({
         generationId,
@@ -482,9 +504,13 @@ function parseAndValidate(
         mealTypeId,
         optionIndex: opt.optionIndex,
         restaurantId: opt.restaurantId,
-        menuItemId: opt.menuItemId,
-        estimatedPrice: opt.estimatedPrice.toFixed(2),
+        estimatedPrice: comboTotal.toFixed(2),
         notes: opt.notes ?? null,
+        items: opt.items.map((item, itemIndex) => ({
+          itemIndex,
+          menuItemId: item.menuItemId,
+          estimatedPrice: item.estimatedPrice.toFixed(2),
+        })),
       });
     }
   }

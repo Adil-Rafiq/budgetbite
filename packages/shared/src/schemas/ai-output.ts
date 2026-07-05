@@ -9,11 +9,21 @@ import { isoDateStringSchema, uuidSchema } from './common.js';
  * before we touch the database.
  */
 
+/** One menu item inside a suggested order (a combo has several). */
+export const aiPlanOptionItemSchema = z.object({
+  menuItemId: uuidSchema,
+  estimatedPrice: z.number().nonnegative(),
+});
+
+/**
+ * One option = one order placed at a single restaurant, composed of 1-4 menu
+ * items (e.g. burger + wings + drink for one lunch). The option's total cost
+ * is derived server-side by summing the item prices.
+ */
 export const aiPlanOptionSchema = z.object({
   optionIndex: z.number().int().min(0).max(2),
   restaurantId: uuidSchema,
-  menuItemId: uuidSchema,
-  estimatedPrice: z.number().nonnegative(),
+  items: z.array(aiPlanOptionItemSchema).min(1).max(4),
   notes: z.string().max(500).optional(),
 });
 
@@ -34,6 +44,7 @@ export const aiPlanOutputSchema = z.object({
 
 // ─── Inferred types ──────────────────────────────────────────────────────────
 
+export type AIPlanOptionItem = z.infer<typeof aiPlanOptionItemSchema>;
 export type AIPlanOption = z.infer<typeof aiPlanOptionSchema>;
 export type AIPlanSlot = z.infer<typeof aiPlanSlotSchema>;
 export type AIPlanOutput = z.infer<typeof aiPlanOutputSchema>;

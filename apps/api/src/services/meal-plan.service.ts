@@ -22,18 +22,25 @@ export type SuggestionRow = Awaited<
 >[number];
 
 export function toOption(o: SuggestionRow): SuggestionOption {
+  const items = o.items.map((item) => ({
+    menuItemId: item.menuItemId,
+    menuItemName: item.menuItem?.name ?? null,
+    description: item.menuItem?.description ?? undefined,
+    price:
+      item.estimatedPrice != null
+        ? toNumber(item.estimatedPrice)
+        : (toNumberOrNull(item.menuItem?.price) ?? 0),
+  }));
   return {
     id: o.id,
     optionIndex: o.optionIndex,
     restaurantId: o.restaurantId,
     restaurantName: o.restaurant?.name ?? null,
-    menuItemId: o.menuItemId,
-    menuItemName: o.menuItem?.name ?? null,
-    description: o.menuItem?.description ?? undefined,
+    items,
     estimatedPrice:
       o.estimatedPrice != null
         ? toNumber(o.estimatedPrice)
-        : (toNumberOrNull(o.menuItem?.price) ?? 0),
+        : items.reduce((sum, item) => sum + item.price, 0),
     notes: o.notes ?? undefined,
     source: 'suggestion',
   };
@@ -54,9 +61,16 @@ function pinToOption(
     optionIndex: 0,
     restaurantId: pin.restaurantId,
     restaurantName: pin.restaurant.name,
-    menuItemId: pin.menuItemId,
-    menuItemName: pin.menuItem.name,
-    description: pin.menuItem.description ?? undefined,
+    // Pins are always a single menu item; materialize as a one-item order so
+    // the merged day view keeps a uniform shape.
+    items: [
+      {
+        menuItemId: pin.menuItemId,
+        menuItemName: pin.menuItem.name,
+        description: pin.menuItem.description ?? undefined,
+        price: toNumber(pin.priceAtPin),
+      },
+    ],
     estimatedPrice: toNumber(pin.priceAtPin),
     notes: undefined,
     source: 'pin',
@@ -139,8 +153,16 @@ export const mealPlanService = {
    * Single read across pins/choices/suggestions, then bucketed in memory; the
    * date range is bounded by plan length (≤31 days for monthly plans) so the
    * payload stays small enough to send eagerly without pagination.
+   *
+   * `clientToday` is the caller's local calendar date. Slot dates are
+   * user-local, so the client's date — not this server's UTC clock, which
+   * lags it for part of the night — decides which day is 'today'.
    */
-  async getTimeline(userId: string, planId: string): Promise<PlanTimelineResponse> {
+  async getTimeline(
+    userId: string,
+    planId: string,
+    clientToday?: string,
+  ): Promise<PlanTimelineResponse> {
     const plan = await budgetPlanRepository.findById(planId);
     if (!plan) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
     if (plan.userId !== userId) throw new AppError(403, 'Forbidden', 'FORBIDDEN');
@@ -180,7 +202,7 @@ export const mealPlanService = {
       choiceByCell.set(`${c.slotDate}|${c.mealTypeId}`, c);
     }
 
-    const today = todayDateString();
+    const today = clientToday ?? todayDateString();
     const days: PlanTimelineDay[] = [];
 
     for (const slotDate of iterateDates(plan.startDate, plan.endDate)) {

@@ -4,7 +4,7 @@ import { budgetPlanMealType } from '../budget-plan-meal-type.js';
 import { budgetPlan } from '../budget-plan.js';
 import { feedback } from '../feedback.js';
 import { restaurantRecommendation } from '../restaurant-recommendation.js';
-import { mealSuggestion, mealPlanGeneration } from '../meal-plan.js';
+import { mealSuggestion, mealSuggestionItem, mealPlanGeneration } from '../meal-plan.js';
 import { mealType } from '../meal-type.js';
 import { menuItem } from '../menu-item.js';
 import { mealChoice } from '../order.js';
@@ -55,6 +55,10 @@ export type UpdateMealPlanGeneration = Partial<Omit<NewMealPlanGeneration, 'id'>
 export type MealSuggestion = typeof mealSuggestion.$inferSelect;
 export type NewMealSuggestion = typeof mealSuggestion.$inferInsert;
 export type UpdateMealSuggestion = Partial<Omit<NewMealSuggestion, 'id'>>;
+
+// Meal suggestion item types
+export type MealSuggestionItem = typeof mealSuggestionItem.$inferSelect;
+export type NewMealSuggestionItem = typeof mealSuggestionItem.$inferInsert;
 
 // Meal type types
 export type MealType = typeof mealType.$inferSelect;

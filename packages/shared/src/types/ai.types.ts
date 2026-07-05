@@ -101,11 +101,16 @@ export interface MealPlannerContext {
 
 // ─── LLM Output shapes ────────────────────────────────────────────────────────
 
+export interface MealSuggestionOptionItem {
+  menuItemId: string;
+  estimatedPrice: number;
+}
+
+/** One option = one order at a single restaurant, composed of 1..N menu items. */
 export interface MealSuggestionOption {
   optionIndex: number; // 0, 1, 2
   restaurantId: string;
-  menuItemId: string;
-  estimatedPrice: number;
+  items: MealSuggestionOptionItem[];
   notes: string;
 }
 

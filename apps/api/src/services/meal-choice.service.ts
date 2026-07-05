@@ -62,18 +62,28 @@ async function loadOwnedActive(userId: string, budgetPlanId: string) {
  * `menuItemId`, lift them off the suggestion. Lets the FE record-choice flow
  * keep its current minimal shape while we get structured links populated.
  *
+ * Suggestions are whole orders and can combine several menu items; the single
+ * `menuItemId` FK is only backfilled when the order has exactly one item. For
+ * multi-item combos we instead backfill `manualDescription` with a combined
+ * "Burger + Wings + Drink" label (unless the caller supplied their own) so the
+ * logged choice still renders a human-readable title everywhere.
+ *
  * Returns nothing — mutates `out` in place.
  */
 async function backfillFksFromSuggestion(
   input: RecordMealChoiceInput,
-  out: { restaurantId: string | null; menuItemId: string | null },
+  out: { restaurantId: string | null; menuItemId: string | null; manualDescription: string | null },
 ): Promise<void> {
   if (!input.suggestionId) return;
   if (out.restaurantId && out.menuItemId) return;
   const suggestion = await mealPlanRepository.getSuggestionForChoice(input.suggestionId);
   if (!suggestion) return;
   out.restaurantId = out.restaurantId ?? suggestion.restaurantId;
-  out.menuItemId = out.menuItemId ?? suggestion.menuItemId;
+  if (suggestion.items.length === 1) {
+    out.menuItemId = out.menuItemId ?? suggestion.items[0]!.menuItemId;
+  } else if (suggestion.items.length > 1 && !out.manualDescription) {
+    out.manualDescription = suggestion.items.map((i) => i.name).join(' + ');
+  }
 }
 
 export const mealChoiceService = {
@@ -104,6 +114,7 @@ export const mealChoiceService = {
     const fks = {
       restaurantId: input.restaurantId ?? null,
       menuItemId: input.menuItemId ?? null,
+      manualDescription: input.manualDescription ?? null,
     };
     await backfillFksFromSuggestion(input, fks);
 
@@ -117,7 +128,7 @@ export const mealChoiceService = {
           suggestionId: input.suggestionId ?? null,
           restaurantId: fks.restaurantId,
           menuItemId: fks.menuItemId,
-          manualDescription: input.manualDescription ?? null,
+          manualDescription: fks.manualDescription,
           actualAmountSpent: String(input.actualAmountSpent),
           restaurantName: input.restaurantName ?? null,
         },

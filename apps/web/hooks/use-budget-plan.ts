@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { budgetPlanApi } from '@/lib/api/endpoints/budget-plan';
 import { orNull } from '@/lib/api/utils';
+import { localDateString } from '@/lib/date';
 import { CreateBudgetPlanInput } from '@repo/shared';
 
 // list of all budget plans
@@ -118,7 +119,9 @@ export const useBudgetPlanGenerationDetail = (planId: string, gid: string | null
 export const usePlanTimeline = (planId: string, isPendingGeneration: boolean = false) =>
   useQuery({
     queryKey: ['planTimeline', planId],
-    queryFn: () => budgetPlanApi.getTimeline(planId),
+    // The server needs the client's local calendar date to mark which day is
+    // 'today' — its own clock is UTC, which lags local time overnight.
+    queryFn: () => budgetPlanApi.getTimeline(planId, localDateString()),
     enabled: !!planId,
     refetchInterval: isPendingGeneration ? 2000 : false,
   });

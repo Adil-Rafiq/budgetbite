@@ -18,6 +18,7 @@ import { Pill } from '@/components/ui/pill';
 import { logSuggestionSchema, logCustomSchema } from '../_schemas/log-meal.schema';
 import type { LogSuggestionForm, LogCustomForm } from '../_schemas/log-meal.schema';
 import type { LogModalState, SavePayload } from '../_hooks/use-meal-slots';
+import { optionLabel } from '@/lib/suggestion';
 
 const labelClass = 'text-[10px] uppercase text-soft';
 const labelStyle: React.CSSProperties = {
@@ -329,8 +330,23 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
 
         {option && (
           <div className="rounded-xl border border-lumen-dk bg-lumen p-3">
-            <p className="font-medium text-vast">{option.menuItemName ?? '—'}</p>
+            <p className="font-medium text-vast">{optionLabel(option)}</p>
             <p className="text-[12px] text-ink">{option.restaurantName ?? '—'}</p>
+            {option.items.length > 1 && (
+              <div className="mt-2 flex flex-col gap-0.5 border-t border-lumen-dk pt-2">
+                {option.items.map((item) => (
+                  <div key={item.menuItemId} className="flex items-center justify-between gap-3">
+                    <p className="truncate text-[12px] text-ink">{item.menuItemName ?? '—'}</p>
+                    <span
+                      className="shrink-0 text-[11px] text-soft"
+                      style={{ fontFamily: 'var(--font-mono)' }}
+                    >
+                      ₨ {item.price.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

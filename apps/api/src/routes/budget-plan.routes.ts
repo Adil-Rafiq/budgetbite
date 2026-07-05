@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
   createBudgetPlanSchema,
   createMealPinSchema,
+  getPlanTimelineQuerySchema,
   listBudgetPlansQuerySchema,
   listMealPinsQuerySchema,
   paginationSchema,
@@ -104,7 +105,7 @@ router.get(
 /** Pin/choice/suggestion-merged day-by-day timeline across the plan's full date range. Returns PlanTimelineResponse. */
 router.get(
   '/:id/timeline',
-  validate({ params: idParams }),
+  validate({ params: idParams, query: getPlanTimelineQuerySchema }),
   asyncHandler(budgetPlanController.getPlanTimeline),
 );
 
