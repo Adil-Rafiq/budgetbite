@@ -82,9 +82,15 @@ export const useBudgetStep = (activeMealTypes: MealType[]) => {
 
   const toggleMealType = (mealTypeId: string) => {
     const selected = form.getValues('mealTypeIds');
+    // Keep the selection in canonical menu order (breakfast < lunch < dinner)
+    // rather than click order — this array drives the notification step and
+    // the persisted position of each meal type on the plan.
+    const optionOrder = new Map(mealTypeOptions.map((opt, i) => [opt.id, i]));
     const next = selected.includes(mealTypeId)
       ? selected.filter((id) => id !== mealTypeId)
-      : [...selected, mealTypeId];
+      : [...selected, mealTypeId].sort(
+          (a, b) => (optionOrder.get(a) ?? 0) - (optionOrder.get(b) ?? 0),
+        );
 
     // Set value first, then validate once — avoids refine timing issues
     form.setValue('mealTypeIds', next, { shouldDirty: true });

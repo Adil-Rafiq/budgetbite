@@ -1,22 +1,41 @@
 'use client';
 
+import type React from 'react';
 import { useMemo, useState } from 'react';
 import { endOfMonth, endOfWeek, format, startOfMonth, startOfWeek } from 'date-fns';
 import {
-  Bar,
+  Bar as RechartsBar,
   BarChart,
+  type BarProps,
   CartesianGrid,
   Cell,
-  Legend,
-  Line,
+  Legend as RechartsLegend,
+  type LegendProps,
+  Line as RechartsLine,
   LineChart,
-  Pie,
+  type LineProps,
+  Pie as RechartsPie,
+  type PieProps,
   PieChart,
   ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+  Tooltip as RechartsTooltip,
+  type TooltipProps,
+  XAxis as RechartsXAxis,
+  type XAxisProps,
+  YAxis as RechartsYAxis,
+  type YAxisProps,
 } from 'recharts';
+
+// recharts 2.x's class-component exports don't satisfy React 19's stricter
+// JSX.ElementType constraint (fixed upstream only in recharts 3, a breaking
+// major bump) — cast the affected ones back to a plain component type.
+const Bar = RechartsBar as unknown as React.FC<BarProps>;
+const Legend = RechartsLegend as unknown as React.FC<LegendProps>;
+const Line = RechartsLine as unknown as React.FC<LineProps>;
+const Pie = RechartsPie as unknown as React.FC<PieProps>;
+const Tooltip = RechartsTooltip as unknown as React.FC<TooltipProps<number, string>>;
+const XAxis = RechartsXAxis as unknown as React.FC<XAxisProps>;
+const YAxis = RechartsYAxis as unknown as React.FC<YAxisProps>;
 
 import { ChartSkeleton, TableSkeleton } from '@/components/skeletons';
 import { FadeUp, Stagger, StaggerItem } from '@/components/motion';

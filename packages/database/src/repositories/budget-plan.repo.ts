@@ -134,7 +134,11 @@ function shapeRow(row: RelationRow, include: BudgetPlanIncludeFlags): BudgetPlan
   const out: BudgetPlanWithRelations = base as BudgetPlan;
   if (include.withContext) out.planContext = ctx ?? null;
   if (include.withMealTypes) {
-    out.mealTypes = (budgetPlanMealTypes ?? []).map((bpmt) => bpmt.mealType);
+    // Canonical menu order, not link position — older plans stored `position`
+    // in the client's selection order, so it can't be trusted for display.
+    out.mealTypes = (budgetPlanMealTypes ?? [])
+      .map((bpmt) => bpmt.mealType)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
   }
   if (include.withLatestGeneration) {
     out.latestAttempt = mealGenerations?.[0] ?? null;
@@ -326,8 +330,9 @@ export const budgetPlanRepository = {
     const rows = await db
       .select({ mealTypeId: budgetPlanMealType.mealTypeId })
       .from(budgetPlanMealType)
+      .innerJoin(mealType, eq(budgetPlanMealType.mealTypeId, mealType.id))
       .where(eq(budgetPlanMealType.budgetPlanId, budgetPlanId))
-      .orderBy(budgetPlanMealType.position);
+      .orderBy(asc(mealType.sortOrder));
     return rows.map((r) => r.mealTypeId);
   },
 
@@ -487,7 +492,7 @@ export const budgetPlanRepository = {
       .from(budgetPlanMealType)
       .innerJoin(mealType, eq(budgetPlanMealType.mealTypeId, mealType.id))
       .where(eq(budgetPlanMealType.budgetPlanId, budgetPlanId))
-      .orderBy(budgetPlanMealType.position);
+      .orderBy(asc(mealType.sortOrder));
     return rows;
   },
 };
