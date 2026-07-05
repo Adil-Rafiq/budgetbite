@@ -3,6 +3,7 @@
 import { Loader2 } from 'lucide-react';
 import { useBudgetPlanGenerationDetail } from '@/hooks/use-budget-plan';
 import { getMealTypeVisual } from '@/lib/meal-type-visuals';
+import { optionLabel } from '@/lib/suggestion';
 import type { SuggestionOption, SuggestionSlot } from '@repo/shared';
 
 interface GenerationSuggestionsGridProps {
@@ -72,9 +73,7 @@ function SlotCard({ slot }: { slot: SuggestionSlot }) {
               className="flex items-start justify-between gap-3 rounded-lg border border-lumen-dk bg-lumen p-2.5 transition hover:-translate-y-px"
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-medium text-vast">
-                  {option.menuItemName ?? '—'}
-                </p>
+                <p className="truncate text-[13px] font-medium text-vast">{optionLabel(option)}</p>
                 <p className="truncate text-[11px] text-ink">{option.restaurantName ?? '—'}</p>
               </div>
               <span

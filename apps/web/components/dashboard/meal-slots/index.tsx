@@ -10,6 +10,7 @@ import {
 import { LogMealModal } from '@/components/dashboard/meal-slots/_components/log-meal-modal';
 import { useMealSlots } from '@/components/dashboard/meal-slots/_hooks/use-meal-slots';
 import { Pill } from '@/components/ui/pill';
+import { optionLabel } from '@/lib/suggestion';
 import type { SuggestionSlot, SuggestionOption } from '@repo/shared';
 
 function SkeletonCard() {
@@ -145,7 +146,7 @@ export function MealSlots() {
                             >
                               {loggedMeal.isCustom
                                 ? (loggedMeal.manualDescription ?? 'Custom entry')
-                                : (loggedMeal.menuItemName ?? '—')}
+                                : (loggedMeal.menuItemName ?? loggedMeal.manualDescription ?? '—')}
                             </p>
                             {loggedMeal.restaurantName && (
                               <p className="mt-0.5 truncate text-[12px] text-ink">
@@ -181,7 +182,7 @@ export function MealSlots() {
                               className="flex items-center justify-between rounded-lg px-3 py-1.5 opacity-60"
                             >
                               <p className="mr-2 truncate text-[12px] text-ink">
-                                {option.menuItemName ?? '—'}
+                                {optionLabel(option)}
                               </p>
                               <span
                                 className="shrink-0 text-[11px] text-soft"
@@ -222,7 +223,7 @@ export function MealSlots() {
                                   letterSpacing: '-0.01em',
                                 }}
                               >
-                                {option.menuItemName ?? '—'}
+                                {optionLabel(option)}
                               </p>
                               <p className="mt-0.5 truncate text-[12px] text-ink">
                                 {option.restaurantName ?? '—'}
@@ -295,11 +296,34 @@ export function MealSlots() {
                       letterSpacing: '-0.01em',
                     }}
                   >
-                    {option.menuItemName ?? '—'}
+                    {optionLabel(option)}
                   </p>
                   <p className="text-[12px] text-ink">{option.restaurantName ?? '—'}</p>
-                  {option.description && (
-                    <p className="mt-0.5 line-clamp-2 text-[12px] text-ink">{option.description}</p>
+                  {option.items.length > 1 ? (
+                    <div className="mt-0.5 flex flex-col gap-0.5">
+                      {option.items.map((item) => (
+                        <div
+                          key={item.menuItemId}
+                          className="flex items-center justify-between gap-3"
+                        >
+                          <p className="truncate text-[12px] text-ink">
+                            {item.menuItemName ?? '—'}
+                          </p>
+                          <span
+                            className="shrink-0 text-[11px] text-soft"
+                            style={{ fontFamily: 'var(--font-mono)' }}
+                          >
+                            ₨ {item.price.toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    option.items[0]?.description && (
+                      <p className="mt-0.5 line-clamp-2 text-[12px] text-ink">
+                        {option.items[0].description}
+                      </p>
+                    )
                   )}
                   {option.notes && (
                     <p
