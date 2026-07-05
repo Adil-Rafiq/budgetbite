@@ -7,7 +7,7 @@ import { planContext } from './plan-context.js';
 import { mealType } from './meal-type.js';
 import { restaurant } from './restaurant.js';
 import { menuItem } from './menu-item.js';
-import { mealPlanGeneration, mealSuggestion } from './meal-plan.js';
+import { mealPlanGeneration, mealSuggestion, mealSuggestionItem } from './meal-plan.js';
 import { mealChoice } from './order.js';
 import { mealPin } from './meal-pin.js';
 import { feedback } from './feedback.js';
@@ -88,7 +88,7 @@ export const menuItemRelations = relations(menuItem, ({ one, many }) => ({
     fields: [menuItem.restaurantId],
     references: [restaurant.id],
   }),
-  mealSuggestions: many(mealSuggestion),
+  mealSuggestionItems: many(mealSuggestionItem),
   mealChoices: many(mealChoice),
   mealPins: many(mealPin),
 }));
@@ -116,11 +116,20 @@ export const mealSuggestionRelations = relations(mealSuggestion, ({ one, many })
     fields: [mealSuggestion.restaurantId],
     references: [restaurant.id],
   }),
+  items: many(mealSuggestionItem),
+  mealChoices: many(mealChoice),
+}));
+
+// Meal Suggestion Item Relations
+export const mealSuggestionItemRelations = relations(mealSuggestionItem, ({ one }) => ({
+  mealSuggestion: one(mealSuggestion, {
+    fields: [mealSuggestionItem.suggestionId],
+    references: [mealSuggestion.id],
+  }),
   menuItem: one(menuItem, {
-    fields: [mealSuggestion.menuItemId],
+    fields: [mealSuggestionItem.menuItemId],
     references: [menuItem.id],
   }),
-  mealChoices: many(mealChoice),
 }));
 
 // Meal Choice Relations
