@@ -193,6 +193,16 @@ export const budgetPlanService = {
       });
     });
 
+    // Normalize link positions to the canonical meal-type order (breakfast <
+    // lunch < dinner) — clients send mealTypeIds in selection order, and
+    // `position` drives the display order of every plan read.
+    const sortOrderById = new Map(
+      (await mealTypeRepository.listActive()).map((mt) => [mt.id, mt.sortOrder]),
+    );
+    const orderedMealTypeIds = [...input.mealTypeIds].sort(
+      (a, b) => (sortOrderById.get(a) ?? 0) - (sortOrderById.get(b) ?? 0),
+    );
+
     await budgetPlanRepository.createWithRelations(
       {
         userId,
@@ -204,7 +214,7 @@ export const budgetPlanService = {
         notificationTimes: input.notificationTimes ?? null,
         status: 'active',
       },
-      input.mealTypeIds,
+      orderedMealTypeIds,
       {
         totalBudget: String(input.totalBudget),
         amountSpent: '0',
