@@ -530,7 +530,7 @@ function toAdminSuggestion(row: {
   notes: string | null;
   mealType: { key: string; label: string };
   restaurant: { id: string; name: string };
-  menuItem: { id: string; name: string; price: string };
+  items: { menuItem: { id: string; name: string; price: string } }[];
 }): AdminPlanSuggestion {
   return {
     id: row.id,
@@ -540,7 +540,11 @@ function toAdminSuggestion(row: {
     notes: row.notes,
     mealType: { key: row.mealType.key, label: row.mealType.label },
     restaurant: { id: row.restaurant.id, name: row.restaurant.name },
-    menuItem: { id: row.menuItem.id, name: row.menuItem.name, price: toNumber(row.menuItem.price) },
+    menuItems: row.items.map((i) => ({
+      id: i.menuItem.id,
+      name: i.menuItem.name,
+      price: toNumber(i.menuItem.price),
+    })),
   };
 }
 
