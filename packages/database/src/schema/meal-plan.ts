@@ -54,6 +54,11 @@ export const mealPlanGeneration = pgTable(
   ],
 );
 
+/**
+ * One suggested *order* for a slot: a single restaurant plus 1..N menu items
+ * (see mealSuggestionItem). estimatedPrice is the combined cost of all items
+ * in the order — per-item prices live on the item rows.
+ */
 export const mealSuggestion = pgTable(
   'meal_suggestion',
   {
@@ -69,9 +74,6 @@ export const mealSuggestion = pgTable(
     restaurantId: uuid('restaurant_id')
       .notNull()
       .references(() => restaurant.id, { onDelete: 'cascade' }),
-    menuItemId: uuid('menu_item_id')
-      .notNull()
-      .references(() => menuItem.id, { onDelete: 'cascade' }),
     estimatedPrice: decimal('estimated_price', { precision: 10, scale: 2 }),
     notes: text('notes'),
   },
@@ -83,5 +85,29 @@ export const mealSuggestion = pgTable(
       table.optionIndex,
     ),
     check('valid_option_index', sql`${table.optionIndex} >= 0`),
+  ],
+);
+
+/**
+ * A menu item inside a suggested order. A suggestion holds one or more of
+ * these (burger + wings + drink for a single lunch); all items belong to the
+ * suggestion's restaurant. itemIndex preserves the order the AI listed them.
+ */
+export const mealSuggestionItem = pgTable(
+  'meal_suggestion_item',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    suggestionId: uuid('suggestion_id')
+      .notNull()
+      .references(() => mealSuggestion.id, { onDelete: 'cascade' }),
+    itemIndex: integer('item_index').notNull(),
+    menuItemId: uuid('menu_item_id')
+      .notNull()
+      .references(() => menuItem.id, { onDelete: 'cascade' }),
+    estimatedPrice: decimal('estimated_price', { precision: 10, scale: 2 }),
+  },
+  (table) => [
+    uniqueIndex('unique_suggestion_item_index').on(table.suggestionId, table.itemIndex),
+    check('valid_item_index', sql`${table.itemIndex} >= 0`),
   ],
 );

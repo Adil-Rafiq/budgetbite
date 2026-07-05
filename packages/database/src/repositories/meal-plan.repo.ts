@@ -1,14 +1,69 @@
 import { eq, and, asc, desc, sql } from 'drizzle-orm';
+import { randomUUID } from 'node:crypto';
 
 import { db, type DbOrTx } from '../db.js';
 import {
   mealPlanGeneration,
   mealSuggestion,
-  menuItem,
+  mealSuggestionItem,
   type MealPlanGeneration,
   type MealSuggestion,
   type NewMealSuggestion,
+  type NewMealSuggestionItem,
 } from '../schema/index.js';
+
+/**
+ * Insert shape for one suggested order: the option row plus the 1..N menu
+ * items composing it (burger + wings + drink). `suggestionId` on the items is
+ * filled in by the repository.
+ */
+export type NewMealSuggestionWithItems = Omit<NewMealSuggestion, 'id'> & {
+  items: Omit<NewMealSuggestionItem, 'id' | 'suggestionId'>[];
+};
+
+/** Item row as returned by the suggestion read queries (with its menu item). */
+export interface SuggestionItemRow {
+  id: string;
+  itemIndex: number;
+  menuItemId: string;
+  estimatedPrice: string | null;
+  menuItem: { id: string; name: string; price: string; description: string | null };
+}
+
+export type SuggestionWithRelations = MealSuggestion & {
+  restaurant: { id: string; name: string };
+  mealType: { key: string; label: string };
+  items: SuggestionItemRow[];
+};
+
+const suggestionColumns = {
+  id: true,
+  generationId: true,
+  slotDate: true,
+  mealTypeId: true,
+  optionIndex: true,
+  restaurantId: true,
+  estimatedPrice: true,
+  notes: true,
+} as const;
+
+const suggestionWith = {
+  restaurant: {
+    columns: { id: true, name: true },
+  },
+  mealType: {
+    columns: { key: true, label: true },
+  },
+  items: {
+    columns: { id: true, itemIndex: true, menuItemId: true, estimatedPrice: true },
+    with: {
+      menuItem: {
+        columns: { id: true, name: true, price: true, description: true },
+      },
+    },
+    orderBy: asc(mealSuggestionItem.itemIndex),
+  },
+} as const;
 
 export const mealPlanRepository = {
   /**
@@ -214,36 +269,10 @@ export const mealPlanRepository = {
     generationId: string,
     slotDate: string,
     mealTypeId: string,
-  ): Promise<
-    (MealSuggestion & {
-      restaurant: { id: string; name: string };
-      menuItem: { id: string; name: string; price: string; description: string | null };
-      mealType: { key: string; label: string };
-    })[]
-  > {
+  ): Promise<SuggestionWithRelations[]> {
     const rows = await db.query.mealSuggestion.findMany({
-      columns: {
-        id: true,
-        generationId: true,
-        slotDate: true,
-        mealTypeId: true,
-        optionIndex: true,
-        restaurantId: true,
-        menuItemId: true,
-        estimatedPrice: true,
-        notes: true,
-      },
-      with: {
-        restaurant: {
-          columns: { id: true, name: true },
-        },
-        menuItem: {
-          columns: { id: true, name: true, price: true, description: true },
-        },
-        mealType: {
-          columns: { key: true, label: true },
-        },
-      },
+      columns: suggestionColumns,
+      with: suggestionWith,
       where: and(
         eq(mealSuggestion.generationId, generationId),
         eq(mealSuggestion.slotDate, slotDate),
@@ -252,46 +281,16 @@ export const mealPlanRepository = {
       orderBy: asc(mealSuggestion.optionIndex),
     });
 
-    return rows as (MealSuggestion & {
-      restaurant: { id: string; name: string };
-      menuItem: { id: string; name: string; price: string; description: string | null };
-      mealType: { key: string; label: string };
-    })[];
+    return rows as SuggestionWithRelations[];
   },
 
   async getSuggestionsForDay(
     generationId: string,
     slotDate: string,
-  ): Promise<
-    (MealSuggestion & {
-      restaurant: { id: string; name: string };
-      menuItem: { id: string; name: string; price: string; description: string | null };
-      mealType: { key: string; label: string };
-    })[]
-  > {
+  ): Promise<SuggestionWithRelations[]> {
     const rows = await db.query.mealSuggestion.findMany({
-      columns: {
-        id: true,
-        generationId: true,
-        slotDate: true,
-        mealTypeId: true,
-        optionIndex: true,
-        restaurantId: true,
-        menuItemId: true,
-        estimatedPrice: true,
-        notes: true,
-      },
-      with: {
-        restaurant: {
-          columns: { id: true, name: true },
-        },
-        menuItem: {
-          columns: { id: true, name: true, price: true, description: true },
-        },
-        mealType: {
-          columns: { key: true, label: true },
-        },
-      },
+      columns: suggestionColumns,
+      with: suggestionWith,
       where: and(
         eq(mealSuggestion.generationId, generationId),
         eq(mealSuggestion.slotDate, slotDate),
@@ -299,23 +298,35 @@ export const mealPlanRepository = {
       orderBy: [asc(mealSuggestion.mealTypeId), asc(mealSuggestion.optionIndex)],
     });
 
-    return rows as (MealSuggestion & {
-      restaurant: { id: string; name: string };
-      menuItem: { id: string; name: string; price: string; description: string | null };
-      mealType: { key: string; label: string };
-    })[];
+    return rows as SuggestionWithRelations[];
   },
 
   // ─── AI methods ────────────────────────────────────────────────────────────
 
   /**
-   * Bulk insert all suggestion rows for a generation.
-   * Called by MealPlannerService after the LLM returns a valid plan.
+   * Bulk insert all suggestion rows (plus their item rows) for a generation.
+   * Called by the generation flow after the LLM returns a valid plan.
+   * Suggestion ids are minted app-side so item rows can reference their parent
+   * without relying on RETURNING order.
    */
-  async insertSuggestions(suggestions: NewMealSuggestion[], tx?: DbOrTx): Promise<void> {
+  async insertSuggestions(suggestions: NewMealSuggestionWithItems[], tx?: DbOrTx): Promise<void> {
     if (suggestions.length === 0) return;
     const exec = tx ?? db;
-    await exec.insert(mealSuggestion).values(suggestions);
+
+    const suggestionRows: NewMealSuggestion[] = [];
+    const itemRows: NewMealSuggestionItem[] = [];
+    for (const { items, ...suggestion } of suggestions) {
+      const id = randomUUID();
+      suggestionRows.push({ ...suggestion, id });
+      for (const item of items) {
+        itemRows.push({ ...item, suggestionId: id });
+      }
+    }
+
+    await exec.insert(mealSuggestion).values(suggestionRows);
+    if (itemRows.length > 0) {
+      await exec.insert(mealSuggestionItem).values(itemRows);
+    }
   },
 
   /**
@@ -339,39 +350,13 @@ export const mealPlanRepository = {
   async getSuggestionsForGeneration(
     generationId: string,
     slotDate?: string,
-  ): Promise<
-    (MealSuggestion & {
-      restaurant: { id: string; name: string };
-      menuItem: { id: string; name: string; price: string; description: string | null };
-      mealType: { key: string; label: string };
-    })[]
-  > {
+  ): Promise<SuggestionWithRelations[]> {
     const conditions = [eq(mealSuggestion.generationId, generationId)];
     if (slotDate) conditions.push(eq(mealSuggestion.slotDate, slotDate));
 
     const rows = await db.query.mealSuggestion.findMany({
-      columns: {
-        id: true,
-        generationId: true,
-        slotDate: true,
-        mealTypeId: true,
-        optionIndex: true,
-        restaurantId: true,
-        menuItemId: true,
-        estimatedPrice: true,
-        notes: true,
-      },
-      with: {
-        restaurant: {
-          columns: { id: true, name: true },
-        },
-        menuItem: {
-          columns: { id: true, name: true, price: true, description: true },
-        },
-        mealType: {
-          columns: { key: true, label: true },
-        },
-      },
+      columns: suggestionColumns,
+      with: suggestionWith,
       where: and(...conditions),
       orderBy: [
         asc(mealSuggestion.slotDate),
@@ -380,43 +365,57 @@ export const mealPlanRepository = {
       ],
     });
 
-    return rows as (MealSuggestion & {
-      restaurant: { id: string; name: string };
-      menuItem: { id: string; name: string; price: string; description: string | null };
-      mealType: { key: string; label: string };
-    })[];
+    return rows as SuggestionWithRelations[];
   },
 
   /**
-   * Get a single suggestion by id with its menu item name.
-   * Used by PreferenceService to resolve the item name from a confirmed choice.
+   * Get a single suggestion by id with the combined name of its menu items
+   * ("Zinger Burger + Fries" for combos). Used by PreferenceService to resolve
+   * the item name from a confirmed choice.
    */
   async getSuggestionWithItem(suggestionId: string): Promise<{ menuItemName: string } | undefined> {
-    const [row] = await db
-      .select({ menuItemName: menuItem.name })
-      .from(mealSuggestion)
-      .innerJoin(menuItem, eq(mealSuggestion.menuItemId, menuItem.id))
-      .where(eq(mealSuggestion.id, suggestionId))
-      .limit(1);
-    return row;
+    const row = await db.query.mealSuggestion.findFirst({
+      columns: { id: true },
+      with: {
+        items: {
+          columns: { itemIndex: true },
+          with: { menuItem: { columns: { name: true } } },
+          orderBy: asc(mealSuggestionItem.itemIndex),
+        },
+      },
+      where: eq(mealSuggestion.id, suggestionId),
+    });
+    if (!row || row.items.length === 0) return undefined;
+    return { menuItemName: row.items.map((i) => i.menuItem.name).join(' + ') };
   },
 
   /**
-   * Lift restaurantId / menuItemId off a suggestion. Used by the
-   * record-choice flow to backfill the structured FKs on meal_choice when the
-   * client only supplies suggestionId.
+   * Lift restaurantId and the composing menu items off a suggestion. Used by
+   * the record-choice flow to backfill the structured FKs (and a combined
+   * combo label) on meal_choice when the client only supplies suggestionId.
    */
-  async getSuggestionForChoice(
-    suggestionId: string,
-  ): Promise<{ restaurantId: string; menuItemId: string } | undefined> {
-    const [row] = await db
-      .select({
-        restaurantId: mealSuggestion.restaurantId,
-        menuItemId: mealSuggestion.menuItemId,
-      })
-      .from(mealSuggestion)
-      .where(eq(mealSuggestion.id, suggestionId))
-      .limit(1);
-    return row;
+  async getSuggestionForChoice(suggestionId: string): Promise<
+    | {
+        restaurantId: string;
+        items: { menuItemId: string; name: string }[];
+      }
+    | undefined
+  > {
+    const row = await db.query.mealSuggestion.findFirst({
+      columns: { restaurantId: true },
+      with: {
+        items: {
+          columns: { menuItemId: true, itemIndex: true },
+          with: { menuItem: { columns: { name: true } } },
+          orderBy: asc(mealSuggestionItem.itemIndex),
+        },
+      },
+      where: eq(mealSuggestion.id, suggestionId),
+    });
+    if (!row) return undefined;
+    return {
+      restaurantId: row.restaurantId,
+      items: row.items.map((i) => ({ menuItemId: i.menuItemId, name: i.menuItem.name })),
+    };
   },
 };
