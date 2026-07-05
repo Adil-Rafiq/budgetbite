@@ -10,7 +10,7 @@
 - [ ] After log-in the user should go to /onboarding if their profile is not set yet
 - [ ] Integrate a logger
 - [ ] Menu image upload for restaurant recommendations: instead of typing menu items one by one, let the user upload a photo of the menu. Pass the image to the AI to extract the items (name + price, description if present) and pre-fill the editable items form. The user verifies/edits the extracted items, then submits the recommendation. Should fall back gracefully to manual entry if extraction fails or finds nothing.
-- [ ] Combo meals per slot: a slot should be able to hold multiple menu items (e.g. burger + wings + drink for one lunch) instead of a single item. Today the AI fills each slot with one item, which rarely reflects how a real order is composed. Needs schema change (slot → items[]), AI prompt + response shape update, plan-generation/replan logic, and UI for displaying/logging a multi-item slot and its combined cost.
+
 
 ## Backlog
 
@@ -20,6 +20,7 @@
 
 ## Done
 
+- [x] Combo meals per slot: a suggestion option is now a whole order (1–N menu items from one restaurant) with per-item and combined pricing
 - [x] The users can add restaurants of their choice with the approval of admin
 - [x] At a time only up to certain number of approval requests for restaurants will be allowed per user
 - [x] Add rate limiting
