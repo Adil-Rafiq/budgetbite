@@ -9,13 +9,15 @@ Your job is to suggest meals from real restaurants that fit within a user's budg
 You always respond with valid JSON only. No prose, no markdown, no code fences.
 You consider the user's taste preferences, disliked restaurants, dietary notes, and price sensitivity.
 You always suggest exactly 3 options per meal slot, ordered from most recommended to least.
+Each option is ONE order placed at a single restaurant and may combine 1-3 menu items
+(e.g. burger + wings + drink for one lunch) so it reflects how a real order is composed.
 Budget adherence is critical — the user's financial wellbeing depends on staying within budget.
 
 ID handling rules (critical):
 - restaurantId and menuItemId values are UUIDs supplied to you in the user message.
 - You may ONLY use UUIDs that appear verbatim in the provided "Available Restaurants" data.
 - Never invent, guess, abbreviate, or modify any UUID.
-- A menuItemId must belong to the restaurant you paired it with — do not mix items across restaurants.
+- Every menuItemId in an option must belong to that option's restaurantId — never mix items across restaurants in one order.
 - If you would otherwise need an ID you weren't given, pick a different real option from the data instead.`;
 
 /**
@@ -100,8 +102,12 @@ ${ctx.plan.mealTypes.map((m) => `- "${m.key}" → ${m.label}`).join('\n')}
         {
           "optionIndex": 0,
           "restaurantId": "<uuid from available restaurants>",
-          "menuItemId": "<uuid from available restaurants>",
-          "estimatedPrice": <number>,
+          "items": [
+            {
+              "menuItemId": "<uuid from available restaurants>",
+              "estimatedPrice": <number>
+            }
+          ],
           "notes": "<short reason why this fits>"
         }
       ]
@@ -114,11 +120,13 @@ ${ctx.plan.mealTypes.map((m) => `- "${m.key}" → ${m.label}`).join('\n')}
 Rules:
 - Each slot must have exactly 3 options (optionIndex 0, 1, 2)
 - optionIndex 0 = most recommended, 1 = second choice, 2 = third choice
+- Each option is ONE order at a single restaurant with 1-3 items — compose a realistic order (e.g. a main plus a side or drink) when the budget allows; a single item is fine for tight budgets
+- Every menuItemId in an option must belong to that option's restaurantId in the catalogue — never mix restaurants inside one order
+- The option's cost is the sum of its items' estimatedPrice values — keep that sum within the per-meal budget
 - mealTypeKey must be EXACTLY as listed in the meal type keys section above — lowercase, no capitalization
 - estimatedPrice must be realistic based on the menu item price
 - Never use a restaurantId or menuItemId not present in the ID catalogue above
 - Never invent, modify, or guess UUIDs — copy them character-for-character from the catalogue
-- A menuItemId must belong to the restaurant it's paired with under that restaurant in the catalogue
 - Distribute variety across the plan — avoid repeating the same restaurant for consecutive meals
 - Keep the total estimated cost within the total budget
 - Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget`;
@@ -176,8 +184,12 @@ ${ctx.plan.mealTypes.map((m) => `- "${m.key}" → ${m.label}`).join('\n')}
         {
           "optionIndex": 0,
           "restaurantId": "<uuid from available restaurants>",
-          "menuItemId": "<uuid from available restaurants>",
-          "estimatedPrice": <number>,
+          "items": [
+            {
+              "menuItemId": "<uuid from available restaurants>",
+              "estimatedPrice": <number>
+            }
+          ],
           "notes": "<short reason why this fits>"
         }
       ]
@@ -191,10 +203,12 @@ Rules:
 - Regenerate ONLY the remaining slots listed above — do not include already consumed meals
 - Each slot must have exactly 3 options (optionIndex 0, 1, 2)
 - optionIndex 0 = most recommended, 1 = second choice, 2 = third choice
+- Each option is ONE order at a single restaurant with 1-3 items — compose a realistic order (e.g. a main plus a side or drink) when the budget allows; a single item is fine for tight budgets
+- Every menuItemId in an option must belong to that option's restaurantId in the catalogue — never mix restaurants inside one order
+- The option's cost is the sum of its items' estimatedPrice values — keep that sum within the per-meal budget
 - mealTypeKey must be EXACTLY as listed in the meal type keys section above — lowercase, no capitalisation
 - Never use a restaurantId or menuItemId not present in the ID catalogue above
 - Never invent, modify, or guess UUIDs — copy them character-for-character from the catalogue
-- A menuItemId must belong to the restaurant it's paired with under that restaurant in the catalogue
 - estimatedTotalCost refers to the remaining meals only, not the full plan
 - Distribute variety — avoid repeating the same restaurant for consecutive meals
 - Keep the remaining estimated cost within the remaining budget of PKR ${ctx.budget.amountRemaining}
