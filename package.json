@@ -9,11 +9,13 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "db:generate": "bash ./scripts/db-migrate.sh generate",
-    "db:migrate": "bash ./scripts/db-migrate.sh migrate"
+    "db:migrate": "bash ./scripts/db-migrate.sh migrate",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "eslint": "^9.39.1",
+    "husky": "^9.1.7",
     "prettier": "^3.7.4",
     "turbo": "^2.8.10"
   },
