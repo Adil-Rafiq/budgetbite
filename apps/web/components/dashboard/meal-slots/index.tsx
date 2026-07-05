@@ -64,7 +64,7 @@ export function MealSlots() {
       </div>
     );
 
-  const dateStr = new Date(slotsData.date).toLocaleDateString('en-PK', {
+  const dateStr = new Date(`${slotsData.date}T00:00:00`).toLocaleDateString('en-PK', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',

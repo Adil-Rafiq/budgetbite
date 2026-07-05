@@ -26,6 +26,7 @@ import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useRecordMealChoice } from '@/hooks/use-meal-choice';
 import { useCreateMealPin, useMealPins } from '@/hooks/use-meal-pin';
 import { getErrorMessage } from '@/lib/api/errors';
+import { localDateString } from '@/lib/date';
 import { showToast } from '@/lib/toast';
 
 interface MenuItemPick {
@@ -40,10 +41,6 @@ interface Props {
   restaurantId: string;
   restaurantName: string;
   menuItem: MenuItemPick;
-}
-
-function todayString(): string {
-  return new Date().toISOString().slice(0, 10);
 }
 
 const labelClass = 'text-[10px] uppercase text-soft';
@@ -63,7 +60,7 @@ export function AddToPlanModal({
   const { data: activePlanData } = useActiveBudgetPlan();
   const planId = activePlanData?.plan.id ?? null;
 
-  const today = todayString();
+  const today = localDateString();
   const planStart = activePlanData?.plan.startDate ?? today;
   const planEnd = activePlanData?.plan.endDate ?? today;
   const minDate = planStart > today ? planStart : today;
