@@ -4,6 +4,16 @@ import { isoDateStringSchema, uuidSchema } from './common.js';
 import { suggestionOptionSchema } from './meal-plan.js';
 
 /**
+ * Query for GET /budget-plans/:id/timeline. `today` is the client's local
+ * calendar date — slot dates are user-local, so only the client knows which
+ * one is "today" (the server's UTC clock lags Pakistan by 5 hours). The
+ * server falls back to its own UTC date when omitted.
+ */
+export const getPlanTimelineQuerySchema = z.object({
+  today: isoDateStringSchema.optional(),
+});
+
+/**
  * Pre-rendered "logged" projection of a meal_choice, attached to a timeline
  * slot when the user has confirmed a meal for (slotDate, mealTypeId). The
  * shape is denormalised so the FE can render the row without a second query.
@@ -35,8 +45,8 @@ export const planTimelineSlotSchema = z.object({
 export const planTimelineDaySchema = z.object({
   slotDate: isoDateStringSchema,
   /**
-   * Server-computed marker so the FE can group/style days without re-deriving
-   * "today" from the user's clock (which can drift relative to UTC dates).
+   * Grouping marker computed against the client-supplied `today` query param
+   * (falling back to server UTC), so the FE can group/style days directly.
    */
   relative: z.enum(['past', 'today', 'future']),
   slots: z.array(planTimelineSlotSchema),
@@ -53,6 +63,7 @@ export const planTimelineResponseSchema = z.object({
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+export type GetPlanTimelineQuery = z.infer<typeof getPlanTimelineQuerySchema>;
 export type PlanTimelineLoggedChoice = z.infer<typeof planTimelineLoggedChoiceSchema>;
 export type PlanTimelineSlot = z.infer<typeof planTimelineSlotSchema>;
 export type PlanTimelineDay = z.infer<typeof planTimelineDaySchema>;

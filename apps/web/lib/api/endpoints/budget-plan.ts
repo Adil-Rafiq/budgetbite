@@ -37,6 +37,8 @@ export const budgetPlanApi = {
     apiClient
       .get(`api/budget-plans/${planId}/generations/${gid}`)
       .json<BudgetGenerationDetailResponse>(),
-  getTimeline: (planId: string) =>
-    apiClient.get(`api/budget-plans/${planId}/timeline`).json<PlanTimelineResponse>(),
+  getTimeline: (planId: string, today: string) =>
+    apiClient
+      .get(`api/budget-plans/${planId}/timeline`, { searchParams: { today } })
+      .json<PlanTimelineResponse>(),
 };

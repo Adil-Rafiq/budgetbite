@@ -153,8 +153,16 @@ export const mealPlanService = {
    * Single read across pins/choices/suggestions, then bucketed in memory; the
    * date range is bounded by plan length (≤31 days for monthly plans) so the
    * payload stays small enough to send eagerly without pagination.
+   *
+   * `clientToday` is the caller's local calendar date. Slot dates are
+   * user-local, so the client's date — not this server's UTC clock, which
+   * lags it for part of the night — decides which day is 'today'.
    */
-  async getTimeline(userId: string, planId: string): Promise<PlanTimelineResponse> {
+  async getTimeline(
+    userId: string,
+    planId: string,
+    clientToday?: string,
+  ): Promise<PlanTimelineResponse> {
     const plan = await budgetPlanRepository.findById(planId);
     if (!plan) throw new AppError(404, 'Budget plan not found', 'NOT_FOUND');
     if (plan.userId !== userId) throw new AppError(403, 'Forbidden', 'FORBIDDEN');
@@ -194,7 +202,7 @@ export const mealPlanService = {
       choiceByCell.set(`${c.slotDate}|${c.mealTypeId}`, c);
     }
 
-    const today = todayDateString();
+    const today = clientToday ?? todayDateString();
     const days: PlanTimelineDay[] = [];
 
     for (const slotDate of iterateDates(plan.startDate, plan.endDate)) {

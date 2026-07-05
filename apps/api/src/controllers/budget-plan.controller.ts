@@ -1,6 +1,7 @@
 import type { Response } from 'express';
 import type {
   CreateBudgetPlanInput,
+  GetPlanTimelineQuery,
   ListBudgetPlansQuery,
   RecordMealChoiceInput,
   UpdateBudgetPlanInput,
@@ -100,6 +101,7 @@ export async function getGenerationDetail(req: AuthRequest, res: Response): Prom
 
 export async function getPlanTimeline(req: AuthRequest, res: Response): Promise<void> {
   const { id } = req.params as IdParams;
-  const result = await mealPlanService.getTimeline(req.userId!, id);
+  const { today } = req.query as unknown as GetPlanTimelineQuery;
+  const result = await mealPlanService.getTimeline(req.userId!, id, today);
   res.json(result);
 }
