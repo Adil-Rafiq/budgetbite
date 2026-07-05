@@ -22,18 +22,25 @@ export type SuggestionRow = Awaited<
 >[number];
 
 export function toOption(o: SuggestionRow): SuggestionOption {
+  const items = o.items.map((item) => ({
+    menuItemId: item.menuItemId,
+    menuItemName: item.menuItem?.name ?? null,
+    description: item.menuItem?.description ?? undefined,
+    price:
+      item.estimatedPrice != null
+        ? toNumber(item.estimatedPrice)
+        : (toNumberOrNull(item.menuItem?.price) ?? 0),
+  }));
   return {
     id: o.id,
     optionIndex: o.optionIndex,
     restaurantId: o.restaurantId,
     restaurantName: o.restaurant?.name ?? null,
-    menuItemId: o.menuItemId,
-    menuItemName: o.menuItem?.name ?? null,
-    description: o.menuItem?.description ?? undefined,
+    items,
     estimatedPrice:
       o.estimatedPrice != null
         ? toNumber(o.estimatedPrice)
-        : (toNumberOrNull(o.menuItem?.price) ?? 0),
+        : items.reduce((sum, item) => sum + item.price, 0),
     notes: o.notes ?? undefined,
     source: 'suggestion',
   };
@@ -54,9 +61,16 @@ function pinToOption(
     optionIndex: 0,
     restaurantId: pin.restaurantId,
     restaurantName: pin.restaurant.name,
-    menuItemId: pin.menuItemId,
-    menuItemName: pin.menuItem.name,
-    description: pin.menuItem.description ?? undefined,
+    // Pins are always a single menu item; materialize as a one-item order so
+    // the merged day view keeps a uniform shape.
+    items: [
+      {
+        menuItemId: pin.menuItemId,
+        menuItemName: pin.menuItem.name,
+        description: pin.menuItem.description ?? undefined,
+        price: toNumber(pin.priceAtPin),
+      },
+    ],
     estimatedPrice: toNumber(pin.priceAtPin),
     notes: undefined,
     source: 'pin',
