@@ -1,8 +1,10 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import {
   createRestaurantRecommendationSchema,
   extractMenuFromImageSchema,
   listRestaurantRecommendationsQuerySchema,
+  uuidSchema,
 } from '@repo/shared';
 
 import { authMiddleware } from '../middleware/auth.middleware.js';
@@ -12,6 +14,8 @@ import { asyncHandler } from '../lib/async-handler.js';
 import * as recommendationController from '../controllers/restaurant-recommendation.controller.js';
 
 const router: Router = Router();
+
+const idParams = z.object({ id: uuidSchema });
 
 router.use(authMiddleware);
 
@@ -40,6 +44,13 @@ router.get(
   '/',
   validate({ query: listRestaurantRecommendationsQuerySchema }),
   asyncHandler(recommendationController.listMyRecommendations),
+);
+
+/** Withdraw (delete) one of the caller's own recommendations while it's still pending. Returns 204. */
+router.delete(
+  '/:id',
+  validate({ params: idParams }),
+  asyncHandler(recommendationController.withdrawRecommendation),
 );
 
 export default router;

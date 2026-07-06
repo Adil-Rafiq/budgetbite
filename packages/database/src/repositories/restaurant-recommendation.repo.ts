@@ -53,6 +53,14 @@ export const restaurantRecommendationRepository = {
     return row;
   },
 
+  async deleteById(id: string): Promise<boolean> {
+    const rows = await db
+      .delete(restaurantRecommendation)
+      .where(eq(restaurantRecommendation.id, id))
+      .returning({ id: restaurantRecommendation.id });
+    return rows.length > 0;
+  },
+
   /** Pending count for a user — backs the per-user submission cap. */
   async countPendingByUser(userId: string): Promise<number> {
     const [row] = await db

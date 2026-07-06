@@ -24,6 +24,11 @@ export const restaurantRecommendationApi = {
       .post('api/restaurant-recommendations', { json: input })
       .json<RestaurantRecommendation>(),
 
+  withdraw: async (id: string): Promise<void> => {
+    // 204 No Content — don't parse a body.
+    await apiClient.delete(`api/restaurant-recommendations/${id}`);
+  },
+
   listMine: (query: Partial<ListRestaurantRecommendationsQuery> = {}) =>
     apiClient
       .get('api/restaurant-recommendations', { searchParams: stripUndefined(query) })

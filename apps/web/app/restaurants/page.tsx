@@ -272,7 +272,16 @@ function RestaurantsPageInner() {
                 </p>
               </div>
             )}
-            <RecommendRestaurantButton />
+            <div className="flex flex-col items-start gap-1.5 sm:items-end">
+              <RecommendRestaurantButton />
+              <Link
+                href="/restaurants/recommendations"
+                className="text-[12px] text-fathom underline-offset-2 hover:underline"
+                style={{ fontFamily: 'var(--font-mono)' }}
+              >
+                your recommendations →
+              </Link>
+            </div>
           </div>
         </header>
       </FadeUp>

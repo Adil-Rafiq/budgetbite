@@ -294,6 +294,28 @@ export const restaurantRecommendationService = {
     };
   },
 
+  /**
+   * Withdraw (delete) one of the caller's own recommendations while it is
+   * still pending review. Reviewed ones are immutable history — approving
+   * created a restaurant and rejecting carries the admin's verdict — so they
+   * can't be withdrawn.
+   */
+  async withdraw(userId: string, id: string): Promise<void> {
+    const existing = await restaurantRecommendationRepository.findById(id);
+    // Someone else's recommendation reads as 404, not 403 — don't leak existence.
+    if (!existing || existing.userId !== userId) {
+      throw new AppError(404, 'Recommendation not found', 'NOT_FOUND');
+    }
+    if (existing.status !== 'pending') {
+      throw new AppError(
+        409,
+        'This recommendation has already been reviewed and can no longer be withdrawn.',
+        'ALREADY_REVIEWED',
+      );
+    }
+    await restaurantRecommendationRepository.deleteById(id);
+  },
+
   async list(query: ListRestaurantRecommendationsQuery) {
     const [rows, total] = await Promise.all([
       restaurantRecommendationRepository.listForAdmin({

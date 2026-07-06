@@ -24,6 +24,11 @@ export async function extractMenuFromImage(req: AuthRequest, res: Response): Pro
   res.json(result);
 }
 
+export async function withdrawRecommendation(req: AuthRequest, res: Response): Promise<void> {
+  await restaurantRecommendationService.withdraw(req.userId!, req.params.id as string);
+  res.status(204).send();
+}
+
 export async function listMyRecommendations(req: AuthRequest, res: Response): Promise<void> {
   const result = await restaurantRecommendationService.listMine(
     req.userId!,
