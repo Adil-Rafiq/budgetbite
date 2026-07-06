@@ -19,6 +19,8 @@ export const userProfileSchema = z.object({
   userId: z.uuid(),
   latitude: z.coerce.number().min(-90).max(90).optional(),
   longitude: z.coerce.number().min(-180).max(180).optional(),
+  dietaryPreferences: z.array(z.string()).default([]),
+  allergens: z.array(z.string()).default([]),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
@@ -29,9 +31,21 @@ export const userWithProfileSchema = userSchema.extend({
 
 // ─── Inputs ─────────────────────────────────────────────────────────────────
 
+/**
+ * Free-form dietary tag list (dietary preferences or allergens).
+ * Normalized so the same tag always reaches the DB/prompt in one shape:
+ * trimmed, lowercased, empties dropped, de-duplicated.
+ */
+export const dietaryTagListSchema = z
+  .array(z.string().trim().max(60))
+  .max(20)
+  .transform((tags) => [...new Set(tags.map((t) => t.toLowerCase()).filter((t) => t.length > 0))]);
+
 export const updateUserProfileSchema = z.object({
   latitude: z.coerce.number().min(-90).max(90).optional(),
   longitude: z.coerce.number().min(-180).max(180).optional(),
+  dietaryPreferences: dietaryTagListSchema.optional(),
+  allergens: dietaryTagListSchema.optional(),
 });
 
 // ─── Admin ──────────────────────────────────────────────────────────────────

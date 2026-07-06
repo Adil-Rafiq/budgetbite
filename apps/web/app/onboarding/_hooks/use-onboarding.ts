@@ -10,6 +10,7 @@ import { showToast } from '@/lib/toast';
 import { ONBOARDING_STEPS } from '@/app/onboarding/constants';
 import { onboardingMachine } from '@/app/onboarding/_machines/onboarding.machine';
 import { useLocationStep } from '@/app/onboarding/_hooks/use-location-step';
+import { useDietaryStep } from '@/app/onboarding/_hooks/use-dietary-step';
 import { useBudgetStep } from '@/app/onboarding/_hooks/use-budget-step';
 import { useNotificationStep } from '@/app/onboarding/_hooks/use-notification-step';
 import type { BudgetPlanPreferencesInput } from '@/app/onboarding/types';
@@ -76,6 +77,7 @@ export const useOnboarding = () => {
   // ─── Step hooks ─────────────────────────────────────────────────────────
 
   const locationStep = useLocationStep(session?.profile);
+  const dietaryStep = useDietaryStep(session?.profile);
   const budgetStep = useBudgetStep(activeMealTypes);
   const notificationStep = useNotificationStep(
     budgetStep.values.selectedMealTypeIds,
@@ -87,6 +89,7 @@ export const useOnboarding = () => {
   const [machineState, send] = useMachine(onboardingMachine);
   const currentStep = machineState.context.step;
   const isSubmittingLocation = machineState.value === 'submittingLocation';
+  const isSubmittingDietary = machineState.value === 'submittingDietary';
   const isSubmittingFinish = machineState.value === 'submittingFinish';
 
   // ─── Derived values ─────────────────────────────────────────────────────
@@ -94,10 +97,10 @@ export const useOnboarding = () => {
   const progress = ((currentStep + 1) / ONBOARDING_STEPS.length) * 100;
   const currentStepData = ONBOARDING_STEPS[currentStep];
   const isLastStep = currentStep === ONBOARDING_STEPS.length - 1;
-  const isSubmitting = isSubmittingLocation || isSubmittingFinish;
+  const isSubmitting = isSubmittingLocation || isSubmittingDietary || isSubmittingFinish;
 
-  // Steps after location depend on meal types being loaded.
-  const requiresMealTypes = currentStep !== 0;
+  // Steps after location and dietary depend on meal types being loaded.
+  const requiresMealTypes = currentStep > 1;
   const canAdvance = !requiresMealTypes || mealTypesStatus === 'ready';
 
   // ─── Step handlers ───────────────────────────────────────────────────────
@@ -111,6 +114,20 @@ export const useOnboarding = () => {
       send({ type: 'LOCATION_SUBMIT_FAILURE' });
       showToast.error({
         title: 'Failed to save location',
+        description: getErrorMessage(err, 'Something went wrong'),
+      });
+    }
+  });
+
+  const handleDietarySubmit = dietaryStep.handleSubmit(async (values) => {
+    send({ type: 'START_DIETARY_SUBMIT' });
+    try {
+      await updateProfile(values);
+      send({ type: 'DIETARY_SUBMIT_SUCCESS' });
+    } catch (err) {
+      send({ type: 'DIETARY_SUBMIT_FAILURE' });
+      showToast.error({
+        title: 'Failed to save dietary preferences',
         description: getErrorMessage(err, 'Something went wrong'),
       });
     }
@@ -164,6 +181,10 @@ export const useOnboarding = () => {
       await handleLocationSubmit();
       return;
     }
+    if (currentStep === 1) {
+      await handleDietarySubmit();
+      return;
+    }
     send({ type: 'CONTINUE' });
   };
 
@@ -188,6 +209,7 @@ export const useOnboarding = () => {
 
     steps: {
       location: locationStep,
+      dietary: dietaryStep,
       budget: budgetStep,
       notifications: notificationStep,
     },

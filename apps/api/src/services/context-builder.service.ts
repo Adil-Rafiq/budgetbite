@@ -38,15 +38,23 @@ export const contextBuilderService = {
   async build(budgetPlanId: string, userId: string): Promise<MealPlannerContext> {
     const fromDate = todayDateString();
 
-    const [plan, rawBudget, preferences, remainingDates, pinnedSlots, pinAggregate] =
-      await Promise.all([
-        this.fetchPlanMeta(budgetPlanId),
-        this.fetchRawBudgetState(budgetPlanId),
-        this.fetchUserPreferences(userId),
-        this.fetchRemainingDates(budgetPlanId),
-        mealPinRepository.getPinnedSlotsForGeneration(budgetPlanId, fromDate),
-        mealPinRepository.sumFutureForPlan(budgetPlanId, fromDate),
-      ]);
+    const [
+      plan,
+      rawBudget,
+      learnedPreferences,
+      remainingDates,
+      pinnedSlots,
+      pinAggregate,
+      profile,
+    ] = await Promise.all([
+      this.fetchPlanMeta(budgetPlanId),
+      this.fetchRawBudgetState(budgetPlanId),
+      this.fetchUserPreferences(userId),
+      this.fetchRemainingDates(budgetPlanId),
+      mealPinRepository.getPinnedSlotsForGeneration(budgetPlanId, fromDate),
+      mealPinRepository.sumFutureForPlan(budgetPlanId, fromDate),
+      userProfileRepository.findByUserId(userId),
+    ]);
 
     const budget = applyPinAdjustment(
       rawBudget,
@@ -54,14 +62,21 @@ export const contextBuilderService = {
       pinAggregate.count,
     );
 
-    const userProfile = await this.fetchUserLocation(userId);
-    const restaurants = userProfile
-      ? await this.fetchNearbyRestaurants(
-          userProfile.latitude,
-          userProfile.longitude,
-          preferences.dislikedRestaurantIds,
-        )
-      : [];
+    // Learned preferences (user_preferences) + user-declared dietary constraints (user_profile).
+    const preferences: UserPreferencesContext = {
+      ...learnedPreferences,
+      dietaryPreferences: profile?.dietaryPreferences ?? [],
+      allergens: profile?.allergens ?? [],
+    };
+
+    const restaurants =
+      profile?.latitude != null && profile?.longitude != null
+        ? await this.fetchNearbyRestaurants(
+            profile.latitude,
+            profile.longitude,
+            preferences.dislikedRestaurantIds,
+          )
+        : [];
 
     return { plan, budget, preferences, restaurants, remainingDates, pinnedSlots };
   },
@@ -104,7 +119,14 @@ export const contextBuilderService = {
     };
   },
 
-  async fetchUserPreferences(userId: string): Promise<UserPreferencesContext> {
+  /**
+   * AI-learned preferences from user_preferences. The user-declared dietary
+   * fields (dietaryPreferences / allergens) live on user_profile and are
+   * merged in by `build()`.
+   */
+  async fetchUserPreferences(
+    userId: string,
+  ): Promise<Omit<UserPreferencesContext, 'dietaryPreferences' | 'allergens'>> {
     const prefs = await userPreferencesRepository.findByUserId(userId);
     return {
       dislikedRestaurantIds: prefs?.dislikedRestaurantIds ?? [],
@@ -114,12 +136,6 @@ export const contextBuilderService = {
       feedbackSummary: prefs?.feedbackSummary ?? null,
       priceSensitivity: prefs?.priceSensitivity ?? 'mid',
     };
-  },
-
-  async fetchUserLocation(userId: string): Promise<{ latitude: number; longitude: number } | null> {
-    const profile = await userProfileRepository.findByUserId(userId);
-    if (!profile?.latitude || !profile?.longitude) return null;
-    return { latitude: profile.latitude, longitude: profile.longitude };
   },
 
   /**

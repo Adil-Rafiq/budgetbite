@@ -11,6 +11,9 @@ type OnboardingMachineEvent =
   | { type: 'START_LOCATION_SUBMIT' }
   | { type: 'LOCATION_SUBMIT_SUCCESS' }
   | { type: 'LOCATION_SUBMIT_FAILURE' }
+  | { type: 'START_DIETARY_SUBMIT' }
+  | { type: 'DIETARY_SUBMIT_SUCCESS' }
+  | { type: 'DIETARY_SUBMIT_FAILURE' }
   | { type: 'START_FINISH_SUBMIT' }
   | { type: 'FINISH_SUBMIT_SUCCESS' }
   | { type: 'FINISH_SUBMIT_FAILURE' };
@@ -33,7 +36,7 @@ export const onboardingMachine = setup({
   initial: 'editing',
   context: {
     step: 0,
-    totalSteps: 3,
+    totalSteps: 4,
   },
   states: {
     editing: {
@@ -43,12 +46,16 @@ export const onboardingMachine = setup({
           actions: 'previousStep',
         },
         CONTINUE: {
-          guard: ({ context }) => context.step > 0 && context.step < context.totalSteps - 1,
+          guard: ({ context }) => context.step > 1 && context.step < context.totalSteps - 1,
           actions: 'nextStep',
         },
         START_LOCATION_SUBMIT: {
           guard: ({ context }) => context.step === 0,
           target: 'submittingLocation',
+        },
+        START_DIETARY_SUBMIT: {
+          guard: ({ context }) => context.step === 1,
+          target: 'submittingDietary',
         },
         START_FINISH_SUBMIT: {
           guard: ({ context }) => context.step === context.totalSteps - 1,
@@ -63,6 +70,17 @@ export const onboardingMachine = setup({
           actions: 'nextStep',
         },
         LOCATION_SUBMIT_FAILURE: {
+          target: 'editing',
+        },
+      },
+    },
+    submittingDietary: {
+      on: {
+        DIETARY_SUBMIT_SUCCESS: {
+          target: 'editing',
+          actions: 'nextStep',
+        },
+        DIETARY_SUBMIT_FAILURE: {
           target: 'editing',
         },
       },

@@ -72,7 +72,12 @@ export interface UserPreferencesContext {
   dislikedRestaurantIds: string[];
   preferredCuisineTags: string[];
   dislikedCuisineTags: string[];
+  /** AI-inferred dietary notes accumulated from feedback (user_preferences). */
   dietaryNotes: string[];
+  /** User-declared dietary preferences from profile/onboarding (user_profile). */
+  dietaryPreferences: string[];
+  /** User-declared allergens — hard constraints the plan must never violate. */
+  allergens: string[];
   feedbackSummary: string | null;
   priceSensitivity: 'budget' | 'mid' | 'premium';
 }

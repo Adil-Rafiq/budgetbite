@@ -12,7 +12,6 @@
 
 ## Backlog
 
-- [ ] Dietary preferences & allergens in profile/onboarding, injected into the AI meal-plan prompt
 - [ ] Learn from actual-vs-listed price gap: track per-restaurant delta between suggested price and logged spend, pad future estimates accordingly, and show "prices last updated N days ago"
 - [ ] Plan-end summary (saved/overspent, favorite cuisine, adherence) + one-click "start next plan with same settings" / recurring plans
 - [ ] Favorites & never-again lists: pin dishes/restaurants, block restaurants, pass as hard constraints to the AI prompt
@@ -26,6 +25,7 @@
 
 ## Done
 
+- [x] Dietary preferences & allergens: user-declared tags on `user_profile` (distinct from AI-learned `dietaryNotes`), editable in a new onboarding step and a profile-page section, injected into all meal-plan prompts with allergens treated as hard constraints
 - [x] AI observability: append-only `ai_call_log` table — one row per LLM call attempt (plan generate/replan, slot reroll, menu extraction, preference extraction) with provider, model, token counts, latency, attempt number, and outcome (succeeded / validation_failed / truncated / provider_error); written fire-and-forget so logging can never fail a request
 - [x] Set up a test runner (Vitest): cover plan-budget arithmetic, numeric string<->number boundary, Haversine filtering, AI-response validation
 - [x] Single-slot reroll: regenerate the 3 options for one meal slot (scoped to that slot's remaining budget); treat reroll as implicit "none of these" feedback, with guard rails (per-user rate limit + per-slot reroll cap per generation + rejected options replayed as hard exclusions)

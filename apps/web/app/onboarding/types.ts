@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { LucideIcon } from 'lucide-react';
 
-export type OnboardingStepId = 'location' | 'budget' | 'notifications';
+export type OnboardingStepId = 'location' | 'dietary' | 'budget' | 'notifications';
 
 export type OnboardingStep = {
   id: OnboardingStepId;
@@ -44,8 +44,14 @@ export const locationPreferencesSchema = z.object({
   longitude: z.number().min(-180).max(180).optional(),
 });
 
+export const dietaryPreferencesSchema = z.object({
+  dietaryPreferences: z.array(z.string().trim().min(1).max(60)).max(20),
+  allergens: z.array(z.string().trim().min(1).max(60)).max(20),
+});
+
 export type NotificationPreferencesInput = z.infer<typeof notificationPreferencesSchema>;
 export type LocationPreferencesInput = z.infer<typeof locationPreferencesSchema>;
+export type DietaryPreferencesInput = z.infer<typeof dietaryPreferencesSchema>;
 
 export interface OnboardingSubmissionInput {
   location: LocationPreferencesInput;

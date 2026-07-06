@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { BadgeCheck, Lock, LogOut, MapPin, ShieldCheck, User } from 'lucide-react';
+import { BadgeCheck, Lock, LogOut, MapPin, Salad, ShieldCheck, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
@@ -19,7 +19,13 @@ import { useDetectLocation } from '@/hooks/use-detect-location';
 import { authClient } from '@/lib/auth-client';
 import { showToast } from '@/lib/toast';
 import { getErrorMessage } from '@/lib/api/errors';
-import { DEFAULT_COORDINATES } from '@/app/onboarding/constants';
+import {
+  ALLERGEN_OPTIONS,
+  DEFAULT_COORDINATES,
+  DIETARY_PREFERENCE_OPTIONS,
+} from '@/app/onboarding/constants';
+import { useDietaryStep } from '@/app/onboarding/_hooks/use-dietary-step';
+import { DietaryTagPicker } from '@/components/dietary-tag-picker';
 import { NotificationTimesCard } from '@/app/profile/_components/notification-times-card';
 import { Section } from '@/app/profile/_components/section';
 
@@ -85,7 +91,8 @@ export default function ProfilePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { data: user, isLoading } = useUser();
-  const { mutateAsync: updateLocation } = useUpdateProfile();
+  const { mutateAsync: updateProfile } = useUpdateProfile();
+  const dietary = useDietaryStep(user?.profile);
 
   const initialAccount = useMemo<AccountInput>(
     () => ({
@@ -154,7 +161,7 @@ export default function ProfilePage() {
 
   const onSaveLocation = async (values: LocationInput) => {
     try {
-      await updateLocation(values);
+      await updateProfile(values);
       showToast.success({ title: 'Location updated' });
     } catch (err) {
       showToast.error({
@@ -163,6 +170,18 @@ export default function ProfilePage() {
       });
     }
   };
+
+  const onSaveDietary = dietary.handleSubmit(async (values) => {
+    try {
+      await updateProfile(values);
+      showToast.success({ title: 'Dietary settings updated' });
+    } catch (err) {
+      showToast.error({
+        title: 'Could not update dietary settings',
+        description: getErrorMessage(err),
+      });
+    }
+  });
 
   const onChangePassword = async (values: PasswordInput) => {
     const { error } = await authClient.changePassword({
@@ -404,6 +423,38 @@ export default function ProfilePage() {
               disabled={locationForm.formState.isSubmitting || !locationForm.formState.isDirty}
             >
               {locationForm.formState.isSubmitting ? 'Updating…' : 'Update location'}
+            </Pill>
+          </form>
+        </Section>
+
+        <Section icon={Salad} title="Dietary" hint="Preferences and allergens the AI must respect.">
+          <form className="flex flex-col gap-5" onSubmit={onSaveDietary} noValidate>
+            <DietaryTagPicker
+              label="Dietary preferences"
+              hint="The AI plans meals around these."
+              quickOptions={DIETARY_PREFERENCE_OPTIONS}
+              selected={dietary.values.dietaryPreferences}
+              error={dietary.errors.dietaryPreferences}
+              onToggle={(tag) => dietary.actions.toggleTag('dietaryPreferences', tag)}
+              onAdd={(tag) => dietary.actions.addTag('dietaryPreferences', tag)}
+            />
+            <DietaryTagPicker
+              label="Allergens"
+              hint="Hard limits — suggested meals will never include these."
+              quickOptions={ALLERGEN_OPTIONS}
+              selected={dietary.values.allergens}
+              error={dietary.errors.allergens}
+              onToggle={(tag) => dietary.actions.toggleTag('allergens', tag)}
+              onAdd={(tag) => dietary.actions.addTag('allergens', tag)}
+            />
+            <Pill
+              type="submit"
+              variant="ghost"
+              size="sm"
+              className="self-start"
+              disabled={dietary.isSubmitting || !dietary.isDirty}
+            >
+              {dietary.isSubmitting ? 'Saving…' : 'Save dietary settings'}
             </Pill>
           </form>
         </Section>

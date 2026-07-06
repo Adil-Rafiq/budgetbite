@@ -8,6 +8,9 @@ export const SYSTEM_PROMPT = `You are BudgetBite AI, a meal planning assistant.
 Your job is to suggest meals from real restaurants that fit within a user's budget.
 You always respond with valid JSON only. No prose, no markdown, no code fences.
 You consider the user's taste preferences, disliked restaurants, dietary notes, and price sensitivity.
+The user's declared dietary preferences and allergens are HARD constraints: never suggest a menu item
+that conflicts with a dietary preference or may contain a listed allergen. When an item's ingredients
+are unclear from its name/description, choose a clearly safe alternative instead.
 You always suggest exactly 3 options per meal slot, ordered from most recommended to least.
 Each option is ONE order placed at a single restaurant and may combine 1-3 menu items
 (e.g. burger + wings + drink for one lunch) so it reflects how a real order is composed.
@@ -19,6 +22,26 @@ ID handling rules (critical):
 - Never invent, guess, abbreviate, or modify any UUID.
 - Every menuItemId in an option must belong to that option's restaurantId — never mix items across restaurants in one order.
 - If you would otherwise need an ID you weren't given, pick a different real option from the data instead.`;
+
+/**
+ * Shared "User Preferences" section: learned signals from user_preferences
+ * plus the user-declared dietary constraints from user_profile.
+ */
+function buildUserPreferencesSection(prefs: MealPlannerContext['preferences']): string {
+  return `- Price sensitivity: ${prefs.priceSensitivity}
+- Preferred tags: ${prefs.preferredCuisineTags.join(', ') || 'none specified'}
+- Disliked tags: ${prefs.dislikedCuisineTags.join(', ') || 'none'}
+- Dietary preferences (user-declared — respect strictly): ${prefs.dietaryPreferences.join(', ') || 'none'}
+- Allergens (HARD constraint — NEVER suggest items that may contain these): ${prefs.allergens.join(', ') || 'none'}
+- Dietary notes (learned from feedback): ${prefs.dietaryNotes.join(', ') || 'none'}
+- Feedback history: ${prefs.feedbackSummary ?? 'No feedback yet'}`;
+}
+
+/** Extra rule line rendered only when the user declared dietary constraints. */
+function buildDietaryRule(prefs: MealPlannerContext['preferences']): string {
+  if (prefs.dietaryPreferences.length === 0 && prefs.allergens.length === 0) return '';
+  return "\n- Never suggest an item that conflicts with the user's dietary preferences or may contain a listed allergen — when in doubt about ingredients, pick a clearly safe alternative";
+}
 
 /**
  * Compact id catalogue: one line per (restaurant, menu item) pair. Repeating
@@ -74,11 +97,7 @@ export function buildGeneratePlanPrompt(ctx: MealPlannerContext): string {
 ${buildPinnedSlotsSection(ctx.pinnedSlots, ctx.plan.mealTypes)}
 
 ## User Preferences
-- Price sensitivity: ${ctx.preferences.priceSensitivity}
-- Preferred tags: ${ctx.preferences.preferredCuisineTags.join(', ') || 'none specified'}
-- Disliked tags: ${ctx.preferences.dislikedCuisineTags.join(', ') || 'none'}
-- Dietary notes: ${ctx.preferences.dietaryNotes.join(', ') || 'none'}
-- Feedback history: ${ctx.preferences.feedbackSummary ?? 'No feedback yet'}
+${buildUserPreferencesSection(ctx.preferences)}
 
 ## Available Restaurants (nearby, preferences already filtered)
 ${JSON.stringify(ctx.restaurants, null, 2)}
@@ -129,7 +148,7 @@ Rules:
 - Never invent, modify, or guess UUIDs — copy them character-for-character from the catalogue
 - Distribute variety across the plan — avoid repeating the same restaurant for consecutive meals
 - Keep the total estimated cost within the total budget
-- Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget`;
+- Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget${buildDietaryRule(ctx.preferences)}`;
 }
 
 // ─── Prompt: Re-plan after a meal choice ──────────────────────────────────────
@@ -156,11 +175,7 @@ ${triggerSummary}
 ${buildPinnedSlotsSection(ctx.pinnedSlots, ctx.plan.mealTypes)}
 
 ## User Preferences
-- Price sensitivity: ${ctx.preferences.priceSensitivity}
-- Preferred tags: ${ctx.preferences.preferredCuisineTags.join(', ') || 'none'}
-- Disliked tags: ${ctx.preferences.dislikedCuisineTags.join(', ') || 'none'}
-- Dietary notes: ${ctx.preferences.dietaryNotes.join(', ') || 'none'}
-- Feedback history: ${ctx.preferences.feedbackSummary ?? 'No feedback yet'}
+${buildUserPreferencesSection(ctx.preferences)}
 
 ## Available Restaurants (nearby, preferences already filtered)
 ${JSON.stringify(ctx.restaurants, null, 2)}
@@ -212,7 +227,7 @@ Rules:
 - estimatedTotalCost refers to the remaining meals only, not the full plan
 - Distribute variety — avoid repeating the same restaurant for consecutive meals
 - Keep the remaining estimated cost within the remaining budget of PKR ${ctx.budget.amountRemaining}
-- Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget`;
+- Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget${buildDietaryRule(ctx.preferences)}`;
 }
 
 // ─── Prompt: Single-slot reroll ───────────────────────────────────────────────
@@ -251,11 +266,7 @@ export function buildRerollSlotPrompt(ctx: MealPlannerContext, args: RerollSlotP
 ${rejectedSection}
 
 ## User Preferences
-- Price sensitivity: ${ctx.preferences.priceSensitivity}
-- Preferred tags: ${ctx.preferences.preferredCuisineTags.join(', ') || 'none specified'}
-- Disliked tags: ${ctx.preferences.dislikedCuisineTags.join(', ') || 'none'}
-- Dietary notes: ${ctx.preferences.dietaryNotes.join(', ') || 'none'}
-- Feedback history: ${ctx.preferences.feedbackSummary ?? 'No feedback yet'}
+${buildUserPreferencesSection(ctx.preferences)}
 
 ## Available Restaurants (nearby, preferences already filtered)
 ${JSON.stringify(ctx.restaurants, null, 2)}
@@ -289,7 +300,7 @@ Rules:
 - Never use a restaurantId or menuItemId not present in the ID catalogue above
 - Never invent, modify, or guess UUIDs — copy them character-for-character from the catalogue
 - estimatedPrice must be realistic based on the menu item price
-- Keep \`notes\` short (≤ 120 chars)`;
+- Keep \`notes\` short (≤ 120 chars)${buildDietaryRule(ctx.preferences)}`;
 }
 
 // ─── Prompt: Preference extraction from feedback ───────────────────────────────

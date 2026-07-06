@@ -25,6 +25,8 @@ export const userService = {
     const profile = await userRepository.upsertProfile(userId, {
       latitude: data.latitude,
       longitude: data.longitude,
+      dietaryPreferences: data.dietaryPreferences,
+      allergens: data.allergens,
     });
 
     return profile;

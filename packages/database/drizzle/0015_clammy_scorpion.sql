@@ -1,0 +1,2 @@
+ALTER TABLE "user_profile" ADD COLUMN "dietary_preferences" jsonb DEFAULT '[]'::jsonb NOT NULL;--> statement-breakpoint
+ALTER TABLE "user_profile" ADD COLUMN "allergens" jsonb DEFAULT '[]'::jsonb NOT NULL;
