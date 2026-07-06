@@ -4,6 +4,7 @@ import type {
   GetPlanTimelineQuery,
   ListBudgetPlansQuery,
   RecordMealChoiceInput,
+  RerollSlotInput,
   UpdateBudgetPlanInput,
 } from '@repo/shared';
 
@@ -84,6 +85,14 @@ export async function generateMealPlan(req: AuthRequest, res: Response): Promise
   // (e.g. NO_NEARBY_RESTAURANTS) still surface synchronously as a 4xx.
   const kickoff = await budgetPlanService.generateMealPlan(req.userId!, id);
   res.status(202).json(kickoff);
+}
+
+export async function rerollSlot(req: AuthRequest, res: Response): Promise<void> {
+  const { id } = req.params as IdParams;
+  // Synchronous by design — a single slot is a small LLM call, so the fresh
+  // options come back in the response instead of via generation polling.
+  const result = await budgetPlanService.rerollSlot(req.userId!, id, req.body as RerollSlotInput);
+  res.json(result);
 }
 
 export async function listGenerations(req: AuthRequest, res: Response): Promise<void> {

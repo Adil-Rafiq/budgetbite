@@ -42,6 +42,15 @@ export const aiPlanOutputSchema = z.object({
   estimatedTotalCost: z.number().nonnegative(),
 });
 
+/**
+ * What the LLM returns for a single-slot reroll: exactly 3 fresh options for
+ * one already-known (slotDate, mealType) cell. The slot identity comes from
+ * the request, not the model, so only the options are exchanged.
+ */
+export const aiSlotRerollOutputSchema = z.object({
+  options: z.array(aiPlanOptionSchema).length(3),
+});
+
 // ─── Menu image extraction output ────────────────────────────────────────────
 
 /**
@@ -71,4 +80,5 @@ export type AIPlanOptionItem = z.infer<typeof aiPlanOptionItemSchema>;
 export type AIPlanOption = z.infer<typeof aiPlanOptionSchema>;
 export type AIPlanSlot = z.infer<typeof aiPlanSlotSchema>;
 export type AIPlanOutput = z.infer<typeof aiPlanOutputSchema>;
+export type AISlotRerollOutput = z.infer<typeof aiSlotRerollOutputSchema>;
 export type AIMenuExtractionOutput = z.infer<typeof aiMenuExtractionOutputSchema>;

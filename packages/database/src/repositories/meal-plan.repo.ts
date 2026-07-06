@@ -4,12 +4,15 @@ import { randomUUID } from 'node:crypto';
 import { db, type DbOrTx } from '../db.js';
 import {
   mealPlanGeneration,
+  mealSlotReroll,
   mealSuggestion,
   mealSuggestionItem,
   type MealPlanGeneration,
   type MealSuggestion,
+  type NewMealSlotReroll,
   type NewMealSuggestion,
   type NewMealSuggestionItem,
+  type RejectedSlotOption,
 } from '../schema/index.js';
 
 /**
@@ -366,6 +369,83 @@ export const mealPlanRepository = {
     });
 
     return rows as SuggestionWithRelations[];
+  },
+
+  /**
+   * Delete every suggestion row (items cascade) for one (generation, date,
+   * mealType) cell. Used by the single-slot reroll inside the same tx as the
+   * replacement insert so the slot never renders empty or doubled.
+   */
+  async deleteSuggestionsForSlot(
+    generationId: string,
+    slotDate: string,
+    mealTypeId: string,
+    tx?: DbOrTx,
+  ): Promise<number> {
+    const exec = tx ?? db;
+    const deleted = await exec
+      .delete(mealSuggestion)
+      .where(
+        and(
+          eq(mealSuggestion.generationId, generationId),
+          eq(mealSuggestion.slotDate, slotDate),
+          eq(mealSuggestion.mealTypeId, mealTypeId),
+        ),
+      )
+      .returning({ id: mealSuggestion.id });
+    return deleted.length;
+  },
+
+  // ─── Slot rerolls ────────────────────────────────────────────────────────────
+
+  async insertSlotReroll(data: NewMealSlotReroll, tx?: DbOrTx): Promise<void> {
+    const exec = tx ?? db;
+    await exec.insert(mealSlotReroll).values(data);
+  },
+
+  /**
+   * How many times this slot has already been rerolled within a generation —
+   * the guard-rail counter that caps paid LLM calls per slot.
+   */
+  async countSlotRerolls(
+    generationId: string,
+    slotDate: string,
+    mealTypeId: string,
+  ): Promise<number> {
+    const [row] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(mealSlotReroll)
+      .where(
+        and(
+          eq(mealSlotReroll.generationId, generationId),
+          eq(mealSlotReroll.slotDate, slotDate),
+          eq(mealSlotReroll.mealTypeId, mealTypeId),
+        ),
+      );
+    return row?.count ?? 0;
+  },
+
+  /**
+   * Every option the user has rejected for this slot within a generation,
+   * oldest reroll first. Replayed to the model as "none of these" feedback.
+   */
+  async listRejectedOptionsForSlot(
+    generationId: string,
+    slotDate: string,
+    mealTypeId: string,
+  ): Promise<RejectedSlotOption[]> {
+    const rows = await db
+      .select({ rejectedOptions: mealSlotReroll.rejectedOptions })
+      .from(mealSlotReroll)
+      .where(
+        and(
+          eq(mealSlotReroll.generationId, generationId),
+          eq(mealSlotReroll.slotDate, slotDate),
+          eq(mealSlotReroll.mealTypeId, mealTypeId),
+        ),
+      )
+      .orderBy(asc(mealSlotReroll.createdAt));
+    return rows.flatMap((r) => r.rejectedOptions);
   },
 
   /**

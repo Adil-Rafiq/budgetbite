@@ -8,11 +8,13 @@ import {
   listMealPinsQuerySchema,
   paginationSchema,
   recordMealChoiceSchema,
+  rerollSlotSchema,
   updateBudgetPlanSchema,
   uuidSchema,
 } from '@repo/shared';
 
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { slotRerollRateLimiter } from '../middleware/rate-limit.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
 import { asyncHandler } from '../lib/async-handler.js';
 import * as budgetPlanController from '../controllers/budget-plan.controller.js';
@@ -86,6 +88,14 @@ router.post(
   '/:id/meal-plan/generate',
   validate({ params: idParams }),
   asyncHandler(budgetPlanController.generateMealPlan),
+);
+
+/** Regenerate the 3 options for one (slotDate, mealTypeId) slot, synchronously. Treats the replaced options as implicit "none of these" feedback. Returns RerollSlotResponse. */
+router.post(
+  '/:id/meal-plan/reroll-slot',
+  slotRerollRateLimiter,
+  validate({ params: idParams, body: rerollSlotSchema }),
+  asyncHandler(budgetPlanController.rerollSlot),
 );
 
 /** Paginated list of every generation attempt for a plan, newest-first. Returns { data: BudgetGeneration[], meta }. */

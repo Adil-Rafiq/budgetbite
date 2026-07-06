@@ -215,6 +215,83 @@ Rules:
 - Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget`;
 }
 
+// ─── Prompt: Single-slot reroll ───────────────────────────────────────────────
+
+export interface RerollSlotPromptArgs {
+  slotDate: string;
+  mealTypeKey: string;
+  mealTypeLabel: string;
+  /** Budget ceiling for this one meal (pin-adjusted avg per remaining meal). */
+  slotBudget: number;
+  /** Options the user rejected — current ones plus any from earlier rerolls of this slot. */
+  rejectedOptions: { restaurantName: string; itemsLabel: string }[];
+}
+
+/**
+ * Regenerate the 3 options for ONE meal slot. Much smaller output contract
+ * than the full-plan prompts: the slot identity is fixed by the request, so
+ * the model only returns `options`. Every rejected option (this reroll and
+ * prior ones for the same slot) is listed as a hard exclusion — the reroll
+ * itself is the user saying "none of these".
+ */
+export function buildRerollSlotPrompt(ctx: MealPlannerContext, args: RerollSlotPromptArgs): string {
+  const rejectedSection =
+    args.rejectedOptions.length > 0
+      ? args.rejectedOptions.map((o) => `- ${o.restaurantName}: ${o.itemsLabel}`).join('\n')
+      : 'None.';
+
+  return `The user asked for different suggestions for ONE meal slot of their plan. They rejected the current options ("none of these"), so propose 3 fresh ones.
+
+## Slot to regenerate
+- Date: ${args.slotDate}
+- Meal: ${args.mealTypeLabel} (key: "${args.mealTypeKey}")
+- Budget for this meal: PKR ${args.slotBudget.toFixed(2)} — the option's combined item cost must stay within this
+
+## Options the user has REJECTED for this slot (do NOT suggest these again, and avoid near-identical orders)
+${rejectedSection}
+
+## User Preferences
+- Price sensitivity: ${ctx.preferences.priceSensitivity}
+- Preferred tags: ${ctx.preferences.preferredCuisineTags.join(', ') || 'none specified'}
+- Disliked tags: ${ctx.preferences.dislikedCuisineTags.join(', ') || 'none'}
+- Dietary notes: ${ctx.preferences.dietaryNotes.join(', ') || 'none'}
+- Feedback history: ${ctx.preferences.feedbackSummary ?? 'No feedback yet'}
+
+## Available Restaurants (nearby, preferences already filtered)
+${JSON.stringify(ctx.restaurants, null, 2)}
+
+## ID catalogue (the ONLY UUIDs you may use — copy exactly)
+${buildIdCatalogue(ctx.restaurants)}
+
+## Required JSON output format
+{
+  "options": [
+    {
+      "optionIndex": 0,
+      "restaurantId": "<uuid from available restaurants>",
+      "items": [
+        {
+          "menuItemId": "<uuid from available restaurants>",
+          "estimatedPrice": <number>
+        }
+      ],
+      "notes": "<short reason why this fits>"
+    }
+  ]
+}
+
+Rules:
+- Return exactly 3 options (optionIndex 0, 1, 2; 0 = most recommended)
+- Each option is ONE order at a single restaurant with 1-3 items — compose a realistic order (e.g. a main plus a side or drink) when the budget allows; a single item is fine for tight budgets
+- Every menuItemId in an option must belong to that option's restaurantId in the catalogue — never mix restaurants inside one order
+- The option's cost is the sum of its items' estimatedPrice values — keep that sum within PKR ${args.slotBudget.toFixed(2)}
+- Never repeat a rejected option; prefer different restaurants or clearly different dishes
+- Never use a restaurantId or menuItemId not present in the ID catalogue above
+- Never invent, modify, or guess UUIDs — copy them character-for-character from the catalogue
+- estimatedPrice must be realistic based on the menu item price
+- Keep \`notes\` short (≤ 120 chars)`;
+}
+
 // ─── Prompt: Preference extraction from feedback ───────────────────────────────
 
 export function buildPreferenceExtractionPrompt(

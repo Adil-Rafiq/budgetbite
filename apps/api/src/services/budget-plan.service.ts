@@ -16,6 +16,8 @@ import type {
   ListBudgetPlansQuery,
   Paginated,
   PaginationQuery,
+  RerollSlotInput,
+  RerollSlotResponse,
   UpdateBudgetPlanInput,
 } from '@repo/shared';
 import { toNumber } from '@repo/shared';
@@ -350,6 +352,14 @@ export const budgetPlanService = {
 
   async generateMealPlan(userId: string, planId: string): Promise<GenerationKickoff> {
     return mealGenerationService.generate(userId, planId);
+  },
+
+  async rerollSlot(
+    userId: string,
+    planId: string,
+    input: RerollSlotInput,
+  ): Promise<RerollSlotResponse> {
+    return mealGenerationService.rerollSlot(userId, planId, input);
   },
 
   /**

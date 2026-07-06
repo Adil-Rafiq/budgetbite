@@ -4,6 +4,7 @@ import {
   decimal,
   index,
   integer,
+  jsonb,
   pgTable,
   timestamp,
   uniqueIndex,
@@ -85,6 +86,53 @@ export const mealSuggestion = pgTable(
       table.optionIndex,
     ),
     check('valid_option_index', sql`${table.optionIndex} >= 0`),
+  ],
+);
+
+/**
+ * One rejected option snapshot inside a reroll event. Denormalized (names and
+ * label are copied at reroll time) because the suggestion rows it describes
+ * are deleted in the same transaction — this is the only surviving record of
+ * what the user said "none of these" to.
+ */
+export interface RejectedSlotOption {
+  restaurantId: string;
+  restaurantName: string;
+  /** Combined combo label, e.g. "Zinger Burger + Fries". */
+  itemsLabel: string;
+  menuItemIds: string[];
+}
+
+/**
+ * One single-slot reroll event: the user asked for 3 fresh options for a
+ * (slotDate, mealType) cell and implicitly rejected the options it had.
+ *
+ * Serves two purposes:
+ *  - guard rail: COUNT(*) per (generationId, slotDate, mealTypeId) caps how
+ *    many times one slot can be rerolled per generation (each row is a paid
+ *    LLM call);
+ *  - feedback: rejectedOptions accumulate across rerolls of the same slot and
+ *    are replayed to the model as "do not suggest these again".
+ */
+export const mealSlotReroll = pgTable(
+  'meal_slot_reroll',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    budgetPlanId: uuid('budget_plan_id')
+      .notNull()
+      .references(() => budgetPlan.id, { onDelete: 'cascade' }),
+    generationId: uuid('generation_id')
+      .notNull()
+      .references(() => mealPlanGeneration.id, { onDelete: 'cascade' }),
+    slotDate: date('slot_date', { mode: 'string' }).notNull(),
+    mealTypeId: uuid('meal_type_id')
+      .notNull()
+      .references(() => mealType.id, { onDelete: 'restrict' }),
+    rejectedOptions: jsonb('rejected_options').$type<RejectedSlotOption[]>().default([]).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index('meal_slot_reroll_slot_idx').on(table.generationId, table.slotDate, table.mealTypeId),
   ],
 );
 

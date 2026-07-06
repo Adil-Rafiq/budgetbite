@@ -13,7 +13,6 @@
 ## Backlog
 
 - [ ] Dietary preferences & allergens in profile/onboarding, injected into the AI meal-plan prompt
-- [ ] Single-slot reroll: regenerate the 3 options for one meal slot (scoped to that slot's remaining budget); treat reroll as implicit "none of these" feedback
 - [ ] Learn from actual-vs-listed price gap: track per-restaurant delta between suggested price and logged spend, pad future estimates accordingly, and show "prices last updated N days ago"
 - [ ] Plan-end summary (saved/overspent, favorite cuisine, adherence) + one-click "start next plan with same settings" / recurring plans
 - [ ] Favorites & never-again lists: pin dishes/restaurants, block restaurants, pass as hard constraints to the AI prompt
@@ -29,6 +28,7 @@
 
 ## Done
 
+- [x] Single-slot reroll: regenerate the 3 options for one meal slot (scoped to that slot's remaining budget); treat reroll as implicit "none of these" feedback, with guard rails (per-user rate limit + per-slot reroll cap per generation + rejected options replayed as hard exclusions)
 - [x] Menu image upload for restaurant recommendations: upload a menu photo, AI extracts items (name + price + description) and pre-fills the editable items form, with graceful fallback to manual entry and anti-abuse guards (per-user rate limit, pending cap, image validation, hardened prompt)
 - [x] Combo meals per slot: a suggestion option is now a whole order (1–N menu items from one restaurant) with per-item and combined pricing
 - [x] The users can add restaurants of their choice with the approval of admin

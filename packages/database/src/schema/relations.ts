@@ -7,7 +7,12 @@ import { planContext } from './plan-context.js';
 import { mealType } from './meal-type.js';
 import { restaurant } from './restaurant.js';
 import { menuItem } from './menu-item.js';
-import { mealPlanGeneration, mealSuggestion, mealSuggestionItem } from './meal-plan.js';
+import {
+  mealPlanGeneration,
+  mealSlotReroll,
+  mealSuggestion,
+  mealSuggestionItem,
+} from './meal-plan.js';
 import { mealChoice } from './order.js';
 import { mealPin } from './meal-pin.js';
 import { feedback } from './feedback.js';
@@ -100,6 +105,23 @@ export const mealPlanGenerationRelations = relations(mealPlanGeneration, ({ one,
     references: [budgetPlan.id],
   }),
   mealSuggestions: many(mealSuggestion),
+  slotRerolls: many(mealSlotReroll),
+}));
+
+// Meal Slot Reroll Relations
+export const mealSlotRerollRelations = relations(mealSlotReroll, ({ one }) => ({
+  budgetPlan: one(budgetPlan, {
+    fields: [mealSlotReroll.budgetPlanId],
+    references: [budgetPlan.id],
+  }),
+  generation: one(mealPlanGeneration, {
+    fields: [mealSlotReroll.generationId],
+    references: [mealPlanGeneration.id],
+  }),
+  mealType: one(mealType, {
+    fields: [mealSlotReroll.mealTypeId],
+    references: [mealType.id],
+  }),
 }));
 
 // Meal Suggestion Relations

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { RerollSlotInput } from '@repo/shared';
 
 import { mealPlanApi } from '@/lib/api/endpoints/meal-plan';
 import { getErrorCode, getErrorMessage } from '@/lib/api/errors';
@@ -27,6 +28,59 @@ const GENERATION_ERROR_COPY: Record<string, { title: string; description: string
     description:
       'Every day in this plan already has meals. Adjust the plan’s dates to generate new suggestions.',
   },
+};
+
+const REROLL_ERROR_COPY: Record<string, { title: string; description: string }> = {
+  SLOT_REROLL_LIMIT_REACHED: {
+    title: 'Reroll limit reached',
+    description:
+      'This slot has been rerolled the maximum number of times. Pick one of the options, log your own meal, or regenerate the whole plan.',
+  },
+  RATE_LIMITED: {
+    title: 'Too many rerolls',
+    description: 'You have rerolled too many times in a short period. Wait a bit and try again.',
+  },
+  SLOT_PINNED: {
+    title: 'Slot is pinned',
+    description: 'Unpin this meal first to get new suggestions for it.',
+  },
+  SLOT_NOT_OPEN: {
+    title: 'Slot can’t be rerolled',
+    description: 'This meal is no longer open for new suggestions.',
+  },
+  SLOT_ALREADY_LOGGED: {
+    title: 'Meal already logged',
+    description: 'You’ve already logged this meal, so its suggestions can’t be rerolled.',
+  },
+  NO_ACTIVE_GENERATION: {
+    title: 'No plan generated yet',
+    description: 'Generate meal suggestions for this plan first, then reroll individual slots.',
+  },
+};
+
+/**
+ * Regenerate the 3 options for one meal slot. Synchronous — the fresh options
+ * come back in the response, so on success we refresh every read model that
+ * embeds slot suggestions (day view + plan timeline).
+ */
+export const useRerollSlot = (planId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: RerollSlotInput) => mealPlanApi.rerollSlot(planId, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['mealPlanSuggestions'] });
+      queryClient.invalidateQueries({ queryKey: ['planTimeline', planId] });
+    },
+    onError: (error, input) => {
+      const code = getErrorCode(error);
+      console.error('Slot reroll failed', { planId, input, code, error });
+      showToast.error(
+        code && REROLL_ERROR_COPY[code]
+          ? REROLL_ERROR_COPY[code]
+          : { title: 'Couldn’t get new suggestions', description: getErrorMessage(error) },
+      );
+    },
+  });
 };
 
 export const useGenerateMealPlan = () => {

@@ -40,6 +40,30 @@ export const orderRepository = {
       .orderBy(desc(mealChoice.slotDate), desc(mealChoice.createdAt));
   },
 
+  /**
+   * Whether a confirmed choice already exists for one (slotDate, mealType)
+   * cell of a plan. Used by the slot reroll to block regenerating a meal the
+   * user has already logged.
+   */
+  async hasChoiceForSlot(
+    budgetPlanId: string,
+    slotDate: string,
+    mealTypeId: string,
+  ): Promise<boolean> {
+    const [row] = await db
+      .select({ id: mealChoice.id })
+      .from(mealChoice)
+      .where(
+        and(
+          eq(mealChoice.budgetPlanId, budgetPlanId),
+          eq(mealChoice.slotDate, slotDate),
+          eq(mealChoice.mealTypeId, mealTypeId),
+        ),
+      )
+      .limit(1);
+    return !!row;
+  },
+
   async getSpentTotalByPlan(budgetPlanId: string): Promise<string> {
     const [row] = await db
       .select({

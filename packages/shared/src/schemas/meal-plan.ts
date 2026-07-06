@@ -9,6 +9,16 @@ export const getSuggestionsSchema = z.object({
   mealTypeId: uuidSchema.optional(),
 });
 
+/**
+ * Body for POST /budget-plans/:id/meal-plan/reroll-slot — regenerate the 3
+ * options for one (slotDate, mealType) cell of the active generation. The
+ * current options are treated as implicitly rejected ("none of these").
+ */
+export const rerollSlotSchema = z.object({
+  slotDate: isoDateStringSchema,
+  mealTypeId: uuidSchema,
+});
+
 // ─── Response DTOs ──────────────────────────────────────────────────────────
 
 /**
@@ -65,9 +75,21 @@ export const generateMealPlanResponseSchema = z.object({
   estimatedTotalCost: z.number().nonnegative().optional(),
 });
 
+/**
+ * Synchronous reroll result: the slot's fresh options plus how many rerolls
+ * this slot has left (drives the FE's button state / copy).
+ */
+export const rerollSlotResponseSchema = z.object({
+  date: z.string(),
+  slot: suggestionSlotSchema,
+  rerollsRemaining: z.number().int().nonnegative(),
+});
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type GetSuggestionsQuery = z.infer<typeof getSuggestionsSchema>;
+export type RerollSlotInput = z.infer<typeof rerollSlotSchema>;
+export type RerollSlotResponse = z.infer<typeof rerollSlotResponseSchema>;
 export type SuggestionOptionItem = z.infer<typeof suggestionOptionItemSchema>;
 export type SuggestionOption = z.infer<typeof suggestionOptionSchema>;
 export type SuggestionSlot = z.infer<typeof suggestionSlotSchema>;

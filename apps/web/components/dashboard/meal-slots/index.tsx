@@ -30,6 +30,7 @@ export function MealSlots() {
     isSlotsLoading,
     slotsError,
     isSaving,
+    isRerolling,
     expandedSlotId,
     expandedSlot,
     logModal,
@@ -357,6 +358,25 @@ export function MealSlots() {
                 </Pill>
               </div>
             ))}
+
+            {expandedSlotId &&
+              !loggedByMealType[expandedSlotId] &&
+              expandedSlot &&
+              expandedSlot.options.length > 0 &&
+              expandedSlot.options[0]?.source !== 'pin' && (
+                <Pill
+                  variant="ghost"
+                  size="sm"
+                  disabled={isRerolling}
+                  onClick={() => actions.handleReroll(expandedSlotId)}
+                  className="w-full"
+                >
+                  {isRerolling ? 'Finding new options…' : 'None of these? Get new options'}
+                  {!isRerolling && (
+                    <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.5 }}>↻</span>
+                  )}
+                </Pill>
+              )}
 
             <div className="my-1 h-px bg-lumen-dk" />
 

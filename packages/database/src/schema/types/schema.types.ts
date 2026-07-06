@@ -4,7 +4,12 @@ import { budgetPlanMealType } from '../budget-plan-meal-type.js';
 import { budgetPlan } from '../budget-plan.js';
 import { feedback } from '../feedback.js';
 import { restaurantRecommendation } from '../restaurant-recommendation.js';
-import { mealSuggestion, mealSuggestionItem, mealPlanGeneration } from '../meal-plan.js';
+import {
+  mealSuggestion,
+  mealSuggestionItem,
+  mealPlanGeneration,
+  mealSlotReroll,
+} from '../meal-plan.js';
 import { mealType } from '../meal-type.js';
 import { menuItem } from '../menu-item.js';
 import { mealChoice } from '../order.js';
@@ -59,6 +64,10 @@ export type UpdateMealSuggestion = Partial<Omit<NewMealSuggestion, 'id'>>;
 // Meal suggestion item types
 export type MealSuggestionItem = typeof mealSuggestionItem.$inferSelect;
 export type NewMealSuggestionItem = typeof mealSuggestionItem.$inferInsert;
+
+// Meal slot reroll types
+export type MealSlotReroll = typeof mealSlotReroll.$inferSelect;
+export type NewMealSlotReroll = typeof mealSlotReroll.$inferInsert;
 
 // Meal type types
 export type MealType = typeof mealType.$inferSelect;

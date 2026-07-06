@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { localDateString } from '@/lib/date';
-import { useMealPlanSuggestions } from '@/hooks/use-meal-plan';
+import { useMealPlanSuggestions, useRerollSlot } from '@/hooks/use-meal-plan';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useRecordMealChoice, useMealChoices } from '@/hooks/use-meal-choice';
 import { useSubmitFeedback } from '@/hooks/use-feedback';
@@ -74,6 +74,7 @@ export function useMealSlots() {
 
   const { mutateAsync: recordChoice, isPending: isSaving } = useRecordMealChoice(planId);
   const { mutateAsync: submitFeedback } = useSubmitFeedback();
+  const { mutateAsync: rerollSlot, isPending: isRerolling } = useRerollSlot(planId);
 
   const [expandedSlotId, setExpandedSlotId] = useState<string | null>(null);
   const [logModal, setLogModal] = useState<LogModalState>(CLOSED_MODAL);
@@ -86,6 +87,23 @@ export function useMealSlots() {
   };
 
   const closeLogModal = () => setLogModal(CLOSED_MODAL);
+
+  // "None of these" — swap the slot's 3 options for fresh AI suggestions.
+  // Errors are toasted by useRerollSlot; the dialog stays open so the user
+  // sees the options change in place.
+  const handleReroll = async (mealTypeId: string) => {
+    if (!planId) return;
+    const result = await rerollSlot({ slotDate: today, mealTypeId }).catch(() => null);
+    if (result) {
+      showToast.success({
+        title: 'New suggestions ready',
+        description:
+          result.rerollsRemaining > 0
+            ? `${result.rerollsRemaining} reroll${result.rerollsRemaining === 1 ? '' : 's'} left for this meal.`
+            : 'That was the last reroll for this meal.',
+      });
+    }
+  };
 
   const handleSave = async (payload: SavePayload) => {
     if (!logModal.mealTypeId || !planId) return;
@@ -132,6 +150,7 @@ export function useMealSlots() {
     isSlotsLoading,
     slotsError,
     isSaving,
+    isRerolling,
     expandedSlotId,
     expandedSlot,
     logModal,
@@ -141,6 +160,7 @@ export function useMealSlots() {
       openLogModal,
       closeLogModal,
       handleSave,
+      handleReroll,
     },
   };
 }
