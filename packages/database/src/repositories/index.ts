@@ -35,5 +35,6 @@ export { mealTypeRepository } from './meal-type.repo.js';
 export { planContextRepository } from './plan-context.repo.js';
 export { userPreferencesRepository } from './user-preferences.repo.js';
 export { auditRepository, type ListAuditLogsFilters } from './audit.repo.js';
+export { aiCallLogRepository, type ListAiCallLogsFilters } from './ai-call-log.repo.js';
 export { scraperRunRepository } from './scraper-run.repo.js';
 export { adminAnalyticsRepository } from './admin-analytics.repo.js';

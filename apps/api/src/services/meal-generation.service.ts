@@ -27,6 +27,7 @@ import {
 } from '@repo/ai/prompts';
 
 import { AppError } from '../middleware/error.middleware.js';
+import { logAICall, type AICallLogEntry } from '../lib/ai-log.js';
 import { llm } from '../lib/llm.js';
 import { contextBuilderService } from './context-builder.service.js';
 import { toOption } from './meal-plan.service.js';
@@ -151,7 +152,7 @@ export const mealGenerationService = {
     }
 
     const prompt = buildGeneratePlanPrompt(ctx);
-    return startGeneration({ planId, ctx, prompt, mode: 'generate' });
+    return startGeneration({ planId, userId, ctx, prompt, mode: 'generate' });
   },
 
   async replan(userId: string, planId: string, triggerSummary: string): Promise<GenerationKickoff> {
@@ -170,7 +171,7 @@ export const mealGenerationService = {
     }
 
     const prompt = buildReplanPrompt(ctx, triggerSummary);
-    return startGeneration({ planId, ctx, prompt, mode: 'replan' });
+    return startGeneration({ planId, userId, ctx, prompt, mode: 'replan' });
   },
 
   /**
@@ -292,17 +293,22 @@ export const mealGenerationService = {
     const menuItemIdsByRestaurant = buildMenuItemIdsByRestaurant(ctx.restaurants);
     const slotLabel = `${input.slotDate}/${mealType.key}`;
 
-    const { result: rows } = await callLLMWithRetries('reroll', prompt, (rawText) => {
-      const out = parseLLMJson(rawText, aiSlotRerollOutputSchema);
-      return validateSlotOptions(slotLabel, out.options, menuItemIdsByRestaurant).map(
-        (optionRow) => ({
-          generationId,
-          slotDate: input.slotDate,
-          mealTypeId: input.mealTypeId,
-          ...optionRow,
-        }),
-      );
-    });
+    const { result: rows } = await callLLMWithRetries(
+      'reroll',
+      prompt,
+      (rawText) => {
+        const out = parseLLMJson(rawText, aiSlotRerollOutputSchema);
+        return validateSlotOptions(slotLabel, out.options, menuItemIdsByRestaurant).map(
+          (optionRow) => ({
+            generationId,
+            slotDate: input.slotDate,
+            mealTypeId: input.mealTypeId,
+            ...optionRow,
+          }),
+        );
+      },
+      { operation: 'slot_reroll', userId, budgetPlanId: planId, generationId },
+    );
 
     await db.transaction(async (tx) => {
       await mealPlanRepository.insertSlotReroll(
@@ -376,6 +382,7 @@ async function assertPlanOwnership(userId: string, planId: string): Promise<void
 
 interface RunArgs {
   planId: string;
+  userId: string;
   ctx: MealPlannerContext;
   prompt: string;
   mode: 'generate' | 'replan';
@@ -415,7 +422,7 @@ async function startGeneration(args: RunArgs): Promise<GenerationKickoff> {
  */
 async function executeGeneration(
   generationId: string,
-  { planId, ctx, prompt, mode }: RunArgs,
+  { planId, userId, ctx, prompt, mode }: RunArgs,
 ): Promise<void> {
   const startedAt = Date.now();
 
@@ -435,8 +442,16 @@ async function executeGeneration(
     };
 
     // ─── 2. Call the LLM with the shared retry-on-validation-failure loop ───
-    const { result, response } = await callLLMWithRetries(mode, prompt, (rawText) =>
-      parseAndValidate(rawText, generationId, validators),
+    const { result, response } = await callLLMWithRetries(
+      mode,
+      prompt,
+      (rawText) => parseAndValidate(rawText, generationId, validators),
+      {
+        operation: mode === 'generate' ? 'plan_generate' : 'plan_replan',
+        userId,
+        budgetPlanId: planId,
+        generationId,
+      },
     );
     const { plan, rows } = result;
 
@@ -540,6 +555,14 @@ async function callLLM(messages: LLMMessage[], maxTokens: number): Promise<LLMRe
   });
 }
 
+/** Identifies the logical operation an attempt belongs to in ai_call_log. */
+interface AICallContext {
+  operation: 'plan_generate' | 'plan_replan' | 'slot_reroll';
+  userId: string;
+  budgetPlanId: string;
+  generationId: string;
+}
+
 /**
  * Shared retry-on-validation-failure loop around `callLLM`. Each retry replays
  * the original prompt + the previous (invalid) response + a fresh user turn
@@ -548,23 +571,52 @@ async function callLLM(messages: LLMMessage[], maxTokens: number): Promise<LLMRe
  * Truncation (finishReason='length') gets its own retry path with a higher
  * token budget so we don't loop on impossible budgets. Exhausted attempts and
  * provider failures surface as `AppError(502)`.
+ *
+ * Every attempt — including the ones that get retried — writes one
+ * ai_call_log row (fire-and-forget) with tokens, latency, and the outcome.
  */
 async function callLLMWithRetries<T>(
   logTag: string,
   prompt: string,
   parse: (rawText: string) => T,
+  callCtx: AICallContext,
 ): Promise<{ result: T; response: LLMResponse }> {
   const maxRetries = getGenerationMaxRetries();
   const baseUserTurn: LLMMessage = { role: 'user', content: prompt };
   let messages: LLMMessage[] = [baseUserTurn];
   let maxTokens = getGenerationMaxTokens();
 
+  const logAttempt = (
+    attempt: number,
+    latencyMs: number,
+    status: AICallLogEntry['status'],
+    response: LLMResponse | null,
+    error?: { code?: string; message?: string },
+  ): void =>
+    logAICall({
+      ...callCtx,
+      provider: response?.provider ?? llm.name,
+      model: response?.model ?? llm.defaultModel,
+      status,
+      attempt,
+      inputTokens: response?.inputTokens ?? null,
+      outputTokens: response?.outputTokens ?? null,
+      latencyMs,
+      errorCode: error?.code ?? null,
+      errorMessage: error?.message ?? null,
+    });
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     const isLastAttempt = attempt === maxRetries;
+    const attemptStartedAt = Date.now();
     let response: LLMResponse;
     try {
       response = await callLLM(messages, maxTokens);
     } catch (err) {
+      logAttempt(attempt + 1, Date.now() - attemptStartedAt, 'provider_error', null, {
+        code: 'AI_PROVIDER_ERROR',
+        message: err instanceof Error ? err.message : String(err),
+      });
       console.error(
         `[mealGenerationService:${logTag}] llm.complete failed (attempt ${attempt + 1}/${maxRetries + 1})`,
         err,
@@ -573,8 +625,13 @@ async function callLLMWithRetries<T>(
       // re-asking with feedback — bail immediately.
       throw new AppError(502, 'AI provider failed', 'AI_PROVIDER_ERROR', { cause: err });
     }
+    const latencyMs = Date.now() - attemptStartedAt;
 
     if (response.finishReason === 'length') {
+      logAttempt(attempt + 1, latencyMs, 'truncated', response, {
+        code: 'AI_RESPONSE_TRUNCATED',
+        message: `max_tokens=${maxTokens} reached`,
+      });
       if (isLastAttempt) {
         throw new AppError(502, 'AI response truncated by token limit', 'AI_RESPONSE_TRUNCATED', {
           cause: new Error(`max_tokens=${maxTokens} reached`),
@@ -592,8 +649,13 @@ async function callLLMWithRetries<T>(
     }
 
     try {
-      return { result: parse(response.text), response };
+      const result = parse(response.text);
+      logAttempt(attempt + 1, latencyMs, 'succeeded', response);
+      return { result, response };
     } catch (err) {
+      logAttempt(attempt + 1, latencyMs, 'validation_failed', response, {
+        message: err instanceof Error ? err.message : String(err),
+      });
       if (err instanceof RetriableLLMError && !isLastAttempt) {
         console.warn(
           `[mealGenerationService:${logTag}] validation failed (attempt ${attempt + 1}/${maxRetries + 1}); retrying with feedback: ${err.feedback}`,

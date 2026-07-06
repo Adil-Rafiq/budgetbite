@@ -2,6 +2,7 @@ import type {
   CreateRestaurantRecommendationInput,
   ExtractedMenuResponse,
   ExtractMenuFromImageInput,
+  LLMResponse,
   ListRestaurantRecommendationsQuery,
   MenuImageMimeType,
   RecommendationStatus,
@@ -23,6 +24,7 @@ import {
 import { buildMenuExtractionPrompt, MENU_EXTRACTION_SYSTEM_PROMPT } from '@repo/ai/prompts';
 
 import { AppError } from '../middleware/error.middleware.js';
+import { logAICall } from '../lib/ai-log.js';
 import { llm } from '../lib/llm.js';
 import { auditService } from './audit.service.js';
 import type { AuditActor } from '../lib/audit-actor.js';
@@ -218,23 +220,57 @@ export const restaurantRecommendationService = {
 
     assertValidMenuImage(input.image, input.mimeType);
 
-    const response = await llm.complete(
-      [
+    const startedAt = Date.now();
+    let response: LLMResponse;
+    try {
+      response = await llm.complete(
+        [
+          {
+            role: 'user',
+            content: buildMenuExtractionPrompt(MAX_RECOMMENDATION_ITEMS),
+            images: [{ data: input.image, mimeType: input.mimeType }],
+          },
+        ],
         {
-          role: 'user',
-          content: buildMenuExtractionPrompt(MAX_RECOMMENDATION_ITEMS),
-          images: [{ data: input.image, mimeType: input.mimeType }],
+          systemPrompt: MENU_EXTRACTION_SYSTEM_PROMPT,
+          temperature: 0,
+          maxTokens: MENU_EXTRACTION_MAX_TOKENS,
+          jsonMode: true,
         },
-      ],
-      {
-        systemPrompt: MENU_EXTRACTION_SYSTEM_PROMPT,
-        temperature: 0,
-        maxTokens: MENU_EXTRACTION_MAX_TOKENS,
-        jsonMode: true,
-      },
-    );
+      );
+    } catch (err) {
+      logAICall({
+        operation: 'menu_extraction',
+        userId,
+        provider: llm.name,
+        model: llm.defaultModel,
+        status: 'provider_error',
+        latencyMs: Date.now() - startedAt,
+        errorCode: 'AI_PROVIDER_ERROR',
+        errorMessage: err instanceof Error ? err.message : String(err),
+      });
+      throw new AppError(502, 'AI provider failed', 'AI_PROVIDER_ERROR', { cause: err });
+    }
+    const latencyMs = Date.now() - startedAt;
+    const logOutcome = (
+      status: 'succeeded' | 'validation_failed' | 'truncated',
+      errorMessage?: string,
+    ): void =>
+      logAICall({
+        operation: 'menu_extraction',
+        userId,
+        provider: response.provider,
+        model: response.model,
+        status,
+        inputTokens: response.inputTokens ?? null,
+        outputTokens: response.outputTokens ?? null,
+        latencyMs,
+        errorCode: status === 'succeeded' ? null : 'AI_EXTRACTION_FAILED',
+        errorMessage: errorMessage ?? null,
+      });
 
     if (response.finishReason === 'length') {
+      logOutcome('truncated', `max_tokens=${MENU_EXTRACTION_MAX_TOKENS} reached`);
       throw new AppError(
         502,
         'The menu could not be read completely. Try a clearer photo, or add the items manually.',
@@ -246,6 +282,7 @@ export const restaurantRecommendationService = {
     try {
       output = aiMenuExtractionOutputSchema.parse(JSON.parse(stripFences(response.text)));
     } catch (err) {
+      logOutcome('validation_failed', err instanceof Error ? err.message : String(err));
       throw new AppError(
         502,
         'The menu photo could not be read. Try a clearer photo, or add the items manually.',
@@ -255,6 +292,7 @@ export const restaurantRecommendationService = {
     }
 
     const items = sanitizeExtractedItems(output.items);
+    logOutcome('succeeded');
 
     console.info(
       '[restaurantRecommendationService] menu extraction',

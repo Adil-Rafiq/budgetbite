@@ -18,6 +18,7 @@ import { restaurant } from '../restaurant.js';
 import { planContext } from '../plan-context.js';
 import { userPreferences } from '../user-preferences.js';
 import { auditLog } from '../audit-log.js';
+import { aiCallLog } from '../ai-call-log.js';
 import { scraperRun } from '../scraper-run.js';
 
 // Auth types
@@ -107,6 +108,10 @@ export type UpdateUserPreferences = Partial<Omit<NewUserPreferences, 'userId'>>;
 // Audit log types
 export type AuditLog = typeof auditLog.$inferSelect;
 export type NewAuditLog = typeof auditLog.$inferInsert;
+
+// AI call log types
+export type AiCallLog = typeof aiCallLog.$inferSelect;
+export type NewAiCallLog = typeof aiCallLog.$inferInsert;
 
 // Scraper run types
 export type ScraperRun = typeof scraperRun.$inferSelect;

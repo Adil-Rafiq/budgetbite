@@ -5,8 +5,9 @@ import {
   userPreferencesRepository,
   feedbackRepository,
 } from '@repo/database';
-import type { ProcessFeedbackInput, AIOperationResult } from '@repo/shared';
+import type { LLMResponse, ProcessFeedbackInput, AIOperationResult } from '@repo/shared';
 import { SYSTEM_PROMPT, buildPreferenceExtractionPrompt } from '@repo/ai/prompts';
+import { logAICall } from '../lib/ai-log.js';
 import { llm } from '../lib/llm.js';
 
 interface PreferenceExtractionOutput {
@@ -48,25 +49,61 @@ export const preferenceService = {
       const currentPrefs = await userPreferencesRepository.findByUserId(userId);
 
       // 5. Extract preference signals via LLM
-      const response = await llm.complete(
-        [
-          {
-            role: 'user',
-            content: buildPreferenceExtractionPrompt(currentPrefs?.feedbackSummary ?? null, {
-              restaurantName: choice.restaurantName ?? 'Unknown restaurant',
-              menuItemName,
-              rating: input.rating,
-              liked: input.liked,
-              comment: input.comment,
-              mealTypeLabel: choice.mealTypeLabel,
-              slotDate: choice.slotDate,
-            }),
-          },
-        ],
-        { systemPrompt: SYSTEM_PROMPT, temperature: 0.2, maxTokens: 1024 },
-      );
+      const startedAt = Date.now();
+      let response: LLMResponse;
+      try {
+        response = await llm.complete(
+          [
+            {
+              role: 'user',
+              content: buildPreferenceExtractionPrompt(currentPrefs?.feedbackSummary ?? null, {
+                restaurantName: choice.restaurantName ?? 'Unknown restaurant',
+                menuItemName,
+                rating: input.rating,
+                liked: input.liked,
+                comment: input.comment,
+                mealTypeLabel: choice.mealTypeLabel,
+                slotDate: choice.slotDate,
+              }),
+            },
+          ],
+          { systemPrompt: SYSTEM_PROMPT, temperature: 0.2, maxTokens: 1024 },
+        );
+      } catch (err) {
+        logAICall({
+          operation: 'preference_extraction',
+          userId,
+          provider: llm.name,
+          model: llm.defaultModel,
+          status: 'provider_error',
+          latencyMs: Date.now() - startedAt,
+          errorCode: 'AI_PROVIDER_ERROR',
+          errorMessage: err instanceof Error ? err.message : String(err),
+        });
+        throw err;
+      }
+      const latencyMs = Date.now() - startedAt;
+      const logOutcome = (status: 'succeeded' | 'validation_failed', errorMessage?: string): void =>
+        logAICall({
+          operation: 'preference_extraction',
+          userId,
+          provider: response.provider,
+          model: response.model,
+          status,
+          inputTokens: response.inputTokens ?? null,
+          outputTokens: response.outputTokens ?? null,
+          latencyMs,
+          errorMessage: errorMessage ?? null,
+        });
 
-      const extracted = this.parseExtraction(response.text);
+      let extracted: PreferenceExtractionOutput;
+      try {
+        extracted = this.parseExtraction(response.text);
+      } catch (err) {
+        logOutcome('validation_failed', err instanceof Error ? err.message : String(err));
+        throw err;
+      }
+      logOutcome('succeeded');
 
       // 6. Resolve restaurantId if user disliked the restaurant
       let dislikedRestaurantIds = currentPrefs?.dislikedRestaurantIds ?? [];
