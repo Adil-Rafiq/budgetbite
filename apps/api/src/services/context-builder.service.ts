@@ -16,37 +16,14 @@ import type {
   NearbyRestaurantContext,
 } from '@repo/shared';
 
+import { applyPinAdjustment } from '../lib/plan-math.js';
+
 const NEARBY_RADIUS_KM = Number(process.env.NEARBY_RADIUS_KM) || 5;
 const MAX_RESTAURANTS = Number(process.env.MAX_RESTAURANTS) || 20;
 const MAX_ITEMS_PER_RESTAURANT = Number(process.env.MAX_ITEMS_PER_RESTAURANT) || 15;
 
 function todayDateString(): string {
   return new Date().toISOString().slice(0, 10);
-}
-
-/**
- * Subtract pinned-slot allocation from raw budget state. plan_context tracks
- * choice-driven spend only — pins are pre-allocations the user has committed
- * to but not yet logged, so for the LLM (and the FE budget-fit indicator) we
- * present a budget that already accounts for them.
- *
- * Adjusted fields: amountRemaining, mealsRemaining, avgBudgetPerRemainingMeal.
- * Untouched: amountSpent, mealsConsumed, totalBudget, totalMeals, cumulativeVariance.
- */
-export function applyPinAdjustment(
-  raw: BudgetStateContext,
-  pinSpend: number,
-  pinCount: number,
-): BudgetStateContext {
-  const amountRemaining = Math.max(0, raw.amountRemaining - pinSpend);
-  const mealsRemaining = Math.max(0, raw.mealsRemaining - pinCount);
-  const avgBudgetPerRemainingMeal = mealsRemaining > 0 ? amountRemaining / mealsRemaining : 0;
-  return {
-    ...raw,
-    amountRemaining,
-    mealsRemaining,
-    avgBudgetPerRemainingMeal,
-  };
 }
 
 /**

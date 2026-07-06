@@ -44,7 +44,9 @@ pnpm --filter api dev         # tsx watch src/index.ts
 pnpm --filter @repo/database db:studio   # Drizzle Studio
 ```
 
-There is no test runner configured yet.
+### Tests
+
+`pnpm test` runs `turbo run test` (Vitest in `@repo/shared` and `apps/api`). Test files are co-located as `src/**/*.test.ts` and are excluded from the tsc build via each package's `tsconfig.json` — keep that exclude in mind when adding tests, or they will be emitted into `dist/`. Only pure logic is covered so far (plan-budget arithmetic in `apps/api/src/lib/plan-math.ts`, numeric string↔number boundary, Haversine distance, AI-output Zod schemas); there is no DB or HTTP test harness. Keep testable arithmetic in pure modules (e.g. `plan-math.ts`) rather than inside services, whose module graphs pull in `@repo/ai` provider construction at import time.
 
 ## Architecture notes that aren't obvious from one file
 

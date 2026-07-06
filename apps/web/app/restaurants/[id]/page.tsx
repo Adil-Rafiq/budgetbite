@@ -4,7 +4,7 @@ import { useMemo, useState, use } from 'react';
 import Link from 'next/link';
 import { ExternalLink, Phone, Search, Star, Utensils } from 'lucide-react';
 
-import { classifyBudgetFit } from '@repo/shared';
+import { classifyBudgetFit, haversineKm } from '@repo/shared';
 import type { BudgetFit, MenuItem } from '@repo/shared';
 
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
@@ -45,17 +45,6 @@ const FIT_RANK: Record<BudgetFit | 'none', number> = {
 
 function buildFoodpandaUrl(externalId: string, slug: string): string {
   return `https://www.foodpanda.pk/restaurant/${externalId}/${slug}`;
-}
-
-function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 const formatPkr = (n: number) => `₨ ${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;

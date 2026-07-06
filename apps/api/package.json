@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "eslint --max-warnings 0",
+    "test": "vitest run",
     "auth:generate": "pnpm dlx auth@latest generate --config ./src/lib/auth.ts --output ../../packages/database/src/schema/auth.ts --yes"
   },
   "dependencies": {
@@ -33,6 +34,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.15.3",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
   }
 }

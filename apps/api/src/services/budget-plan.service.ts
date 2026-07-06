@@ -37,7 +37,7 @@ import {
 } from '@repo/database';
 
 import { AppError } from '../middleware/error.middleware.js';
-import { applyPinAdjustment } from './context-builder.service.js';
+import { applyPinAdjustment, totalMealsForPlan } from '../lib/plan-math.js';
 import { mealGenerationService, type GenerationKickoff } from './meal-generation.service.js';
 import { toOption, type SuggestionRow } from './meal-plan.service.js';
 
@@ -65,18 +65,6 @@ function todayDateString(): string {
 // method that opens its own transaction, or through db.transaction() in this
 // file passing `tx` to every repo call.
 // ─────────────────────────────────────────────────────────────────────────────
-
-function totalMealsForPlan(input: {
-  mealsPerDay: number;
-  startDate: string;
-  endDate: string;
-}): number {
-  const start = new Date(input.startDate);
-  const end = new Date(input.endDate);
-  const msPerDay = 1000 * 60 * 60 * 24;
-  const days = Math.max(1, Math.round((end.getTime() - start.getTime()) / msPerDay) + 1);
-  return input.mealsPerDay * days;
-}
 
 function toBudgetStateContext(ctx: PlanContextRelationRow): BudgetStateContext {
   return {

@@ -14,7 +14,7 @@ import {
   userRepository,
 } from '@repo/database';
 import { AppError } from '../middleware/error.middleware.js';
-import { applyPinAdjustment } from './context-builder.service.js';
+import { applyPinAdjustment } from '../lib/plan-math.js';
 import { auditService } from './audit.service.js';
 import type { AuditActor } from '../lib/audit-actor.js';
 
