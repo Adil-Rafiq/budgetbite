@@ -100,6 +100,7 @@ Key vars: `DATABASE_URL`, `DIRECT_DATABASE_URL` (for Drizzle migrations), `BETTE
 
 ## Conventions
 
+- Pushing directly to `main` is fine. The repo has a "changes via pull request" branch rule, but the owner deliberately bypasses it with admin rights — do not flag the bypass warning or suggest a PR workflow.
 - ESM everywhere; in `apps/api` and `packages/database`/`packages/ai`, relative imports must end in `.js` even though the source is `.ts`.
 - ESLint runs with `--max-warnings 0`; warnings fail CI/turbo.
 - Do not edit auto-generated files: `packages/database/src/schema/auth.ts` (better-auth) and `packages/database/drizzle/*.sql` / `meta/*.json` (drizzle-kit).
