@@ -1,6 +1,7 @@
 import type { Response } from 'express';
 import type {
   CreateRestaurantRecommendationInput,
+  ExtractMenuFromImageInput,
   ListRestaurantRecommendationsQuery,
 } from '@repo/shared';
 
@@ -13,6 +14,14 @@ export async function submitRecommendation(req: AuthRequest, res: Response): Pro
     req.body as CreateRestaurantRecommendationInput,
   );
   res.status(201).json(result);
+}
+
+export async function extractMenuFromImage(req: AuthRequest, res: Response): Promise<void> {
+  const result = await restaurantRecommendationService.extractMenuFromImage(
+    req.userId!,
+    req.body as ExtractMenuFromImageInput,
+  );
+  res.json(result);
 }
 
 export async function listMyRecommendations(req: AuthRequest, res: Response): Promise<void> {

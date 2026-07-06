@@ -13,8 +13,8 @@
       "default": "./dist/providers/index.js"
     },
     "./prompts": {
-      "types": "./dist/prompts/meal-planner.prompts.d.ts",
-      "default": "./dist/prompts/meal-planner.prompts.js"
+      "types": "./dist/prompts/index.d.ts",
+      "default": "./dist/prompts/index.js"
     }
   },
   "scripts": {

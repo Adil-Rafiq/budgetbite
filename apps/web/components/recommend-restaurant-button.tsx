@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { z } from 'zod';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, X } from 'lucide-react';
+import { ImageUp, Plus, X } from 'lucide-react';
 import {
   createRestaurantRecommendationSchema,
   MAX_PENDING_RESTAURANT_RECOMMENDATIONS,
@@ -14,9 +14,12 @@ import {
 } from '@repo/shared';
 
 import {
+  useExtractMenuFromImage,
   useMyRecommendations,
   useSubmitRecommendation,
 } from '@/hooks/use-restaurant-recommendations';
+import { fileToMenuImagePayload, MenuImageError } from '@/lib/menu-image';
+import { showToast } from '@/lib/toast';
 import { useUser } from '@/hooks/use-user';
 import { useDetectLocation } from '@/hooks/use-detect-location';
 import { DEFAULT_COORDINATES } from '@/app/onboarding/constants';
@@ -110,7 +113,65 @@ export function RecommendRestaurantButton({
     },
   });
 
-  const { fields, append, remove } = useFieldArray({ control, name: 'items' });
+  const { fields, append, remove, replace } = useFieldArray({ control, name: 'items' });
+
+  // ── AI menu extraction from an uploaded photo ─────────────────────────────
+  const extract = useExtractMenuFromImage();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const onMenuPhotoSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-selecting the same file after a failure
+    if (!file) return;
+
+    let payload;
+    try {
+      payload = await fileToMenuImagePayload(file);
+    } catch (err) {
+      showToast.error({
+        title: 'Could not use that photo',
+        description:
+          err instanceof MenuImageError ? err.message : 'Please choose a JPEG, PNG, or WebP image.',
+      });
+      return;
+    }
+
+    extract.mutate(payload, {
+      onSuccess: ({ items }) => {
+        if (items.length === 0) {
+          showToast.info({
+            title: 'No menu items found',
+            description:
+              'We couldn’t spot any items on that photo. Try a clearer one, or add them manually below.',
+          });
+          return;
+        }
+        // Prefill (replacing whatever was typed) — the user reviews/edits before submitting.
+        replace(
+          items.map((i) => ({
+            name: i.name,
+            price: String(i.price),
+            description: i.description ?? undefined,
+          })),
+        );
+        // Prices flagged as non-PKR are prefilled as printed (never converted)
+        // — the user must convert them before submitting.
+        const foreign = items.filter((i) => i.foreignCurrency);
+        if (foreign.length > 0) {
+          const currencies = [...new Set(foreign.map((i) => i.foreignCurrency))].join(', ');
+          showToast.warning({
+            title: `Found ${items.length} menu item${items.length === 1 ? '' : 's'} — check the currency`,
+            description: `${foreign.length} price${foreign.length === 1 ? ' looks' : 's look'} like ${currencies}, not PKR. Please convert ${foreign.length === 1 ? 'it' : 'them'} to PKR before submitting.`,
+          });
+        } else {
+          showToast.success({
+            title: `Found ${items.length} menu item${items.length === 1 ? '' : 's'}`,
+            description: 'Check names and prices below before submitting.',
+          });
+        }
+      },
+    });
+  };
 
   // Re-seed the pin to the user's location each time the dialog opens.
   useEffect(() => {
@@ -279,6 +340,39 @@ export function RecommendRestaurantButton({
                 <Label className={labelClass} style={labelStyle}>
                   Menu items
                 </Label>
+                {/* AI prefill from a photo — replaces the rows below; falls back to manual entry. */}
+                <div className="flex items-center gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={onMenuPhotoSelected}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={extract.isPending}
+                  >
+                    {extract.isPending ? (
+                      <>
+                        <span
+                          className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current"
+                          style={{ borderTopColor: 'transparent' }}
+                        />
+                        Reading menu…
+                      </>
+                    ) : (
+                      <>
+                        <ImageUp className="h-3.5 w-3.5" />
+                        Upload a menu photo
+                      </>
+                    )}
+                  </Button>
+                  <span className="text-[11px] text-soft">or type the items yourself</span>
+                </div>
                 <div className="flex flex-col gap-2">
                   {fields.map((field, i) => (
                     <div key={field.id} className="flex flex-col gap-1">

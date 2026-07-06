@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, type Part } from '@google/genai';
 import type { LLMFinishReason, LLMMessage, LLMRequestOptions, LLMResponse } from '@repo/shared';
 import { BaseLLMProvider } from './base.provider.js';
 
@@ -18,7 +18,7 @@ export class GeminiProvider extends BaseLLMProvider {
   async complete(messages: LLMMessage[], options: LLMRequestOptions = {}): Promise<LLMResponse> {
     const history = messages.slice(0, -1).map((m) => ({
       role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }],
+      parts: toGeminiParts(m),
     }));
 
     const lastMessage = messages[messages.length - 1];
@@ -38,7 +38,7 @@ export class GeminiProvider extends BaseLLMProvider {
       },
     });
 
-    const result = await chat.sendMessage({ message: lastMessage.content });
+    const result = await chat.sendMessage({ message: toGeminiParts(lastMessage) });
     const finishReason = mapGeminiFinishReason(
       result.candidates?.[0]?.finishReason as string | undefined,
     );
@@ -52,6 +52,18 @@ export class GeminiProvider extends BaseLLMProvider {
       finishReason,
     };
   }
+}
+
+/** Text (+ optional inline images on user turns) → Gemini `Part[]`. */
+function toGeminiParts(message: LLMMessage): Part[] {
+  const parts: Part[] =
+    message.role === 'user' && message.images?.length
+      ? message.images.map((img) => ({
+          inlineData: { mimeType: img.mimeType, data: img.data },
+        }))
+      : [];
+  parts.push({ text: message.content });
+  return parts;
 }
 
 function mapGeminiFinishReason(reason: string | undefined): LLMFinishReason {

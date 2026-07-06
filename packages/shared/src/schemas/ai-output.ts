@@ -42,9 +42,33 @@ export const aiPlanOutputSchema = z.object({
   estimatedTotalCost: z.number().nonnegative(),
 });
 
+// ─── Menu image extraction output ────────────────────────────────────────────
+
+/**
+ * What the LLM returns when asked to read menu items off a photo. Deliberately
+ * loose (price may come back as a string, descriptions may be null/missing);
+ * the service sanitizes each item against `recommendationItemInputSchema` and
+ * drops the ones that don't survive, so one garbled row never fails the whole
+ * extraction. The array cap bounds how much model output we ever process.
+ */
+export const aiMenuExtractionOutputSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        name: z.string(),
+        price: z.coerce.number(),
+        description: z.string().nullish(),
+        /** ISO code or symbol when the printed price is clearly not PKR. */
+        foreignCurrency: z.string().nullish(),
+      }),
+    )
+    .max(100),
+});
+
 // ─── Inferred types ──────────────────────────────────────────────────────────
 
 export type AIPlanOptionItem = z.infer<typeof aiPlanOptionItemSchema>;
 export type AIPlanOption = z.infer<typeof aiPlanOptionSchema>;
 export type AIPlanSlot = z.infer<typeof aiPlanSlotSchema>;
 export type AIPlanOutput = z.infer<typeof aiPlanOutputSchema>;
+export type AIMenuExtractionOutput = z.infer<typeof aiMenuExtractionOutputSchema>;

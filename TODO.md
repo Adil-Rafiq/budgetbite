@@ -9,7 +9,6 @@
 - [ ] There's a mismatch between web and api better-auth setup
 - [ ] After log-in the user should go to /onboarding if their profile is not set yet
 - [ ] Integrate a logger
-- [ ] Menu image upload for restaurant recommendations: instead of typing menu items one by one, let the user upload a photo of the menu. Pass the image to the AI to extract the items (name + price, description if present) and pre-fill the editable items form. The user verifies/edits the extracted items, then submits the recommendation. Should fall back gracefully to manual entry if extraction fails or finds nothing.
 
 ## Backlog
 
@@ -19,6 +18,7 @@
 
 ## Done
 
+- [x] Menu image upload for restaurant recommendations: upload a menu photo, AI extracts items (name + price + description) and pre-fills the editable items form, with graceful fallback to manual entry and anti-abuse guards (per-user rate limit, pending cap, image validation, hardened prompt)
 - [x] Combo meals per slot: a suggestion option is now a whole order (1–N menu items from one restaurant) with per-item and combined pricing
 - [x] The users can add restaurants of their choice with the approval of admin
 - [x] At a time only up to certain number of approval requests for restaurants will be allowed per user

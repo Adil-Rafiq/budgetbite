@@ -25,7 +25,21 @@ export class OpenAIProvider extends BaseLLMProvider {
         ...(options.systemPrompt
           ? [{ role: 'system' as const, content: options.systemPrompt }]
           : []),
-        ...messages.map((m) => ({ role: m.role, content: m.content })),
+        ...messages.map(
+          (m): OpenAI.Chat.ChatCompletionMessageParam =>
+            m.role === 'user' && m.images?.length
+              ? {
+                  role: 'user',
+                  content: [
+                    ...m.images.map((img) => ({
+                      type: 'image_url' as const,
+                      image_url: { url: `data:${img.mimeType};base64,${img.data}` },
+                    })),
+                    { type: 'text' as const, text: m.content },
+                  ],
+                }
+              : { role: m.role, content: m.content },
+        ),
       ],
     });
 
