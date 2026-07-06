@@ -38,6 +38,27 @@ export const useSubmitRecommendation = () => {
   });
 };
 
+/** Withdraw a still-pending recommendation. Reviewed ones can't be withdrawn. */
+export const useWithdrawRecommendation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => restaurantRecommendationApi.withdraw(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MY_RECOMMENDATIONS_KEY });
+      showToast.success({
+        title: 'Recommendation withdrawn',
+        description: 'It has been removed from the review queue.',
+      });
+    },
+    onError: (err) => {
+      showToast.error({
+        title: 'Could not withdraw recommendation',
+        description: getErrorMessage(err),
+      });
+    },
+  });
+};
+
 /**
  * AI menu-item extraction from an uploaded menu photo. Success/empty handling
  * lives in the caller (it prefills the form); this hook only owns the error
