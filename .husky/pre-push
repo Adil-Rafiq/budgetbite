@@ -1,4 +1,5 @@
 pnpm check-types
 pnpm lint
 pnpm build
+pnpm test
 pnpm format:check
