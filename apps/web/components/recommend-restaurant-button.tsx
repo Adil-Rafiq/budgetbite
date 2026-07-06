@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { z } from 'zod';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -53,12 +54,6 @@ const errorClass = 'text-[11px] text-pulse';
 
 // Empty string → undefined so optional fields are omitted, not sent as ''.
 const optionalString = (v: unknown) => (v === '' || v == null ? undefined : v);
-
-const STATUS_PILL: Record<string, string> = {
-  pending: 'bg-amber/[0.12] text-amber',
-  approved: 'bg-fathom/10 text-fathom',
-  rejected: 'bg-pulse/10 text-pulse',
-};
 
 const EMPTY_ITEM = { name: '', price: '', description: undefined };
 
@@ -242,7 +237,15 @@ export function RecommendRestaurantButton({
           {atCap ? (
             <div className="rounded-xl border border-amber/30 bg-amber/[0.06] p-4 text-[13px] text-ink">
               You’ve reached the limit of {MAX_PENDING_RESTAURANT_RECOMMENDATIONS} recommendations
-              awaiting review. Once an admin reviews one, you can send another.
+              awaiting review. Once an admin reviews one — or you{' '}
+              <Link
+                href="/restaurants/recommendations"
+                className="text-fathom underline underline-offset-2"
+                onClick={() => setOpen(false)}
+              >
+                withdraw one
+              </Link>{' '}
+              — you can send another.
             </div>
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -455,23 +458,18 @@ export function RecommendRestaurantButton({
           )}
 
           {mine.length > 0 && (
-            <div className="mt-1 border-t border-lumen-dk pt-3">
-              <p className={labelClass} style={labelStyle}>
-                your recommendations
-              </p>
-              <ul className="mt-2 flex flex-col gap-1.5">
-                {mine.slice(0, 5).map((r) => (
-                  <li key={r.id} className="flex items-center justify-between gap-2 text-[13px]">
-                    <span className="truncate text-vast">{r.name}</span>
-                    <span
-                      className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] ${STATUS_PILL[r.status]}`}
-                      style={{ fontFamily: 'var(--font-mono)' }}
-                    >
-                      {r.status}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+            <div className="mt-1 flex items-center justify-between gap-2 border-t border-lumen-dk pt-3">
+              <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+                {pendingCount} / {MAX_PENDING_RESTAURANT_RECOMMENDATIONS} pending review
+              </span>
+              <Link
+                href="/restaurants/recommendations"
+                className="text-[12px] text-fathom underline-offset-2 hover:underline"
+                style={{ fontFamily: 'var(--font-mono)' }}
+                onClick={() => setOpen(false)}
+              >
+                view your recommendations →
+              </Link>
             </div>
           )}
         </DialogContent>
