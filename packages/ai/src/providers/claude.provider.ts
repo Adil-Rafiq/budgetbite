@@ -18,7 +18,22 @@ export class ClaudeProvider extends BaseLLMProvider {
   async complete(messages: LLMMessage[], options: LLMRequestOptions = {}): Promise<LLMResponse> {
     // Anthropic has no JSON mode; prefilling the assistant turn with `{` is
     // the documented way to coerce a JSON-only response.
-    const apiMessages = messages.map((m) => ({ role: m.role, content: m.content }));
+    const apiMessages: Anthropic.MessageParam[] = messages.map((m) =>
+      m.role === 'user' && m.images?.length
+        ? {
+            role: 'user',
+            content: [
+              ...m.images.map(
+                (img): Anthropic.ImageBlockParam => ({
+                  type: 'image',
+                  source: { type: 'base64', media_type: img.mimeType, data: img.data },
+                }),
+              ),
+              { type: 'text', text: m.content },
+            ],
+          }
+        : { role: m.role, content: m.content },
+    );
     if (options.jsonMode) {
       apiMessages.push({ role: 'assistant', content: '{' });
     }

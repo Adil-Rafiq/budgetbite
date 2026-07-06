@@ -43,6 +43,12 @@ app.use(
 
 app.all('/api/auth/{*any}', toNodeHandler(auth));
 
+// The menu-image extraction endpoint carries a base64 photo, so it alone gets
+// a larger JSON body limit (4MB decoded ≈ 5.5MB base64 + envelope). Mounted
+// before the global parser — once this one has parsed the body, the global
+// one is a no-op for the request — so every other endpoint keeps the tight
+// 100kb default.
+app.use('/api/restaurant-recommendations/extract-menu-image', express.json({ limit: '6mb' }));
 app.use(express.json());
 
 app.get('/health', (_req, res) => {

@@ -6,7 +6,18 @@ import type { BudgetStateContext } from '../schemas/budget-state.js';
 
 // ─── LLM Provider Abstraction ────────────────────────────────────────────────
 
-export type LLMMessage = { role: 'user'; content: string } | { role: 'assistant'; content: string };
+/** Mime types every supported provider accepts for inline image input. */
+export type LLMImageMimeType = 'image/jpeg' | 'image/png' | 'image/webp';
+
+export interface LLMImageAttachment {
+  /** Raw base64 (no `data:` URL prefix). */
+  data: string;
+  mimeType: LLMImageMimeType;
+}
+
+export type LLMMessage =
+  | { role: 'user'; content: string; images?: LLMImageAttachment[] }
+  | { role: 'assistant'; content: string };
 
 export interface LLMRequestOptions {
   model?: string;

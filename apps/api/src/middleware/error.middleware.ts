@@ -37,6 +37,24 @@ export function errorMiddleware(
     return;
   }
 
+  // Errors thrown before routing (e.g. body-parser's PayloadTooLargeError on
+  // an oversized upload) are http-errors instances whose 4xx statusCode and
+  // message are marked client-safe via `expose` — surface them instead of
+  // collapsing to a generic 500.
+  const httpErr = err as { statusCode?: unknown; expose?: unknown; message?: unknown };
+  if (
+    typeof httpErr.statusCode === 'number' &&
+    httpErr.statusCode >= 400 &&
+    httpErr.statusCode < 500 &&
+    httpErr.expose === true
+  ) {
+    res.status(httpErr.statusCode).json({
+      error: String(httpErr.message),
+      code: httpErr.statusCode === 413 ? 'PAYLOAD_TOO_LARGE' : 'BAD_REQUEST',
+    });
+    return;
+  }
+
   // Log unexpected errors, but never leak internals to the client
   console.error('[Unhandled error]', err);
   res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });

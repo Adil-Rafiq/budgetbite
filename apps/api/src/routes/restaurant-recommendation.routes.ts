@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import {
   createRestaurantRecommendationSchema,
+  extractMenuFromImageSchema,
   listRestaurantRecommendationsQuerySchema,
 } from '@repo/shared';
 
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { menuExtractionRateLimiter } from '../middleware/rate-limit.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
 import { asyncHandler } from '../lib/async-handler.js';
 import * as recommendationController from '../controllers/restaurant-recommendation.controller.js';
@@ -18,6 +20,19 @@ router.post(
   '/',
   validate({ body: createRestaurantRecommendationSchema }),
   asyncHandler(recommendationController.submitRecommendation),
+);
+
+/**
+ * AI-extract menu items from an uploaded menu photo to pre-fill the
+ * recommendation form. Per-user rate limited on top of the global limiter
+ * (every hit is a multimodal LLM call). Returns { items } — possibly empty
+ * when the photo isn't a legible menu.
+ */
+router.post(
+  '/extract-menu-image',
+  menuExtractionRateLimiter,
+  validate({ body: extractMenuFromImageSchema }),
+  asyncHandler(recommendationController.extractMenuFromImage),
 );
 
 /** List the caller's own recommendations (newest first). Returns { data, meta }. */

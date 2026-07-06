@@ -46,6 +46,28 @@ export const listRestaurantRecommendationsQuerySchema = paginationSchema.extend(
   status: recommendationStatusSchema.optional(),
 });
 
+// ─── Menu image extraction ──────────────────────────────────────────────────
+
+/** Max decoded size of an uploaded menu photo. The web client downscales to a
+ * ~1600px JPEG before uploading, so this is a hard server-side backstop. */
+export const MENU_IMAGE_MAX_BYTES = 4 * 1024 * 1024;
+
+/** Base64 inflates by 4/3; used to bound the wire form of the image. */
+export const MENU_IMAGE_MAX_BASE64_LENGTH = Math.ceil(MENU_IMAGE_MAX_BYTES / 3) * 4;
+
+export const MENU_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
+
+export const menuImageMimeTypeSchema = z.enum(MENU_IMAGE_MIME_TYPES);
+
+/**
+ * A menu photo sent for AI item extraction. Raw base64, no `data:` prefix.
+ * The API additionally sniffs magic bytes so the declared mime type can't lie.
+ */
+export const extractMenuFromImageSchema = z.object({
+  image: z.base64().min(1).max(MENU_IMAGE_MAX_BASE64_LENGTH),
+  mimeType: menuImageMimeTypeSchema,
+});
+
 /**
  * Admin review action. Approving auto-creates the restaurant + its menu items
  * server-side (the link is set there), so the client only sends the verdict.
@@ -61,6 +83,25 @@ export const recommendationItemSchema = z.object({
   name: z.string(),
   price: z.number(),
   description: z.string().nullable(),
+});
+
+/**
+ * One item the AI read off a menu photo, already sanitized to satisfy
+ * `recommendationItemInputSchema` so the web form can prefill it verbatim.
+ * `foreignCurrency` is the ISO code (or printed symbol) when the menu clearly
+ * prices the item in something other than PKR — the price is still the number
+ * as printed (never converted), so the client warns the user to convert it.
+ */
+export const extractedMenuItemSchema = recommendationItemSchema.extend({
+  foreignCurrency: z.string().nullable(),
+});
+
+/**
+ * An empty array means "no menu items found" — the client falls back to
+ * manual entry.
+ */
+export const extractedMenuResponseSchema = z.object({
+  items: z.array(extractedMenuItemSchema).max(MAX_RECOMMENDATION_ITEMS),
 });
 
 export const restaurantRecommendationSchema = z.object({
@@ -102,6 +143,10 @@ export const adminRestaurantRecommendationListResponseSchema = paginatedSchema(
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type RecommendationStatus = z.infer<typeof recommendationStatusSchema>;
+export type MenuImageMimeType = z.infer<typeof menuImageMimeTypeSchema>;
+export type ExtractMenuFromImageInput = z.infer<typeof extractMenuFromImageSchema>;
+export type ExtractedMenuItem = z.infer<typeof extractedMenuItemSchema>;
+export type ExtractedMenuResponse = z.infer<typeof extractedMenuResponseSchema>;
 export type RecommendationItemInput = z.infer<typeof recommendationItemInputSchema>;
 export type RecommendationItem = z.infer<typeof recommendationItemSchema>;
 export type CreateRestaurantRecommendationInput = z.infer<
