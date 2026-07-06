@@ -12,6 +12,17 @@
 
 ## Backlog
 
+- [ ] Dietary preferences & allergens in profile/onboarding, injected into the AI meal-plan prompt
+- [ ] Single-slot reroll: regenerate the 3 options for one meal slot (scoped to that slot's remaining budget); treat reroll as implicit "none of these" feedback
+- [ ] Learn from actual-vs-listed price gap: track per-restaurant delta between suggested price and logged spend, pad future estimates accordingly, and show "prices last updated N days ago"
+- [ ] Plan-end summary (saved/overspent, favorite cuisine, adherence) + one-click "start next plan with same settings" / recurring plans
+- [ ] Favorites & never-again lists: pin dishes/restaurants, block restaurants, pass as hard constraints to the AI prompt
+- [ ] "Cook at home" as a meal slot option with estimated cost (AI-suggested or user-entered)
+- [ ] Weekly email digest via Resend (spent X of Y, week summary)
+- [ ] Set up a test runner (Vitest): cover plan-budget arithmetic, numeric string<->number boundary, Haversine filtering, AI-response validation
+- [ ] AI observability: log token counts, latency, provider, and validation failures per generation (e.g. an `ai_generations` audit table)
+- [ ] OpenAPI docs auto-generated from the Zod schemas in `@repo/shared` (e.g. `zod-openapi`), served as interactive docs at `/api/docs`
+- [ ] Seed/demo data script (`pnpm db:seed`): fixture restaurants + menu items around a chosen location, plus a demo user with a completed plan; doubles as test fixtures
 - [ ] Integrate [Three Js](#threejs.org) and [GSAP](#gsap.com). [GSAP](#gsap.com) has a cool [design](#planetono.space)
 - [ ] Push notifications - can leverage pubsub model using pg triggers. See [video](#https://www.youtube.com/watch?v=4-Z_I4SwgJQ)
 - [ ] Calories statistics / Diet Planning
