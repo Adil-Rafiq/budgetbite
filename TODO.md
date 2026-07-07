@@ -12,7 +12,6 @@
 
 ## Backlog
 
-- [ ] Learn from actual-vs-listed price gap: track per-restaurant delta between suggested price and logged spend, pad future estimates accordingly, and show "prices last updated N days ago"
 - [ ] Plan-end summary (saved/overspent, favorite cuisine, adherence) + one-click "start next plan with same settings" / recurring plans
 - [ ] Favorites & never-again lists: pin dishes/restaurants, block restaurants, pass as hard constraints to the AI prompt
 - [ ] "Cook at home" as a meal slot option with estimated cost (AI-suggested or user-entered)
@@ -24,6 +23,7 @@
 
 ## Done
 
+- [x] Learn from actual-vs-listed price gap: per-restaurant paid-vs-suggested ratio learned from logged choices (90-day window, outlier bounds, all users), applied as a shrunk-and-capped padding factor to menu prices in the AI planner context; restaurants list & detail pages show "prices updated N days ago"
 - [x] Seed/demo data script (`pnpm db:seed`): fixture restaurants + menu items around the scraper's Lahore location, plus a verified demo user (`demo@budgetbite.dev`) with a completed weekly plan (succeeded generation, logged choices, closed plan context); fixtures exported from `@repo/database` for reuse in tests
 - [x] Dietary preferences & allergens: user-declared tags on `user_profile` (distinct from AI-learned `dietaryNotes`), editable in a new onboarding step and a profile-page section, injected into all meal-plan prompts with allergens treated as hard constraints
 - [x] AI observability: append-only `ai_call_log` table — one row per LLM call attempt (plan generate/replan, slot reroll, menu extraction, preference extraction) with provider, model, token counts, latency, attempt number, and outcome (succeeded / validation_failed / truncated / provider_error); written fire-and-forget so logging can never fail a request

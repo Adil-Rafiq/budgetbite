@@ -69,6 +69,11 @@ export const restaurantWithDistanceSchema = restaurantSchema.extend({
   minItemPrice: z.number().nullable().optional(),
   /** Average menu item price — drives the "Best for budget" sort. Null when no items. */
   avgItemPrice: z.number().nullable().optional(),
+  /**
+   * Newest menu_item.updatedAt for this restaurant — drives the "prices
+   * updated N days ago" freshness hint. Null when the menu is empty.
+   */
+  pricesUpdatedAt: z.coerce.date().nullable().optional(),
 });
 
 export const listRestaurantsResponseSchema = paginatedSchema(restaurantWithDistanceSchema);

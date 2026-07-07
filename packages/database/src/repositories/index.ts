@@ -22,7 +22,7 @@ export {
   type SuggestionItemRow,
   type SuggestionWithRelations,
 } from './meal-plan.repo.js';
-export { orderRepository } from './order.repo.js';
+export { orderRepository, type RestaurantPriceGapStats } from './order.repo.js';
 export { mealPinRepository, type MealPinWithRefs } from './meal-pin.repo.js';
 export { feedbackRepository } from './feedback.repo.js';
 export {

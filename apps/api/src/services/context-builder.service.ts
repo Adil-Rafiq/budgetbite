@@ -16,7 +16,7 @@ import type {
   NearbyRestaurantContext,
 } from '@repo/shared';
 
-import { applyPinAdjustment } from '../lib/plan-math.js';
+import { applyPinAdjustment, padPrice, pricePaddingFactor } from '../lib/plan-math.js';
 
 const NEARBY_RADIUS_KM = Number(process.env.NEARBY_RADIUS_KM) || 5;
 const MAX_RESTAURANTS = Number(process.env.MAX_RESTAURANTS) || 20;
@@ -168,6 +168,11 @@ export const contextBuilderService = {
    * Fetch nearby restaurants using the Haversine approximation in SQL.
    * Filters out disliked restaurants before returning.
    * Limits to MAX_RESTAURANTS to keep the LLM context manageable.
+   *
+   * Menu prices are padded per restaurant with the learned actual-vs-listed
+   * gap (logged spend vs suggested price, all users) so the LLM budgets
+   * against what meals really cost, not stale listed prices. Restaurants with
+   * no logged history keep their listed prices untouched.
    */
   async fetchNearbyRestaurants(
     lat: number,
@@ -184,10 +189,18 @@ export const contextBuilderService = {
     // Filter disliked restaurants
     const filtered = results.filter((r) => !dislikedIds.includes(r.restaurant.id));
 
+    const gapStats = await orderRepository.getPriceGapStatsByRestaurants(
+      filtered.map((r) => r.restaurant.id),
+    );
+    const paddingByRestaurant = new Map(
+      gapStats.map((s) => [s.restaurantId, pricePaddingFactor(s)]),
+    );
+
     // Fetch menu items per restaurant
     const contexts: NearbyRestaurantContext[] = await Promise.all(
       filtered.map(async ({ restaurant: r, distanceKm }) => {
         const items = await menuRepository.findByRestaurantId(r.id);
+        const padding = paddingByRestaurant.get(r.id) ?? 1;
         return {
           restaurantId: r.id,
           name: r.name,
@@ -198,7 +211,7 @@ export const contextBuilderService = {
             menuItemId: item.id,
             name: item.name,
             description: item.description,
-            price: Number(item.price),
+            price: padding > 1 ? padPrice(Number(item.price), padding) : Number(item.price),
           })),
         };
       }),

@@ -36,6 +36,8 @@ export type ListRestaurantsRow = {
   distanceKm?: number;
   minItemPrice: number | null;
   avgItemPrice: number | null;
+  /** Newest menu_item.updatedAt — how fresh the price snapshot is. Null when no items. */
+  pricesUpdatedAt: Date | null;
 };
 
 export const restaurantRepository = {
@@ -92,6 +94,11 @@ export const restaurantRepository = {
       FROM ${menuItem}
       WHERE ${menuItem.restaurantId} = ${outerRestaurantId}
     )`;
+    const pricesUpdatedAtExpr = sql<string | null>`(
+      SELECT MAX(${menuItem.updatedAt})::text
+      FROM ${menuItem}
+      WHERE ${menuItem.restaurantId} = ${outerRestaurantId}
+    )`;
 
     const conditions = [];
     if (minRating != null) conditions.push(gte(restaurant.rating, String(minRating)));
@@ -122,6 +129,7 @@ export const restaurantRepository = {
         ...(distanceExpr && { distanceKm: sql<number>`${distanceExpr}`.as('distance_km') }),
         minItemPrice: minPriceExpr.as('min_item_price'),
         avgItemPrice: avgPriceExpr.as('avg_item_price'),
+        pricesUpdatedAt: pricesUpdatedAtExpr.as('prices_updated_at'),
       })
       .from(restaurant);
 
@@ -139,6 +147,7 @@ export const restaurantRepository = {
       distanceKm: 'distanceKm' in r ? (r.distanceKm as number) : undefined,
       minItemPrice: r.minItemPrice != null ? Number(r.minItemPrice) : null,
       avgItemPrice: r.avgItemPrice != null ? Number(r.avgItemPrice) : null,
+      pricesUpdatedAt: r.pricesUpdatedAt != null ? new Date(r.pricesUpdatedAt) : null,
     }));
   },
 

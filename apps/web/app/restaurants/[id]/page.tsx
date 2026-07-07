@@ -10,6 +10,7 @@ import type { BudgetFit, MenuItem } from '@repo/shared';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useRestaurant, useRestaurantMenu } from '@/hooks/use-restaurant';
 import { useUser } from '@/hooks/use-user';
+import { pricesUpdatedAgoLabel } from '@/lib/date';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -89,11 +90,16 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
     if (items.length === 0) return null;
     const prices = items.map((i) => i.price);
     const sum = prices.reduce((a, b) => a + b, 0);
+    const newestUpdate = items.reduce<number>(
+      (max, i) => Math.max(max, new Date(i.updatedAt).getTime()),
+      0,
+    );
     return {
       count: items.length,
       min: Math.min(...prices),
       max: Math.max(...prices),
       avg: sum / items.length,
+      freshness: newestUpdate > 0 ? pricesUpdatedAgoLabel(new Date(newestUpdate)) : null,
     };
   }, [menuQuery.data]);
 
@@ -300,6 +306,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
             <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
               {menuStats.count} item{menuStats.count === 1 ? '' : 's'} · {formatPkr(menuStats.min)}{' '}
               – {formatPkr(menuStats.max)} · avg {formatPkr(menuStats.avg)}
+              {menuStats.freshness ? ` · ${menuStats.freshness}` : ''}
             </span>
           )}
         </div>

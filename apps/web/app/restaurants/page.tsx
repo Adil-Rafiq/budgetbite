@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 
+import { pricesUpdatedAgoLabel } from '@/lib/date';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { useRestaurants } from '@/hooks/use-restaurant';
@@ -488,6 +489,8 @@ function RestaurantsPageInner() {
                 r.avgItemPrice != null &&
                 r.minItemPrice != null &&
                 Math.round(r.avgItemPrice) !== Math.round(r.minItemPrice);
+              const priceFreshness =
+                r.minItemPrice != null ? pricesUpdatedAgoLabel(r.pricesUpdatedAt) : null;
               return (
                 <StaggerItem key={r.id}>
                   <Link href={`/restaurants/${r.id}`} className="group block h-full">
@@ -594,6 +597,14 @@ function RestaurantsPageInner() {
                             </span>
                           )}
                         </div>
+                        {priceFreshness && (
+                          <span
+                            className="text-[10px] text-soft"
+                            style={{ fontFamily: 'var(--font-mono)' }}
+                          >
+                            {priceFreshness}
+                          </span>
+                        )}
                       </div>
                     </motion.div>
                   </Link>

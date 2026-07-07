@@ -104,6 +104,7 @@ export const restaurantService = {
         distanceKm: r.distanceKm != null ? Number(r.distanceKm) : undefined,
         minItemPrice: r.minItemPrice,
         avgItemPrice: r.avgItemPrice,
+        pricesUpdatedAt: r.pricesUpdatedAt,
       })),
       meta: {
         total,

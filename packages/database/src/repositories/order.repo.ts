@@ -1,7 +1,33 @@
-import { eq, and, gte, lte, desc, sql } from 'drizzle-orm';
+import { eq, and, gte, lte, desc, inArray, sql } from 'drizzle-orm';
 
 import { db, type DbOrTx } from '../db.js';
-import { mealChoice, type MealChoice, type NewMealChoice } from '../schema/index.js';
+import {
+  mealChoice,
+  mealSuggestion,
+  type MealChoice,
+  type NewMealChoice,
+} from '../schema/index.js';
+
+/**
+ * Window and sanity bounds for the actual-vs-listed price gap signal.
+ *
+ * Only choices from the last 90 days count — menu prices drift and old gaps
+ * describe prices that no longer exist. The ratio bounds drop obvious
+ * non-meal-scale rows (a 3x "ratio" is a group order, not a price gap;
+ * a 0.5x one is a partial order or a typo), so one outlier can't skew a
+ * restaurant's padding.
+ */
+const PRICE_GAP_WINDOW_DAYS = 90;
+const PRICE_GAP_MIN_RATIO = 0.5;
+const PRICE_GAP_MAX_RATIO = 2.5;
+
+export interface RestaurantPriceGapStats {
+  restaurantId: string;
+  /** Number of logged choices that produced a usable paid/suggested ratio. */
+  sampleCount: number;
+  /** Mean of actualAmountSpent / suggestion.estimatedPrice across the samples. */
+  avgPaidToEstimatedRatio: number;
+}
 
 export const orderRepository = {
   async findById(id: string): Promise<MealChoice | undefined> {
@@ -151,6 +177,52 @@ export const orderRepository = {
   },
 
   // ─── AI methods ────────────────────────────────────────────────────────────
+
+  /**
+   * Per-restaurant gap between what plans suggested and what users actually
+   * paid, learned from logged choices across ALL users (the gap is a property
+   * of the restaurant — taxes, fees, stale scraped prices — not of one user).
+   *
+   * A choice contributes a sample only when it is tied to a suggestion AND the
+   * user ordered from the suggested restaurant — free-form/manual logs say
+   * nothing about the listed price. See PRICE_GAP_* constants for the window
+   * and outlier bounds. Used by ContextBuilderService to pad menu prices in
+   * the AI context so future estimates track what meals really cost.
+   */
+  async getPriceGapStatsByRestaurants(
+    restaurantIds: string[],
+  ): Promise<RestaurantPriceGapStats[]> {
+    if (restaurantIds.length === 0) return [];
+    const since = new Date(Date.now() - PRICE_GAP_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+    const ratioExpr = sql`(${mealChoice.actualAmountSpent}::numeric / ${mealSuggestion.estimatedPrice}::numeric)`;
+
+    const rows = await db
+      .select({
+        restaurantId: mealChoice.restaurantId,
+        sampleCount: sql<number>`count(*)::int`,
+        avgRatio: sql<string>`avg(${ratioExpr})::text`,
+      })
+      .from(mealChoice)
+      .innerJoin(mealSuggestion, eq(mealChoice.suggestionId, mealSuggestion.id))
+      .where(
+        and(
+          inArray(mealChoice.restaurantId, restaurantIds),
+          // The user actually ordered from the suggested restaurant; a choice
+          // recorded against a different restaurant compares unrelated prices.
+          eq(mealChoice.restaurantId, mealSuggestion.restaurantId),
+          sql`${mealSuggestion.estimatedPrice}::numeric > 0`,
+          gte(mealChoice.createdAt, since),
+          sql`${ratioExpr} between ${PRICE_GAP_MIN_RATIO} and ${PRICE_GAP_MAX_RATIO}`,
+        ),
+      )
+      .groupBy(mealChoice.restaurantId);
+
+    return rows.map((r) => ({
+      restaurantId: r.restaurantId!,
+      sampleCount: r.sampleCount,
+      avgPaidToEstimatedRatio: Number(r.avgRatio),
+    }));
+  },
 
   /**
    * Count how many meal choices have been confirmed for a plan.
