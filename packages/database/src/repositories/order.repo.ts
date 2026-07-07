@@ -189,9 +189,7 @@ export const orderRepository = {
    * and outlier bounds. Used by ContextBuilderService to pad menu prices in
    * the AI context so future estimates track what meals really cost.
    */
-  async getPriceGapStatsByRestaurants(
-    restaurantIds: string[],
-  ): Promise<RestaurantPriceGapStats[]> {
+  async getPriceGapStatsByRestaurants(restaurantIds: string[]): Promise<RestaurantPriceGapStats[]> {
     if (restaurantIds.length === 0) return [];
     const since = new Date(Date.now() - PRICE_GAP_WINDOW_DAYS * 24 * 60 * 60 * 1000);
     const ratioExpr = sql`(${mealChoice.actualAmountSpent}::numeric / ${mealSuggestion.estimatedPrice}::numeric)`;
