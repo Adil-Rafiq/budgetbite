@@ -18,13 +18,13 @@
 - [ ] "Cook at home" as a meal slot option with estimated cost (AI-suggested or user-entered)
 - [ ] Weekly email digest via Resend (spent X of Y, week summary)
 - [ ] OpenAPI docs auto-generated from the Zod schemas in `@repo/shared` (e.g. `zod-openapi`), served as interactive docs at `/api/docs`
-- [ ] Seed/demo data script (`pnpm db:seed`): fixture restaurants + menu items around a chosen location, plus a demo user with a completed plan; doubles as test fixtures
 - [ ] Integrate [Three Js](#threejs.org) and [GSAP](#gsap.com). [GSAP](#gsap.com) has a cool [design](#planetono.space)
 - [ ] Push notifications - can leverage pubsub model using pg triggers. See [video](#https://www.youtube.com/watch?v=4-Z_I4SwgJQ)
 - [ ] Calories statistics / Diet Planning
 
 ## Done
 
+- [x] Seed/demo data script (`pnpm db:seed`): fixture restaurants + menu items around the scraper's Lahore location, plus a verified demo user (`demo@budgetbite.dev`) with a completed weekly plan (succeeded generation, logged choices, closed plan context); fixtures exported from `@repo/database` for reuse in tests
 - [x] Dietary preferences & allergens: user-declared tags on `user_profile` (distinct from AI-learned `dietaryNotes`), editable in a new onboarding step and a profile-page section, injected into all meal-plan prompts with allergens treated as hard constraints
 - [x] AI observability: append-only `ai_call_log` table — one row per LLM call attempt (plan generate/replan, slot reroll, menu extraction, preference extraction) with provider, model, token counts, latency, attempt number, and outcome (succeeded / validation_failed / truncated / provider_error); written fire-and-forget so logging can never fail a request
 - [x] Set up a test runner (Vitest): cover plan-budget arithmetic, numeric string<->number boundary, Haversine filtering, AI-response validation

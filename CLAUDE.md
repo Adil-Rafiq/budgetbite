@@ -34,6 +34,8 @@ pnpm format                   # prettier --write **/*.{ts,tsx,md}
 pnpm db:generate              # 1) regen better-auth schema into packages/database/src/schema/auth.ts
                               # 2) drizzle-kit generate (creates new SQL migration in packages/database/drizzle/)
 pnpm db:migrate               # same as above + applies the migration
+pnpm db:seed                  # demo data: seed- restaurants + demo@budgetbite.dev user with a
+                              # completed plan (idempotent wipe & re-create; see packages/database/src/seed/)
 ```
 
 Per-app:

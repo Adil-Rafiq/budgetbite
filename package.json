@@ -11,6 +11,7 @@
     "check-types": "turbo run check-types",
     "db:generate": "bash ./scripts/db-migrate.sh generate",
     "db:migrate": "bash ./scripts/db-migrate.sh migrate",
+    "db:seed": "pnpm --filter @repo/database db:seed",
     "prepare": "husky"
   },
   "devDependencies": {
