@@ -26,3 +26,4 @@ export * from './scraper-run.js';
 export * from './admin-plan.js';
 export * from './admin-analytics.js';
 export * from './admin-config.js';
+export * from './digest.js';
