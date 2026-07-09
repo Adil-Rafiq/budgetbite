@@ -149,8 +149,38 @@ export const budgetGenerationDetailResponseSchema = z.object({
   days: z.array(budgetGenerationDayGroupSchema),
 });
 
+// ─── Plan-end summary ───────────────────────────────────────────────────────
+
+/**
+ * Point-in-time summary of how a plan went: saved vs overspent (from
+ * plan_context.cumulativeVariance), how much of the plan was logged, how
+ * often the user took an AI suggestion vs a manual entry, and which
+ * restaurant they ordered from most. Meaningful for any status, but the FE
+ * surfaces it once a plan is no longer active.
+ */
+export const planSummaryResponseSchema = z.object({
+  planId: uuidSchema,
+  status: z.enum(['active', 'completed', 'cancelled']),
+  totalBudget: z.number(),
+  amountSpent: z.number(),
+  /** totalBudget - amountSpent at the meals-logged-so-far point. Positive = saved, negative = overspent. */
+  variance: z.number(),
+  mealsLogged: z.number().int(),
+  totalMeals: z.number().int(),
+  /** Share of logged choices that came from an AI suggestion. Null when nothing has been logged yet. */
+  adherencePercent: z.number().min(0).max(100).nullable(),
+  favoriteRestaurant: z
+    .object({
+      restaurantId: uuidSchema.nullable(),
+      name: z.string(),
+      choiceCount: z.number().int(),
+    })
+    .nullable(),
+});
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+export type PlanSummaryResponse = z.infer<typeof planSummaryResponseSchema>;
 export type CreateBudgetPlanInput = z.infer<typeof createBudgetPlanSchema>;
 export type UpdateBudgetPlanInput = z.infer<typeof updateBudgetPlanSchema>;
 export type PlanAlreadyActiveError = z.infer<typeof planAlreadyActiveErrorSchema>;
