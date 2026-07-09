@@ -27,6 +27,7 @@ import {
 import { useDietaryStep } from '@/app/onboarding/_hooks/use-dietary-step';
 import { DietaryTagPicker } from '@/components/dietary-tag-picker';
 import { NotificationTimesCard } from '@/app/profile/_components/notification-times-card';
+import { FoodPreferencesCard } from '@/app/profile/_components/food-preferences-card';
 import { Section } from '@/app/profile/_components/section';
 
 const LocationMap = dynamic(() => import('@/components/location-map').then((m) => m.LocationMap), {
@@ -460,6 +461,8 @@ export default function ProfilePage() {
         </Section>
 
         <NotificationTimesCard />
+
+        <FoodPreferencesCard />
 
         <Section icon={Lock} title="Password" hint="Keep your account secure.">
           <form

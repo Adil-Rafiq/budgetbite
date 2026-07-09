@@ -23,6 +23,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+import { FoodPreferenceToggle } from '@/components/food-preference-toggle';
+
 import { AddToPlanModal } from '../_components/add-to-plan-modal';
 import { MenuItemSkeleton } from '../_components/menu-item-skeleton';
 import { RestaurantHeaderSkeleton } from '../_components/restaurant-header-skeleton';
@@ -206,7 +208,13 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
               </div>
             </div>
 
-            <div className="flex shrink-0 flex-wrap gap-2">
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <FoodPreferenceToggle
+                targetType="restaurant"
+                targetId={r.id}
+                name={r.name}
+                size="md"
+              />
               {foodpandaUrl ? (
                 <Pill asChild size="sm">
                   <a href={foodpandaUrl} target="_blank" rel="noopener noreferrer">
@@ -465,17 +473,24 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                       </span>
                     </div>
 
-                    {hasActivePlan && (
-                      <Pill
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setPickedItem(item)}
-                        className="w-full"
-                      >
-                        Add to plan
-                        <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>+</span>
-                      </Pill>
-                    )}
+                    <div className="mt-auto flex items-center gap-2 pt-1">
+                      <FoodPreferenceToggle
+                        targetType="menu_item"
+                        targetId={item.id}
+                        name={item.name}
+                      />
+                      {hasActivePlan && (
+                        <Pill
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setPickedItem(item)}
+                          className="flex-1"
+                        >
+                          Add to plan
+                          <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>+</span>
+                        </Pill>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
