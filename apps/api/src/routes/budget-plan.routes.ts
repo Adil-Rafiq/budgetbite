@@ -67,6 +67,13 @@ router.get(
   asyncHandler(budgetPlanController.getPlanContext),
 );
 
+/** Get the plan-end summary (saved/overspent, adherence, favorite restaurant). Returns PlanSummaryResponse. */
+router.get(
+  '/:id/summary',
+  validate({ params: idParams }),
+  asyncHandler(budgetPlanController.getPlanSummary),
+);
+
 /** List confirmed meal choices on a plan. Returns { data: MealChoiceResponse[], meta }. */
 router.get(
   '/:id/choices',

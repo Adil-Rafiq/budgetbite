@@ -61,6 +61,12 @@ export async function getPlanContext(req: AuthRequest, res: Response): Promise<v
   res.json(ctx);
 }
 
+export async function getPlanSummary(req: AuthRequest, res: Response): Promise<void> {
+  const { id } = req.params as IdParams;
+  const summary = await budgetPlanService.getSummary(req.userId!, id);
+  res.json(summary);
+}
+
 export async function listChoices(req: AuthRequest, res: Response): Promise<void> {
   const { id } = req.params as IdParams;
   const { limit, offset } = req.query as unknown as PaginationQuery;

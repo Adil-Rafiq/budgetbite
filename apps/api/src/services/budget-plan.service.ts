@@ -16,6 +16,7 @@ import type {
   ListBudgetPlansQuery,
   Paginated,
   PaginationQuery,
+  PlanSummaryResponse,
   RerollSlotInput,
   RerollSlotResponse,
   UpdateBudgetPlanInput,
@@ -27,6 +28,7 @@ import {
   mealPinRepository,
   mealPlanRepository,
   mealTypeRepository,
+  orderRepository,
   planContextRepository,
   userRepository,
   type AdminPlanListRow,
@@ -311,6 +313,39 @@ export const budgetPlanService = {
     const ctx = await planContextRepository.findByPlanId(planId);
     if (!ctx) throw new AppError(500, 'Plan context missing', 'PLAN_CONTEXT_MISSING');
     return getPinAdjustedState(ctx, planId);
+  },
+
+  /**
+   * Plan-end summary: saved/overspent, how much of the plan was logged, how
+   * often the user took an AI suggestion vs a manual entry, and their
+   * favorite restaurant. Reads plan_context for the budget numbers (already
+   * the source of truth, updated transactionally on every choice) plus a
+   * choice-level aggregate for adherence/favorite restaurant. Available for
+   * any status — the FE renders it once the plan is no longer active.
+   */
+  async getSummary(userId: string, planId: string): Promise<PlanSummaryResponse> {
+    await applyLazyFixersForRead(userId, planId);
+    const plan = await loadOwned(userId, planId);
+    if (!plan.planContext) {
+      throw new AppError(500, 'Plan context missing', 'PLAN_CONTEXT_MISSING');
+    }
+
+    const ctx = plan.planContext;
+    const mealsLogged = ctx.mealsConsumed;
+    const { adherentCount, favoriteRestaurant } =
+      await orderRepository.getSummaryStatsForPlan(planId);
+
+    return {
+      planId: plan.id,
+      status: plan.status as 'active' | 'completed' | 'cancelled',
+      totalBudget: toNumber(ctx.totalBudget),
+      amountSpent: toNumber(ctx.amountSpent),
+      variance: toNumber(ctx.cumulativeVariance),
+      mealsLogged,
+      totalMeals: ctx.totalMeals,
+      adherencePercent: mealsLogged > 0 ? Math.round((adherentCount / mealsLogged) * 100) : null,
+      favoriteRestaurant,
+    };
   },
 
   async update(
