@@ -52,12 +52,46 @@ function buildDietaryRule(prefs: MealPlannerContext['preferences']): string {
 function buildIdCatalogue(restaurants: NearbyRestaurantContext[]): string {
   const lines: string[] = [];
   for (const r of restaurants) {
-    lines.push(`Restaurant ${r.restaurantId} — ${r.name}`);
+    lines.push(`Restaurant ${r.restaurantId} — ${r.name}${r.isFavorite ? ' ⭐ FAVORITE' : ''}`);
     for (const item of r.menuItems) {
-      lines.push(`  Item ${item.menuItemId} — ${item.name} (PKR ${item.price})`);
+      lines.push(
+        `  Item ${item.menuItemId} — ${item.name} (PKR ${item.price})${item.isFavorite ? ' ⭐ FAVORITE' : ''}`,
+      );
     }
   }
   return lines.join('\n');
+}
+
+/**
+ * Concise list of the user's favorited restaurants and dishes that are actually
+ * in the nearby set. Favorites are a SOFT bias — the model should prefer them
+ * when they fit the budget and dietary constraints, but never break budget or
+ * dietary rules (or sacrifice all variety) to force one in.
+ */
+function buildFavoritesSection(restaurants: NearbyRestaurantContext[]): string {
+  const favRestaurants = restaurants.filter((r) => r.isFavorite).map((r) => r.name);
+  const favItems: string[] = [];
+  for (const r of restaurants) {
+    for (const item of r.menuItems) {
+      if (item.isFavorite) favItems.push(`${item.name} (${r.name})`);
+    }
+  }
+  if (favRestaurants.length === 0 && favItems.length === 0) {
+    return 'None — the user has not favorited any nearby restaurant or dish.';
+  }
+  const lines: string[] = [];
+  if (favRestaurants.length > 0) lines.push(`- Favorite restaurants: ${favRestaurants.join(', ')}`);
+  if (favItems.length > 0) lines.push(`- Favorite dishes: ${favItems.join(', ')}`);
+  return lines.join('\n');
+}
+
+/** Bias rule appended to a prompt's Rules section when favorites are present. */
+function buildFavoritesRule(restaurants: NearbyRestaurantContext[]): string {
+  const hasFavorites = restaurants.some(
+    (r) => r.isFavorite || r.menuItems.some((i) => i.isFavorite),
+  );
+  if (!hasFavorites) return '';
+  return "\n- Prefer the user's ⭐ favorite restaurants and dishes when they fit the slot's budget and dietary constraints — lead with them (optionIndex 0) where reasonable. Favorites are a preference, NOT a hard rule: never exceed budget, violate a dietary/allergen constraint, or collapse all variety just to include one";
 }
 
 /**
@@ -98,6 +132,9 @@ ${buildPinnedSlotsSection(ctx.pinnedSlots, ctx.plan.mealTypes)}
 
 ## User Preferences
 ${buildUserPreferencesSection(ctx.preferences)}
+
+## User Favorites (prefer these when they fit the budget & dietary constraints)
+${buildFavoritesSection(ctx.restaurants)}
 
 ## Available Restaurants (nearby, preferences already filtered)
 ${JSON.stringify(ctx.restaurants, null, 2)}
@@ -148,7 +185,7 @@ Rules:
 - Never invent, modify, or guess UUIDs — copy them character-for-character from the catalogue
 - Distribute variety across the plan — avoid repeating the same restaurant for consecutive meals
 - Keep the total estimated cost within the total budget
-- Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget${buildDietaryRule(ctx.preferences)}`;
+- Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget${buildDietaryRule(ctx.preferences)}${buildFavoritesRule(ctx.restaurants)}`;
 }
 
 // ─── Prompt: Re-plan after a meal choice ──────────────────────────────────────
@@ -176,6 +213,9 @@ ${buildPinnedSlotsSection(ctx.pinnedSlots, ctx.plan.mealTypes)}
 
 ## User Preferences
 ${buildUserPreferencesSection(ctx.preferences)}
+
+## User Favorites (prefer these when they fit the budget & dietary constraints)
+${buildFavoritesSection(ctx.restaurants)}
 
 ## Available Restaurants (nearby, preferences already filtered)
 ${JSON.stringify(ctx.restaurants, null, 2)}
@@ -227,7 +267,7 @@ Rules:
 - estimatedTotalCost refers to the remaining meals only, not the full plan
 - Distribute variety — avoid repeating the same restaurant for consecutive meals
 - Keep the remaining estimated cost within the remaining budget of PKR ${ctx.budget.amountRemaining}
-- Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget${buildDietaryRule(ctx.preferences)}`;
+- Keep \`notes\` short (≤ 120 chars) so the response fits within the token budget${buildDietaryRule(ctx.preferences)}${buildFavoritesRule(ctx.restaurants)}`;
 }
 
 // ─── Prompt: Single-slot reroll ───────────────────────────────────────────────
@@ -268,6 +308,9 @@ ${rejectedSection}
 ## User Preferences
 ${buildUserPreferencesSection(ctx.preferences)}
 
+## User Favorites (prefer these when they fit the budget & dietary constraints)
+${buildFavoritesSection(ctx.restaurants)}
+
 ## Available Restaurants (nearby, preferences already filtered)
 ${JSON.stringify(ctx.restaurants, null, 2)}
 
@@ -300,7 +343,7 @@ Rules:
 - Never use a restaurantId or menuItemId not present in the ID catalogue above
 - Never invent, modify, or guess UUIDs — copy them character-for-character from the catalogue
 - estimatedPrice must be realistic based on the menu item price
-- Keep \`notes\` short (≤ 120 chars)${buildDietaryRule(ctx.preferences)}`;
+- Keep \`notes\` short (≤ 120 chars)${buildDietaryRule(ctx.preferences)}${buildFavoritesRule(ctx.restaurants)}`;
 }
 
 // ─── Prompt: Preference extraction from feedback ───────────────────────────────
