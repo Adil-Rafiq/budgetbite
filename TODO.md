@@ -12,7 +12,7 @@
 
 ## Backlog
 
-- [ ] "Cook at home" as a meal slot option with estimated cost (AI-suggested or user-entered)
+- [ ] "Cook at home": AI-suggested cost estimate — pre-fill the home-cooked cost with a small self-contained estimate (heuristic or a tiny LLM call) for the meal type, on top of the user-entered value shipped below
 - [ ] Weekly email digest via Resend (spent X of Y, week summary)
 - [ ] OpenAPI docs auto-generated from the Zod schemas in `@repo/shared` (e.g. `zod-openapi`), served as interactive docs at `/api/docs`
 - [ ] Integrate [Three Js](#threejs.org) and [GSAP](#gsap.com). [GSAP](#gsap.com) has a cool [design](#planetono.space)
@@ -21,6 +21,7 @@
 
 ## Done
 
+- [x] "Cook at home" meal logging (user-entered cost): a first-class home-cooked meal choice per slot, distinct from restaurant orders. New `is_home_cooked` column on `meal_choice` (migration `0017_naive_dust.sql` — run `pnpm db:migrate` to apply); home-cooked rows carry no suggestion/restaurant/menu-item link (server strips them) so they never count toward suggestion-adherence or the favorite-restaurant summary. Threaded `isHomeCooked` through `recordMealChoiceSchema`, `mealChoiceResponseSchema`, `planTimelineLoggedChoiceSchema`, the order-repo projections, and the timeline builder. Web: a "Cook at home" entry in the slot dialog + a dedicated `HomeCookedForm` (optional dish name, user-entered ingredient/cooking cost, feedback), and a "🍳 Cooked at home" label on the dashboard slot cards, recent-activity list, and plan timeline. AI-suggested cost estimate deferred (see Backlog).
 - [x] Favorites & never-again lists: persistent, user-managed favorites (restaurants + dishes) and block list on a new normalized `user_food_preference` table (one row per user/target, restaurant xor menu-item, favorite|blocked). `GET/POST/DELETE /api/food-preferences`. Context-builder unions blocked-restaurant ids with the AI-learned `dislikedRestaurantIds` (hard exclusion), drops blocked dishes from each menu, and flags favorites (`isFavorite`) on the nearby context; the meal-planner prompts (generate/replan/reroll) render a Favorites section + ⭐ markers and a soft-bias rule (favorites never override budget/dietary/allergen constraints). Web: reusable `FoodPreferenceToggle` (heart/ban) on the restaurant detail header + each dish card, plus a "Favorites & blocks" management card on the profile page. Migration `0016_quick_catseye.sql` (run `pnpm db:migrate` to apply)
 - [x] Plan-end summary (saved/overspent, adherence to AI suggestions, favorite restaurant) via `GET /api/budget-plans/:id/summary`, shown on the plan detail page once a plan is completed/cancelled, plus a one-click "start next plan" that reuses the finished plan's type/budget/meal types/notification times. True cron-based recurring plans deferred — no worker/scheduler tier exists yet.
 - [x] Learn from actual-vs-listed price gap: per-restaurant paid-vs-suggested ratio learned from logged choices (90-day window, outlier bounds, all users), applied as a shrunk-and-capped padding factor to menu prices in the AI planner context; restaurants list & detail pages show "prices updated N days ago"
