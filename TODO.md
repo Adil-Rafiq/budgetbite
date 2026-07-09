@@ -12,8 +12,6 @@
 
 ## Backlog
 
-- [ ] Plan-end summary (saved/overspent, favorite cuisine, adherence) + one-click "start next plan with same settings" / recurring plans
-- [ ] Favorites & never-again lists: pin dishes/restaurants, block restaurants, pass as hard constraints to the AI prompt
 - [ ] "Cook at home" as a meal slot option with estimated cost (AI-suggested or user-entered)
 - [ ] Weekly email digest via Resend (spent X of Y, week summary)
 - [ ] OpenAPI docs auto-generated from the Zod schemas in `@repo/shared` (e.g. `zod-openapi`), served as interactive docs at `/api/docs`
@@ -23,6 +21,8 @@
 
 ## Done
 
+- [x] Favorites & never-again lists: persistent, user-managed favorites (restaurants + dishes) and block list on a new normalized `user_food_preference` table (one row per user/target, restaurant xor menu-item, favorite|blocked). `GET/POST/DELETE /api/food-preferences`. Context-builder unions blocked-restaurant ids with the AI-learned `dislikedRestaurantIds` (hard exclusion), drops blocked dishes from each menu, and flags favorites (`isFavorite`) on the nearby context; the meal-planner prompts (generate/replan/reroll) render a Favorites section + ⭐ markers and a soft-bias rule (favorites never override budget/dietary/allergen constraints). Web: reusable `FoodPreferenceToggle` (heart/ban) on the restaurant detail header + each dish card, plus a "Favorites & blocks" management card on the profile page. Migration `0016_quick_catseye.sql` (run `pnpm db:migrate` to apply)
+- [x] Plan-end summary (saved/overspent, adherence to AI suggestions, favorite restaurant) via `GET /api/budget-plans/:id/summary`, shown on the plan detail page once a plan is completed/cancelled, plus a one-click "start next plan" that reuses the finished plan's type/budget/meal types/notification times. True cron-based recurring plans deferred — no worker/scheduler tier exists yet.
 - [x] Learn from actual-vs-listed price gap: per-restaurant paid-vs-suggested ratio learned from logged choices (90-day window, outlier bounds, all users), applied as a shrunk-and-capped padding factor to menu prices in the AI planner context; restaurants list & detail pages show "prices updated N days ago"
 - [x] Seed/demo data script (`pnpm db:seed`): fixture restaurants + menu items around the scraper's Lahore location, plus a verified demo user (`demo@budgetbite.dev`) with a completed weekly plan (succeeded generation, logged choices, closed plan context); fixtures exported from `@repo/database` for reuse in tests
 - [x] Dietary preferences & allergens: user-declared tags on `user_profile` (distinct from AI-learned `dietaryNotes`), editable in a new onboarding step and a profile-page section, injected into all meal-plan prompts with allergens treated as hard constraints
