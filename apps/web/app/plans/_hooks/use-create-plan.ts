@@ -17,7 +17,7 @@ export type MealTypesStatus = 'loading' | 'error' | 'empty' | 'ready';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const getPlanDateRange = (planType: BudgetPlanPreferencesInput['planType']) => {
+export const getPlanDateRange = (planType: BudgetPlanPreferencesInput['planType']) => {
   const startDate = new Date();
   const endDate = new Date(startDate);
 

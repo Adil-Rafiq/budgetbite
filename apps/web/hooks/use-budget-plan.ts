@@ -80,6 +80,14 @@ export const useBudgetPlanContext = (id: string) =>
     enabled: !!id,
   });
 
+// plan-end summary (saved/overspent, adherence, favorite restaurant)
+export const usePlanSummary = (id: string) =>
+  useQuery({
+    queryKey: ['planSummary', id],
+    queryFn: () => budgetPlanApi.getSummary(id),
+    enabled: !!id,
+  });
+
 // Paginated generation history for a plan, newest-first.
 //
 // Polls every 2s while any item on the *current page* is `pending` so the

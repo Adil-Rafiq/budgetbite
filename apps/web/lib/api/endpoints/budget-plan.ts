@@ -11,6 +11,7 @@ import type {
   BudgetGenerationDetailResponse,
   Paginated,
   PaginationQuery,
+  PlanSummaryResponse,
   PlanTimelineResponse,
 } from '@repo/shared';
 
@@ -29,6 +30,8 @@ export const budgetPlanApi = {
     apiClient.post(`api/budget-plans/${id}/cancel`).json(),
   getContext: (id: string): Promise<BudgetStateContext> =>
     apiClient.get(`api/budget-plans/${id}/context`).json(),
+  getSummary: (id: string): Promise<PlanSummaryResponse> =>
+    apiClient.get(`api/budget-plans/${id}/summary`).json(),
   listGenerations: (planId: string, params: PaginationQuery) =>
     apiClient
       .get(`api/budget-plans/${planId}/generations`, { searchParams: params })

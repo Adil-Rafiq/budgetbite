@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useBudgetPlanById } from '@/hooks/use-budget-plan';
 import { PlanDetailHeader } from '@/app/plans/[id]/_components/plan-detail-header';
 import { PlanSummaryCard } from '@/app/plans/[id]/_components/plan-summary-card';
+import { PlanEndSummaryCard } from '@/app/plans/[id]/_components/plan-end-summary-card';
 import { GenerationStatusBanner } from '@/app/plans/[id]/_components/generation-status-banner';
 import { GenerationHistoryTimeline } from '@/app/plans/[id]/_components/generation-history-timeline';
 import { PlanTimeline } from '@/app/plans/[id]/_components/plan-timeline';
@@ -82,7 +83,11 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
         <GenerationStatusBanner plan={plan} />
       </FadeUp>
       <FadeUp delay={0.12}>
-        <PlanSummaryCard plan={plan} />
+        {plan.status === 'active' ? (
+          <PlanSummaryCard plan={plan} />
+        ) : (
+          <PlanEndSummaryCard plan={plan} />
+        )}
       </FadeUp>
 
       <FadeUp delay={0.18}>
