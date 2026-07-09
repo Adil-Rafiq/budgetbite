@@ -29,6 +29,17 @@ export interface RestaurantPriceGapStats {
   avgPaidToEstimatedRatio: number;
 }
 
+export interface PlanFavoriteRestaurant {
+  restaurantId: string | null;
+  name: string;
+  choiceCount: number;
+}
+
+export interface PlanSummaryStats {
+  adherentCount: number;
+  favoriteRestaurant: PlanFavoriteRestaurant | null;
+}
+
 export const orderRepository = {
   async findById(id: string): Promise<MealChoice | undefined> {
     const [row] = await db.select().from(mealChoice).where(eq(mealChoice.id, id)).limit(1);
@@ -302,6 +313,49 @@ export const orderRepository = {
       restaurantName: r.restaurantName,
       menuItemName: r.menuItem?.name ?? null,
     }));
+  },
+
+  /**
+   * Adherence + favorite-restaurant stats for a plan's end-of-plan summary.
+   * Adherence counts choices tied to an AI suggestion (suggestionId set);
+   * favorite restaurant is the restaurant with the most logged choices
+   * (manual entries with no restaurant attached don't count toward either).
+   */
+  async getSummaryStatsForPlan(budgetPlanId: string): Promise<PlanSummaryStats> {
+    const [adherentRow] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(mealChoice)
+      .where(
+        and(eq(mealChoice.budgetPlanId, budgetPlanId), sql`${mealChoice.suggestionId} is not null`),
+      );
+
+    const [favoriteRow] = await db
+      .select({
+        restaurantId: mealChoice.restaurantId,
+        name: mealChoice.restaurantName,
+        choiceCount: sql<number>`count(*)::int`,
+      })
+      .from(mealChoice)
+      .where(
+        and(
+          eq(mealChoice.budgetPlanId, budgetPlanId),
+          sql`${mealChoice.restaurantName} is not null`,
+        ),
+      )
+      .groupBy(mealChoice.restaurantId, mealChoice.restaurantName)
+      .orderBy(desc(sql`count(*)`))
+      .limit(1);
+
+    return {
+      adherentCount: adherentRow?.count ?? 0,
+      favoriteRestaurant: favoriteRow
+        ? {
+            restaurantId: favoriteRow.restaurantId,
+            name: favoriteRow.name!,
+            choiceCount: favoriteRow.choiceCount,
+          }
+        : null,
+    };
   },
 
   /**
