@@ -25,6 +25,8 @@ export const planTimelineLoggedChoiceSchema = z.object({
   manualDescription: z.string().nullable(),
   actualAmountSpent: z.number(),
   isCustom: z.boolean(),
+  /** True when the user cooked at home instead of ordering — no restaurant attached. */
+  isHomeCooked: z.boolean(),
 });
 
 /**

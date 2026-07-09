@@ -12,6 +12,10 @@ import { isoDateStringSchema, uuidSchema } from './common.js';
  * server backfills them from the suggestion when only `suggestionId` is
  * supplied. They remain optional so free-form "manual" entries (typed
  * description, no catalogue link) keep working unchanged.
+ *
+ * `isHomeCooked` marks a meal the user cooked at home instead of ordering out:
+ * cost is user-entered, `manualDescription` holds an optional dish name, and the
+ * server strips any restaurant/menu-item link (a home-cooked meal has none).
  */
 export const recordMealChoiceSchema = z.object({
   slotDate: isoDateStringSchema,
@@ -22,6 +26,7 @@ export const recordMealChoiceSchema = z.object({
   manualDescription: z.string().max(500).optional(),
   actualAmountSpent: z.coerce.number().min(0),
   restaurantName: z.string().max(200).optional(),
+  isHomeCooked: z.boolean().optional(),
 });
 
 // ─── Response DTO ───────────────────────────────────────────────────────────
@@ -38,6 +43,7 @@ export const mealChoiceResponseSchema = z.object({
   actualAmountSpent: z.number(),
   restaurantName: z.string().nullable(),
   menuItemName: z.string().nullable(),
+  isHomeCooked: z.boolean(),
   createdAt: z.coerce.date(),
 });
 
