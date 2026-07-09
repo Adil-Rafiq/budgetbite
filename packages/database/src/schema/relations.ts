@@ -15,6 +15,7 @@ import {
 } from './meal-plan.js';
 import { mealChoice } from './order.js';
 import { mealPin } from './meal-pin.js';
+import { userFoodPreference } from './user-food-preference.js';
 import { feedback } from './feedback.js';
 import { restaurantRecommendation } from './restaurant-recommendation.js';
 import { budgetPlanMealType } from './budget-plan-meal-type.js';
@@ -27,6 +28,7 @@ export const userRelations = relations(user, ({ many, one }) => ({
   budgetPlans: many(budgetPlan),
   mealChoices: many(mealChoice),
   mealPins: many(mealPin),
+  foodPreferences: many(userFoodPreference),
   feedbacks: many(feedback),
   restaurantRecommendations: many(restaurantRecommendation),
 }));
@@ -203,6 +205,22 @@ export const mealPinRelations = relations(mealPin, ({ one }) => ({
   }),
   menuItem: one(menuItem, {
     fields: [mealPin.menuItemId],
+    references: [menuItem.id],
+  }),
+}));
+
+// User Food Preference Relations (favorites & block list)
+export const userFoodPreferenceRelations = relations(userFoodPreference, ({ one }) => ({
+  user: one(user, {
+    fields: [userFoodPreference.userId],
+    references: [user.id],
+  }),
+  restaurant: one(restaurant, {
+    fields: [userFoodPreference.restaurantId],
+    references: [restaurant.id],
+  }),
+  menuItem: one(menuItem, {
+    fields: [userFoodPreference.menuItemId],
     references: [menuItem.id],
   }),
 }));

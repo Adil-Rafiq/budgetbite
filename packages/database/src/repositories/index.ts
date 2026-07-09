@@ -24,6 +24,12 @@ export {
 } from './meal-plan.repo.js';
 export { orderRepository, type RestaurantPriceGapStats } from './order.repo.js';
 export { mealPinRepository, type MealPinWithRefs } from './meal-pin.repo.js';
+export {
+  userFoodPreferenceRepository,
+  type FoodPreferenceSentiment,
+  type FoodPreferenceWithRefs,
+  type PlannerFoodSignals,
+} from './user-food-preference.repo.js';
 export { feedbackRepository } from './feedback.repo.js';
 export {
   restaurantRecommendationRepository,

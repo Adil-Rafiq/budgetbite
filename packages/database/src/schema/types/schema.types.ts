@@ -14,6 +14,7 @@ import { mealType } from '../meal-type.js';
 import { menuItem } from '../menu-item.js';
 import { mealChoice } from '../order.js';
 import { mealPin } from '../meal-pin.js';
+import { userFoodPreference } from '../user-food-preference.js';
 import { restaurant } from '../restaurant.js';
 import { planContext } from '../plan-context.js';
 import { userPreferences } from '../user-preferences.js';
@@ -89,6 +90,10 @@ export type UpdateMealChoice = Partial<Omit<NewMealChoice, 'id'>>;
 export type MealPin = typeof mealPin.$inferSelect;
 export type NewMealPin = typeof mealPin.$inferInsert;
 export type UpdateMealPin = Partial<Omit<NewMealPin, 'id'>>;
+
+// User food preference types (favorites & block list)
+export type UserFoodPreference = typeof userFoodPreference.$inferSelect;
+export type NewUserFoodPreference = typeof userFoodPreference.$inferInsert;
 
 // Restaurant types
 export type Restaurant = typeof restaurant.$inferSelect;

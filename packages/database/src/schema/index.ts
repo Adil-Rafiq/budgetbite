@@ -8,6 +8,7 @@ export * from './budget-plan-meal-type.js';
 export * from './meal-plan.js';
 export * from './order.js';
 export * from './meal-pin.js';
+export * from './user-food-preference.js';
 export * from './feedback.js';
 export * from './restaurant-recommendation.js';
 export * from './relations.js';
