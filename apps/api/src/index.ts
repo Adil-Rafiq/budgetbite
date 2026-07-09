@@ -18,6 +18,7 @@ import foodPreferenceRoutes from './routes/food-preference.routes.js';
 import restaurantRecommendationRoutes from './routes/restaurant-recommendation.routes.js';
 import analyticsRoutes from './routes/analytics.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import cronRoutes from './routes/cron.routes.js';
 
 const app = express();
 const port = Number(process.env.API_PORT) || 3001;
@@ -70,6 +71,7 @@ app.use('/api/food-preferences', foodPreferenceRoutes);
 app.use('/api/restaurant-recommendations', restaurantRecommendationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/cron', cronRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found', code: 'NOT_FOUND' });

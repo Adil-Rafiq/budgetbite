@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 import {
   MAX_PRICE_PADDING_FACTOR,
   applyPinAdjustment,
+  daysRemaining,
+  isOnBudgetPace,
   padPrice,
   pricePaddingFactor,
   totalMealsForPlan,
@@ -132,6 +134,79 @@ describe('pricePaddingFactor', () => {
   it('treats a non-finite ratio as no signal', () => {
     expect(pricePaddingFactor({ avgPaidToEstimatedRatio: NaN, sampleCount: 10 })).toBe(1);
     expect(pricePaddingFactor({ avgPaidToEstimatedRatio: Infinity, sampleCount: 10 })).toBe(1);
+  });
+});
+
+describe('isOnBudgetPace', () => {
+  const base = { startDate: '2026-07-06', endDate: '2026-07-12', today: '2026-07-09' };
+
+  it('is on pace when spend fraction trails elapsed fraction', () => {
+    // 3 of 6 days elapsed (~0.5), spent 4000/10000 (0.4)
+    expect(isOnBudgetPace({ ...base, totalBudget: 10000, amountSpent: 4000 })).toBe(true);
+  });
+
+  it('is off pace when spend outruns the clock beyond tolerance', () => {
+    // ~0.5 elapsed, spent 0.8 of budget
+    expect(isOnBudgetPace({ ...base, totalBudget: 10000, amountSpent: 8000 })).toBe(false);
+  });
+
+  it('allows a small tolerance so slight front-loading still counts as on pace', () => {
+    // ~0.5 elapsed, spent 0.54 — within the 5% tolerance
+    expect(isOnBudgetPace({ ...base, totalBudget: 10000, amountSpent: 5400 })).toBe(true);
+  });
+
+  it('treats overspending a zero budget as off pace instead of dividing by zero', () => {
+    expect(isOnBudgetPace({ ...base, totalBudget: 0, amountSpent: 500 })).toBe(false);
+    expect(isOnBudgetPace({ ...base, totalBudget: 0, amountSpent: 0 })).toBe(true);
+  });
+
+  it('clamps a not-yet-started plan to zero elapsed, so spend past tolerance is off pace', () => {
+    // today precedes startDate → elapsed 0; 1000/10000 (0.1) exceeds tolerance
+    expect(
+      isOnBudgetPace({
+        totalBudget: 10000,
+        amountSpent: 1000,
+        startDate: '2026-07-10',
+        endDate: '2026-07-16',
+        today: '2026-07-08',
+      }),
+    ).toBe(false);
+    // ...but a trivial pre-spend within tolerance is still fine
+    expect(
+      isOnBudgetPace({
+        totalBudget: 10000,
+        amountSpent: 100,
+        startDate: '2026-07-10',
+        endDate: '2026-07-16',
+        today: '2026-07-08',
+      }),
+    ).toBe(true);
+  });
+
+  it('treats a same-day (zero-span) plan as fully elapsed', () => {
+    expect(
+      isOnBudgetPace({
+        totalBudget: 10000,
+        amountSpent: 9000,
+        startDate: '2026-07-09',
+        endDate: '2026-07-09',
+        today: '2026-07-09',
+      }),
+    ).toBe(true);
+  });
+});
+
+describe('daysRemaining', () => {
+  it('counts whole days up to and including the end date', () => {
+    expect(daysRemaining('2026-07-09', '2026-07-12')).toBe(3);
+  });
+
+  it('is zero on the final day', () => {
+    expect(daysRemaining('2026-07-12', '2026-07-12')).toBe(0);
+  });
+
+  it('clamps a past end date to zero', () => {
+    expect(daysRemaining('2026-07-12', '2026-07-06')).toBe(0);
   });
 });
 

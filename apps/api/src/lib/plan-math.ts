@@ -66,6 +66,48 @@ export function padPrice(listedPrice: number, factor: number): number {
   return Math.round(listedPrice * factor);
 }
 
+/**
+ * Weekly-digest pace check: has the plan's spend kept up with its clock?
+ * Compares the fraction of budget spent against the fraction of the plan's
+ * calendar span elapsed (both clamped to [0, 1]) and returns `true` when spend
+ * is at or below elapsed, allowing a small tolerance so a meal or two of
+ * front-loading doesn't read as "over budget". Dates are YYYY-MM-DD strings.
+ *
+ * A zero (or inverted) span and a non-positive budget both collapse to "fully
+ * elapsed" / "fully committed", so any spend beyond the budget reads as off
+ * pace rather than dividing by zero.
+ */
+export function isOnBudgetPace(input: {
+  totalBudget: number;
+  amountSpent: number;
+  startDate: string;
+  endDate: string;
+  today: string;
+}): boolean {
+  const { totalBudget, amountSpent } = input;
+  const spentFraction = totalBudget > 0 ? amountSpent / totalBudget : amountSpent > 0 ? 1 : 0;
+
+  const start = new Date(input.startDate).getTime();
+  const end = new Date(input.endDate).getTime();
+  const now = new Date(input.today).getTime();
+  const span = end - start;
+  const elapsedFraction = span > 0 ? Math.min(1, Math.max(0, (now - start) / span)) : 1;
+
+  const PACE_TOLERANCE = 0.05;
+  return spentFraction <= elapsedFraction + PACE_TOLERANCE;
+}
+
+/**
+ * Whole calendar days from `today` up to and including `endDate`, clamped at 0
+ * so a finished plan reports zero days left rather than a negative count.
+ * Dates are YYYY-MM-DD strings.
+ */
+export function daysRemaining(today: string, endDate: string): number {
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const diff = Math.round((new Date(endDate).getTime() - new Date(today).getTime()) / msPerDay);
+  return Math.max(0, diff);
+}
+
 export function applyPinAdjustment(
   raw: BudgetStateContext,
   pinSpend: number,
