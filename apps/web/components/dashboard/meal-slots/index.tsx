@@ -145,14 +145,24 @@ export function MealSlots() {
                                 letterSpacing: '-0.01em',
                               }}
                             >
-                              {loggedMeal.isCustom
-                                ? (loggedMeal.manualDescription ?? 'Custom entry')
-                                : (loggedMeal.menuItemName ?? loggedMeal.manualDescription ?? '—')}
+                              {loggedMeal.isHomeCooked
+                                ? (loggedMeal.manualDescription ?? 'Home-cooked meal')
+                                : loggedMeal.isCustom
+                                  ? (loggedMeal.manualDescription ?? 'Custom entry')
+                                  : (loggedMeal.menuItemName ??
+                                    loggedMeal.manualDescription ??
+                                    '—')}
                             </p>
-                            {loggedMeal.restaurantName && (
+                            {loggedMeal.isHomeCooked ? (
                               <p className="mt-0.5 truncate text-[12px] text-ink">
-                                {loggedMeal.restaurantName}
+                                🍳 Cooked at home
                               </p>
+                            ) : (
+                              loggedMeal.restaurantName && (
+                                <p className="mt-0.5 truncate text-[12px] text-ink">
+                                  {loggedMeal.restaurantName}
+                                </p>
+                              )
                             )}
                           </div>
                           <span
@@ -387,6 +397,40 @@ export function MealSlots() {
                   style={{ fontFamily: 'var(--font-mono)' }}
                   aria-hidden
                 >
+                  🍳
+                </span>
+                <div>
+                  <p
+                    className="text-vast"
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
+                    Cook at home
+                  </p>
+                  <p className="text-[12px] text-ink">Made it yourself? Log the cost.</p>
+                </div>
+              </div>
+              <Pill
+                variant="ghost"
+                size="xs"
+                onClick={() => actions.openLogModal(expandedSlotId!, { type: 'home' })}
+                className="shrink-0"
+              >
+                Log
+              </Pill>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-lumen-dk bg-lumen p-4">
+              <div className="flex items-center gap-3">
+                <span
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-fathom/10 text-[13px] text-fathom"
+                  style={{ fontFamily: 'var(--font-mono)' }}
+                  aria-hidden
+                >
                   ✎
                 </span>
                 <div>
@@ -401,7 +445,7 @@ export function MealSlots() {
                   >
                     Log your own
                   </p>
-                  <p className="text-[12px] text-ink">Had something else? Enter it manually.</p>
+                  <p className="text-[12px] text-ink">Ordered elsewhere? Enter it manually.</p>
                 </div>
               </div>
               <Pill

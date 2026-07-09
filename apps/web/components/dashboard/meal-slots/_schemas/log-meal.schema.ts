@@ -14,5 +14,13 @@ export const logCustomSchema = z.object({
   ...baseFields,
 });
 
+// Cook-at-home: no restaurant, dish name optional — only the amount spent on
+// ingredients is required.
+export const logHomeSchema = z.object({
+  manualDescription: z.string().max(500).optional(),
+  ...baseFields,
+});
+
 export type LogSuggestionForm = z.infer<typeof logSuggestionSchema>;
 export type LogCustomForm = z.infer<typeof logCustomSchema>;
+export type LogHomeForm = z.infer<typeof logHomeSchema>;

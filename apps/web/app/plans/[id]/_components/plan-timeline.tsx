@@ -48,16 +48,22 @@ function StatusBadge({ status }: { status: PlanTimelineSlot['status'] }) {
 
 function LoggedBody({ slot }: { slot: PlanTimelineSlot }) {
   const c = slot.loggedChoice!;
-  const title = c.isCustom
-    ? (c.manualDescription ?? 'Custom entry')
-    : (c.menuItemName ?? c.manualDescription ?? '—');
+  const title = c.isHomeCooked
+    ? (c.manualDescription ?? 'Home-cooked meal')
+    : c.isCustom
+      ? (c.manualDescription ?? 'Custom entry')
+      : (c.menuItemName ?? c.manualDescription ?? '—');
 
   return (
     <div className="flex items-start justify-between gap-3 rounded-lg border border-fathom/20 bg-fathom/[0.03] p-3">
       <div className="min-w-0">
         <p className="truncate text-[13px] font-medium text-vast">{title}</p>
-        {c.restaurantName && (
-          <p className="mt-0.5 truncate text-[11px] text-ink">{c.restaurantName}</p>
+        {c.isHomeCooked ? (
+          <p className="mt-0.5 truncate text-[11px] text-ink">🍳 Cooked at home</p>
+        ) : (
+          c.restaurantName && (
+            <p className="mt-0.5 truncate text-[11px] text-ink">{c.restaurantName}</p>
+          )
         )}
       </div>
       <span

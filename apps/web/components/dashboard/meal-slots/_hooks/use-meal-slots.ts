@@ -10,7 +10,10 @@ import type { GetSuggestionsQuery, SuggestionOption } from '@repo/shared';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type ModalMode = { type: 'suggestion'; option: SuggestionOption } | { type: 'custom' };
+export type ModalMode =
+  | { type: 'suggestion'; option: SuggestionOption }
+  | { type: 'custom' }
+  | { type: 'home' };
 
 export interface LogModalState {
   open: boolean;
@@ -34,6 +37,7 @@ export interface LoggedMeal {
   restaurantName: string | null;
   actualAmountSpent: number;
   isCustom: boolean;
+  isHomeCooked: boolean;
   manualDescription: string | null;
 }
 
@@ -66,6 +70,7 @@ export function useMealSlots() {
         restaurantName: choice.restaurantName,
         actualAmountSpent: choice.actualAmountSpent,
         isCustom: choice.suggestionId === null,
+        isHomeCooked: choice.isHomeCooked,
         manualDescription: choice.manualDescription,
       };
     }
@@ -109,21 +114,24 @@ export function useMealSlots() {
     if (!logModal.mealTypeId || !planId) return;
 
     try {
-      const isSuggestion = logModal.mode?.type === 'suggestion';
-      const option = isSuggestion
-        ? (logModal.mode as { type: 'suggestion'; option: SuggestionOption }).option
-        : null;
+      const mode = logModal.mode?.type;
+      const option =
+        mode === 'suggestion'
+          ? (logModal.mode as { type: 'suggestion'; option: SuggestionOption }).option
+          : null;
 
       const choice = await recordChoice({
         slotDate: today,
         mealTypeId: logModal.mealTypeId,
         actualAmountSpent: payload.actualAmountSpent,
-        ...(isSuggestion && option
+        ...(mode === 'suggestion' && option
           ? { suggestionId: option.id, restaurantName: option.restaurantName ?? undefined }
-          : {
-              manualDescription: payload.manualDescription,
-              restaurantName: payload.restaurantName,
-            }),
+          : mode === 'home'
+            ? { isHomeCooked: true, manualDescription: payload.manualDescription }
+            : {
+                manualDescription: payload.manualDescription,
+                restaurantName: payload.restaurantName,
+              }),
       });
 
       // Fire-and-forget — rating, liked, comment are all optional per FeedbackInput

@@ -15,8 +15,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Pill } from '@/components/ui/pill';
-import { logSuggestionSchema, logCustomSchema } from '../_schemas/log-meal.schema';
-import type { LogSuggestionForm, LogCustomForm } from '../_schemas/log-meal.schema';
+import { logSuggestionSchema, logCustomSchema, logHomeSchema } from '../_schemas/log-meal.schema';
+import type { LogSuggestionForm, LogCustomForm, LogHomeForm } from '../_schemas/log-meal.schema';
 import type { LogModalState, SavePayload } from '../_hooks/use-meal-slots';
 import { optionLabel } from '@/lib/suggestion';
 
@@ -27,7 +27,7 @@ const labelStyle: React.CSSProperties = {
 };
 const inputClass = 'bg-lumen border-lumen-dk text-vast';
 
-function FeedbackFields<T extends LogSuggestionForm | LogCustomForm>({
+function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeForm>({
   control,
 }: {
   control: Control<T>;
@@ -289,6 +289,82 @@ function CustomForm({ onSave, isSaving }: { onSave: (p: SavePayload) => void; is
   );
 }
 
+function HomeCookedForm({
+  onSave,
+  isSaving,
+}: {
+  onSave: (p: SavePayload) => void;
+  isSaving: boolean;
+}) {
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LogHomeForm>({
+    resolver: zodResolver(logHomeSchema),
+    defaultValues: {
+      manualDescription: '',
+      actualAmountSpent: 0,
+      rating: 0,
+      liked: null,
+      comment: '',
+    },
+  });
+
+  return (
+    <form
+      onSubmit={handleSubmit(onSave as SubmitHandler<LogHomeForm>)}
+      className="flex flex-col gap-4"
+    >
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="home-desc" className={labelClass} style={labelStyle}>
+          What did you cook?{' '}
+          <span className="ml-1 normal-case text-soft" style={{ letterSpacing: 0 }}>
+            (optional)
+          </span>
+        </Label>
+        <Input
+          id="home-desc"
+          placeholder="e.g. Chicken karahi & roti"
+          {...register('manualDescription')}
+          className={inputClass}
+        />
+        {errors.manualDescription && (
+          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
+            {errors.manualDescription.message}
+          </p>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="home-amount" className={labelClass} style={labelStyle}>
+          Ingredient / cooking cost (PKR)
+        </Label>
+        <Input
+          id="home-amount"
+          type="number"
+          {...register('actualAmountSpent', { valueAsNumber: true })}
+          className={`${inputClass} font-semibold`}
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 18,
+          }}
+        />
+        {errors.actualAmountSpent && (
+          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
+            {errors.actualAmountSpent.message}
+          </p>
+        )}
+      </div>
+
+      <FeedbackFields control={control} />
+
+      <PrimaryPill disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryPill>
+    </form>
+  );
+}
+
 interface Props {
   state: LogModalState;
   onClose: () => void;
@@ -297,8 +373,18 @@ interface Props {
 }
 
 export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
-  const isCustom = state.mode?.type === 'custom';
+  const mode = state.mode?.type;
+  const isCustom = mode === 'custom';
+  const isHome = mode === 'home';
   const option = state.mode?.type === 'suggestion' ? state.mode.option : null;
+
+  const eyebrow = isHome ? 'cook at home · /log' : isCustom ? 'custom · /log' : 'choose · /log';
+  const title = isHome ? 'Log a home-cooked meal' : isCustom ? 'Log custom meal' : 'Log your meal';
+  const description = isHome
+    ? 'You cooked this yourself — just note what it cost.'
+    : isCustom
+      ? 'Enter the details of what you had.'
+      : 'Confirm the amount and leave feedback.';
 
   return (
     <Dialog open={state.open} onOpenChange={onClose}>
@@ -308,7 +394,7 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
             className="text-[10px] uppercase text-fathom"
             style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
           >
-            {isCustom ? 'custom · /log' : 'choose · /log'}
+            {eyebrow}
           </div>
           <DialogTitle
             className="text-vast"
@@ -319,13 +405,9 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
               letterSpacing: '-0.02em',
             }}
           >
-            {isCustom ? 'Log custom meal' : 'Log your meal'}
+            {title}
           </DialogTitle>
-          <DialogDescription className="text-ink">
-            {isCustom
-              ? 'Enter the details of what you had.'
-              : 'Confirm the amount and leave feedback.'}
-          </DialogDescription>
+          <DialogDescription className="text-ink">{description}</DialogDescription>
         </DialogHeader>
 
         {option && (
@@ -350,7 +432,9 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
           </div>
         )}
 
-        {isCustom ? (
+        {isHome ? (
+          <HomeCookedForm key="home" onSave={onSave} isSaving={isSaving} />
+        ) : isCustom ? (
           <CustomForm key="custom" onSave={onSave} isSaving={isSaving} />
         ) : (
           <SuggestionForm
