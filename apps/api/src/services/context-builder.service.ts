@@ -7,6 +7,8 @@ import {
   userPreferencesRepository,
   orderRepository,
   userProfileRepository,
+  userFoodPreferenceRepository,
+  type PlannerFoodSignals,
 } from '@repo/database';
 import type {
   MealPlannerContext,
@@ -46,6 +48,7 @@ export const contextBuilderService = {
       pinnedSlots,
       pinAggregate,
       profile,
+      foodSignals,
     ] = await Promise.all([
       this.fetchPlanMeta(budgetPlanId),
       this.fetchRawBudgetState(budgetPlanId),
@@ -54,6 +57,7 @@ export const contextBuilderService = {
       mealPinRepository.getPinnedSlotsForGeneration(budgetPlanId, fromDate),
       mealPinRepository.sumFutureForPlan(budgetPlanId, fromDate),
       userProfileRepository.findByUserId(userId),
+      userFoodPreferenceRepository.getPlannerSignals(userId),
     ]);
 
     const budget = applyPinAdjustment(
@@ -69,13 +73,19 @@ export const contextBuilderService = {
       allergens: profile?.allergens ?? [],
     };
 
+    // Blocked restaurants come from two sources — the AI-learned dislikes on
+    // user_preferences and the user's explicit block list — and are both hard
+    // exclusions. Union them so neither leaks into the LLM's restaurant list.
+    const blockedRestaurantIds = [
+      ...new Set([...preferences.dislikedRestaurantIds, ...foodSignals.blockedRestaurantIds]),
+    ];
+
     const restaurants =
       profile?.latitude != null && profile?.longitude != null
-        ? await this.fetchNearbyRestaurants(
-            profile.latitude,
-            profile.longitude,
-            preferences.dislikedRestaurantIds,
-          )
+        ? await this.fetchNearbyRestaurants(profile.latitude, profile.longitude, {
+            ...foodSignals,
+            blockedRestaurantIds,
+          })
         : [];
 
     return { plan, budget, preferences, restaurants, remainingDates, pinnedSlots };
@@ -166,8 +176,13 @@ export const contextBuilderService = {
 
   /**
    * Fetch nearby restaurants using the Haversine approximation in SQL.
-   * Filters out disliked restaurants before returning.
    * Limits to MAX_RESTAURANTS to keep the LLM context manageable.
+   *
+   * Applies the user's favorites & block list:
+   *  - blocked restaurants are dropped entirely (hard exclusion),
+   *  - blocked menu items are dropped from each restaurant's menu,
+   *  - favorite restaurants / items are flagged `isFavorite` so the prompt can
+   *    bias toward them (soft preference).
    *
    * Menu prices are padded per restaurant with the learned actual-vs-listed
    * gap (logged spend vs suggested price, all users) so the LLM budgets
@@ -177,7 +192,7 @@ export const contextBuilderService = {
   async fetchNearbyRestaurants(
     lat: number,
     lng: number,
-    dislikedIds: string[],
+    signals: PlannerFoodSignals,
   ): Promise<NearbyRestaurantContext[]> {
     const results = await restaurantRepository.list({
       userLat: lat,
@@ -186,8 +201,13 @@ export const contextBuilderService = {
       limit: MAX_RESTAURANTS,
     });
 
-    // Filter disliked restaurants
-    const filtered = results.filter((r) => !dislikedIds.includes(r.restaurant.id));
+    const blockedRestaurants = new Set(signals.blockedRestaurantIds);
+    const blockedMenuItems = new Set(signals.blockedMenuItemIds);
+    const favoriteRestaurants = new Set(signals.favoriteRestaurantIds);
+    const favoriteMenuItems = new Set(signals.favoriteMenuItemIds);
+
+    // Filter blocked restaurants (hard exclusion)
+    const filtered = results.filter((r) => !blockedRestaurants.has(r.restaurant.id));
 
     const gapStats = await orderRepository.getPriceGapStatsByRestaurants(
       filtered.map((r) => r.restaurant.id),
@@ -207,12 +227,17 @@ export const contextBuilderService = {
           distanceKm: Number((distanceKm ?? 0).toFixed(2)),
           rating: r.rating ? Number(r.rating) : null,
           deliveryFee: r.deliveryFee ? Number(r.deliveryFee) : null,
-          menuItems: items.slice(0, MAX_ITEMS_PER_RESTAURANT).map((item) => ({
-            menuItemId: item.id,
-            name: item.name,
-            description: item.description,
-            price: padding > 1 ? padPrice(Number(item.price), padding) : Number(item.price),
-          })),
+          isFavorite: favoriteRestaurants.has(r.id),
+          menuItems: items
+            .filter((item) => !blockedMenuItems.has(item.id))
+            .slice(0, MAX_ITEMS_PER_RESTAURANT)
+            .map((item) => ({
+              menuItemId: item.id,
+              name: item.name,
+              description: item.description,
+              price: padding > 1 ? padPrice(Number(item.price), padding) : Number(item.price),
+              isFavorite: favoriteMenuItems.has(item.id),
+            })),
         };
       }),
     );
