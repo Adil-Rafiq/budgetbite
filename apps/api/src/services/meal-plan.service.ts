@@ -217,6 +217,7 @@ export const mealPlanService = {
             manualDescription: choice.manualDescription,
             actualAmountSpent: toNumber(choice.actualAmountSpent),
             isCustom: choice.suggestionId === null && choice.menuItemId === null,
+            isHomeCooked: choice.isHomeCooked,
           };
           return {
             mealTypeId: mt.id,

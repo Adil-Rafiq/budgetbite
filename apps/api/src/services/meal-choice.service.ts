@@ -32,6 +32,7 @@ function toMealChoiceResponse(c: {
   actualAmountSpent: string;
   restaurantName: string | null;
   menuItemName?: string | null;
+  isHomeCooked: boolean;
   createdAt: Date;
 }): MealChoiceResponse {
   return {
@@ -46,6 +47,7 @@ function toMealChoiceResponse(c: {
     actualAmountSpent: toNumber(c.actualAmountSpent),
     restaurantName: c.restaurantName,
     menuItemName: c.menuItemName ?? null,
+    isHomeCooked: c.isHomeCooked,
     createdAt: c.createdAt,
   };
 }
@@ -111,12 +113,18 @@ export const mealChoiceService = {
     if (!ctx) throw new AppError(500, 'Plan context missing', 'PLAN_CONTEXT_MISSING');
     const plannedMealBudget = toNumber(ctx.totalBudget) / Math.max(1, ctx.totalMeals);
 
+    // A home-cooked meal has no restaurant/menu-item link — the user cooked it
+    // themselves. Strip any restaurant fields the client sent so the row can
+    // never carry a spurious catalogue link (and never counts toward
+    // adherence or the favorite-restaurant summary).
+    const isHomeCooked = input.isHomeCooked === true;
+
     const fks = {
-      restaurantId: input.restaurantId ?? null,
-      menuItemId: input.menuItemId ?? null,
+      restaurantId: isHomeCooked ? null : (input.restaurantId ?? null),
+      menuItemId: isHomeCooked ? null : (input.menuItemId ?? null),
       manualDescription: input.manualDescription ?? null,
     };
-    await backfillFksFromSuggestion(input, fks);
+    if (!isHomeCooked) await backfillFksFromSuggestion(input, fks);
 
     const choice = await db.transaction(async (tx) => {
       const inserted = await orderRepository.create(
@@ -125,12 +133,13 @@ export const mealChoiceService = {
           budgetPlanId,
           slotDate: input.slotDate,
           mealTypeId: input.mealTypeId,
-          suggestionId: input.suggestionId ?? null,
+          suggestionId: isHomeCooked ? null : (input.suggestionId ?? null),
           restaurantId: fks.restaurantId,
           menuItemId: fks.menuItemId,
           manualDescription: fks.manualDescription,
+          isHomeCooked,
           actualAmountSpent: String(input.actualAmountSpent),
-          restaurantName: input.restaurantName ?? null,
+          restaurantName: isHomeCooked ? null : (input.restaurantName ?? null),
         },
         tx,
       );
@@ -162,7 +171,7 @@ export const mealChoiceService = {
         const ratio = Math.abs(variance) / Math.max(totalBudget, 1);
         if (ratio > getReplanRatioThreshold()) {
           const triggerSummary =
-            `User confirmed ${input.restaurantName ?? 'a meal'} on ${input.slotDate} ` +
+            `User confirmed ${input.restaurantName ?? (isHomeCooked ? 'a home-cooked meal' : 'a meal')} on ${input.slotDate} ` +
             `for PKR ${input.actualAmountSpent} (planned PKR ${plannedMealBudget.toFixed(2)}). ` +
             `Cumulative variance is now PKR ${variance.toFixed(2)} ` +
             `(${(ratio * 100).toFixed(1)}% of total budget).`;
