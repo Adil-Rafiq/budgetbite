@@ -1,0 +1,40 @@
+name: Weekly digest
+
+# Fires the weekly "spent X of Y" email digest by POSTing the cron endpoint on
+# the API. There is no in-process worker tier, so an external scheduler drives
+# it (see apps/api/DESIGN.md § Scheduled jobs).
+#
+# Setup (Settings → Secrets and variables → Actions):
+#   • Secret   CRON_SECRET   — must match the API's CRON_SECRET env var
+#   • Variable API_BASE_URL  — e.g. https://budgetbite-api.onrender.com (no trailing slash)
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Mondays 09:00 UTC
+  workflow_dispatch: {} # allow manual runs from the Actions tab
+
+# Never run two digest sends at once (a manual run overlapping the schedule).
+concurrency:
+  group: weekly-digest
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger weekly digest
+        env:
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$API_BASE_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "::error::API_BASE_URL variable and/or CRON_SECRET secret are not set"
+            exit 1
+          fi
+          # Render free tier cold-starts, so allow a generous timeout and a few
+          # retries. --fail makes a non-2xx response fail the job.
+          curl -fsS -X POST "$API_BASE_URL/api/cron/digests/weekly" \
+            -H "X-Cron-Secret: $CRON_SECRET" \
+            --max-time 180 \
+            --retry 3 --retry-delay 30 --retry-connrefused \
+            -w '\nHTTP %{http_code}\n'
