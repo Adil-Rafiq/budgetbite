@@ -1,0 +1,1 @@
+ALTER TABLE "meal_choice" ADD COLUMN "is_home_cooked" boolean DEFAULT false NOT NULL;

@@ -135,6 +135,7 @@ export const orderRepository = {
       actualAmountSpent: string;
       restaurantName: string | null;
       menuItemName: string | null;
+      isHomeCooked: boolean;
       createdAt: Date;
     }[]
   > {
@@ -154,6 +155,7 @@ export const orderRepository = {
         manualDescription: true,
         actualAmountSpent: true,
         restaurantName: true,
+        isHomeCooked: true,
         createdAt: true,
       },
       with: {
@@ -175,6 +177,7 @@ export const orderRepository = {
       actualAmountSpent: r.actualAmountSpent,
       restaurantName: r.restaurantName,
       menuItemName: r.menuItem?.name ?? null,
+      isHomeCooked: r.isHomeCooked,
       createdAt: r.createdAt,
     }));
   },
@@ -279,6 +282,7 @@ export const orderRepository = {
       actualAmountSpent: string;
       restaurantName: string | null;
       menuItemName: string | null;
+      isHomeCooked: boolean;
     }[]
   > {
     const rows = await db.query.mealChoice.findMany({
@@ -293,6 +297,7 @@ export const orderRepository = {
         manualDescription: true,
         actualAmountSpent: true,
         restaurantName: true,
+        isHomeCooked: true,
       },
       with: {
         menuItem: {
@@ -312,6 +317,7 @@ export const orderRepository = {
       actualAmountSpent: r.actualAmountSpent,
       restaurantName: r.restaurantName,
       menuItemName: r.menuItem?.name ?? null,
+      isHomeCooked: r.isHomeCooked,
     }));
   },
 
@@ -379,6 +385,7 @@ export const orderRepository = {
         manualDescription: true,
         actualAmountSpent: true,
         restaurantName: true,
+        isHomeCooked: true,
         createdAt: true,
       },
       with: {
@@ -404,6 +411,7 @@ export const orderRepository = {
       manualDescription: row.manualDescription,
       actualAmountSpent: row.actualAmountSpent,
       restaurantName: row.restaurantName,
+      isHomeCooked: row.isHomeCooked,
       createdAt: row.createdAt,
       mealTypeLabel: row.mealType.label,
     };

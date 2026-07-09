@@ -1,4 +1,4 @@
-import { date, decimal, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, date, decimal, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { budgetPlan } from './budget-plan.js';
 import { mealSuggestion } from './meal-plan.js';
@@ -33,6 +33,13 @@ export const mealChoice = pgTable('meal_choice', {
     onDelete: 'set null',
   }),
   manualDescription: text('manual_description'),
+  // A meal the user cooked at home rather than ordered out. Mutually exclusive
+  // with a restaurant/menu-item link: home-cooked rows carry no suggestionId,
+  // restaurantId, menuItemId, or restaurantName — only a user-entered amount and
+  // an optional dish name in manualDescription. Kept as an explicit flag (rather
+  // than inferred from null restaurant fields) so display/analytics can tell a
+  // home-cooked meal apart from a manual restaurant entry.
+  isHomeCooked: boolean('is_home_cooked').notNull().default(false),
   actualAmountSpent: decimal('actual_amount_spent', { precision: 10, scale: 2 }).notNull(),
   restaurantName: text('restaurant_name'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
