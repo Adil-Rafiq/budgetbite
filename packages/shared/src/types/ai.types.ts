@@ -60,11 +60,15 @@ export interface NearbyRestaurantContext {
   distanceKm: number;
   rating: number | null;
   deliveryFee: number | null;
+  /** User has favorited this restaurant — the planner should bias toward it. */
+  isFavorite: boolean;
   menuItems: {
     menuItemId: string;
     name: string;
     description: string | null;
     price: number;
+    /** User has favorited this dish — the planner should bias toward it. */
+    isFavorite: boolean;
   }[];
 }
 
