@@ -61,6 +61,15 @@ export type AdminPlanListRow = BudgetPlan & {
   mealGenerations: LatestGenerationRow[];
 };
 
+/**
+ * One active plan enriched with just what the weekly email digest needs: the
+ * owner's contact fields and the running budget state from plan_context.
+ */
+export type ActiveDigestPlanRow = BudgetPlan & {
+  user: { name: string; email: string; emailVerified: boolean };
+  planContext: PlanContextRelationRow | null;
+};
+
 export type BudgetPlanIncludeFlags = {
   withContext?: boolean;
   withMealTypes?: boolean;
@@ -422,6 +431,43 @@ export const budgetPlanRepository = {
       },
     });
     return rows as AdminPlanListRow[];
+  },
+
+  /**
+   * Every active plan across all users with its owner (name/email/verified) and
+   * plan_context, for the weekly email digest batch. Cross-user by design and
+   * unpaginated — the caller (a scheduled digest run) fans out one email per
+   * row, so this is not exposed on any user-facing read path.
+   */
+  async listActiveForDigest(): Promise<ActiveDigestPlanRow[]> {
+    const rows = await db.query.budgetPlan.findMany({
+      where: eq(budgetPlan.status, 'active'),
+      orderBy: asc(budgetPlan.createdAt),
+      with: {
+        user: { columns: { name: true, email: true, emailVerified: true } },
+        planContext: {
+          columns: {
+            totalBudget: true,
+            amountSpent: true,
+            amountRemaining: true,
+            totalMeals: true,
+            mealsConsumed: true,
+            mealsRemaining: true,
+            avgBudgetPerRemainingMeal: true,
+            cumulativeVariance: true,
+          },
+        },
+      },
+    });
+    return rows as ActiveDigestPlanRow[];
+  },
+
+  /** Stamp a plan's weekly-digest marker to now, once its email has been sent. */
+  async markWeeklyDigestSent(planId: string): Promise<void> {
+    await db
+      .update(budgetPlan)
+      .set({ lastWeeklyDigestSentAt: new Date() })
+      .where(eq(budgetPlan.id, planId));
   },
 
   async countAllForAdmin(status?: 'active' | 'completed' | 'cancelled'): Promise<number> {

@@ -1,0 +1,1 @@
+ALTER TABLE "budget_plan" ADD COLUMN "last_weekly_digest_sent_at" timestamp with time zone;

@@ -8,6 +8,7 @@ import {
   text,
   date,
   jsonb,
+  timestamp,
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
@@ -34,6 +35,12 @@ export const budgetPlan = pgTable(
     status: text('status', { enum: ['active', 'completed', 'cancelled'] })
       .notNull()
       .default('active'),
+
+    // Idempotency marker for the weekly email digest: when the last digest for
+    // this plan went out. Null until the first send. The digest job skips any
+    // plan sent within its cooldown window, so a cron misfire or manual
+    // re-trigger in the same week never double-emails the user.
+    lastWeeklyDigestSentAt: timestamp('last_weekly_digest_sent_at', { withTimezone: true }),
 
     ...timestamps,
   },

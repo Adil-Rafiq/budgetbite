@@ -15,6 +15,7 @@ export {
   type MealTypeOnPlanRow,
   type LatestGenerationRow,
   type AdminPlanListRow,
+  type ActiveDigestPlanRow,
 } from './budget-plan.repo.js';
 export {
   mealPlanRepository,
@@ -22,7 +23,11 @@ export {
   type SuggestionItemRow,
   type SuggestionWithRelations,
 } from './meal-plan.repo.js';
-export { orderRepository, type RestaurantPriceGapStats } from './order.repo.js';
+export {
+  orderRepository,
+  type RestaurantPriceGapStats,
+  type PlanWeeklyStats,
+} from './order.repo.js';
 export { mealPinRepository, type MealPinWithRefs } from './meal-pin.repo.js';
 export {
   userFoodPreferenceRepository,

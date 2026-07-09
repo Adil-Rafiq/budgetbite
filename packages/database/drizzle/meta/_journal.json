@@ -127,6 +127,13 @@
       "when": 1783622688591,
       "tag": "0017_naive_dust",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1783625648109,
+      "tag": "0018_skinny_colossus",
+      "breakpoints": true
     }
   ]
 }

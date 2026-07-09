@@ -40,6 +40,14 @@ export interface PlanSummaryStats {
   favoriteRestaurant: PlanFavoriteRestaurant | null;
 }
 
+export interface PlanWeeklyStats {
+  budgetPlanId: string;
+  /** Choices logged in the window. */
+  mealsLogged: number;
+  /** Sum of actualAmountSpent over the window. */
+  amountSpent: number;
+}
+
 export const orderRepository = {
   async findById(id: string): Promise<MealChoice | undefined> {
     const [row] = await db.select().from(mealChoice).where(eq(mealChoice.id, id)).limit(1);
@@ -109,6 +117,36 @@ export const orderRepository = {
       .from(mealChoice)
       .where(eq(mealChoice.budgetPlanId, budgetPlanId));
     return row?.total ?? '0';
+  },
+
+  /**
+   * Per-plan meals-logged count and total spent over a window (slotDate on or
+   * after `sinceDate`), for a set of plans in one grouped query. Powers the
+   * "this week" section of the weekly email digest. Plans with no choices in
+   * the window are simply absent from the result — the caller defaults them to
+   * zero.
+   */
+  async getWeeklyStatsByPlans(
+    budgetPlanIds: string[],
+    sinceDate: string,
+  ): Promise<PlanWeeklyStats[]> {
+    if (budgetPlanIds.length === 0) return [];
+    const rows = await db
+      .select({
+        budgetPlanId: mealChoice.budgetPlanId,
+        mealsLogged: sql<number>`count(*)::int`,
+        amountSpent: sql<string>`coalesce(sum(${mealChoice.actualAmountSpent}::numeric), 0)::text`,
+      })
+      .from(mealChoice)
+      .where(
+        and(inArray(mealChoice.budgetPlanId, budgetPlanIds), gte(mealChoice.slotDate, sinceDate)),
+      )
+      .groupBy(mealChoice.budgetPlanId);
+    return rows.map((r) => ({
+      budgetPlanId: r.budgetPlanId,
+      mealsLogged: r.mealsLogged,
+      amountSpent: Number(r.amountSpent),
+    }));
   },
 
   async create(data: NewMealChoice, tx?: DbOrTx): Promise<MealChoice> {
