@@ -127,6 +127,16 @@ Keep **read** endpoints public (or optionally authenticated) under existing path
 
 - **Mount:** e.g. `app.use("/api/admin", adminOrScraperMiddleware, adminRoutes)` so every admin route is protected by the same guard.
 
+#### Scheduled jobs (`/api/cron/*`)
+
+There is no in-process worker/scheduler tier, so recurring jobs are exposed as HTTP endpoints and driven by an **external scheduler** (Vercel/Cloudflare cron, a GitHub Actions cron, cron-job.org, …). These live under their **own `/api/cron` prefix**, separate from `/api/admin` — a cron runner is a single-purpose machine caller, so it gets a dedicated least-privilege secret (`CRON_SECRET`, sent as `X-Cron-Secret: <value>`) rather than the full-trust `ADMIN_API_KEY`. When `CRON_SECRET` is unset the endpoints return 503 (closed by default). See `cron.middleware.ts` / `cron.routes.ts`.
+
+| Method   | Path                           | Purpose                                                              | Used by       |
+| -------- | ------------------------------ | -------------------------------------------------------------------- | ------------- |
+| **POST** | **`/api/cron/digests/weekly`** | Email a "spent X of Y" progress digest to every eligible active plan | External cron |
+
+The weekly digest picks up active plans whose owner has a verified email and whose date window includes today, computes plan-to-date + trailing-7-day figures, and sends one email each; the response is `{ total, sent, skipped, failed }`. Each send is isolated, so one bad recipient never aborts the batch. It is **idempotent within a week**: each plan carries a `last_weekly_digest_sent_at` marker (stamped only after a confirmed send) and a plan sent inside the ~6-day cooldown is skipped, so a cron misfire or manual re-trigger never double-emails.
+
 ### 2. Authorization: two ways to access admin routes
 
 Only two callers should be allowed: the **scraper** (automated) and **admin users** (dashboard).
