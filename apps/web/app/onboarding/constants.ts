@@ -5,26 +5,35 @@ export const ONBOARDING_STEPS: readonly OnboardingStep[] = [
   {
     id: 'location',
     icon: MapPin,
-    title: 'Set your location',
-    description: 'We use this to find nearby restaurants',
+    label: 'Your location',
+    accent: 'green',
+    title: 'Where do you eat out?',
+    description:
+      "We'll find restaurants near you with real menus and live prices to build your plan.",
   },
   {
     id: 'dietary',
     icon: Salad,
-    title: 'Dietary preferences',
-    description: 'Tell the AI what you eat — and what it must avoid',
+    label: 'Dietary preferences',
+    accent: 'dark-green',
+    title: 'Anything we should know?',
+    description: 'Tell the AI what you love to eat — and what it must always avoid.',
   },
   {
     id: 'budget',
     icon: Wallet,
-    title: 'Create your budget plan',
-    description: 'Set up your first meal budget',
+    label: 'Budget setup',
+    accent: 'tomato',
+    title: 'How much do you want to spend?',
+    description: 'Set a realistic food budget. The AI makes every rupee count across real menus.',
   },
   {
     id: 'notifications',
     icon: Bell,
-    title: 'Notification times',
-    description: 'When should we remind you to order?',
+    label: 'Meal reminders',
+    accent: 'green',
+    title: 'When should we nudge you?',
+    description: 'A single reminder per meal, at the time you choose. Toggle off any you skip.',
   },
 ] as const;
 
