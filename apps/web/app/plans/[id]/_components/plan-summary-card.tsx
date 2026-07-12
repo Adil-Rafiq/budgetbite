@@ -6,7 +6,6 @@ import { motion } from 'motion/react';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
 import { useUser } from '@/hooks/use-user';
 import { cn } from '@/lib/utils';
-import { Pill } from '@/components/ui/pill';
 import type { BudgetPlanDetail } from '@repo/shared';
 
 interface PlanSummaryCardProps {
@@ -50,42 +49,35 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
 
   const varianceTone =
     ctx.cumulativeVariance >= 0
-      ? 'text-fathom'
+      ? 'text-green'
       : ctx.cumulativeVariance < -total * 0.1
-        ? 'text-pulse'
-        : 'text-amber';
+        ? 'text-tomato'
+        : 'text-[#b45309]';
+
+  const fillClass = spentPercent >= 90 ? 'bg-tomato' : 'bg-green';
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+    <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
       <div className="flex flex-col gap-5 p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-1">
-            <div
-              className="text-[10px] uppercase text-soft"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-            >
-              budget summary
+            <div className="text-xs font-semibold uppercase tracking-widest text-slate/60">
+              Budget summary
             </div>
-            <p
-              className="leading-tight text-vast"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 32,
-                fontWeight: 600,
-                letterSpacing: '-0.02em',
-              }}
-            >
+            <p className="font-display text-[32px] font-semibold leading-tight tracking-tight text-charcoal">
               {fmtPkr(remaining)}
-              <span
-                className="ml-2 text-[13px] font-normal text-ink"
-                style={{ fontFamily: 'var(--font-body)' }}
-              >
+              <span className="ml-2 text-[13px] font-normal text-slate">
                 of {fmtPkr(total)} left
               </span>
             </p>
           </div>
 
-          <Pill size="md" onClick={handleGenerate} disabled={disabled} className="shrink-0">
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={disabled}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-green px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+          >
             {hasActiveGen ? (
               <>
                 <RefreshCw className={cn('h-4 w-4', generate.isPending && 'animate-spin')} />
@@ -97,11 +89,11 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
                 Generate now
               </>
             )}
-          </Pill>
+          </button>
         </div>
 
         {needsLocation && (
-          <div className="flex items-start gap-3 rounded-xl border border-amber/20 bg-amber/10 px-4 py-3 text-amber">
+          <div className="flex items-start gap-3 rounded-xl border border-[#f5a623]/30 bg-[#fef6e6] px-4 py-3 text-[#8a5a12]">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="text-[14px] font-medium">Set your location to generate a plan</p>
@@ -110,29 +102,26 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
                 come back to generate suggestions.
               </p>
             </div>
-            <Pill asChild variant="ghost" size="xs" className="shrink-0">
-              <Link href="/onboarding">Complete setup</Link>
-            </Pill>
+            <Link
+              href="/onboarding"
+              className="inline-flex shrink-0 items-center rounded-lg border border-[#f5a623]/40 bg-white px-3 py-1.5 text-[12px] font-medium text-[#8a5a12] transition-colors hover:bg-[#fef6e6]"
+            >
+              Complete setup
+            </Link>
           </div>
         )}
 
         <div className="flex flex-col gap-2">
-          <div
-            className="flex items-center justify-between text-[12px] text-ink"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
+          <div className="flex items-center justify-between text-[12px] text-slate">
             <span>{fmtPkr(spent)} spent</span>
-            <span className="font-semibold text-vast">{spentPercent}%</span>
+            <span className="font-semibold text-charcoal">{spentPercent}%</span>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-lumen-dk">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-sage/50">
             <motion.div
-              className="h-full rounded-full"
+              className={`h-full rounded-full ${fillClass}`}
               initial={{ width: '0%' }}
               animate={{ width: `${spentPercent}%` }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-              style={{
-                background: 'linear-gradient(90deg, var(--color-fathom), var(--color-amber))',
-              }}
             />
           </div>
         </div>
@@ -157,17 +146,13 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
 
         {plan.mealTypes.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
-            <span
-              className="mr-1 text-[10px] uppercase text-soft"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-            >
-              tracking
+            <span className="mr-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60">
+              Tracking
             </span>
             {plan.mealTypes.map((mt) => (
               <span
                 key={mt.id}
-                className="rounded-full border border-lumen-dk bg-lumen px-2.5 py-0.5 text-[10px] capitalize text-vast"
-                style={{ fontFamily: 'var(--font-mono)' }}
+                className="rounded-full border border-sage bg-canvas px-2.5 py-0.5 text-[10px] capitalize text-slate"
               >
                 {mt.label}
               </span>
@@ -189,21 +174,10 @@ function SummaryStat({
   toneClass?: string;
 }) {
   return (
-    <div className="rounded-lg border border-lumen-dk bg-lumen p-3">
+    <div className="rounded-lg border border-sage bg-canvas p-3">
+      <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate/60">{label}</p>
       <p
-        className="text-[9px] uppercase text-soft"
-        style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-      >
-        {label}
-      </p>
-      <p
-        className={`mt-0.5 ${toneClass ?? 'text-vast'}`}
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 15,
-          fontWeight: 600,
-          letterSpacing: '-0.01em',
-        }}
+        className={`mt-0.5 font-display text-[15px] font-semibold tracking-tight ${toneClass ?? 'text-charcoal'}`}
       >
         {value}
       </p>

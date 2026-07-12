@@ -10,7 +10,6 @@ import { GenerationStatusBanner } from '@/app/plans/[id]/_components/generation-
 import { GenerationHistoryTimeline } from '@/app/plans/[id]/_components/generation-history-timeline';
 import { PlanTimeline } from '@/app/plans/[id]/_components/plan-timeline';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Pill } from '@/components/ui/pill';
 import { FadeUp } from '@/components/motion';
 
 export default function PlanDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -21,12 +20,12 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
     return (
       <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <div className="h-3 w-24 animate-pulse rounded bg-lumen-dk" />
-          <div className="h-8 w-48 animate-pulse rounded bg-lumen-dk" />
-          <div className="h-4 w-64 animate-pulse rounded bg-lumen-dk" />
+          <div className="h-3 w-24 animate-pulse rounded bg-sage" />
+          <div className="h-8 w-48 animate-pulse rounded bg-sage" />
+          <div className="h-4 w-64 animate-pulse rounded bg-sage" />
         </div>
-        <div className="h-44 w-full animate-pulse rounded-2xl bg-lumen-dk" />
-        <div className="h-32 w-full animate-pulse rounded-2xl bg-lumen-dk" />
+        <div className="h-44 w-full animate-pulse rounded-2xl bg-sage" />
+        <div className="h-32 w-full animate-pulse rounded-2xl bg-sage" />
       </div>
     );
   }
@@ -36,13 +35,12 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
       <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-4">
         <Link
           href="/plans"
-          className="inline-flex w-fit items-center gap-1.5 text-[12px] text-ink"
-          style={{ fontFamily: 'var(--font-mono)' }}
+          className="inline-flex w-fit items-center gap-1.5 text-[12px] text-slate transition hover:text-green"
         >
-          ← back to plans
+          ← Back to plans
         </Link>
-        <div className="flex items-start gap-3 rounded-xl border border-pulse bg-pulse/[0.06] p-4 text-pulse">
-          <span style={{ fontFamily: 'var(--font-mono)' }}>!</span>
+        <div className="flex items-start gap-3 rounded-xl border border-tomato/30 bg-tomato/[0.06] p-4 text-tomato">
+          <span className="font-semibold">!</span>
           <div className="min-w-0">
             <p className="text-[14px] font-medium">Couldn&apos;t load this plan</p>
             <p className="mt-0.5 text-[12px] opacity-80">{error.message}</p>
@@ -57,18 +55,20 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
       <div className="mx-auto flex w-full max-w-[1180px] flex-col items-start gap-4">
         <Link
           href="/plans"
-          className="inline-flex items-center gap-1.5 text-[12px] text-ink"
-          style={{ fontFamily: 'var(--font-mono)' }}
+          className="inline-flex items-center gap-1.5 text-[12px] text-slate transition hover:text-green"
         >
-          ← back to plans
+          ← Back to plans
         </Link>
-        <div className="w-full rounded-2xl border border-dashed border-lumen-dk bg-white p-8 text-center">
-          <p className="text-[14px] text-ink">
+        <div className="w-full rounded-2xl border border-dashed border-sage bg-white p-8 text-center">
+          <p className="text-sm text-slate">
             This plan doesn&apos;t exist or you don&apos;t have access to it.
           </p>
-          <Pill asChild size="sm" className="mt-3">
-            <Link href="/plans">Back to plans</Link>
-          </Pill>
+          <Link
+            href="/plans"
+            className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl bg-green px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green"
+          >
+            Back to plans
+          </Link>
         </div>
       </div>
     );
