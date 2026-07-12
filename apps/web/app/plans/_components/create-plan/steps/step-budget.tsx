@@ -10,11 +10,7 @@ import {
 } from '@/components/ui/select';
 import { useCreatePlanContext } from '@/app/plans/_context/create-plan-context';
 
-const labelClass = 'text-[10px] uppercase text-soft';
-const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)',
-  letterSpacing: '0.18em',
-};
+const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60';
 
 export const StepBudgetDetails = () => {
   const { steps, mealTypes } = useCreatePlanContext();
@@ -23,9 +19,7 @@ export const StepBudgetDetails = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <Label className={labelClass} style={labelStyle}>
-          Plan type
-        </Label>
+        <Label className={labelClass}>Plan type</Label>
         <Select value={values.planType} onValueChange={actions.setPlanType}>
           <SelectTrigger>
             <SelectValue />
@@ -37,7 +31,7 @@ export const StepBudgetDetails = () => {
         </Select>
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="budget" className={labelClass} style={labelStyle}>
+        <Label htmlFor="budget" className={labelClass}>
           Total budget (PKR)
         </Label>
         <Input
@@ -46,27 +40,22 @@ export const StepBudgetDetails = () => {
           min={1}
           value={values.totalBudget}
           onChange={(event) => actions.setTotalBudget(Number(event.target.value))}
-          className="font-semibold text-vast"
-          style={{ fontFamily: 'var(--font-display)', fontSize: 18 }}
+          className="font-display text-lg font-semibold text-charcoal"
         />
         {errors.totalBudget ? (
-          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
-            {errors.totalBudget}
-          </p>
+          <p className="text-[11px] text-tomato">{errors.totalBudget}</p>
         ) : null}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label className={labelClass} style={labelStyle}>
-          Meal types
-        </Label>
+        <Label className={labelClass}>Meal types</Label>
 
         {mealTypes.status === 'loading' && (
           <div className="flex flex-wrap gap-2" aria-busy="true" aria-label="Loading meal types">
             {[0, 1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-[30px] w-20 animate-pulse rounded-full border border-lumen-dk bg-lumen"
+                className="h-[30px] w-20 animate-pulse rounded-full border border-sage bg-canvas"
               />
             ))}
           </div>
@@ -75,16 +64,16 @@ export const StepBudgetDetails = () => {
         {mealTypes.status === 'error' && (
           <div
             role="alert"
-            className="flex flex-col items-start gap-2 rounded-lg border border-pulse/30 bg-pulse/5 p-3 text-[12px]"
+            className="flex flex-col items-start gap-2 rounded-lg border border-tomato/30 bg-tomato/5 p-3 text-[12px]"
           >
-            <div className="font-medium text-pulse">Couldn&apos;t load meal types</div>
-            <div className="text-[11px] text-ink">
+            <div className="font-medium text-tomato">Couldn&apos;t load meal types</div>
+            <div className="text-[11px] text-slate">
               Check your connection and try again. If this keeps happening, please contact support.
             </div>
             <button
               type="button"
               onClick={mealTypes.refetch}
-              className="text-[11px] font-medium text-fathom underline underline-offset-2"
+              className="text-[11px] font-medium text-green underline underline-offset-2"
             >
               Try again
             </button>
@@ -92,9 +81,9 @@ export const StepBudgetDetails = () => {
         )}
 
         {mealTypes.status === 'empty' && (
-          <div className="rounded-lg border border-lumen-dk bg-lumen p-3 text-[12px] text-vast">
+          <div className="rounded-lg border border-sage bg-canvas p-3 text-[12px] text-charcoal">
             <div className="font-medium">No meal types available yet</div>
-            <div className="mt-0.5 text-[11px] text-ink">
+            <div className="mt-0.5 text-[11px] text-slate">
               An admin still needs to configure these. Please reach out to support so we can get you
               set up.
             </div>
@@ -111,8 +100,8 @@ export const StepBudgetDetails = () => {
                     key={type.id}
                     className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 transition ${
                       checked
-                        ? 'border-vast bg-vast text-lumen'
-                        : 'border-lumen-dk bg-lumen text-vast'
+                        ? 'border-green bg-green text-white'
+                        : 'border-sage bg-canvas text-slate hover:border-green/40'
                     }`}
                   >
                     <Checkbox
@@ -120,29 +109,19 @@ export const StepBudgetDetails = () => {
                       onCheckedChange={() => actions.toggleMealType(type.id)}
                       className="hidden"
                     />
-                    <span
-                      className="text-[12px] capitalize"
-                      style={{ fontFamily: 'var(--font-mono)' }}
-                    >
-                      {type.label}
-                    </span>
+                    <span className="text-[12px] font-medium capitalize">{type.label}</span>
                   </label>
                 );
               })}
             </div>
             {errors.mealTypeIds ? (
-              <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
-                {errors.mealTypeIds}
-              </p>
+              <p className="text-[11px] text-tomato">{errors.mealTypeIds}</p>
             ) : null}
           </>
         )}
       </div>
-      <div
-        className="rounded-lg border border-lumen-dk bg-lumen p-3 text-[12px] text-ink"
-        style={{ fontFamily: 'var(--font-mono)' }}
-      >
-        meals/day = {values.mealsPerDay} · based on selected types
+      <div className="rounded-lg border border-sage bg-canvas p-3 text-[12px] text-slate">
+        Meals/day = {values.mealsPerDay} · based on selected types
       </div>
     </div>
   );
