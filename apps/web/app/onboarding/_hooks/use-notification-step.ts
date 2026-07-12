@@ -14,22 +14,42 @@ type NotificationSlot = NotificationPreferencesInput['notificationSlots'][number
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
+ * Sensible default reminder times per meal, keyed by meal-type key. New slots
+ * start pre-filled with these so the user can finish onboarding without opening
+ * a single time picker — they only adjust the ones they care about. Unknown
+ * keys fall back to midday.
+ */
+const DEFAULT_TIME_BY_KEY: Record<string, string> = {
+  breakfast: '08:00',
+  lunch: '13:00',
+  dinner: '20:00',
+  snack: '16:00',
+};
+const FALLBACK_TIME = '12:00';
+
+const defaultTimeForMealType = (option?: BudgetPlanMealTypeOption): string =>
+  (option && DEFAULT_TIME_BY_KEY[option.key]) ?? FALLBACK_TIME;
+
+/**
  * Builds notification slots aligned to the current meal type selection.
- * Preserves existing times where the meal type already has one set.
- * New meal types get an empty time so the user must fill them in.
+ * Preserves existing times where the meal type already has one set; new meal
+ * types get a sensible default time so the plan can be launched as-is.
  */
 const buildSlotsForMealTypes = (
   current: NotificationSlot[],
   selectedMealTypeIds: string[],
+  mealTypeOptions: BudgetPlanMealTypeOption[],
 ): NotificationSlot[] => {
   const ids =
     selectedMealTypeIds.length > 0 ? selectedMealTypeIds : current.map((slot) => slot.mealTypeId);
 
   return ids.map((mealTypeId) => {
     const existing = current.find((slot) => slot.mealTypeId === mealTypeId);
+    const option = mealTypeOptions.find((opt) => opt.id === mealTypeId);
     return {
       mealTypeId,
-      time: existing?.time ?? '',
+      // `||` (not `??`) so a previously empty time is replaced with a default.
+      time: existing?.time || defaultTimeForMealType(option),
       enabled: existing?.enabled ?? true,
     };
   });
@@ -66,14 +86,14 @@ export const useNotificationStep = (
   // removes slots for deselected meal types.
   useEffect(() => {
     const current = form.getValues('notificationSlots');
-    const next = buildSlotsForMealTypes(current, selectedMealTypeIds);
+    const next = buildSlotsForMealTypes(current, selectedMealTypeIds, mealTypeOptions);
 
     if (areSlotsEqual(current, next)) return;
 
     // Set without shouldValidate — user hasn't interacted yet,
     // triggering errors immediately would be jarring
     form.setValue('notificationSlots', next, { shouldDirty: true });
-  }, [selectedMealTypeIds, form]);
+  }, [selectedMealTypeIds, mealTypeOptions, form]);
 
   // ─── Actions ────────────────────────────────────────────────────────────────
 
