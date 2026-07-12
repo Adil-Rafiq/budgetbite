@@ -24,7 +24,6 @@ import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { useRestaurants } from '@/hooks/use-restaurant';
 import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
-import { Pill } from '@/components/ui/pill';
 import { RecommendRestaurantButton } from '@/components/recommend-restaurant-button';
 import { motion } from 'motion/react';
 
@@ -49,17 +48,16 @@ type SortValue = RestaurantSort | 'auto';
 
 type FitTone = 'green' | 'amber' | 'red';
 const FIT_TONE: Record<FitTone, { dot: string; pill: string; label: string }> = {
-  green: { dot: 'bg-fathom', pill: 'bg-fathom/[0.10] text-fathom', label: 'Fits budget' },
-  amber: { dot: 'bg-amber', pill: 'bg-amber/[0.12] text-amber', label: 'Tight' },
-  red: { dot: 'bg-pulse', pill: 'bg-pulse/[0.10] text-pulse', label: 'Over budget' },
+  green: { dot: 'bg-green', pill: 'bg-green/10 text-dark-green', label: 'Fits budget' },
+  amber: { dot: 'bg-[#f5a623]', pill: 'bg-[#fef6e6] text-[#8a5a12]', label: 'Tight' },
+  red: { dot: 'bg-tomato', pill: 'bg-tomato/10 text-tomato', label: 'Over budget' },
 };
 
 function FitPill({ fit }: { fit: FitTone }) {
   const v = FIT_TONE[fit];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] uppercase ${v.pill}`}
-      style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${v.pill}`}
     >
       <span className={`inline-block h-1.5 w-1.5 rounded-full ${v.dot}`} />
       {v.label}
@@ -67,12 +65,8 @@ function FitPill({ fit }: { fit: FitTone }) {
   );
 }
 
-const labelClass = 'text-[10px] uppercase text-soft';
-const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)',
-  letterSpacing: '0.18em',
-};
-const inputClass = 'bg-lumen border-lumen-dk text-vast';
+const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60';
+const inputClass = 'bg-canvas border-sage text-charcoal';
 
 function formatCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}m`;
@@ -225,49 +219,26 @@ function RestaurantsPageInner() {
       <FadeUp>
         <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-2">
-            <div
-              className="text-[10px] uppercase text-fathom"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-            >
-              nearby · /restaurants
+            <div className="text-xs font-semibold uppercase tracking-widest text-green">
+              Nearby · Restaurants
             </div>
-            <h1
-              className="text-vast"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(28px, 3.6vw, 40px)',
-                fontWeight: 600,
-                letterSpacing: '-0.02em',
-                lineHeight: 1.05,
-              }}
-            >
-              Restaurants.
+            <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
+              Restaurants
             </h1>
-            <p className="max-w-[540px] text-[14px] text-ink">
+            <p className="max-w-[540px] text-[14px] text-slate">
               Places that deliver to you, ranked for your budget.
             </p>
           </div>
           <div className="flex items-center gap-4 sm:items-end">
             {hasActivePlan && avgPerMeal > 0 && (
-              <div
-                className="flex flex-col items-start gap-0.5 sm:items-end"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                <p className="text-[11px] uppercase text-soft" style={{ letterSpacing: '0.18em' }}>
-                  avg target / meal
+              <div className="flex flex-col items-start gap-0.5 sm:items-end">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate/60">
+                  Avg target / meal
                 </p>
-                <p
-                  className="text-vast"
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 22,
-                    fontWeight: 600,
-                    letterSpacing: '-0.02em',
-                  }}
-                >
+                <p className="font-display text-[22px] font-semibold tracking-tight text-charcoal">
                   ₨ {avgPerMeal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </p>
-                <p className="text-[11px] text-ink">
+                <p className="text-[11px] text-slate">
                   ₨ {amountRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 })}{' '}
                   remaining
                 </p>
@@ -277,10 +248,9 @@ function RestaurantsPageInner() {
               <RecommendRestaurantButton />
               <Link
                 href="/restaurants/recommendations"
-                className="text-[12px] text-fathom underline-offset-2 hover:underline"
-                style={{ fontFamily: 'var(--font-mono)' }}
+                className="text-[12px] font-medium text-green underline-offset-2 hover:underline"
               >
-                your recommendations →
+                Your recommendations →
               </Link>
             </div>
           </div>
@@ -288,15 +258,15 @@ function RestaurantsPageInner() {
       </FadeUp>
 
       <FadeUp delay={0.08}>
-        <div className="overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+        <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
           <div className="flex flex-col gap-4 p-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="search" className={labelClass} style={labelStyle}>
+                <Label htmlFor="search" className={labelClass}>
                   Search by name
                 </Label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-soft" />
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate/60" />
                   <Input
                     id="search"
                     value={searchInput}
@@ -308,7 +278,7 @@ function RestaurantsPageInner() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="sort" className={labelClass} style={labelStyle}>
+                <Label htmlFor="sort" className={labelClass}>
                   Sort
                 </Label>
                 <Select
@@ -334,8 +304,8 @@ function RestaurantsPageInner() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
-                <Label className={labelClass} style={labelStyle}>
-                  Max distance: <span className="text-fathom">{maxDistanceKm} km</span>
+                <Label className={labelClass}>
+                  Max distance: <span className="text-green">{maxDistanceKm} km</span>
                 </Label>
                 <Slider
                   value={[maxDistanceKm]}
@@ -356,12 +326,11 @@ function RestaurantsPageInner() {
                         type="button"
                         disabled={!hasLocation}
                         onClick={() => updateParams({ maxDistanceKm: String(km) })}
-                        className={`rounded-full border px-2.5 py-0.5 text-[11px] transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                        className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                           active
-                            ? 'border-fathom bg-fathom/[0.08] text-fathom'
-                            : 'border-lumen-dk bg-lumen text-ink hover:border-fathom/40'
+                            ? 'border-green bg-green/10 text-dark-green'
+                            : 'border-sage bg-canvas text-slate hover:border-green/40'
                         }`}
-                        style={{ fontFamily: 'var(--font-mono)' }}
                       >
                         {km}km
                       </button>
@@ -369,16 +338,16 @@ function RestaurantsPageInner() {
                   })}
                 </div>
                 {!hasLocation && (
-                  <p className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
-                    set your location in profile to enable distance.
+                  <p className="text-[11px] text-slate/60">
+                    Set your location in profile to enable distance.
                   </p>
                 )}
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label className={labelClass} style={labelStyle}>
+                <Label className={labelClass}>
                   Minimum rating:{' '}
-                  <span className="text-fathom">{minRating === 0 ? 'Any' : `${minRating}+`}</span>
+                  <span className="text-green">{minRating === 0 ? 'Any' : `${minRating}+`}</span>
                 </Label>
                 <Slider
                   value={[minRating]}
@@ -404,12 +373,11 @@ function RestaurantsPageInner() {
                         onClick={() =>
                           updateParams({ minRating: value === 0 ? null : String(value) })
                         }
-                        className={`rounded-full border px-2.5 py-0.5 text-[11px] transition-colors ${
+                        className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
                           active
-                            ? 'border-fathom bg-fathom/[0.08] text-fathom'
-                            : 'border-lumen-dk bg-lumen text-ink hover:border-fathom/40'
+                            ? 'border-green bg-green/10 text-dark-green'
+                            : 'border-sage bg-canvas text-slate hover:border-green/40'
                         }`}
-                        style={{ fontFamily: 'var(--font-mono)' }}
                       >
                         {label}
                       </button>
@@ -424,19 +392,15 @@ function RestaurantsPageInner() {
 
       {activeChips.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
-          <span
-            className="text-[10px] uppercase text-soft"
-            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-          >
-            active ·
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate/60">
+            Active ·
           </span>
           {activeChips.map((chip) => (
             <button
               key={chip.key}
               type="button"
               onClick={chip.clear}
-              className="inline-flex items-center gap-1 rounded-full border border-lumen-dk bg-white px-2.5 py-1 text-[11px] text-vast transition-colors hover:border-pulse/40 hover:text-pulse"
-              style={{ fontFamily: 'var(--font-mono)' }}
+              className="inline-flex items-center gap-1 rounded-full border border-sage bg-white px-2.5 py-1 text-[11px] font-medium text-charcoal transition-colors hover:border-tomato/40 hover:text-tomato"
               aria-label={`Remove ${chip.label}`}
             >
               {chip.label}
@@ -446,10 +410,9 @@ function RestaurantsPageInner() {
           <button
             type="button"
             onClick={clearAll}
-            className="ml-1 text-[11px] text-soft underline-offset-2 hover:text-pulse hover:underline"
-            style={{ fontFamily: 'var(--font-mono)' }}
+            className="ml-1 text-[11px] text-slate/60 underline-offset-2 hover:text-tomato hover:underline"
           >
-            clear all
+            Clear all
           </button>
         </div>
       )}
@@ -461,11 +424,11 @@ function RestaurantsPageInner() {
           ))}
         </div>
       ) : error ? (
-        <p className="rounded-xl border border-pulse/20 bg-pulse/[0.06] p-4 text-[13px] text-pulse">
+        <p className="rounded-xl border border-tomato/20 bg-tomato/[0.06] p-4 text-[13px] text-tomato">
           Could not load restaurants.
         </p>
       ) : data.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-lumen-dk bg-white p-8 text-center text-[13px] text-ink">
+        <div className="rounded-2xl border border-dashed border-sage bg-white p-8 text-center text-[13px] text-slate">
           {urlQ
             ? 'No restaurants match your search.'
             : activeChips.length > 0
@@ -497,29 +460,23 @@ function RestaurantsPageInner() {
                     <motion.div
                       whileHover={{ y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }}
                       transition={{ duration: 0.22, ease: 'easeOut' }}
-                      className="flex h-full flex-col rounded-2xl border border-lumen-dk bg-white p-5 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+                      className="flex h-full flex-col rounded-2xl border border-sage bg-white p-5 shadow-sm"
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <span
-                          className="text-[10px] uppercase text-soft"
-                          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-                        >
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60">
                           {code}
                         </span>
                         {r.rating != null && (
-                          <div
-                            className="flex shrink-0 items-baseline gap-1"
-                            style={{ fontFamily: 'var(--font-mono)' }}
-                          >
+                          <div className="flex shrink-0 items-baseline gap-1">
                             <Star
-                              className="h-3.5 w-3.5 self-center text-amber"
-                              style={{ fill: 'var(--color-amber)' }}
+                              className="h-3.5 w-3.5 self-center text-[#f5a623]"
+                              style={{ fill: '#f5a623' }}
                             />
-                            <span className="text-[13px] font-medium text-vast">
+                            <span className="text-[13px] font-semibold text-charcoal">
                               {r.rating.toFixed(1)}
                             </span>
                             {r.ratingCount > 0 && (
-                              <span className="text-[11px] text-soft">
+                              <span className="text-[11px] text-slate/60">
                                 · {formatCount(r.ratingCount)}
                               </span>
                             )}
@@ -527,22 +484,11 @@ function RestaurantsPageInner() {
                         )}
                       </div>
 
-                      <h3
-                        className="mt-2 truncate text-vast"
-                        style={{
-                          fontFamily: 'var(--font-display)',
-                          fontSize: 18,
-                          fontWeight: 600,
-                          letterSpacing: '-0.01em',
-                        }}
-                      >
+                      <h3 className="mt-2 truncate font-display text-lg font-semibold tracking-tight text-charcoal">
                         {r.name}
                       </h3>
 
-                      <div
-                        className="mt-1 flex items-center gap-3 text-[12px] text-ink"
-                        style={{ fontFamily: 'var(--font-mono)' }}
-                      >
+                      <div className="mt-1 flex items-center gap-3 text-[12px] text-slate">
                         {r.distanceKm != null && <span>{r.distanceKm.toFixed(1)} km</span>}
                         {r.deliveryFee != null && <span>₨ {r.deliveryFee} fee</span>}
                       </div>
@@ -552,58 +498,29 @@ function RestaurantsPageInner() {
                         <div className="flex items-end justify-between gap-2">
                           {r.minItemPrice != null ? (
                             <div className="flex flex-col gap-0.5">
-                              <span
-                                className="text-[10px] uppercase text-soft"
-                                style={{
-                                  fontFamily: 'var(--font-mono)',
-                                  letterSpacing: '0.18em',
-                                }}
-                              >
-                                from
+                              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60">
+                                From
                               </span>
-                              <span
-                                className="text-vast"
-                                style={{
-                                  fontFamily: 'var(--font-display)',
-                                  fontSize: 16,
-                                  fontWeight: 600,
-                                }}
-                              >
+                              <span className="font-display text-base font-semibold text-charcoal">
                                 ₨ {r.minItemPrice.toLocaleString()}
                               </span>
                               {showAvg && (
-                                <span
-                                  className="text-[11px] text-soft"
-                                  style={{ fontFamily: 'var(--font-mono)' }}
-                                >
+                                <span className="text-[11px] text-slate/60">
                                   avg ₨ {Math.round(r.avgItemPrice as number).toLocaleString()}
                                 </span>
                               )}
                             </div>
                           ) : (
-                            <span
-                              className="text-[11px] text-soft"
-                              style={{ fontFamily: 'var(--font-mono)' }}
-                            >
-                              no menu yet
-                            </span>
+                            <span className="text-[11px] text-slate/60">no menu yet</span>
                           )}
                           {r.minimumOrder != null && (
-                            <span
-                              className="text-[11px] text-ink"
-                              style={{ fontFamily: 'var(--font-mono)' }}
-                            >
+                            <span className="text-[11px] text-slate">
                               min order ₨ {r.minimumOrder}
                             </span>
                           )}
                         </div>
                         {priceFreshness && (
-                          <span
-                            className="text-[10px] text-soft"
-                            style={{ fontFamily: 'var(--font-mono)' }}
-                          >
-                            {priceFreshness}
-                          </span>
+                          <span className="text-[10px] text-slate/60">{priceFreshness}</span>
                         )}
                       </div>
                     </motion.div>
@@ -615,28 +532,26 @@ function RestaurantsPageInner() {
 
           {totalPages > 1 && (
             <div className="flex items-center justify-between gap-3 pt-2">
-              <Pill
-                variant="ghost"
-                size="xs"
+              <button
+                type="button"
                 onClick={() => updateParams({ page: String(page - 1) }, { resetPage: false })}
                 disabled={!hasPrev || isFetching}
-                style={{ fontFamily: 'var(--font-mono)' }}
+                className="inline-flex items-center rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40"
               >
-                ← prev
-              </Pill>
-              <p className="text-[11px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
-                page {page + 1} of {totalPages} · {total} total
+                ← Prev
+              </button>
+              <p className="text-[11px] text-slate">
+                Page {page + 1} of {totalPages} · {total} total
                 {isFetching ? ' · loading…' : ''}
               </p>
-              <Pill
-                variant="ghost"
-                size="xs"
+              <button
+                type="button"
                 onClick={() => updateParams({ page: String(page + 1) }, { resetPage: false })}
                 disabled={!hasNext || isFetching}
-                style={{ fontFamily: 'var(--font-mono)' }}
+                className="inline-flex items-center rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40"
               >
-                next →
-              </Pill>
+                Next →
+              </button>
             </div>
           )}
         </>
