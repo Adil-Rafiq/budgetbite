@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { z } from 'zod';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ImageUp, Plus, X } from 'lucide-react';
+import { ImageUp, Plus, X, LocateFixed } from 'lucide-react';
 import {
   createRestaurantRecommendationSchema,
   MAX_PENDING_RESTAURANT_RECOMMENDATIONS,
@@ -35,22 +35,18 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Pill } from '@/components/ui/pill';
 import { Textarea } from '@/components/ui/textarea';
 
 const LocationMap = dynamic(() => import('@/components/location-map').then((m) => m.LocationMap), {
   ssr: false,
   loading: () => (
-    <div className="h-[220px] w-full animate-pulse rounded-[14px] border border-lumen-dk bg-lumen" />
+    <div className="h-[220px] w-full animate-pulse rounded-[14px] border border-sage bg-canvas" />
   ),
 });
 
-const labelClass = 'text-[10px] uppercase text-soft';
-const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)',
-  letterSpacing: '0.18em',
-};
-const errorClass = 'text-[11px] text-pulse';
+const labelClass = 'text-xs font-semibold uppercase tracking-wide text-slate';
+const labelStyle: React.CSSProperties = {};
+const errorClass = 'text-[11px] text-tomato';
 
 // Empty string → undefined so optional fields are omitted, not sent as ''.
 const optionalString = (v: unknown) => (v === '' || v == null ? undefined : v);
@@ -216,18 +212,10 @@ export function RecommendRestaurantButton({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
           <DialogHeader>
-            <DialogTitle
-              className="text-vast"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 22,
-                fontWeight: 600,
-                letterSpacing: '-0.02em',
-              }}
-            >
+            <DialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
               Recommend a restaurant
             </DialogTitle>
-            <DialogDescription className="text-ink">
+            <DialogDescription className="text-slate">
               Know a great local spot we don’t have yet? Add it with a few menu items and an admin
               will review it. You can have up to {MAX_PENDING_RESTAURANT_RECOMMENDATIONS} awaiting
               review at a time.
@@ -235,12 +223,12 @@ export function RecommendRestaurantButton({
           </DialogHeader>
 
           {atCap ? (
-            <div className="rounded-xl border border-amber/30 bg-amber/[0.06] p-4 text-[13px] text-ink">
+            <div className="rounded-xl border border-tomato/30 bg-tomato/[0.06] p-4 text-[13px] text-slate">
               You’ve reached the limit of {MAX_PENDING_RESTAURANT_RECOMMENDATIONS} recommendations
               awaiting review. Once an admin reviews one — or you{' '}
               <Link
                 href="/restaurants/recommendations"
-                className="text-fathom underline underline-offset-2"
+                className="text-green underline underline-offset-2"
                 onClick={() => setOpen(false)}
               >
                 withdraw one
@@ -300,33 +288,31 @@ export function RecommendRestaurantButton({
                 <Label className={labelClass} style={labelStyle}>
                   Where is it?
                 </Label>
-                <p className="text-[12px] text-soft">
+                <p className="text-[12px] text-slate/60">
                   Drag the pin or search to mark the restaurant’s location — this is where it’ll
                   appear for people nearby.
                 </p>
-                <Pill
+                <button
                   type="button"
-                  variant="accent"
-                  size="md"
-                  className="self-start"
+                  className="inline-flex min-h-10 items-center gap-2 self-start rounded-xl bg-green px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
                   onClick={detectLocation}
                   disabled={isDetecting}
                 >
                   {isDetecting ? (
                     <>
                       <span
-                        className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-lumen"
+                        className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white"
                         style={{ borderTopColor: 'transparent' }}
                       />
                       Detecting…
                     </>
                   ) : (
                     <>
-                      <span style={{ fontFamily: 'var(--font-mono)' }}>◉</span>
+                      <LocateFixed className="h-4 w-4" />
                       Use my current location
                     </>
                   )}
-                </Pill>
+                </button>
                 <LocationMap
                   latitude={mapLatitude}
                   longitude={mapLongitude}
@@ -374,7 +360,7 @@ export function RecommendRestaurantButton({
                       </>
                     )}
                   </Button>
-                  <span className="text-[11px] text-soft">or type the items yourself</span>
+                  <span className="text-[11px] text-slate/60">or type the items yourself</span>
                 </div>
                 <div className="flex flex-col gap-2">
                   {fields.map((field, i) => (
@@ -458,14 +444,13 @@ export function RecommendRestaurantButton({
           )}
 
           {mine.length > 0 && (
-            <div className="mt-1 flex items-center justify-between gap-2 border-t border-lumen-dk pt-3">
-              <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+            <div className="mt-1 flex items-center justify-between gap-2 border-t border-sage pt-3">
+              <span className="text-[11px] text-slate/60">
                 {pendingCount} / {MAX_PENDING_RESTAURANT_RECOMMENDATIONS} pending review
               </span>
               <Link
                 href="/restaurants/recommendations"
-                className="text-[12px] text-fathom underline-offset-2 hover:underline"
-                style={{ fontFamily: 'var(--font-mono)' }}
+                className="text-[12px] text-green underline-offset-2 hover:underline"
                 onClick={() => setOpen(false)}
               >
                 view your recommendations →

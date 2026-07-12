@@ -16,51 +16,36 @@ export function RecentActivity() {
     <section className="flex flex-col gap-4">
       <div className="flex items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <span
-            className="text-[10px] uppercase text-fathom"
-            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-          >
-            /history
+          <span className="text-xs font-semibold uppercase tracking-widest text-green">
+            History
           </span>
-          <h2
-            className="text-vast"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 22,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-charcoal">
             Recent activity
           </h2>
         </div>
-        <span className="text-[11px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
-          last 5 entries
-        </span>
+        <span className="text-[12px] text-slate">Last 5 entries</span>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-lumen-dk bg-white">
+      <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
         {isLoading ? (
           <div className="flex flex-col">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className={`h-14 animate-pulse ${
-                  i === 0 ? '' : 'border-t border-lumen-dk'
-                } ${i % 2 === 0 ? 'bg-white' : 'bg-lumen-dk/25'}`}
+                className={`h-14 animate-pulse ${i === 0 ? '' : 'border-t border-sage'} ${
+                  i % 2 === 0 ? 'bg-white' : 'bg-canvas'
+                }`}
               />
             ))}
           </div>
         ) : error ? (
-          <p className="p-5 text-[13px] text-pulse">Could not load recent activity.</p>
+          <p className="p-5 text-[13px] text-tomato">Could not load recent activity.</p>
         ) : !planId ? (
-          <p className="p-5 text-[13px] text-ink">No active plan yet.</p>
+          <p className="p-5 text-[13px] text-slate">No active plan yet.</p>
         ) : !data?.data.length ? (
           <div className="flex flex-col items-start gap-1 p-5">
-            <p className="text-[13px] font-medium text-vast">Nothing logged yet.</p>
-            <p className="text-[12px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
-              choose a meal above to start tracking.
-            </p>
+            <p className="text-[13px] font-medium text-charcoal">Nothing logged yet.</p>
+            <p className="text-[12px] text-slate">Choose a meal above to start tracking.</p>
           </div>
         ) : (
           <div className="flex flex-col">
@@ -78,45 +63,26 @@ export function RecentActivity() {
                 <div
                   key={item.id}
                   className={`flex items-center justify-between gap-4 px-5 py-3.5 ${
-                    i === 0 ? '' : 'border-t border-lumen-dk'
-                  } ${i % 2 === 0 ? 'bg-white' : 'bg-lumen-dk/[0.18]'}`}
+                    i === 0 ? '' : 'border-t border-sage'
+                  } ${i % 2 === 0 ? 'bg-white' : 'bg-canvas'}`}
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <span
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-fathom/10 text-[11px] text-fathom"
-                      style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}
-                    >
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-green/10 text-[12px] font-semibold text-green">
                       {label.slice(0, 1).toUpperCase()}
                     </span>
                     <div className="flex min-w-0 flex-col">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="text-[10px] uppercase capitalize text-soft"
-                          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-                        >
-                          {label}
-                        </span>
-                      </div>
-                      <span className="truncate text-[14px] font-medium text-vast">{name}</span>
-                      <span className="truncate text-[12px] text-ink">{restaurant}</span>
+                      <span className="text-[10px] font-semibold uppercase capitalize tracking-wide text-slate/60">
+                        {label}
+                      </span>
+                      <span className="truncate text-[14px] font-medium text-charcoal">{name}</span>
+                      <span className="truncate text-[12px] text-slate">{restaurant}</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-0.5">
-                    <span
-                      className="text-vast"
-                      style={{
-                        fontFamily: 'var(--font-display)',
-                        fontSize: 15,
-                        fontWeight: 700,
-                        letterSpacing: '-0.01em',
-                      }}
-                    >
+                    <span className="font-display text-[15px] font-bold text-charcoal">
                       ₨ {item.actualAmountSpent.toLocaleString()}
                     </span>
-                    <span
-                      className="text-[11px] text-ink"
-                      style={{ fontFamily: 'var(--font-mono)' }}
-                    >
+                    <span className="text-[11px] text-slate">
                       {new Date(item.slotDate).toLocaleDateString('en-PK', {
                         month: 'short',
                         day: 'numeric',
@@ -129,11 +95,8 @@ export function RecentActivity() {
           </div>
         )}
       </div>
-      <p
-        className="bg-lumen px-1 text-center text-[11px] text-soft"
-        style={{ fontFamily: 'var(--font-mono)' }}
-      >
-        all logged meals are private to your account.
+      <p className="px-1 text-center text-[11px] text-slate/60">
+        All logged meals are private to your account.
       </p>
     </section>
   );
