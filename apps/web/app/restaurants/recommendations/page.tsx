@@ -15,7 +15,6 @@ import {
 import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
 import { RecommendRestaurantButton } from '@/components/recommend-restaurant-button';
 import { Button } from '@/components/ui/button';
-import { Pill } from '@/components/ui/pill';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,15 +29,10 @@ import {
 const PAGE_SIZE = 12;
 const ITEM_PREVIEW_COUNT = 3;
 
-const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)',
-  letterSpacing: '0.18em',
-};
-
 const STATUS_PILL: Record<string, { className: string; label: string }> = {
-  pending: { className: 'bg-amber/[0.12] text-amber', label: 'pending review' },
-  approved: { className: 'bg-fathom/10 text-fathom', label: 'approved' },
-  rejected: { className: 'bg-pulse/10 text-pulse', label: 'rejected' },
+  pending: { className: 'bg-[#fef6e6] text-[#8a5a12]', label: 'Pending review' },
+  approved: { className: 'bg-green/10 text-dark-green', label: 'Approved' },
+  rejected: { className: 'bg-tomato/10 text-tomato', label: 'Rejected' },
 };
 
 function formatDate(value: Date | string): string {
@@ -61,34 +55,22 @@ function RecommendationCard({
   const extra = rec.items.length - preview.length;
 
   return (
-    <div className="flex h-full flex-col gap-3 rounded-2xl border border-lumen-dk bg-white p-5 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+    <div className="flex h-full flex-col gap-3 rounded-2xl border border-sage bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
-        <h3
-          className="min-w-0 truncate text-vast"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 18,
-            fontWeight: 600,
-            letterSpacing: '-0.01em',
-          }}
-        >
+        <h3 className="min-w-0 truncate font-display text-lg font-semibold tracking-tight text-charcoal">
           {rec.name}
         </h3>
         {status && (
           <span
-            className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] uppercase ${status.className}`}
-            style={labelStyle}
+            className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${status.className}`}
           >
             {status.label}
           </span>
         )}
       </div>
 
-      <div
-        className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-ink"
-        style={{ fontFamily: 'var(--font-mono)' }}
-      >
-        <span>sent {formatDate(rec.createdAt)}</span>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-slate">
+        <span>Sent {formatDate(rec.createdAt)}</span>
         {rec.area && <span>· {rec.area}</span>}
         <span>
           · {rec.items.length} item{rec.items.length === 1 ? '' : 's'}
@@ -102,23 +84,17 @@ function RecommendationCard({
               key={`${item.name}-${i}`}
               className="flex items-baseline justify-between gap-2 text-[13px]"
             >
-              <span className="truncate text-vast">{item.name}</span>
-              <span className="shrink-0 text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
-                ₨ {item.price.toLocaleString()}
-              </span>
+              <span className="truncate text-charcoal">{item.name}</span>
+              <span className="shrink-0 text-slate">₨ {item.price.toLocaleString()}</span>
             </li>
           ))}
-          {extra > 0 && (
-            <li className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
-              +{extra} more
-            </li>
-          )}
+          {extra > 0 && <li className="text-[11px] text-slate/60">+{extra} more</li>}
         </ul>
       )}
 
       {rec.status === 'rejected' && rec.adminNote && (
-        <p className="rounded-xl border border-pulse/20 bg-pulse/[0.06] p-3 text-[12px] text-ink">
-          <span className="font-medium text-pulse">Admin note:</span> {rec.adminNote}
+        <p className="rounded-xl border border-tomato/20 bg-tomato/[0.06] p-3 text-[12px] text-slate">
+          <span className="font-medium text-tomato">Admin note:</span> {rec.adminNote}
         </p>
       )}
 
@@ -126,16 +102,15 @@ function RecommendationCard({
         {rec.status === 'approved' && rec.createdRestaurantId ? (
           <Link
             href={`/restaurants/${rec.createdRestaurantId}`}
-            className="text-[12px] text-fathom underline-offset-2 hover:underline"
-            style={{ fontFamily: 'var(--font-mono)' }}
+            className="text-[12px] font-medium text-green underline-offset-2 hover:underline"
           >
-            view restaurant →
+            View restaurant →
           </Link>
         ) : (
-          <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="text-[11px] text-slate/60">
             {rec.status === 'pending'
-              ? 'awaiting admin review'
-              : `reviewed ${rec.reviewedAt ? formatDate(rec.reviewedAt) : ''}`}
+              ? 'Awaiting admin review'
+              : `Reviewed ${rec.reviewedAt ? formatDate(rec.reviewedAt) : ''}`}
           </span>
         )}
         {rec.status === 'pending' && (
@@ -143,7 +118,7 @@ function RecommendationCard({
             type="button"
             variant="outline"
             size="sm"
-            className="text-pulse hover:text-pulse"
+            className="text-tomato hover:text-tomato"
             onClick={() => onWithdraw(rec)}
           >
             <Trash2 className="h-3.5 w-3.5" />
@@ -181,25 +156,13 @@ export default function MyRecommendationsPage() {
       <FadeUp>
         <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-2">
-            <div
-              className="text-[10px] uppercase text-fathom"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-            >
-              community · /restaurants/recommendations
+            <div className="text-xs font-semibold uppercase tracking-widest text-green">
+              Community · Recommendations
             </div>
-            <h1
-              className="text-vast"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(28px, 3.6vw, 40px)',
-                fontWeight: 600,
-                letterSpacing: '-0.02em',
-                lineHeight: 1.05,
-              }}
-            >
-              Your recommendations.
+            <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
+              Your recommendations
             </h1>
-            <p className="max-w-[540px] text-[14px] text-ink">
+            <p className="max-w-[540px] text-[14px] text-slate">
               Restaurants you’ve suggested and where they are in review. Pending ones can be
               withdrawn; reviewed ones stay as history.
             </p>
@@ -207,11 +170,10 @@ export default function MyRecommendationsPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/restaurants"
-              className="inline-flex items-center gap-1.5 text-[12px] text-ink underline-offset-2 hover:text-vast hover:underline"
-              style={{ fontFamily: 'var(--font-mono)' }}
+              className="inline-flex items-center gap-1.5 text-[12px] text-slate underline-offset-2 transition-colors hover:text-green hover:underline"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              all restaurants
+              All restaurants
             </Link>
             <RecommendRestaurantButton />
           </div>
@@ -223,20 +185,18 @@ export default function MyRecommendationsPage() {
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="h-[180px] animate-pulse rounded-2xl border border-lumen-dk bg-white"
+              className="h-[180px] animate-pulse rounded-2xl border border-sage bg-sage/40"
             />
           ))}
         </div>
       ) : error ? (
-        <p className="rounded-xl border border-pulse/20 bg-pulse/[0.06] p-4 text-[13px] text-pulse">
+        <p className="rounded-xl border border-tomato/20 bg-tomato/[0.06] p-4 text-[13px] text-tomato">
           Could not load your recommendations.
         </p>
       ) : recommendations.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-lumen-dk bg-white p-10 text-center">
-          <p className="text-[14px] text-vast" style={{ fontFamily: 'var(--font-display)' }}>
-            Nothing here yet.
-          </p>
-          <p className="max-w-[380px] text-[13px] text-ink">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sage bg-white p-10 text-center">
+          <p className="font-display text-[14px] font-semibold text-charcoal">Nothing here yet.</p>
+          <p className="max-w-[380px] text-[13px] text-slate">
             Know a great local spot we don’t have? Recommend it and an admin will review it for the
             menu.
           </p>
@@ -244,7 +204,7 @@ export default function MyRecommendationsPage() {
       ) : (
         <>
           {pendingCount > 0 && (
-            <p className="text-[12px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
+            <p className="text-[12px] text-slate">
               {pendingCount} / {MAX_PENDING_RESTAURANT_RECOMMENDATIONS} pending slots used
             </p>
           )}
@@ -258,28 +218,26 @@ export default function MyRecommendationsPage() {
 
           {totalPages > 1 && (
             <div className="flex items-center justify-between gap-3 pt-2">
-              <Pill
-                variant="ghost"
-                size="xs"
+              <button
+                type="button"
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
                 disabled={page === 0 || isFetching}
-                style={{ fontFamily: 'var(--font-mono)' }}
+                className="inline-flex items-center rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40"
               >
-                ← prev
-              </Pill>
-              <p className="text-[11px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
-                page {page + 1} of {totalPages} · {total} total
+                ← Prev
+              </button>
+              <p className="text-[11px] text-slate">
+                Page {page + 1} of {totalPages} · {total} total
                 {isFetching ? ' · loading…' : ''}
               </p>
-              <Pill
-                variant="ghost"
-                size="xs"
+              <button
+                type="button"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={(page + 1) * PAGE_SIZE >= total || isFetching}
-                style={{ fontFamily: 'var(--font-mono)' }}
+                className="inline-flex items-center rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40"
               >
-                next →
-              </Pill>
+                Next →
+              </button>
             </div>
           )}
         </>
@@ -293,32 +251,20 @@ export default function MyRecommendationsPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div
-              className="text-[10px] uppercase text-pulse"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-            >
-              confirm · /withdraw
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-tomato">
+              Confirm withdrawal
             </div>
-            <AlertDialogTitle
-              className="text-vast"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 22,
-                fontWeight: 600,
-                letterSpacing: '-0.02em',
-              }}
-            >
+            <AlertDialogTitle className="font-display text-[22px] font-semibold tracking-tight text-charcoal">
               Withdraw “{withdrawTarget?.name}”?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-ink">
+            <AlertDialogDescription className="text-slate">
               This removes it from the review queue for good. If you change your mind, you’ll have
               to submit it again from scratch.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className="rounded-full border border-lumen-dk bg-transparent px-4 py-2 text-[13px] text-vast transition-colors hover:bg-lumen active:scale-[0.97]"
-              style={{ fontFamily: 'var(--font-mono)' }}
+              className="rounded-lg border border-sage bg-white px-4 py-2 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97]"
               disabled={withdraw.isPending}
             >
               Keep it
@@ -330,7 +276,7 @@ export default function MyRecommendationsPage() {
                 confirmWithdraw();
               }}
               disabled={withdraw.isPending}
-              className="rounded-full bg-pulse px-5 py-2 text-[13px] font-medium text-lumen transition-colors hover:bg-pulse/85 active:scale-[0.97]"
+              className="rounded-lg bg-tomato px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-tomato/90 active:scale-[0.97]"
             >
               {withdraw.isPending ? 'Withdrawing…' : 'Withdraw'}
             </AlertDialogAction>
