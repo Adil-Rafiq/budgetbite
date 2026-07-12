@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import { CreatePlanDialog } from '@/app/plans/_components/create-plan/create-plan-dialog';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
-import { Pill } from '@/components/ui/pill';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,39 +41,26 @@ export function PlansPageHeader() {
     <>
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-col gap-2">
-          <div
-            className="text-[10px] uppercase text-fathom"
-            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-          >
-            budgets · /plans
+          <div className="text-xs font-semibold uppercase tracking-widest text-green">
+            Budgets · Your plans
           </div>
-          <h1
-            className="text-vast"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(28px, 3.6vw, 40px)',
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.05,
-            }}
-          >
+          <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
             Budget plans.
           </h1>
-          <p className="max-w-[540px] text-[14px] text-ink">
+          <p className="max-w-[540px] text-sm text-slate">
             Past and present — at a glance.
-            <span
-              className="ml-1.5 text-[12px] text-soft"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              one active at a time.
-            </span>
+            <span className="ml-1.5 text-[12px] text-slate/60">One active at a time.</span>
           </p>
         </div>
 
-        <Pill size="md" onClick={handleNewPlanClick} className="self-start sm:self-auto">
+        <button
+          type="button"
+          onClick={handleNewPlanClick}
+          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-green px-5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-dark-green sm:self-auto"
+        >
           New plan
-          <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>+</span>
-        </Pill>
+          <Plus className="h-4 w-4" />
+        </button>
       </header>
 
       <CreatePlanDialog open={open} onOpenChange={setOpen} replaceActivePlanId={replaceTargetId} />
@@ -81,37 +68,23 @@ export function PlansPageHeader() {
       <AlertDialog open={confirmReplaceOpen} onOpenChange={setConfirmReplaceOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div
-              className="text-[10px] uppercase text-pulse"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-            >
-              confirm · /replace
+            <div className="text-xs font-semibold uppercase tracking-widest text-tomato">
+              Confirm · Replace
             </div>
-            <AlertDialogTitle
-              className="text-vast"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 22,
-                fontWeight: 600,
-                letterSpacing: '-0.02em',
-              }}
-            >
+            <AlertDialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
               Replace active plan?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-ink">
+            <AlertDialogDescription className="text-slate">
               You already have an active plan. Cancel it and start a new one?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel
-              className="rounded-full border border-lumen-dk bg-transparent px-4 py-2 text-[13px] text-vast transition-colors hover:bg-lumen active:scale-[0.97]"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
+            <AlertDialogCancel className="rounded-xl border border-sage bg-white px-4 py-2 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97]">
               Keep current plan
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmReplace}
-              className="rounded-full bg-vast px-5 py-2 text-[13px] font-medium text-lumen transition-colors hover:bg-vast/85 active:scale-[0.97]"
+              className="rounded-xl bg-green px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-dark-green active:scale-[0.97]"
             >
               Replace plan
             </AlertDialogAction>
