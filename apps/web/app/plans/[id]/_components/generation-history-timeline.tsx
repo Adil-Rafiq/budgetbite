@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { Sparkles } from 'lucide-react';
 import { useBudgetPlanGenerations } from '@/hooks/use-budget-plan';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
-import { Pill } from '@/components/ui/pill';
 import { GenerationAttemptItem } from './generation-attempt-item';
 import type { BudgetGeneration, BudgetPlanDetail } from '@repo/shared';
 
@@ -16,11 +15,11 @@ interface GenerationHistoryTimelineProps {
 function TimelineSkeleton() {
   return (
     <div className="relative">
-      <div className="absolute left-4 bottom-2 top-2 w-px bg-lumen-dk" aria-hidden />
+      <div className="absolute bottom-2 left-4 top-2 w-px bg-sage" aria-hidden />
       <div className="flex flex-col gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="pl-10">
-            <div className="h-20 w-full animate-pulse rounded-xl bg-lumen" />
+            <div className="h-20 w-full animate-pulse rounded-xl bg-sage" />
           </div>
         ))}
       </div>
@@ -30,8 +29,8 @@ function TimelineSkeleton() {
 
 function TimelineError({ message }: { message: string }) {
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-pulse/20 bg-pulse/[0.06] p-3 text-[13px] text-pulse">
-      <span style={{ fontFamily: 'var(--font-mono)' }}>!</span>
+    <div className="flex items-center gap-2 rounded-xl border border-tomato/20 bg-tomato/[0.06] p-3 text-[13px] text-tomato">
+      <span className="font-semibold">!</span>
       <span>{message}</span>
     </div>
   );
@@ -40,20 +39,25 @@ function TimelineError({ message }: { message: string }) {
 function TimelineEmpty({ planId }: { planId: string }) {
   const generate = useGenerateMealPlan();
   return (
-    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-lumen-dk bg-white p-8 text-center">
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-fathom/[0.08] text-fathom">
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sage bg-white p-8 text-center">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green/10 text-green">
         <Sparkles className="h-5 w-5" />
       </div>
       <div>
-        <p className="text-[14px] font-medium text-vast">No plans generated yet</p>
-        <p className="mt-1 text-[12px] text-ink">
+        <p className="text-[14px] font-medium text-charcoal">No plans generated yet</p>
+        <p className="mt-1 text-[12px] text-slate">
           Kick off your first AI-curated meal plan to see suggestions for every day.
         </p>
       </div>
-      <Pill size="sm" onClick={() => generate.mutate(planId)} disabled={generate.isPending}>
+      <button
+        type="button"
+        onClick={() => generate.mutate(planId)}
+        disabled={generate.isPending}
+        className="inline-flex items-center gap-2 rounded-xl bg-green px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+      >
         <Sparkles className="h-3.5 w-3.5" />
         Generate now
-      </Pill>
+      </button>
     </div>
   );
 }
@@ -72,26 +76,15 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
     () => (
       <div className="flex items-end justify-between">
         <div className="flex flex-col gap-1">
-          <span
-            className="text-[10px] uppercase text-fathom"
-            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-          >
-            /history
+          <span className="text-xs font-semibold uppercase tracking-widest text-green">
+            History
           </span>
-          <h2
-            className="text-vast"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 22,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <h2 className="font-display text-xl font-semibold tracking-tight text-charcoal">
             Generation history
           </h2>
         </div>
         {total > 0 && (
-          <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="text-[11px] text-slate/60">
             {total} attempt{total === 1 ? '' : 's'}
           </span>
         )}
@@ -132,7 +125,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
       {header}
 
       <div className="relative">
-        <div className="absolute left-[15px] bottom-2 top-2 w-px bg-lumen-dk" aria-hidden />
+        <div className="absolute bottom-2 left-[15px] top-2 w-px bg-sage" aria-hidden />
         <ol className="flex flex-col gap-3">
           {items.map((gen: BudgetGeneration) => (
             <li key={gen.id}>
@@ -149,8 +142,8 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
       </div>
 
       {data?.meta && total > items.length && (
-        <p className="text-center text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
-          showing the latest {items.length} of {total} attempts
+        <p className="text-center text-[11px] text-slate/60">
+          Showing the latest {items.length} of {total} attempts
         </p>
       )}
     </div>
