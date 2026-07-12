@@ -3,16 +3,31 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'motion/react';
+import {
+  LayoutGrid,
+  CalendarDays,
+  Store,
+  BarChart3,
+  User as UserIcon,
+  ShieldCheck,
+  type LucideIcon,
+} from 'lucide-react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { LogoIcon } from '@/components/icons';
 
-const navItems = [
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/plans', label: 'Plans' },
-  { href: '/restaurants', label: 'Restaurants' },
-  { href: '/analytics', label: 'Analytics' },
-  { href: '/profile', label: 'Profile' },
+interface NavItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+const navItems: NavItem[] = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
+  { href: '/plans', label: 'Plans', icon: CalendarDays },
+  { href: '/restaurants', label: 'Restaurants', icon: Store },
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/profile', label: 'Profile', icon: UserIcon },
 ];
 
 function initials(name: string | undefined): string {
@@ -33,124 +48,99 @@ export function AppSidebar() {
   const remaining = Math.max(0, totalBudget - spent);
   const spentPercent = totalBudget > 0 ? Math.round((spent / totalBudget) * 100) : 0;
 
+  const items =
+    user?.role === 'admin'
+      ? [...navItems, { href: '/admin', label: 'Admin', icon: ShieldCheck }]
+      : navItems;
+
   return (
-    <aside className="fixed inset-y-0 hidden border-r border-lumen-dk bg-lumen text-vast lg:flex lg:w-64 lg:flex-col">
-      <Link
-        href="/dashboard"
-        className="flex items-center gap-2.5 border-b border-lumen-dk px-6 py-6"
-      >
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-fathom text-lumen">
-          <LogoIcon />
+    <aside className="fixed inset-y-0 hidden border-r border-sage bg-white text-charcoal lg:flex lg:w-64 lg:flex-col">
+      {/* Logo */}
+      <Link href="/dashboard" className="flex items-center gap-2.5 border-b border-sage px-6 py-5">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green text-white shadow-sm">
+          <LogoIcon size={16} />
         </span>
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 18,
-            fontWeight: 600,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          BudgetBite
+        <span className="font-display text-lg font-bold tracking-tight">
+          Budget<span className="text-green">Bite</span>
         </span>
       </Link>
 
-      <div
-        className="px-6 pt-5 pb-2 text-[10px] uppercase text-soft"
-        style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-      >
-        navigation
+      {/* User profile */}
+      <div className="border-b border-sage/60 px-5 py-4">
+        <div className="flex items-center gap-3">
+          <span
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green text-sm font-semibold text-white"
+            style={{ boxShadow: '0 0 0 2px #8cc63f, 0 0 0 4px #f0f9e0' }}
+          >
+            {initials(user?.name)}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-display text-sm font-semibold text-charcoal">
+              {user?.name ?? '—'}
+            </p>
+            <p className="truncate text-xs text-slate">{user?.email ?? ''}</p>
+          </div>
+        </div>
       </div>
-      <nav className="flex flex-col gap-1 px-3">
-        {(user?.role === 'admin'
-          ? [...navItems, { href: '/admin', label: 'Admin' }]
-          : navItems
-        ).map((item) => {
+
+      {/* Nav */}
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+        <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-widest text-slate/60">
+          Main
+        </p>
+        {items.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          const Icon = item.icon;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`group flex items-center gap-3 rounded-lg border px-3 py-2 text-[14px] transition-colors ${
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${
                 isActive
-                  ? 'border-lumen-dk bg-white font-medium text-vast shadow-[0_1px_0_rgba(0,0,0,0.03)]'
-                  : 'border-transparent bg-transparent font-normal text-ink hover:bg-lumen hover:text-vast'
+                  ? 'bg-[#f0f9e0] text-dark-green'
+                  : 'text-slate hover:bg-canvas hover:text-charcoal'
               }`}
             >
               <span
-                className={`inline-block h-1.5 w-1.5 rounded-full transition-colors group-hover:bg-soft ${
-                  isActive ? 'border-0 bg-fathom' : 'border border-soft bg-transparent'
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
+                  isActive ? 'bg-green/15 text-green' : 'border border-sage bg-canvas text-slate'
                 }`}
-              />
-              {item.label}
+              >
+                <Icon className="h-3.5 w-3.5" />
+              </span>
+              <span className="text-sm font-medium">{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="mt-auto flex flex-col gap-3 px-4 pb-4 pt-6">
-        {active && (
-          <div className="rounded-xl border border-lumen-dk bg-white p-4">
+      {/* Budget mini-card */}
+      {active && (
+        <div className="mt-auto px-4 pb-5 pt-2">
+          <div className="rounded-2xl border border-sage bg-canvas p-4">
             <div className="flex items-center justify-between">
-              <span
-                className="text-[10px] uppercase text-soft"
-                style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-              >
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate">
                 {active.plan.planType} budget
               </span>
-              <span
-                className="text-fathom"
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 11,
-                  fontWeight: 600,
-                }}
-              >
-                {spentPercent}%
-              </span>
+              <span className="text-xs font-bold text-dark-green">{spentPercent}%</span>
             </div>
-            <div
-              className="mt-3 text-vast"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 22,
-                fontWeight: 600,
-                letterSpacing: '-0.02em',
-              }}
-            >
+            <div className="mt-2.5 font-display text-2xl font-bold tracking-tight text-charcoal">
               ₨ {remaining.toLocaleString()}
             </div>
-            <div className="mt-1 text-[11px] text-ink">
+            <div className="mt-0.5 text-xs text-slate">
               left of ₨ {totalBudget.toLocaleString()}
             </div>
-            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-lumen-dk">
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-sage">
               <motion.div
-                className={`h-full rounded-full ${spentPercent >= 90 ? 'bg-pulse' : 'bg-fathom'}`}
+                className={`h-full rounded-full ${spentPercent >= 90 ? 'bg-tomato' : 'bg-green'}`}
                 initial={{ width: '0%' }}
                 animate={{ width: `${Math.min(100, spentPercent)}%` }}
                 transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
               />
             </div>
           </div>
-        )}
-
-        <div className="flex items-center gap-3 rounded-xl border border-lumen-dk bg-white px-3 py-2.5">
-          <span
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-fathom text-[11px] text-lumen"
-            style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}
-          >
-            {initials(user?.name)}
-          </span>
-          <div className="flex min-w-0 flex-col">
-            <span className="truncate text-[13px] font-medium text-vast">{user?.name ?? '—'}</span>
-            <span
-              className="truncate text-[11px] text-soft"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              {user?.email ?? ''}
-            </span>
-          </div>
         </div>
-      </div>
+      )}
     </aside>
   );
 }

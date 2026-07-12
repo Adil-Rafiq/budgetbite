@@ -49,71 +49,47 @@ export function AppHeader() {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b border-lumen-dk bg-lumen/85"
+      className="sticky top-0 z-40 border-b border-sage bg-canvas/85"
       style={{ backdropFilter: 'saturate(180%) blur(10px)' }}
     >
       <div className="flex items-center justify-between px-4 py-3 lg:px-8 lg:py-4">
+        {/* Mobile logo */}
         <Link href="/dashboard" className="flex items-center gap-2.5 lg:hidden">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-fathom text-lumen">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-green text-white">
             <LogoIcon size={13} />
           </span>
-          <span
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 16,
-              fontWeight: 600,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            BudgetBite
+          <span className="font-display text-base font-bold tracking-tight">
+            Budget<span className="text-green">Bite</span>
           </span>
         </Link>
 
-        <div
-          className="hidden text-[11px] uppercase text-soft lg:block"
-          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-        >
-          home · /dashboard
+        <div className="hidden text-xs font-semibold uppercase tracking-widest text-slate/60 lg:block">
+          Home · Dashboard
         </div>
 
         <div className="flex items-center gap-3">
           {active && (
-            <div className="hidden items-center gap-3 rounded-full border border-lumen-dk bg-white px-4 py-1.5 sm:flex">
-              <span
-                className="text-[10px] uppercase text-soft"
-                style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-              >
-                left
-              </span>
-              <span
-                className="text-vast"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 14,
-                  fontWeight: 600,
-                }}
-              >
+            <div className="hidden items-center gap-3 rounded-full border border-sage bg-white px-4 py-1.5 shadow-sm sm:flex">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate">Left</span>
+              <span className="font-display text-sm font-semibold text-charcoal">
                 ₨ {remaining.toLocaleString()}
               </span>
-              <div className="h-1.5 w-20 overflow-hidden rounded-full bg-lumen-dk">
+              <div className="h-1.5 w-20 overflow-hidden rounded-full bg-sage">
                 <motion.div
-                  className={`h-full rounded-full ${spentPercent >= 90 ? 'bg-pulse' : 'bg-fathom'}`}
+                  className={`h-full rounded-full ${spentPercent >= 90 ? 'bg-tomato' : 'bg-green'}`}
                   initial={{ width: '0%' }}
                   animate={{ width: `${Math.min(100, spentPercent)}%` }}
                   transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
                 />
               </div>
-              <span className="text-ink" style={{ fontFamily: 'var(--font-mono)', fontSize: 10 }}>
-                {spentPercent}%
-              </span>
+              <span className="text-[10px] font-medium text-slate">{spentPercent}%</span>
             </div>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-fathom text-[12px] text-lumen transition-all hover:shadow-[0_4px_12px_-4px_rgba(0,0,0,0.25)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fathom/40 focus-visible:ring-offset-2 focus-visible:ring-offset-lumen"
-                style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-green text-xs font-semibold text-white transition-all hover:bg-dark-green active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
                 aria-label={user?.name ? `Account menu for ${user.name}` : 'Account menu'}
               >
                 {initials(user?.name)}
@@ -123,15 +99,10 @@ export function AppHeader() {
               {user && (
                 <>
                   <DropdownMenuLabel className="flex flex-col gap-0.5 py-2">
-                    <span className="truncate text-[13px] font-medium text-vast">
+                    <span className="truncate text-[13px] font-medium text-charcoal">
                       {user.name || '—'}
                     </span>
-                    <span
-                      className="truncate text-[11px] text-soft"
-                      style={{ fontFamily: 'var(--font-mono)' }}
-                    >
-                      {user.email}
-                    </span>
+                    <span className="truncate text-[11px] text-slate">{user.email}</span>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                 </>
