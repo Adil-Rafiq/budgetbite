@@ -23,19 +23,19 @@ function PreferenceRow({ pref }: { pref: FoodPreferenceResponse }) {
   };
 
   return (
-    <li className="flex items-center gap-3 rounded-xl border border-lumen-dk bg-lumen px-3 py-2">
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white text-soft">
+    <li className="flex items-center gap-3 rounded-xl border border-sage bg-canvas px-3 py-2">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white text-slate">
         {isRestaurant ? <Store className="h-3.5 w-3.5" /> : <Utensils className="h-3.5 w-3.5" />}
       </span>
       <div className="flex min-w-0 flex-1 flex-col">
         <Link
           href={href}
-          className="truncate text-[13px] font-medium text-vast underline-offset-2 hover:text-fathom hover:underline"
+          className="truncate text-[13px] font-medium text-charcoal underline-offset-2 hover:text-green hover:underline"
         >
           {pref.name}
         </Link>
-        <span className="truncate text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
-          {isRestaurant ? 'restaurant' : (pref.restaurantName ?? 'dish')}
+        <span className="truncate text-[11px] text-slate/60">
+          {isRestaurant ? 'Restaurant' : (pref.restaurantName ?? 'Dish')}
         </span>
       </div>
       <button
@@ -43,7 +43,7 @@ function PreferenceRow({ pref }: { pref: FoodPreferenceResponse }) {
         onClick={onRemove}
         disabled={remove.isPending}
         aria-label={`Remove ${pref.name}`}
-        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-lumen-dk bg-white text-soft transition-colors hover:border-pulse/50 hover:text-pulse disabled:opacity-50"
+        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sage bg-white text-slate transition-colors hover:border-tomato/50 hover:text-tomato disabled:opacity-50"
       >
         <X className="h-3.5 w-3.5" />
       </button>
@@ -62,27 +62,20 @@ function Group({
   label: string;
   hint: string;
   items: FoodPreferenceResponse[];
-  tone: 'amber' | 'pulse';
+  tone: 'positive' | 'danger';
 }) {
-  const toneClass = tone === 'amber' ? 'text-amber' : 'text-pulse';
+  const toneClass = tone === 'positive' ? 'text-dark-green' : 'text-tomato';
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline gap-2">
         <span className={`inline-flex items-center gap-1.5 ${toneClass}`}>
           <Icon className="h-3.5 w-3.5" />
-          <span
-            className="text-[10px] uppercase"
-            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-          >
-            {label}
-          </span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em]">{label}</span>
         </span>
-        <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
-          {items.length}
-        </span>
+        <span className="text-[11px] text-slate/60">{items.length}</span>
       </div>
       {items.length === 0 ? (
-        <p className="text-[12px] text-soft">{hint}</p>
+        <p className="text-[12px] text-slate/60">{hint}</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {items.map((pref) => (
@@ -108,20 +101,16 @@ export function FoodPreferencesCard() {
     >
       {isLoading ? (
         <div className="flex flex-col gap-2">
-          <div className="h-10 w-full animate-pulse rounded-xl bg-lumen-dk" />
-          <div className="h-10 w-full animate-pulse rounded-xl bg-lumen-dk" />
+          <div className="h-10 w-full animate-pulse rounded-xl bg-sage" />
+          <div className="h-10 w-full animate-pulse rounded-xl bg-sage" />
         </div>
       ) : error ? (
-        <p className="text-[13px] text-pulse">Could not load your preferences.</p>
+        <p className="text-[13px] text-tomato">Could not load your preferences.</p>
       ) : favorites.length === 0 && blocked.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-lumen-dk bg-lumen p-4 text-[13px] text-ink">
-          Use the <Heart className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-amber" /> and{' '}
-          <Ban className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-pulse" /> buttons on a{' '}
-          <Link
-            href="/restaurants"
-            className="text-fathom underline-offset-2 hover:underline"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
+        <div className="rounded-xl border border-dashed border-sage bg-canvas p-4 text-[13px] text-slate">
+          Use the <Heart className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-dark-green" /> and{' '}
+          <Ban className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-tomato" /> buttons on a{' '}
+          <Link href="/restaurants" className="text-green underline-offset-2 hover:underline">
             restaurant or dish
           </Link>{' '}
           to build these lists.
@@ -133,9 +122,9 @@ export function FoodPreferencesCard() {
             label="Favorites"
             hint="No favorites yet."
             items={favorites}
-            tone="amber"
+            tone="positive"
           />
-          <Group icon={Ban} label="Blocked" hint="Nothing blocked." items={blocked} tone="pulse" />
+          <Group icon={Ban} label="Blocked" hint="Nothing blocked." items={blocked} tone="danger" />
         </div>
       )}
     </Section>
