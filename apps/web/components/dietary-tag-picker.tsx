@@ -1,12 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-
-const labelClass = 'text-[11px] uppercase text-ink';
-const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)',
-  letterSpacing: '0.16em',
-};
+import { Check } from 'lucide-react';
 
 interface DietaryTagPickerProps {
   label: string;
@@ -44,10 +39,8 @@ export const DietaryTagPicker = ({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
-        <label className={labelClass} style={labelStyle}>
-          {label}
-        </label>
-        <p className="text-[12px] text-ink">{hint}</p>
+        <span className="text-xs font-semibold uppercase tracking-wide text-slate">{label}</span>
+        <p className="text-xs text-slate">{hint}</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -58,23 +51,18 @@ export const DietaryTagPicker = ({
               key={tag}
               type="button"
               onClick={() => onToggle(tag)}
-              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] capitalize transition ${
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] capitalize transition-colors ${
                 checked
-                  ? 'border-fathom bg-fathom/8 font-medium text-fathom'
-                  : 'border-lumen-dk bg-white font-normal text-vast'
+                  ? 'border-green bg-green/5 font-semibold text-charcoal'
+                  : 'border-sage bg-white font-normal text-slate hover:border-green/40'
               }`}
             >
               <span
-                className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-lumen ${
-                  checked ? 'bg-fathom' : 'bg-white'
+                className={`flex h-4 w-4 items-center justify-center rounded-full border transition-colors ${
+                  checked ? 'border-green bg-green text-white' : 'border-sage bg-white'
                 }`}
-                style={{
-                  border: `1.5px solid var(--color-${checked ? 'fathom' : 'lumen-dk'})`,
-                  fontSize: 9,
-                  lineHeight: 1,
-                }}
               >
-                {checked && '✓'}
+                {checked && <Check className="h-2.5 w-2.5" />}
               </span>
               {tag}
             </button>
@@ -95,19 +83,19 @@ export const DietaryTagPicker = ({
               handleAdd();
             }
           }}
-          className="w-full rounded-[10px] border border-lumen-dk bg-white px-3.5 py-2 text-[13px] text-vast outline-none"
+          className="w-full rounded-xl border border-sage bg-white px-3.5 py-2 text-[13px] text-charcoal outline-none transition-colors placeholder:text-slate/50 focus:border-green"
         />
         <button
           type="button"
           onClick={handleAdd}
           disabled={draft.trim().length === 0}
-          className="rounded-[10px] border border-lumen-dk bg-lumen px-4 py-2 text-[13px] font-medium text-vast transition disabled:opacity-40"
+          className="rounded-xl border border-sage bg-canvas px-4 py-2 text-[13px] font-medium text-charcoal transition-colors hover:border-green disabled:opacity-40 disabled:hover:border-sage"
         >
           Add
         </button>
       </div>
 
-      {error && <p className="text-[11px] text-pulse">{error}</p>}
+      {error && <p className="text-xs text-tomato">{error}</p>}
     </div>
   );
 };

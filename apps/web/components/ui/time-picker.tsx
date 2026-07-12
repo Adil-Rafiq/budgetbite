@@ -48,19 +48,18 @@ export function TimePicker({
           disabled={disabled}
           aria-label={ariaLabel ?? `Time, ${hh}:${mm}`}
           className={cn(
-            'inline-flex items-center justify-between gap-2 rounded-[10px] border bg-white outline-none transition',
-            'focus-visible:border-fathom/50 focus-visible:ring-2 focus-visible:ring-fathom/30',
-            'data-[state=open]:border-fathom/50 data-[state=open]:ring-2 data-[state=open]:ring-fathom/30',
+            'inline-flex items-center justify-between gap-2 rounded-xl border bg-white outline-none transition',
+            'focus-visible:border-green/50 focus-visible:ring-2 focus-visible:ring-green/30',
+            'data-[state=open]:border-green/50 data-[state=open]:ring-2 data-[state=open]:ring-green/30',
             'disabled:cursor-not-allowed',
             disabled
-              ? 'border-lumen-dk/60 text-soft line-through'
-              : 'border-lumen-dk text-vast hover:border-fathom/40',
+              ? 'border-sage/60 text-slate/50 line-through'
+              : 'border-sage text-charcoal hover:border-green/40',
             size === 'sm'
               ? 'w-[100px] px-2.5 py-1.5 text-[12px]'
               : 'w-[124px] px-3.5 py-2.5 text-[14px]',
             className,
           )}
-          style={{ fontFamily: 'var(--font-mono)' }}
         >
           <span className="tabular-nums">{`${hh}:${mm}`}</span>
           <Clock className={cn('shrink-0 opacity-60', size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5')} />
@@ -78,22 +77,19 @@ export function TimePicker({
         align="end"
         sideOffset={6}
         className={cn(
-          'z-50 w-auto origin-(--radix-popover-content-transform-origin) overflow-hidden rounded-xl border border-lumen-dk bg-white p-0 shadow-[0_10px_28px_rgba(0,0,0,0.10)] outline-none',
+          'z-50 w-auto origin-(--radix-popover-content-transform-origin) overflow-hidden rounded-xl border border-sage bg-white p-0 shadow-[0_10px_28px_rgba(0,0,0,0.10)] outline-none',
           'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
           'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
         )}
       >
-        <div
-          className="flex items-baseline justify-center gap-1 border-b border-lumen-dk bg-lumen px-5 py-3 text-[22px] text-vast tabular-nums"
-          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.04em' }}
-        >
+        <div className="flex items-baseline justify-center gap-1 border-b border-sage bg-canvas px-5 py-3 text-[22px] tabular-nums text-charcoal">
           <span>{hh}</span>
-          <span className="text-soft">:</span>
+          <span className="text-slate/50">:</span>
           <span>{mm}</span>
         </div>
         <div className="flex">
           <TimeColumn label="Hour" items={HOURS} selected={hh} onSelect={setHour} open={open} />
-          <div className="w-px bg-lumen-dk" />
+          <div className="w-px bg-sage" />
           <TimeColumn label="Min" items={MINUTES} selected={mm} onSelect={setMinute} open={open} />
         </div>
       </PopoverPrimitive.Content>
@@ -124,10 +120,7 @@ function TimeColumn({ label, items, selected, onSelect, open }: TimeColumnProps)
 
   return (
     <div className="flex flex-col">
-      <div
-        className="border-b border-lumen-dk px-3 py-1.5 text-center text-[10px] uppercase text-soft"
-        style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-      >
+      <div className="border-b border-sage px-3 py-1.5 text-center text-[10px] uppercase tracking-[0.18em] text-slate/60">
         {label}
       </div>
       <div
@@ -149,10 +142,9 @@ function TimeColumn({ label, items, selected, onSelect, open }: TimeColumnProps)
               className={cn(
                 'flex h-8 w-full items-center justify-center text-[13px] tabular-nums transition-colors',
                 isSelected
-                  ? 'bg-fathom text-lumen'
-                  : 'text-vast hover:bg-lumen-dk/40 focus:bg-lumen-dk/40',
+                  ? 'bg-green text-white'
+                  : 'text-charcoal hover:bg-sage/40 focus:bg-sage/40',
               )}
-              style={{ fontFamily: 'var(--font-mono)' }}
             >
               {v}
             </button>

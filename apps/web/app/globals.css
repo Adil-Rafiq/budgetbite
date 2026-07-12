@@ -181,9 +181,56 @@
   animation: bb-progress-fill 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Onboarding budget slider — sage track, green thumb. */
+.bb-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--color-sage);
+  outline: none;
+}
+.bb-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-green);
+  border: 3px solid #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(140, 198, 63, 0.4);
+}
+.bb-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-green);
+  border: 3px solid #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(140, 198, 63, 0.4);
+}
+
+/* Onboarding step card fade-up on step change. */
+@keyframes bb-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bb-step-in {
+  animation: bb-step-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bb-float,
-  .bb-progress {
+  .bb-progress,
+  .bb-step-in {
     animation: none;
   }
 }
