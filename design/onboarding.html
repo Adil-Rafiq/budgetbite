@@ -1,0 +1,1527 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onboarding</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              canvas: '#f7fbf0',
+              sage: '#d4e8b0',
+              green: '#8cc63f',
+              tomato: '#e84c3d',
+              darkGreen: '#5a8a1a',
+              charcoal: '#1a1a1a',
+              slate: '#4a4a4a',
+            },
+            fontFamily: {
+              grotesk: ['Space Grotesk', 'sans-serif'],
+              dm: ['DM Sans', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
+    </script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      ::-webkit-scrollbar {
+        display: none;
+      }
+      body {
+        font-family: 'DM Sans', sans-serif;
+        background-color: #f7fbf0;
+      }
+      .font-grotesk {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+
+      /* Progress Bar Fill */
+      @keyframes fillSegment {
+        from {
+          width: 0%;
+        }
+        to {
+          width: 100%;
+        }
+      }
+      .segment-fill {
+        animation: fillSegment 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      /* Pin Pulse */
+      @keyframes pinPulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.4);
+          opacity: 0.5;
+        }
+      }
+      .pin-pulse {
+        animation: pinPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes ringPulse {
+        0% {
+          transform: scale(1);
+          opacity: 0.6;
+        }
+        100% {
+          transform: scale(2.8);
+          opacity: 0;
+        }
+      }
+      .ring-pulse {
+        animation: ringPulse 2s ease-out infinite;
+      }
+      .ring-pulse-2 {
+        animation: ringPulse 2s ease-out 0.7s infinite;
+      }
+
+      /* AI Pulse dot */
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+      .ai-pulse {
+        animation: pulse 2s infinite;
+      }
+
+      /* Step card fade-in */
+      @keyframes stepIn {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .step-card {
+        animation: stepIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .bento-card {
+        border: 1px solid #d4e8b0;
+        background: white;
+        border-radius: 20px;
+      }
+
+      /* Meal card selected state */
+      .meal-card {
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .meal-card.selected {
+        border-color: #8cc63f;
+        background: linear-gradient(135deg, #f7fbf0, #eef7df);
+        box-shadow: 0 4px 16px rgba(140, 198, 63, 0.2);
+      }
+      .meal-card:hover:not(.selected) {
+        border-color: #c8dfa0;
+        transform: translateY(-2px);
+      }
+
+      /* Cuisine card selected */
+      .cuisine-card {
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .cuisine-card.selected {
+        border-color: #8cc63f;
+        background: #f0f9e0;
+        box-shadow: 0 4px 12px rgba(140, 198, 63, 0.18);
+      }
+      .cuisine-card:hover:not(.selected) {
+        border-color: #b8d890;
+      }
+
+      /* Toggle switch */
+      .toggle-track {
+        transition: background 0.3s ease;
+      }
+      .toggle-thumb {
+        transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      /* Budget mode segmented */
+      .mode-btn {
+        transition: all 0.25s ease;
+      }
+      .mode-btn.active {
+        background: #8cc63f;
+        color: white;
+        box-shadow: 0 4px 12px rgba(140, 198, 63, 0.3);
+      }
+
+      /* Reminder time slot */
+      .time-slot {
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .time-slot.selected {
+        background: #8cc63f;
+        color: white;
+        border-color: #8cc63f;
+      }
+      .time-slot:hover:not(.selected) {
+        border-color: #8cc63f;
+        color: #5a8a1a;
+      }
+
+      /* Nav link hover */
+      .nav-link {
+        color: #4a4a4a;
+        transition: color 0.2s ease;
+      }
+      .nav-link:hover {
+        color: #8cc63f;
+      }
+
+      /* Input focus glow */
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #8cc63f;
+        box-shadow: 0 0 0 3px rgba(140, 198, 63, 0.15);
+      }
+
+      /* Map grid pattern */
+      .map-grid {
+        background-image:
+          linear-gradient(rgba(140, 198, 63, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(140, 198, 63, 0.08) 1px, transparent 1px);
+        background-size: 32px 32px;
+      }
+
+      /* Floating step number badge */
+      .step-badge-done {
+        background: #8cc63f;
+      }
+      .step-badge-active {
+        background: #e84c3d;
+      }
+      .step-badge-inactive {
+        background: #d4e8b0;
+      }
+
+      /* Budget digit input effect */
+      .budget-input::-webkit-inner-spin-button,
+      .budget-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+      }
+      .budget-input {
+        -moz-appearance: textfield;
+      }
+
+      /* Slider styling */
+      input[type='range'] {
+        -webkit-appearance: none;
+        height: 6px;
+        border-radius: 99px;
+        background: #d4e8b0;
+        outline: none;
+      }
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #8cc63f;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(140, 198, 63, 0.4);
+        border: 3px solid white;
+      }
+
+      /* Success check animation */
+      @keyframes checkPop {
+        0% {
+          transform: scale(0);
+        }
+        70% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .check-pop {
+        animation: checkPop 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      /* Confetti dots for completion */
+      @keyframes confettiFly {
+        0% {
+          transform: translateY(0) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-80px) rotate(360deg);
+          opacity: 0;
+        }
+      }
+      .confetti-dot {
+        animation: confettiFly 1.2s ease-out forwards;
+      }
+    </style>
+  </head>
+  <body class="bg-canvas text-charcoal overflow-x-hidden min-h-screen flex flex-col">
+    <!-- ===== TOP PROGRESS HEADER ===== -->
+    <header
+      id="onboarding-header"
+      class="w-full sticky top-0 z-50 bg-canvas/95 backdrop-blur-sm border-b border-sage"
+    >
+      <!-- Brand bar -->
+      <div class="max-w-2xl mx-auto px-4 sm:px-6">
+        <div class="flex items-center justify-between h-14">
+          <!-- Logo -->
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 bg-tomato rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-leaf text-white text-xs"></i>
+            </div>
+            <span class="font-grotesk font-bold text-base text-charcoal">BudgetBite</span>
+          </div>
+          <!-- Step indicator -->
+          <div class="flex items-center gap-2">
+            <span id="step-label" class="text-xs font-semibold font-grotesk text-slate"
+              >Step 1 of 4</span
+            >
+            <button
+              onclick="skipOnboarding()"
+              class="text-xs font-dm text-slate/60 hover:text-slate transition-colors ml-2 hidden sm:block"
+            >
+              Skip setup
+            </button>
+          </div>
+          <!-- Close / exit -->
+          <a
+            href="#"
+            class="w-7 h-7 rounded-full border border-sage flex items-center justify-center text-slate hover:border-tomato hover:text-tomato transition-colors"
+          >
+            <i class="fa-solid fa-xmark text-xs"></i>
+          </a>
+        </div>
+      </div>
+      <!-- 4-Segment Progress Bar -->
+      <div class="max-w-2xl mx-auto px-4 sm:px-6 pb-3">
+        <div class="flex gap-1.5">
+          <div class="flex-1 h-1.5 rounded-full bg-sage/40 overflow-hidden">
+            <div
+              id="seg-1"
+              class="h-full bg-green rounded-full w-0 transition-all duration-500"
+            ></div>
+          </div>
+          <div class="flex-1 h-1.5 rounded-full bg-sage/40 overflow-hidden">
+            <div
+              id="seg-2"
+              class="h-full bg-green rounded-full w-0 transition-all duration-500"
+            ></div>
+          </div>
+          <div class="flex-1 h-1.5 rounded-full bg-sage/40 overflow-hidden">
+            <div
+              id="seg-3"
+              class="h-full bg-green rounded-full w-0 transition-all duration-500"
+            ></div>
+          </div>
+          <div class="flex-1 h-1.5 rounded-full bg-sage/40 overflow-hidden">
+            <div
+              id="seg-4"
+              class="h-full bg-green rounded-full w-0 transition-all duration-500"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT AREA ===== -->
+    <main id="onboarding-main" class="flex-1 w-full max-w-2xl mx-auto px-4 sm:px-6 pt-8 pb-32">
+      <!-- ==================== STEP 1: LOCATION ==================== -->
+      <div id="step-1" class="step-card">
+        <!-- Step eyebrow -->
+        <div class="mb-6">
+          <div
+            class="inline-flex items-center gap-2 bg-green/10 border border-green/20 rounded-full px-3 py-1 mb-3"
+          >
+            <i class="fa-solid fa-location-dot text-green text-xs"></i>
+            <span class="text-xs font-semibold text-darkGreen font-grotesk tracking-wide uppercase"
+              >Step 1 — Your Location</span
+            >
+          </div>
+          <h1 class="font-grotesk font-bold text-3xl sm:text-4xl text-charcoal leading-tight mb-2">
+            Where do you<br />eat out?
+          </h1>
+          <p class="text-slate font-dm text-sm leading-relaxed">
+            We'll find restaurants near you with real menus and live prices to build your meal plan.
+          </p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="bento-card p-4 mb-4 shadow-sm">
+          <div class="relative">
+            <div class="absolute left-4 top-1/2 -translate-y-1/2">
+              <i class="fa-solid fa-location-dot text-green text-base"></i>
+            </div>
+            <input
+              type="text"
+              id="location-input"
+              placeholder="Search your city, area, or neighborhood…"
+              class="w-full border border-sage rounded-xl pl-10 pr-28 py-3.5 text-sm font-dm bg-canvas placeholder-slate/50 focus:border-green transition-colors"
+              value="Gulshan-e-Iqbal, Karachi"
+            />
+            <button
+              class="absolute right-2 top-1/2 -translate-y-1/2 bg-green text-white text-xs font-grotesk font-semibold px-4 py-2 rounded-lg hover:bg-darkGreen transition-colors"
+            >
+              Detect
+            </button>
+          </div>
+          <!-- Suggestions -->
+          <div class="mt-3 space-y-1">
+            <button
+              onclick="selectLocation(this)"
+              class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-canvas transition-colors group"
+            >
+              <div
+                class="w-7 h-7 bg-sage/50 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fa-solid fa-map-pin text-darkGreen text-xs"></i>
+              </div>
+              <div>
+                <p
+                  class="text-sm font-dm font-medium text-charcoal group-hover:text-green transition-colors"
+                >
+                  Gulshan-e-Iqbal, Karachi
+                </p>
+                <p class="text-xs text-slate font-dm">324 restaurants nearby</p>
+              </div>
+              <span class="ml-auto text-xs bg-green/10 text-green px-2 py-0.5 rounded-full font-dm"
+                >Current</span
+              >
+            </button>
+            <button
+              onclick="selectLocation(this)"
+              class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-canvas transition-colors group"
+            >
+              <div
+                class="w-7 h-7 bg-sage/50 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fa-solid fa-building text-slate text-xs"></i>
+              </div>
+              <div>
+                <p
+                  class="text-sm font-dm font-medium text-charcoal group-hover:text-green transition-colors"
+                >
+                  DHA Phase 6, Karachi
+                </p>
+                <p class="text-xs text-slate font-dm">211 restaurants nearby</p>
+              </div>
+            </button>
+            <button
+              onclick="selectLocation(this)"
+              class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-canvas transition-colors group"
+            >
+              <div
+                class="w-7 h-7 bg-sage/50 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fa-solid fa-building text-slate text-xs"></i>
+              </div>
+              <div>
+                <p
+                  class="text-sm font-dm font-medium text-charcoal group-hover:text-green transition-colors"
+                >
+                  Clifton Block 9, Karachi
+                </p>
+                <p class="text-xs text-slate font-dm">189 restaurants nearby</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Map View -->
+        <div class="bento-card overflow-hidden shadow-sm relative" style="height: 240px">
+          <!-- Map background -->
+          <div class="absolute inset-0 bg-canvas map-grid"></div>
+          <!-- Subtle road lines -->
+          <div class="absolute inset-0 opacity-30">
+            <div
+              class="absolute bg-sage/60 rounded-full"
+              style="width: 2px; height: 100%; left: 30%; top: 0"
+            ></div>
+            <div
+              class="absolute bg-sage/60 rounded-full"
+              style="width: 100%; height: 2px; left: 0; top: 45%"
+            ></div>
+            <div
+              class="absolute bg-sage/40 rounded-full"
+              style="width: 2px; height: 100%; left: 60%; top: 0"
+            ></div>
+            <div
+              class="absolute bg-sage/40 rounded-full"
+              style="width: 100%; height: 2px; left: 0; top: 70%"
+            ></div>
+            <div
+              class="absolute bg-sage/30"
+              style="width: 1px; height: 100%; left: 15%; top: 0"
+            ></div>
+            <div
+              class="absolute bg-sage/30"
+              style="width: 1px; height: 100%; left: 80%; top: 0"
+            ></div>
+            <div
+              class="absolute bg-sage/30"
+              style="width: 100%; height: 1px; left: 0; top: 25%"
+            ></div>
+          </div>
+          <!-- Restaurant blobs -->
+          <div class="absolute w-2 h-2 bg-green/40 rounded-full" style="top: 28%; left: 22%"></div>
+          <div class="absolute w-2 h-2 bg-green/40 rounded-full" style="top: 58%; left: 42%"></div>
+          <div class="absolute w-2 h-2 bg-green/40 rounded-full" style="top: 72%; left: 68%"></div>
+          <div class="absolute w-2 h-2 bg-green/40 rounded-full" style="top: 35%; left: 78%"></div>
+          <div
+            class="absolute w-2.5 h-2.5 bg-tomato/50 rounded-full"
+            style="top: 20%; left: 55%"
+          ></div>
+          <div class="absolute w-2 h-2 bg-tomato/40 rounded-full" style="top: 65%; left: 25%"></div>
+
+          <!-- Center pin with pulse -->
+          <div class="absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%)">
+            <!-- Outer rings -->
+            <div
+              class="absolute ring-pulse w-10 h-10 bg-green/30 rounded-full"
+              style="top: 50%; left: 50%; transform: translate(-50%, -50%)"
+            ></div>
+            <div
+              class="absolute ring-pulse-2 w-10 h-10 bg-green/20 rounded-full"
+              style="top: 50%; left: 50%; transform: translate(-50%, -50%)"
+            ></div>
+            <!-- Pin -->
+            <div class="relative z-10 flex flex-col items-center">
+              <div
+                class="w-10 h-10 bg-tomato rounded-full flex items-center justify-center shadow-lg shadow-tomato/30 pin-pulse"
+              >
+                <i class="fa-solid fa-location-dot text-white text-base"></i>
+              </div>
+              <div class="w-2 h-2 bg-tomato rounded-full mt-0.5 opacity-60"></div>
+            </div>
+          </div>
+
+          <!-- Map Label -->
+          <div
+            class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm border border-sage rounded-xl px-3 py-2 shadow-sm flex items-center gap-2"
+          >
+            <span class="w-2 h-2 rounded-full bg-green ai-pulse inline-block"></span>
+            <span class="text-xs font-dm font-medium text-charcoal">Gulshan-e-Iqbal, Karachi</span>
+          </div>
+
+          <!-- Restaurant count badge -->
+          <div
+            class="absolute bottom-3 right-3 bg-charcoal text-white rounded-xl px-3 py-2 shadow-sm"
+          >
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-store text-green text-xs"></i>
+              <span class="text-xs font-grotesk font-semibold">324 restaurants found</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cuisine Preference -->
+        <div class="mt-4">
+          <p class="text-xs font-semibold text-slate font-grotesk uppercase tracking-wide mb-3">
+            Cuisine Preferences
+            <span class="text-slate/50 font-normal normal-case tracking-normal"
+              >(pick all you love)</span
+            >
+          </p>
+          <div id="cuisine-grid" class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            <button
+              onclick="toggleCuisine(this)"
+              class="cuisine-card selected border-2 border-green rounded-xl p-3 text-center bg-green/5"
+            >
+              <span class="text-xl block mb-1">🍛</span>
+              <span class="text-xs font-dm font-medium text-charcoal">Pakistani</span>
+            </button>
+            <button
+              onclick="toggleCuisine(this)"
+              class="cuisine-card border-2 border-sage rounded-xl p-3 text-center"
+            >
+              <span class="text-xl block mb-1">🍕</span>
+              <span class="text-xs font-dm font-medium text-charcoal">Pizza</span>
+            </button>
+            <button
+              onclick="toggleCuisine(this)"
+              class="cuisine-card border-2 border-sage rounded-xl p-3 text-center"
+            >
+              <span class="text-xl block mb-1">🍜</span>
+              <span class="text-xs font-dm font-medium text-charcoal">Chinese</span>
+            </button>
+            <button
+              onclick="toggleCuisine(this)"
+              class="cuisine-card selected border-2 border-green rounded-xl p-3 text-center bg-green/5"
+            >
+              <span class="text-xl block mb-1">🥗</span>
+              <span class="text-xs font-dm font-medium text-charcoal">Healthy</span>
+            </button>
+            <button
+              onclick="toggleCuisine(this)"
+              class="cuisine-card border-2 border-sage rounded-xl p-3 text-center"
+            >
+              <span class="text-xl block mb-1">🍔</span>
+              <span class="text-xs font-dm font-medium text-charcoal">Burgers</span>
+            </button>
+            <button
+              onclick="toggleCuisine(this)"
+              class="cuisine-card border-2 border-sage rounded-xl p-3 text-center"
+            >
+              <span class="text-xl block mb-1">☕</span>
+              <span class="text-xs font-dm font-medium text-charcoal">Cafe</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== STEP 2: BUDGET ==================== -->
+      <div id="step-2" class="step-card hidden">
+        <!-- Step eyebrow -->
+        <div class="mb-6">
+          <div
+            class="inline-flex items-center gap-2 bg-tomato/10 border border-tomato/20 rounded-full px-3 py-1 mb-3"
+          >
+            <i class="fa-solid fa-wallet text-tomato text-xs"></i>
+            <span class="text-xs font-semibold text-tomato font-grotesk tracking-wide uppercase"
+              >Step 2 — Budget Setup</span
+            >
+          </div>
+          <h1 class="font-grotesk font-bold text-3xl sm:text-4xl text-charcoal leading-tight mb-2">
+            How much do<br />you want to spend?
+          </h1>
+          <p class="text-slate font-dm text-sm leading-relaxed">
+            Set a realistic food budget. AI will make every rupee count across real restaurant
+            menus.
+          </p>
+        </div>
+
+        <!-- Budget Mode Toggle -->
+        <div class="bento-card p-2 mb-5 shadow-sm flex gap-1">
+          <button
+            onclick="setBudgetMode('weekly')"
+            id="mode-weekly"
+            class="mode-btn active flex-1 py-3 rounded-xl font-grotesk font-semibold text-sm flex items-center justify-center gap-2"
+          >
+            <i class="fa-solid fa-calendar-week text-sm"></i>
+            Weekly
+          </button>
+          <button
+            onclick="setBudgetMode('monthly')"
+            id="mode-monthly"
+            class="mode-btn flex-1 py-3 rounded-xl font-grotesk font-semibold text-sm text-slate flex items-center justify-center gap-2"
+          >
+            <i class="fa-solid fa-calendar text-sm"></i>
+            Monthly
+          </button>
+        </div>
+
+        <!-- Budget Input Card -->
+        <div class="bento-card p-6 mb-4 shadow-sm">
+          <p class="text-xs font-semibold text-slate font-grotesk uppercase tracking-wide mb-4">
+            Total Food Budget
+          </p>
+          <div class="flex items-end gap-3 mb-5">
+            <span class="font-grotesk font-bold text-2xl text-charcoal pb-1">Rs.</span>
+            <div class="flex-1">
+              <input
+                id="budget-value"
+                type="number"
+                value="7500"
+                class="budget-input w-full font-grotesk font-bold text-5xl sm:text-6xl text-green border-b-2 border-sage bg-transparent focus:border-green transition-colors pb-1 focus:outline-none"
+              />
+            </div>
+            <span id="budget-period-label" class="font-dm text-slate text-sm pb-2">/ week</span>
+          </div>
+
+          <!-- Slider -->
+          <input
+            type="range"
+            id="budget-slider"
+            min="1000"
+            max="50000"
+            step="500"
+            value="7500"
+            class="w-full mb-3"
+            oninput="syncBudget(this.value)"
+          />
+          <div class="flex justify-between text-xs text-slate font-dm mb-5">
+            <span>Rs. 1,000</span>
+            <span>Rs. 50,000</span>
+          </div>
+
+          <!-- Quick presets -->
+          <div class="flex gap-2 flex-wrap">
+            <span class="text-xs text-slate font-dm mr-1 self-center">Quick pick:</span>
+            <button
+              onclick="setPreset(3500)"
+              class="text-xs border border-sage rounded-full px-3 py-1.5 font-dm hover:border-green hover:text-green transition-colors"
+            >
+              Rs. 3,500
+            </button>
+            <button
+              onclick="setPreset(7500)"
+              class="text-xs border border-green text-green bg-green/5 rounded-full px-3 py-1.5 font-dm font-medium"
+            >
+              Rs. 7,500
+            </button>
+            <button
+              onclick="setPreset(12000)"
+              class="text-xs border border-sage rounded-full px-3 py-1.5 font-dm hover:border-green hover:text-green transition-colors"
+            >
+              Rs. 12,000
+            </button>
+            <button
+              onclick="setPreset(20000)"
+              class="text-xs border border-sage rounded-full px-3 py-1.5 font-dm hover:border-green hover:text-green transition-colors"
+            >
+              Rs. 20,000
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Budget Breakdown -->
+        <div class="bento-card p-5 mb-4 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 bg-green/15 rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-wand-magic-sparkles text-green text-xs"></i>
+              </div>
+              <span class="text-sm font-grotesk font-semibold text-charcoal"
+                >AI Budget Breakdown</span
+              >
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-green ai-pulse inline-block"></span>
+              <span class="text-xs text-slate font-dm">Auto-calculated</span>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="font-dm text-slate flex items-center gap-1.5">🍳 Breakfast</span>
+                <span class="font-grotesk font-semibold text-charcoal" id="b-breakfast"
+                  >Rs. 1,875</span
+                >
+              </div>
+              <div class="h-2 bg-sage/40 rounded-full overflow-hidden">
+                <div class="h-full bg-green/60 rounded-full" style="width: 25%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="font-dm text-slate flex items-center gap-1.5">🍚 Lunch</span>
+                <span class="font-grotesk font-semibold text-charcoal" id="b-lunch">Rs. 3,375</span>
+              </div>
+              <div class="h-2 bg-sage/40 rounded-full overflow-hidden">
+                <div class="h-full bg-green rounded-full" style="width: 45%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="font-dm text-slate flex items-center gap-1.5">🥘 Dinner</span>
+                <span class="font-grotesk font-semibold text-charcoal" id="b-dinner"
+                  >Rs. 2,250</span
+                >
+              </div>
+              <div class="h-2 bg-sage/40 rounded-full overflow-hidden">
+                <div class="h-full bg-green/80 rounded-full" style="width: 30%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Savings potential card -->
+        <div class="bg-charcoal rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+          <div
+            class="w-12 h-12 bg-green/20 rounded-xl flex items-center justify-center flex-shrink-0"
+          >
+            <i class="fa-solid fa-piggy-bank text-green text-xl"></i>
+          </div>
+          <div class="flex-1">
+            <p class="text-xs text-white/50 font-dm mb-0.5">At this budget, you could save</p>
+            <p class="font-grotesk font-bold text-2xl text-green" id="savings-estimate">
+              Rs. 1,800 / week
+            </p>
+            <p class="text-xs text-white/40 font-dm">vs. avg. unplanned food spending</p>
+          </div>
+          <i class="fa-solid fa-arrow-trend-down text-green text-xl"></i>
+        </div>
+      </div>
+
+      <!-- ==================== STEP 3: DAILY RHYTHM ==================== -->
+      <div id="step-3" class="step-card hidden">
+        <!-- Step eyebrow -->
+        <div class="mb-6">
+          <div
+            class="inline-flex items-center gap-2 bg-sage border border-green/20 rounded-full px-3 py-1 mb-3"
+          >
+            <i class="fa-solid fa-sun text-darkGreen text-xs"></i>
+            <span class="text-xs font-semibold text-darkGreen font-grotesk tracking-wide uppercase"
+              >Step 3 — Daily Rhythm</span
+            >
+          </div>
+          <h1 class="font-grotesk font-bold text-3xl sm:text-4xl text-charcoal leading-tight mb-2">
+            When do you<br />typically eat out?
+          </h1>
+          <p class="text-slate font-dm text-sm leading-relaxed">
+            Select your meal occasions. AI schedules your plan around your real eating habits.
+          </p>
+        </div>
+
+        <!-- Meal Occasion Grid -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+          <!-- Breakfast -->
+          <button
+            onclick="toggleMeal(this, 'breakfast')"
+            id="meal-breakfast"
+            class="meal-card selected border-2 border-green rounded-2xl p-4 sm:p-5 text-center"
+          >
+            <div
+              class="w-12 h-12 bg-green/10 rounded-xl flex items-center justify-center mx-auto mb-3"
+            >
+              <span class="text-2xl">🍳</span>
+            </div>
+            <p class="font-grotesk font-bold text-sm text-charcoal">Breakfast</p>
+            <p class="text-xs text-slate font-dm mt-0.5">7–10 AM</p>
+            <div id="check-breakfast" class="mt-2 check-pop">
+              <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green">
+                <i class="fa-solid fa-check text-white text-xs"></i>
+              </span>
+            </div>
+          </button>
+          <!-- Lunch -->
+          <button
+            onclick="toggleMeal(this, 'lunch')"
+            id="meal-lunch"
+            class="meal-card selected border-2 border-green rounded-2xl p-4 sm:p-5 text-center"
+          >
+            <div
+              class="w-12 h-12 bg-green/10 rounded-xl flex items-center justify-center mx-auto mb-3"
+            >
+              <span class="text-2xl">🍚</span>
+            </div>
+            <p class="font-grotesk font-bold text-sm text-charcoal">Lunch</p>
+            <p class="text-xs text-slate font-dm mt-0.5">12–2 PM</p>
+            <div id="check-lunch" class="mt-2 check-pop">
+              <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green">
+                <i class="fa-solid fa-check text-white text-xs"></i>
+              </span>
+            </div>
+          </button>
+          <!-- Dinner -->
+          <button
+            onclick="toggleMeal(this, 'dinner')"
+            id="meal-dinner"
+            class="meal-card selected border-2 border-green rounded-2xl p-4 sm:p-5 text-center"
+          >
+            <div
+              class="w-12 h-12 bg-green/10 rounded-xl flex items-center justify-center mx-auto mb-3"
+            >
+              <span class="text-2xl">🥘</span>
+            </div>
+            <p class="font-grotesk font-bold text-sm text-charcoal">Dinner</p>
+            <p class="text-xs text-slate font-dm mt-0.5">7–10 PM</p>
+            <div id="check-dinner" class="mt-2 check-pop">
+              <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green">
+                <i class="fa-solid fa-check text-white text-xs"></i>
+              </span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Reminder Times -->
+        <div class="bento-card p-5 mb-4 shadow-sm">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 bg-tomato/10 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-bell text-tomato text-xs"></i>
+            </div>
+            <div>
+              <p class="text-sm font-grotesk font-semibold text-charcoal">Meal Reminders</p>
+              <p class="text-xs text-slate font-dm">When should AI nudge you to log meals?</p>
+            </div>
+            <!-- Toggle switch -->
+            <div class="ml-auto flex items-center gap-2">
+              <span class="text-xs font-dm text-slate">On</span>
+              <div
+                onclick="toggleReminders(this)"
+                class="toggle-track w-10 h-6 bg-green rounded-full cursor-pointer relative"
+                id="reminder-toggle"
+              >
+                <div
+                  class="toggle-thumb absolute w-4 h-4 bg-white rounded-full top-1 left-5 shadow-sm"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div id="reminder-times" class="space-y-3">
+            <div>
+              <p class="text-xs text-slate font-dm mb-2 flex items-center gap-1.5">
+                <span>🍳</span> Breakfast reminder
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  onclick="selectTime(this, 'breakfast')"
+                  class="time-slot selected border border-green bg-green text-white text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  8:00 AM
+                </button>
+                <button
+                  onclick="selectTime(this, 'breakfast')"
+                  class="time-slot border border-sage text-slate text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  8:30 AM
+                </button>
+                <button
+                  onclick="selectTime(this, 'breakfast')"
+                  class="time-slot border border-sage text-slate text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  9:00 AM
+                </button>
+                <button
+                  onclick="selectTime(this, 'breakfast')"
+                  class="time-slot border border-sage text-slate text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  9:30 AM
+                </button>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-slate font-dm mb-2 flex items-center gap-1.5">
+                <span>🍚</span> Lunch reminder
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  onclick="selectTime(this, 'lunch')"
+                  class="time-slot border border-sage text-slate text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  12:00 PM
+                </button>
+                <button
+                  onclick="selectTime(this, 'lunch')"
+                  class="time-slot selected border border-green bg-green text-white text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  12:30 PM
+                </button>
+                <button
+                  onclick="selectTime(this, 'lunch')"
+                  class="time-slot border border-sage text-slate text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  1:00 PM
+                </button>
+                <button
+                  onclick="selectTime(this, 'lunch')"
+                  class="time-slot border border-sage text-slate text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  1:30 PM
+                </button>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-slate font-dm mb-2 flex items-center gap-1.5">
+                <span>🥘</span> Dinner reminder
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  onclick="selectTime(this, 'dinner')"
+                  class="time-slot border border-sage text-slate text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  7:00 PM
+                </button>
+                <button
+                  onclick="selectTime(this, 'dinner')"
+                  class="time-slot border border-sage text-slate text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  7:30 PM
+                </button>
+                <button
+                  onclick="selectTime(this, 'dinner')"
+                  class="time-slot selected border border-green bg-green text-white text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  8:00 PM
+                </button>
+                <button
+                  onclick="selectTime(this, 'dinner')"
+                  class="time-slot border border-sage text-slate text-xs font-dm px-3 py-1.5 rounded-full"
+                >
+                  8:30 PM
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Days of the week selector -->
+        <div class="bento-card p-5 shadow-sm">
+          <p class="text-xs font-semibold text-slate font-grotesk uppercase tracking-wide mb-3">
+            Active Days
+          </p>
+          <div class="flex gap-2 justify-between">
+            <button
+              onclick="toggleDay(this)"
+              class="flex-1 text-center py-2.5 rounded-xl text-xs font-grotesk font-semibold border-2 border-green bg-green/10 text-darkGreen"
+            >
+              M
+            </button>
+            <button
+              onclick="toggleDay(this)"
+              class="flex-1 text-center py-2.5 rounded-xl text-xs font-grotesk font-semibold border-2 border-green bg-green/10 text-darkGreen"
+            >
+              T
+            </button>
+            <button
+              onclick="toggleDay(this)"
+              class="flex-1 text-center py-2.5 rounded-xl text-xs font-grotesk font-semibold border-2 border-green bg-green/10 text-darkGreen"
+            >
+              W
+            </button>
+            <button
+              onclick="toggleDay(this)"
+              class="flex-1 text-center py-2.5 rounded-xl text-xs font-grotesk font-semibold border-2 border-green bg-green/10 text-darkGreen"
+            >
+              T
+            </button>
+            <button
+              onclick="toggleDay(this)"
+              class="flex-1 text-center py-2.5 rounded-xl text-xs font-grotesk font-semibold border-2 border-green bg-green/10 text-darkGreen"
+            >
+              F
+            </button>
+            <button
+              onclick="toggleDay(this)"
+              class="flex-1 text-center py-2.5 rounded-xl text-xs font-grotesk font-semibold border-2 border-sage text-slate"
+            >
+              S
+            </button>
+            <button
+              onclick="toggleDay(this)"
+              class="flex-1 text-center py-2.5 rounded-xl text-xs font-grotesk font-semibold border-2 border-sage text-slate"
+            >
+              S
+            </button>
+          </div>
+          <p class="text-xs text-slate font-dm mt-2">
+            5 days selected — AI plans weekdays by default.
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================== STEP 4: ALL SET ==================== -->
+      <div id="step-4" class="step-card hidden">
+        <!-- Step eyebrow -->
+        <div class="mb-6">
+          <div
+            class="inline-flex items-center gap-2 bg-green/10 border border-green/20 rounded-full px-3 py-1 mb-3"
+          >
+            <i class="fa-solid fa-check-double text-green text-xs"></i>
+            <span class="text-xs font-semibold text-darkGreen font-grotesk tracking-wide uppercase"
+              >Step 4 — Review & Launch</span
+            >
+          </div>
+          <h1 class="font-grotesk font-bold text-3xl sm:text-4xl text-charcoal leading-tight mb-2">
+            Your BudgetBite<br />is ready! 🎉
+          </h1>
+          <p class="text-slate font-dm text-sm leading-relaxed">
+            Here's a summary of your personalized setup. AI will generate your first meal plan
+            instantly.
+          </p>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="bento-card p-6 mb-4 shadow-sm space-y-4">
+          <!-- Location row -->
+          <div class="flex items-center gap-4 pb-4 border-b border-sage/50">
+            <div
+              class="w-11 h-11 bg-canvas rounded-xl flex items-center justify-center flex-shrink-0 border border-sage"
+            >
+              <i class="fa-solid fa-location-dot text-tomato text-base"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-xs text-slate font-dm uppercase tracking-wide">Location</p>
+              <p class="text-sm font-grotesk font-semibold text-charcoal">
+                Gulshan-e-Iqbal, Karachi
+              </p>
+              <p class="text-xs text-green font-dm">324 restaurants indexed</p>
+            </div>
+            <button
+              onclick="goToStep(1)"
+              class="text-xs text-slate hover:text-green font-dm underline underline-offset-2"
+            >
+              Edit
+            </button>
+          </div>
+          <!-- Budget row -->
+          <div class="flex items-center gap-4 pb-4 border-b border-sage/50">
+            <div
+              class="w-11 h-11 bg-canvas rounded-xl flex items-center justify-center flex-shrink-0 border border-sage"
+            >
+              <i class="fa-solid fa-wallet text-green text-base"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-xs text-slate font-dm uppercase tracking-wide">Budget</p>
+              <p class="text-sm font-grotesk font-semibold text-charcoal" id="summary-budget">
+                Rs. 7,500 / week
+              </p>
+              <p class="text-xs text-slate font-dm">≈ Rs. 1,071 per day · 3 meals</p>
+            </div>
+            <button
+              onclick="goToStep(2)"
+              class="text-xs text-slate hover:text-green font-dm underline underline-offset-2"
+            >
+              Edit
+            </button>
+          </div>
+          <!-- Meals row -->
+          <div class="flex items-center gap-4">
+            <div
+              class="w-11 h-11 bg-canvas rounded-xl flex items-center justify-center flex-shrink-0 border border-sage"
+            >
+              <i class="fa-solid fa-bowl-food text-darkGreen text-base"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-xs text-slate font-dm uppercase tracking-wide">Meal Occasions</p>
+              <p class="text-sm font-grotesk font-semibold text-charcoal">
+                Breakfast · Lunch · Dinner
+              </p>
+              <p class="text-xs text-slate font-dm">8:00 AM · 12:30 PM · 8:00 PM</p>
+            </div>
+            <button
+              onclick="goToStep(3)"
+              class="text-xs text-slate hover:text-green font-dm underline underline-offset-2"
+            >
+              Edit
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Preview Card -->
+        <div class="bg-charcoal rounded-2xl p-5 mb-4 shadow-sm">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-7 h-7 bg-green/20 rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-wand-magic-sparkles text-green text-xs"></i>
+            </div>
+            <span class="text-sm font-grotesk font-semibold text-white">AI First Day Preview</span>
+            <div class="ml-auto flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-green ai-pulse inline-block"></span>
+              <span class="text-xs text-white/40 font-dm">Generating…</span>
+            </div>
+          </div>
+          <div class="space-y-2.5">
+            <div class="flex items-center gap-3 bg-white/5 rounded-xl p-3">
+              <span class="text-base">🍳</span>
+              <div class="flex-1">
+                <p class="text-xs font-dm font-medium text-white">
+                  Aloo Paratha + Chai — Roti Republic
+                </p>
+                <p class="text-xs text-white/40 font-dm">Breakfast · Tomorrow 8:00 AM</p>
+              </div>
+              <span class="text-xs font-grotesk font-bold text-green">Rs. 220</span>
+            </div>
+            <div class="flex items-center gap-3 bg-white/5 rounded-xl p-3">
+              <span class="text-base">🍚</span>
+              <div class="flex-1">
+                <p class="text-xs font-dm font-medium text-white">
+                  Chicken Biryani — Karachi Darbar
+                </p>
+                <p class="text-xs text-white/40 font-dm">Lunch · Tomorrow 12:30 PM</p>
+              </div>
+              <span class="text-xs font-grotesk font-bold text-green">Rs. 650</span>
+            </div>
+            <div class="flex items-center gap-3 bg-white/5 rounded-xl p-3">
+              <span class="text-base">🥗</span>
+              <div class="flex-1">
+                <p class="text-xs font-dm font-medium text-white">Garden Salad — GreenBowl Co.</p>
+                <p class="text-xs text-white/40 font-dm">Dinner · Tomorrow 8:00 PM</p>
+              </div>
+              <span class="text-xs font-grotesk font-bold text-green">Rs. 380</span>
+            </div>
+          </div>
+          <div class="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
+            <span class="text-xs text-white/50 font-dm">Day Total</span>
+            <span class="text-sm font-grotesk font-bold text-green"
+              >Rs. 1,250
+              <span class="text-white/40 font-normal text-xs">of Rs. 1,071 limit</span></span
+            >
+          </div>
+        </div>
+
+        <!-- Trust badges -->
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-white border border-sage rounded-xl p-3 text-center">
+            <i class="fa-solid fa-shield-halved text-green text-lg mb-1.5 block"></i>
+            <p class="text-xs font-grotesk font-semibold text-charcoal">Privacy First</p>
+            <p class="text-xs text-slate font-dm mt-0.5">Data stays yours</p>
+          </div>
+          <div class="bg-white border border-sage rounded-xl p-3 text-center">
+            <i class="fa-solid fa-bolt text-green text-lg mb-1.5 block"></i>
+            <p class="text-xs font-grotesk font-semibold text-charcoal">Instant Plans</p>
+            <p class="text-xs text-slate font-dm mt-0.5">AI in seconds</p>
+          </div>
+          <div class="bg-white border border-sage rounded-xl p-3 text-center">
+            <i class="fa-solid fa-rotate text-green text-lg mb-1.5 block"></i>
+            <p class="text-xs font-grotesk font-semibold text-charcoal">Always Fresh</p>
+            <p class="text-xs text-slate font-dm mt-0.5">Live menu prices</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ===== BOTTOM STICKY NAV ===== -->
+    <div
+      id="bottom-nav"
+      class="fixed bottom-0 left-0 right-0 z-50 bg-canvas/95 backdrop-blur-sm border-t border-sage"
+    >
+      <div class="max-w-2xl mx-auto px-4 sm:px-6 py-4">
+        <div class="flex items-center gap-3">
+          <!-- Back Button -->
+          <button
+            id="back-btn"
+            onclick="prevStep()"
+            class="flex items-center gap-2 border border-sage rounded-xl px-5 py-3.5 text-sm font-grotesk font-semibold text-slate hover:border-charcoal hover:text-charcoal transition-colors invisible"
+          >
+            <i class="fa-solid fa-arrow-left text-xs"></i>
+            Back
+          </button>
+
+          <!-- Continue / Launch Button -->
+          <button
+            id="continue-btn"
+            onclick="nextStep()"
+            class="flex-1 bg-tomato text-white font-grotesk font-semibold py-3.5 rounded-xl hover:bg-red-600 transition-all hover:shadow-lg hover:shadow-tomato/25 flex items-center justify-center gap-2 text-sm"
+          >
+            <span id="continue-label">Continue</span>
+            <i id="continue-icon" class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </div>
+        <!-- Step dots -->
+        <div class="flex justify-center gap-2 mt-3">
+          <div id="dot-1" class="w-6 h-1.5 rounded-full bg-green transition-all duration-300"></div>
+          <div
+            id="dot-2"
+            class="w-1.5 h-1.5 rounded-full bg-sage transition-all duration-300"
+          ></div>
+          <div
+            id="dot-3"
+            class="w-1.5 h-1.5 rounded-full bg-sage transition-all duration-300"
+          ></div>
+          <div
+            id="dot-4"
+            class="w-1.5 h-1.5 rounded-full bg-sage transition-all duration-300"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentStep = 1;
+      const totalSteps = 4;
+      let budgetMode = 'weekly';
+
+      const stepLabels = {
+        1: 'Step 1 of 4',
+        2: 'Step 2 of 4',
+        3: 'Step 3 of 4',
+        4: 'Step 4 of 4',
+      };
+
+      const continueLabels = {
+        1: 'Continue',
+        2: 'Continue',
+        3: 'Continue',
+        4: 'Launch My BudgetBite 🚀',
+      };
+
+      function updateProgress(step) {
+        // Step label
+        document.getElementById('step-label').textContent = stepLabels[step];
+
+        // Progress segments
+        for (let i = 1; i <= 4; i++) {
+          const seg = document.getElementById('seg-' + i);
+          seg.style.width = i <= step ? '100%' : '0%';
+        }
+
+        // Back button visibility
+        const backBtn = document.getElementById('back-btn');
+        backBtn.style.visibility = step > 1 ? 'visible' : 'hidden';
+
+        // Continue label
+        document.getElementById('continue-label').textContent = continueLabels[step];
+
+        // Dots
+        for (let i = 1; i <= 4; i++) {
+          const dot = document.getElementById('dot-' + i);
+          if (i === step) {
+            dot.classList.remove('bg-sage', 'w-1.5');
+            dot.classList.add('bg-green', 'w-6');
+          } else if (i < step) {
+            dot.classList.remove('bg-sage', 'w-6');
+            dot.classList.add('bg-green', 'w-1.5');
+          } else {
+            dot.classList.remove('bg-green', 'w-6');
+            dot.classList.add('bg-sage', 'w-1.5');
+          }
+        }
+
+        // Launch icon change
+        const icon = document.getElementById('continue-icon');
+        if (step === 4) {
+          icon.className = 'fa-solid fa-rocket text-xs';
+          document.getElementById('continue-btn').classList.remove('bg-tomato', 'hover:bg-red-600');
+          document.getElementById('continue-btn').classList.add('bg-green', 'hover:bg-darkGreen');
+        } else {
+          icon.className = 'fa-solid fa-arrow-right text-xs';
+          document.getElementById('continue-btn').classList.add('bg-tomato', 'hover:bg-red-600');
+          document
+            .getElementById('continue-btn')
+            .classList.remove('bg-green', 'hover:bg-darkGreen');
+        }
+      }
+
+      function showStep(step) {
+        for (let i = 1; i <= totalSteps; i++) {
+          const el = document.getElementById('step-' + i);
+          if (i === step) {
+            el.classList.remove('hidden');
+            el.style.animation = 'none';
+            void el.offsetWidth;
+            el.style.animation = 'stepIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards';
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+        updateProgress(step);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function nextStep() {
+        if (currentStep < totalSteps) {
+          currentStep++;
+          showStep(currentStep);
+        } else {
+          // Final step — simulate launch
+          const btn = document.getElementById('continue-btn');
+          btn.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin text-sm mr-2"></i> Generating Your Plan...';
+          btn.disabled = true;
+          setTimeout(() => {
+            btn.innerHTML =
+              '<i class="fa-solid fa-check text-sm mr-2"></i> All Set! Redirecting...';
+            btn.classList.remove('bg-green');
+            btn.classList.add('bg-darkGreen');
+          }, 2000);
+        }
+      }
+
+      function prevStep() {
+        if (currentStep > 1) {
+          currentStep--;
+          showStep(currentStep);
+        }
+      }
+
+      function goToStep(step) {
+        currentStep = step;
+        showStep(step);
+      }
+
+      function skipOnboarding() {
+        currentStep = 4;
+        showStep(4);
+      }
+
+      // Cuisine toggle
+      function toggleCuisine(btn) {
+        btn.classList.toggle('selected');
+        if (btn.classList.contains('selected')) {
+          btn.classList.add('border-green', 'bg-green/5');
+          btn.classList.remove('border-sage');
+        } else {
+          btn.classList.remove('border-green', 'bg-green/5');
+          btn.classList.add('border-sage');
+        }
+      }
+
+      // Meal toggle
+      function toggleMeal(btn, meal) {
+        const isSelected = btn.classList.contains('selected');
+        const checkEl = document.getElementById('check-' + meal);
+        if (isSelected) {
+          btn.classList.remove('selected', 'border-green');
+          btn.classList.add('border-sage');
+          checkEl.style.opacity = '0';
+        } else {
+          btn.classList.add('selected', 'border-green');
+          btn.classList.remove('border-sage');
+          checkEl.style.opacity = '1';
+          checkEl.style.animation = 'none';
+          void checkEl.offsetWidth;
+          checkEl.style.animation = 'checkPop 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards';
+        }
+      }
+
+      // Time slot selection
+      function selectTime(btn, meal) {
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.time-slot').forEach((b) => {
+          b.classList.remove('selected', 'bg-green', 'text-white', 'border-green');
+          b.classList.add('border-sage', 'text-slate');
+        });
+        btn.classList.add('selected', 'bg-green', 'text-white', 'border-green');
+        btn.classList.remove('border-sage', 'text-slate');
+      }
+
+      // Day toggle
+      function toggleDay(btn) {
+        const isActive = btn.classList.contains('border-green');
+        if (isActive) {
+          btn.classList.remove('border-green', 'bg-green/10', 'text-darkGreen');
+          btn.classList.add('border-sage', 'text-slate');
+        } else {
+          btn.classList.add('border-green', 'bg-green/10', 'text-darkGreen');
+          btn.classList.remove('border-sage', 'text-slate');
+        }
+      }
+
+      // Budget mode
+      function setBudgetMode(mode) {
+        budgetMode = mode;
+        const weeklyBtn = document.getElementById('mode-weekly');
+        const monthlyBtn = document.getElementById('mode-monthly');
+        const periodLabel = document.getElementById('budget-period-label');
+        const slider = document.getElementById('budget-slider');
+
+        if (mode === 'weekly') {
+          weeklyBtn.classList.add('active');
+          monthlyBtn.classList.remove('active');
+          monthlyBtn.classList.add('text-slate');
+          weeklyBtn.classList.remove('text-slate');
+          periodLabel.textContent = '/ week';
+          slider.max = '50000';
+          slider.min = '1000';
+          setPreset(7500);
+        } else {
+          monthlyBtn.classList.add('active');
+          weeklyBtn.classList.remove('active');
+          weeklyBtn.classList.add('text-slate');
+          monthlyBtn.classList.remove('text-slate');
+          periodLabel.textContent = '/ month';
+          slider.max = '200000';
+          slider.min = '5000';
+          setPreset(30000);
+        }
+      }
+
+      function syncBudget(val) {
+        const input = document.getElementById('budget-value');
+        input.value = val;
+        updateBreakdown(parseInt(val));
+      }
+
+      function setPreset(val) {
+        const input = document.getElementById('budget-value');
+        const slider = document.getElementById('budget-slider');
+        input.value = val;
+        slider.value = val;
+        updateBreakdown(val);
+      }
+
+      function formatRs(n) {
+        return 'Rs. ' + n.toLocaleString('en-IN');
+      }
+
+      function updateBreakdown(total) {
+        document.getElementById('b-breakfast').textContent = formatRs(Math.round(total * 0.25));
+        document.getElementById('b-lunch').textContent = formatRs(Math.round(total * 0.45));
+        document.getElementById('b-dinner').textContent = formatRs(Math.round(total * 0.3));
+        const saving = Math.round(total * 0.24);
+        const period = budgetMode === 'weekly' ? '/ week' : '/ month';
+        document.getElementById('savings-estimate').textContent = formatRs(saving) + ' ' + period;
+
+        // Update summary
+        const summaryBudget = document.getElementById('summary-budget');
+        if (summaryBudget) {
+          summaryBudget.textContent =
+            formatRs(total) + (budgetMode === 'weekly' ? ' / week' : ' / month');
+        }
+      }
+
+      // Listen to direct input changes on budget field
+      document.getElementById('budget-value').addEventListener('input', function () {
+        const val = parseInt(this.value) || 0;
+        document.getElementById('budget-slider').value = Math.min(
+          val,
+          parseInt(document.getElementById('budget-slider').max),
+        );
+        updateBreakdown(val);
+      });
+
+      // Reminder toggle
+      function toggleReminders(el) {
+        const thumb = el.querySelector('.toggle-thumb');
+        const reminderTimes = document.getElementById('reminder-times');
+        const isOn = thumb.style.transform === '' || thumb.style.transform === 'translateX(0px)';
+        if (el.classList.contains('bg-green')) {
+          // Turn off
+          el.classList.remove('bg-green');
+          el.classList.add('bg-sage/60');
+          thumb.style.transform = 'translateX(-16px)';
+          reminderTimes.style.opacity = '0.4';
+          reminderTimes.style.pointerEvents = 'none';
+        } else {
+          // Turn on
+          el.classList.add('bg-green');
+          el.classList.remove('bg-sage/60');
+          thumb.style.transform = 'translateX(0px)';
+          reminderTimes.style.opacity = '1';
+          reminderTimes.style.pointerEvents = 'auto';
+        }
+      }
+
+      function selectLocation(btn) {
+        const input = document.getElementById('location-input');
+        const locationName = btn.querySelector('p.text-sm').textContent.trim();
+        input.value = locationName;
+      }
+
+      // Initialize
+      showStep(1);
+      updateBreakdown(7500);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1263 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              canvas: '#f7fbf0',
+              sage: '#d4e8b0',
+              green: '#8cc63f',
+              tomato: '#e84c3d',
+              darkGreen: '#5a8a1a',
+              charcoal: '#1a1a1a',
+              slate: '#4a4a4a',
+            },
+            fontFamily: {
+              grotesk: ['Space Grotesk', 'sans-serif'],
+              dm: ['DM Sans', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
+    </script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      ::-webkit-scrollbar {
+        display: none;
+      }
+      body {
+        font-family: 'DM Sans', sans-serif;
+        background-color: #f7fbf0;
+      }
+      .font-grotesk {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+
+      .bento-card {
+        border: 1px solid #d4e8b0;
+        background: white;
+        border-radius: 20px;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+      .ai-pulse {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes needsPulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(232, 76, 61, 0);
+        }
+        50% {
+          box-shadow: 0 0 0 8px rgba(232, 76, 61, 0.12);
+        }
+      }
+      .needs-pulse {
+        animation: needsPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes ringPop {
+        0% {
+          transform: scale(1);
+          opacity: 0.5;
+        }
+        100% {
+          transform: scale(2.2);
+          opacity: 0;
+        }
+      }
+      .ring-pop {
+        animation: ringPop 1.8s ease-out infinite;
+      }
+      .ring-pop-2 {
+        animation: ringPop 1.8s ease-out 0.6s infinite;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .slide-in {
+        animation: slideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .fade-in {
+        animation: fadeIn 0.5s ease forwards;
+      }
+
+      /* Progress bar */
+      .progress-actual {
+        transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      /* Sidebar nav */
+      .nav-item {
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .nav-item.active {
+        background: #f0f9e0;
+        color: #5a8a1a;
+      }
+      .nav-item:hover:not(.active) {
+        background: #f7fbf0;
+        color: #4a4a4a;
+      }
+
+      /* Meal slot states */
+      .meal-slot-logged {
+        background: linear-gradient(135deg, #f0f9e0, #e8f5d0);
+        border-color: #8cc63f;
+      }
+      .meal-slot-urgent {
+        background: white;
+        border-color: #e84c3d;
+      }
+      .meal-slot-planned {
+        background: #fafafa;
+        border-color: #d4e8b0;
+      }
+
+      /* Toggle */
+      input[type='range'] {
+        -webkit-appearance: none;
+        height: 5px;
+        border-radius: 99px;
+        background: #d4e8b0;
+        outline: none;
+      }
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #8cc63f;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(140, 198, 63, 0.4);
+        border: 2px solid white;
+      }
+
+      /* Stat bar fill */
+      .stat-bar-fill {
+        animation: fillBar 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      @keyframes fillBar {
+        from {
+          width: 0%;
+        }
+        to {
+          width: var(--target-width);
+        }
+      }
+
+      /* Quick action FAB */
+      .fab-btn {
+        transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .fab-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Avatar ring */
+      .avatar-ring {
+        box-shadow:
+          0 0 0 2px #8cc63f,
+          0 0 0 4px #f0f9e0;
+      }
+
+      /* Suggestion card */
+      .suggestion-card {
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .suggestion-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(140, 198, 63, 0.15);
+      }
+
+      /* Bottom mobile nav */
+      .mobile-nav-item.active {
+        color: #8cc63f;
+      }
+      .mobile-nav-item {
+        color: #4a4a4a;
+        transition: color 0.2s;
+      }
+      .mobile-nav-item:hover {
+        color: #8cc63f;
+      }
+
+      /* Tooltip */
+      .tooltip {
+        position: relative;
+      }
+      .tooltip:hover::after {
+        content: attr(data-tip);
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1a1a1a;
+        color: white;
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        white-space: nowrap;
+        font-family: 'DM Sans', sans-serif;
+        pointer-events: none;
+        z-index: 100;
+      }
+
+      /* Dashed planned overlay */
+      .planned-overlay {
+        background: repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 6px,
+          rgba(140, 198, 63, 0.25) 6px,
+          rgba(140, 198, 63, 0.25) 8px
+        );
+      }
+
+      .swap-btn {
+        transition: all 0.2s ease;
+      }
+      .swap-btn:hover {
+        background: #f0f9e0;
+        color: #5a8a1a;
+      }
+
+      /* Weekly day pills */
+      .day-pill {
+        transition: all 0.15s ease;
+      }
+      .day-pill.active {
+        background: #8cc63f;
+        color: white;
+      }
+      .day-pill:hover:not(.active) {
+        border-color: #8cc63f;
+        color: #5a8a1a;
+      }
+    </style>
+  </head>
+  <body class="bg-canvas text-charcoal overflow-x-hidden">
+    <div class="flex min-h-screen">
+      <!-- ===== SIDEBAR (Desktop) ===== -->
+      <aside
+        id="sidebar"
+        class="hidden lg:flex flex-col w-64 xl:w-72 bg-white border-r border-sage sticky top-0 h-screen flex-shrink-0"
+      >
+        <!-- Logo -->
+        <div class="px-6 py-5 border-b border-sage">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 bg-tomato rounded-xl flex items-center justify-center shadow-sm">
+              <i class="fa-solid fa-leaf text-white text-sm"></i>
+            </div>
+            <span class="font-grotesk font-bold text-lg text-charcoal">BudgetBite</span>
+          </div>
+        </div>
+
+        <!-- User Profile -->
+        <div class="px-5 py-4 border-b border-sage/50">
+          <div class="flex items-center gap-3">
+            <img
+              src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg"
+              class="w-10 h-10 rounded-full object-cover avatar-ring flex-shrink-0"
+              alt="User"
+            />
+            <div class="flex-1 min-w-0">
+              <p class="font-grotesk font-semibold text-sm text-charcoal truncate">Ayesha Rehman</p>
+              <p class="text-xs text-slate font-dm truncate">Gulshan-e-Iqbal, Karachi</p>
+            </div>
+            <button
+              class="w-7 h-7 rounded-lg border border-sage flex items-center justify-center hover:border-charcoal transition-colors flex-shrink-0"
+            >
+              <i class="fa-solid fa-ellipsis text-slate text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Nav Items -->
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <p
+            class="text-xs font-grotesk font-semibold text-slate/60 uppercase tracking-widest px-3 mb-2"
+          >
+            Main
+          </p>
+          <div class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-xl">
+            <div
+              class="w-7 h-7 bg-green/15 rounded-lg flex items-center justify-center flex-shrink-0"
+            >
+              <i class="fa-solid fa-gauge-high text-green text-xs"></i>
+            </div>
+            <span class="font-dm font-medium text-sm text-darkGreen">Dashboard</span>
+            <span
+              class="ml-auto bg-tomato text-white text-xs font-grotesk font-bold px-1.5 py-0.5 rounded-full"
+              >1</span
+            >
+          </div>
+          <div class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+            <div
+              class="w-7 h-7 bg-canvas rounded-lg flex items-center justify-center flex-shrink-0 border border-sage"
+            >
+              <i class="fa-solid fa-calendar-days text-slate text-xs"></i>
+            </div>
+            <span class="font-dm font-medium text-sm text-slate">Meal Plan</span>
+          </div>
+          <div class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+            <div
+              class="w-7 h-7 bg-canvas rounded-lg flex items-center justify-center flex-shrink-0 border border-sage"
+            >
+              <i class="fa-solid fa-chart-bar text-slate text-xs"></i>
+            </div>
+            <span class="font-dm font-medium text-sm text-slate">Analytics</span>
+          </div>
+          <div class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+            <div
+              class="w-7 h-7 bg-canvas rounded-lg flex items-center justify-center flex-shrink-0 border border-sage"
+            >
+              <i class="fa-solid fa-clock-rotate-left text-slate text-xs"></i>
+            </div>
+            <span class="font-dm font-medium text-sm text-slate">History</span>
+          </div>
+          <div class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+            <div
+              class="w-7 h-7 bg-canvas rounded-lg flex items-center justify-center flex-shrink-0 border border-sage"
+            >
+              <i class="fa-solid fa-store text-slate text-xs"></i>
+            </div>
+            <span class="font-dm font-medium text-sm text-slate">Restaurants</span>
+          </div>
+
+          <p
+            class="text-xs font-grotesk font-semibold text-slate/60 uppercase tracking-widest px-3 mt-5 mb-2"
+          >
+            Account
+          </p>
+          <div class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+            <div
+              class="w-7 h-7 bg-canvas rounded-lg flex items-center justify-center flex-shrink-0 border border-sage"
+            >
+              <i class="fa-solid fa-gear text-slate text-xs"></i>
+            </div>
+            <span class="font-dm font-medium text-sm text-slate">Settings</span>
+          </div>
+          <div class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl">
+            <div
+              class="w-7 h-7 bg-canvas rounded-lg flex items-center justify-center flex-shrink-0 border border-sage"
+            >
+              <i class="fa-solid fa-circle-question text-slate text-xs"></i>
+            </div>
+            <span class="font-dm font-medium text-sm text-slate">Help & Support</span>
+          </div>
+        </nav>
+
+        <!-- Bottom promo -->
+        <div class="px-4 py-4 border-t border-sage">
+          <div class="bg-charcoal rounded-2xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <i class="fa-solid fa-wand-magic-sparkles text-green text-sm"></i>
+              <span class="text-xs font-grotesk font-bold text-white">AI Pro Mode</span>
+            </div>
+            <p class="text-xs text-white/50 font-dm mb-3">
+              Unlock smart swaps, price predictions & nutrition goals.
+            </p>
+            <button
+              class="w-full bg-green text-white text-xs font-grotesk font-semibold py-2 rounded-xl hover:bg-darkGreen transition-colors"
+            >
+              Upgrade Free →
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ===== MAIN CONTENT ===== -->
+      <main id="main-content" class="flex-1 min-w-0 pb-24 lg:pb-0">
+        <!-- ===== TOP HEADER BAR ===== -->
+        <header
+          id="dashboard-header"
+          class="sticky top-0 z-40 bg-canvas/95 backdrop-blur-sm border-b border-sage"
+        >
+          <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+              <!-- Mobile Logo -->
+              <div class="flex items-center gap-2 lg:hidden">
+                <div class="w-7 h-7 bg-tomato rounded-lg flex items-center justify-center">
+                  <i class="fa-solid fa-leaf text-white text-xs"></i>
+                </div>
+                <span class="font-grotesk font-bold text-base text-charcoal">BudgetBite</span>
+              </div>
+              <!-- Desktop heading -->
+              <div class="hidden lg:block">
+                <h1 class="font-grotesk font-bold text-xl text-charcoal">
+                  Good morning, Ayesha 👋
+                </h1>
+                <p class="text-xs text-slate font-dm">
+                  Thursday, 17 July 2025 · Week 3 of your plan
+                </p>
+              </div>
+              <!-- Right actions -->
+              <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Search -->
+                <button
+                  class="w-9 h-9 rounded-xl border border-sage bg-white flex items-center justify-center text-slate hover:border-green hover:text-green transition-colors"
+                >
+                  <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                </button>
+                <!-- Notification Bell -->
+                <button
+                  class="relative w-9 h-9 rounded-xl border border-sage bg-white flex items-center justify-center text-slate hover:border-green hover:text-green transition-colors"
+                >
+                  <i class="fa-solid fa-bell text-sm"></i>
+                  <span
+                    class="absolute -top-1 -right-1 w-4 h-4 bg-tomato rounded-full flex items-center justify-center"
+                  >
+                    <span class="text-white text-xs font-grotesk font-bold" style="font-size: 9px"
+                      >2</span
+                    >
+                  </span>
+                </button>
+                <!-- Avatar mobile -->
+                <img
+                  src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg"
+                  class="w-9 h-9 rounded-xl object-cover border-2 border-green lg:hidden"
+                  alt="User"
+                />
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- ===== PAGE BODY ===== -->
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+          <!-- Mobile greeting -->
+          <div class="lg:hidden">
+            <h1 class="font-grotesk font-bold text-2xl text-charcoal">Good morning, Ayesha 👋</h1>
+            <p class="text-xs text-slate font-dm mt-0.5">
+              Thursday, 17 July 2025 · Week 3 of your plan
+            </p>
+          </div>
+
+          <!-- ===== HERO BUDGET CARD ===== -->
+          <section id="budget-hero" class="bento-card p-6 shadow-sm slide-in">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
+              <div>
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="w-2 h-2 rounded-full bg-green ai-pulse inline-block"></span>
+                  <span
+                    class="text-xs font-grotesk font-semibold text-slate uppercase tracking-widest"
+                    >Weekly Budget · Remaining</span
+                  >
+                </div>
+                <div class="flex items-end gap-3">
+                  <span
+                    class="font-grotesk font-bold text-5xl sm:text-6xl text-charcoal leading-none"
+                    >14,500</span
+                  >
+                  <div class="pb-1.5">
+                    <span class="font-grotesk font-semibold text-lg text-slate">PKR</span>
+                  </div>
+                </div>
+                <p class="text-xs font-dm text-slate mt-1.5">
+                  of <strong class="text-charcoal font-grotesk">Rs. 21,000</strong> total ·
+                  <span class="text-tomato font-semibold">Rs. 6,500 spent</span>
+                </p>
+              </div>
+              <!-- Right side stats -->
+              <div class="flex sm:flex-col gap-4 sm:gap-3 sm:text-right">
+                <div>
+                  <p class="text-xs text-slate font-dm">Daily Avg. Target</p>
+                  <p class="font-grotesk font-bold text-base text-charcoal">Rs. 3,000</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate font-dm">Days Remaining</p>
+                  <p class="font-grotesk font-bold text-base text-green">4 days</p>
+                </div>
+                <div class="hidden sm:block">
+                  <p class="text-xs text-slate font-dm">On Track</p>
+                  <div class="flex items-center gap-1 justify-end">
+                    <i class="fa-solid fa-circle-check text-green text-sm"></i>
+                    <p class="font-grotesk font-bold text-sm text-green">Yes</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dual-layer Progress Bar -->
+            <div class="mb-2">
+              <div class="relative h-4 bg-sage/30 rounded-full overflow-hidden">
+                <!-- Planned overlay (dashed) -->
+                <div
+                  class="planned-overlay absolute inset-0 rounded-full"
+                  style="width: 100%"
+                ></div>
+                <!-- Actual spent bar -->
+                <div
+                  class="progress-actual absolute left-0 top-0 h-full bg-green rounded-full z-10 flex items-center justify-end pr-2"
+                  style="width: 31%"
+                >
+                  <span class="text-white text-xs font-grotesk font-bold" style="font-size: 9px"
+                    >31%</span
+                  >
+                </div>
+                <!-- Today's planned marker -->
+                <div class="absolute top-0 h-full z-20 flex items-center" style="left: 45%">
+                  <div class="w-0.5 h-full bg-charcoal/30"></div>
+                </div>
+              </div>
+              <div class="flex justify-between mt-1.5">
+                <span class="text-xs font-dm text-slate flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-green inline-block"></span> Spent: Rs. 6,500
+                </span>
+                <span class="text-xs font-dm text-slate flex items-center gap-1.5">
+                  <span
+                    class="w-2 h-2 rounded-full bg-charcoal/20 inline-block border border-charcoal/20"
+                  ></span>
+                  Planned: Rs. 9,500
+                </span>
+              </div>
+            </div>
+
+            <!-- Weekly day selector -->
+            <div class="flex gap-1.5 mt-4 pt-4 border-t border-sage/50">
+              <button
+                class="day-pill flex-1 text-center py-2 rounded-xl text-xs font-grotesk font-semibold border border-sage text-slate"
+              >
+                M
+              </button>
+              <button
+                class="day-pill flex-1 text-center py-2 rounded-xl text-xs font-grotesk font-semibold border border-sage text-slate"
+              >
+                T
+              </button>
+              <button
+                class="day-pill flex-1 text-center py-2 rounded-xl text-xs font-grotesk font-semibold border border-sage text-slate"
+              >
+                W
+              </button>
+              <button
+                class="day-pill active flex-1 text-center py-2 rounded-xl text-xs font-grotesk font-semibold border border-green"
+              >
+                Th
+              </button>
+              <button
+                class="day-pill flex-1 text-center py-2 rounded-xl text-xs font-grotesk font-semibold border border-sage text-slate"
+              >
+                F
+              </button>
+              <button
+                class="day-pill flex-1 text-center py-2 rounded-xl text-xs font-grotesk font-semibold border border-sage text-slate/40"
+              >
+                Sa
+              </button>
+              <button
+                class="day-pill flex-1 text-center py-2 rounded-xl text-xs font-grotesk font-semibold border border-sage text-slate/40"
+              >
+                Su
+              </button>
+            </div>
+          </section>
+
+          <!-- ===== QUICK STATS STRIP ===== -->
+          <section id="quick-stats" class="grid grid-cols-3 gap-3 slide-in">
+            <div class="bento-card p-4 text-center shadow-sm">
+              <div
+                class="w-9 h-9 bg-green/10 rounded-xl flex items-center justify-center mx-auto mb-2"
+              >
+                <i class="fa-solid fa-utensils text-green text-sm"></i>
+              </div>
+              <p class="font-grotesk font-bold text-lg text-charcoal">3</p>
+              <p class="text-xs font-dm text-slate mt-0.5">Meals Today</p>
+            </div>
+            <div class="bento-card p-4 text-center shadow-sm">
+              <div
+                class="w-9 h-9 bg-tomato/10 rounded-xl flex items-center justify-center mx-auto mb-2"
+              >
+                <i class="fa-solid fa-fire-flame-curved text-tomato text-sm"></i>
+              </div>
+              <p class="font-grotesk font-bold text-lg text-charcoal">1,250</p>
+              <p class="text-xs font-dm text-slate mt-0.5">Today's Spend</p>
+            </div>
+            <div class="bento-card p-4 text-center shadow-sm">
+              <div class="w-9 h-9 bg-sage rounded-xl flex items-center justify-center mx-auto mb-2">
+                <i class="fa-solid fa-piggy-bank text-darkGreen text-sm"></i>
+              </div>
+              <p class="font-grotesk font-bold text-lg text-green">1,750</p>
+              <p class="text-xs font-dm text-slate mt-0.5">Saved This Wk</p>
+            </div>
+          </section>
+
+          <!-- ===== TWO-COLUMN LAYOUT (FEED + SIDEBAR WIDGETS) ===== -->
+          <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+            <!-- LEFT: Daily Feed Timeline -->
+            <div id="daily-feed" class="lg:col-span-3 space-y-4">
+              <div class="flex items-center justify-between">
+                <h2 class="font-grotesk font-bold text-base text-charcoal">Today's Meal Feed</h2>
+                <div class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-green ai-pulse inline-block"></span>
+                  <span class="text-xs font-dm text-slate">Thursday, 17 Jul</span>
+                </div>
+              </div>
+
+              <!-- Timeline Container -->
+              <div class="relative">
+                <!-- Vertical line -->
+                <div
+                  class="absolute left-5 top-6 bottom-6 w-px bg-sage/70 z-0 hidden sm:block"
+                ></div>
+
+                <div class="space-y-3 relative z-10">
+                  <!-- SLOT 1: BREAKFAST — LOGGED ✓ -->
+                  <div
+                    id="slot-breakfast"
+                    class="meal-slot-logged bento-card p-4 sm:p-5 border-2 slide-in"
+                  >
+                    <div class="flex items-start gap-3 sm:gap-4">
+                      <!-- Timeline dot -->
+                      <div
+                        class="w-10 h-10 bg-green rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm shadow-green/20"
+                      >
+                        <i class="fa-solid fa-check text-white text-sm"></i>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <span
+                              class="text-xs font-grotesk font-semibold text-green uppercase tracking-wide"
+                              >Breakfast · Logged</span
+                            >
+                            <span
+                              class="text-xs bg-green/10 text-darkGreen font-dm px-2 py-0.5 rounded-full"
+                              >8:12 AM</span
+                            >
+                          </div>
+                          <span class="font-grotesk font-bold text-base text-green flex-shrink-0"
+                            >Rs. 450</span
+                          >
+                        </div>
+                        <p class="font-grotesk font-semibold text-sm text-charcoal mb-0.5">
+                          Omelette & Chai
+                        </p>
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <span class="text-xs font-dm text-slate">Roti Republic, Gulshan</span>
+                          <span class="text-xs text-sage">·</span>
+                          <span class="text-xs font-dm text-slate flex items-center gap-1">
+                            <i class="fa-solid fa-fire-flame-curved text-slate/50 text-xs"></i> 320
+                            kcal
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Logged receipt strip -->
+                    <div
+                      class="mt-3 pt-3 border-t border-green/20 flex items-center justify-between"
+                    >
+                      <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-receipt text-green/50 text-xs"></i>
+                        <span class="text-xs font-dm text-slate/70"
+                          >Receipt logged · Order #4821</span
+                        >
+                      </div>
+                      <button
+                        class="text-xs font-dm text-green hover:text-darkGreen transition-colors underline underline-offset-2"
+                      >
+                        View
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- SLOT 2: LUNCH — NEEDS CHOICE (URGENT) -->
+                  <div
+                    id="slot-lunch"
+                    class="meal-slot-urgent bento-card p-4 sm:p-5 border-2 needs-pulse slide-in"
+                  >
+                    <div class="flex items-start gap-3 sm:gap-4">
+                      <!-- Pulsing indicator -->
+                      <div class="relative flex-shrink-0">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <div class="w-10 h-10 bg-tomato/20 rounded-xl ring-pop"></div>
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <div class="w-10 h-10 bg-tomato/10 rounded-xl ring-pop-2"></div>
+                        </div>
+                        <div
+                          class="relative w-10 h-10 bg-tomato rounded-xl flex items-center justify-center shadow-sm shadow-tomato/30 z-10"
+                        >
+                          <i class="fa-solid fa-exclamation text-white text-sm font-bold"></i>
+                        </div>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <span
+                              class="text-xs font-grotesk font-semibold text-tomato uppercase tracking-wide"
+                              >Lunch · Decide Now</span
+                            >
+                            <span
+                              class="text-xs bg-tomato/10 text-tomato font-dm px-2 py-0.5 rounded-full"
+                              >12:30 PM</span
+                            >
+                          </div>
+                          <span
+                            class="font-grotesk font-semibold text-sm text-slate/60 flex-shrink-0"
+                            >Budget: Rs. 600</span
+                          >
+                        </div>
+                        <p class="font-grotesk font-semibold text-sm text-charcoal mb-0.5">
+                          No meal selected yet
+                        </p>
+                        <p class="text-xs font-dm text-slate">
+                          AI has 3 suggestions ready within your budget.
+                        </p>
+                      </div>
+                    </div>
+
+                    <!-- AI Suggestions -->
+                    <div class="mt-4 space-y-2">
+                      <p
+                        class="text-xs font-grotesk font-semibold text-charcoal uppercase tracking-wide mb-2 flex items-center gap-1.5"
+                      >
+                        <i class="fa-solid fa-wand-magic-sparkles text-green text-xs"></i> AI Picks
+                        for You
+                      </p>
+                      <div
+                        class="suggestion-card flex items-center gap-3 bg-canvas border border-sage rounded-xl px-3 py-3 hover:border-green"
+                      >
+                        <span class="text-xl flex-shrink-0">🍛</span>
+                        <div class="flex-1 min-w-0">
+                          <p class="text-xs font-dm font-semibold text-charcoal truncate">
+                            Dal Chawal Platter
+                          </p>
+                          <p class="text-xs text-slate font-dm">Student Biryani · 12 min away</p>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                          <p class="font-grotesk font-bold text-sm text-green">Rs. 380</p>
+                          <span
+                            class="text-xs bg-green/10 text-darkGreen font-dm px-1.5 py-0.5 rounded-full"
+                            >Best Value</span
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="suggestion-card flex items-center gap-3 bg-canvas border border-sage rounded-xl px-3 py-3 hover:border-green"
+                      >
+                        <span class="text-xl flex-shrink-0">🥗</span>
+                        <div class="flex-1 min-w-0">
+                          <p class="text-xs font-dm font-semibold text-charcoal truncate">
+                            Grilled Chicken Salad
+                          </p>
+                          <p class="text-xs text-slate font-dm">GreenBowl Co. · 8 min away</p>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                          <p class="font-grotesk font-bold text-sm text-charcoal">Rs. 560</p>
+                          <span
+                            class="text-xs bg-sage text-darkGreen font-dm px-1.5 py-0.5 rounded-full"
+                            >Healthy</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Action button -->
+                    <button
+                      class="mt-3 w-full bg-tomato text-white font-grotesk font-semibold text-sm py-3 rounded-xl hover:bg-red-600 transition-all hover:shadow-lg hover:shadow-tomato/25 flex items-center justify-center gap-2"
+                    >
+                      <i class="fa-solid fa-bolt text-xs"></i>
+                      Decide Now — All AI Picks
+                    </button>
+                  </div>
+
+                  <!-- SLOT 3: DINNER — PLANNED (GHOSTED) -->
+                  <div
+                    id="slot-dinner"
+                    class="meal-slot-planned bento-card p-4 sm:p-5 border-2 opacity-80 slide-in"
+                  >
+                    <div class="flex items-start gap-3 sm:gap-4">
+                      <div
+                        class="w-10 h-10 bg-sage/60 rounded-xl flex items-center justify-center flex-shrink-0"
+                      >
+                        <i class="fa-solid fa-moon text-slate text-sm"></i>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <span
+                              class="text-xs font-grotesk font-semibold text-slate uppercase tracking-wide"
+                              >Dinner · Planned</span
+                            >
+                            <span
+                              class="text-xs bg-sage/50 text-slate font-dm px-2 py-0.5 rounded-full"
+                              >8:00 PM</span
+                            >
+                          </div>
+                          <span class="font-grotesk font-bold text-base text-slate flex-shrink-0"
+                            >Est. Rs. 800</span
+                          >
+                        </div>
+                        <p class="font-grotesk font-semibold text-sm text-charcoal mb-0.5">
+                          Chicken Biryani
+                        </p>
+                        <p class="text-xs font-dm text-slate">Karachi Darbar · Gulshan-e-Iqbal</p>
+                      </div>
+                      <!-- Swap button -->
+                      <button
+                        class="swap-btn flex-shrink-0 flex items-center gap-1.5 border border-sage rounded-xl px-3 py-2 text-xs font-dm text-slate"
+                      >
+                        <i class="fa-solid fa-arrows-rotate text-xs"></i>
+                        <span class="hidden sm:inline">Swap</span>
+                      </button>
+                    </div>
+                    <!-- Estimate strip -->
+                    <div class="mt-3 pt-3 border-t border-sage/40 flex items-center gap-2">
+                      <i class="fa-solid fa-triangle-exclamation text-slate/40 text-xs"></i>
+                      <span class="text-xs font-dm text-slate/60"
+                        >Estimated price — AI will confirm closer to mealtime.</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Today's Total Row -->
+              <div class="bento-card p-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-xs text-slate font-dm mb-0.5">Today's Total (Projected)</p>
+                    <p class="font-grotesk font-bold text-xl text-charcoal">Rs. 1,830</p>
+                    <p class="text-xs font-dm text-slate mt-0.5">
+                      of <span class="font-semibold text-charcoal">Rs. 3,000</span> daily budget ·
+                      <span class="text-green font-semibold">Rs. 1,170 saved</span>
+                    </p>
+                  </div>
+                  <div class="text-right">
+                    <div class="w-14 h-14 relative flex items-center justify-center">
+                      <svg class="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
+                        <circle
+                          cx="28"
+                          cy="28"
+                          r="22"
+                          fill="none"
+                          stroke="#d4e8b0"
+                          stroke-width="5"
+                        />
+                        <circle
+                          cx="28"
+                          cy="28"
+                          r="22"
+                          fill="none"
+                          stroke="#8cc63f"
+                          stroke-width="5"
+                          stroke-linecap="round"
+                          stroke-dasharray="138"
+                          stroke-dashoffset="93"
+                        />
+                      </svg>
+                      <span class="absolute font-grotesk font-bold text-xs text-green">61%</span>
+                    </div>
+                    <p class="text-xs font-dm text-slate mt-1">of limit used</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT: Widget Column -->
+            <div id="widget-column" class="lg:col-span-2 space-y-4">
+              <!-- Spending Trend Mini Chart -->
+              <div id="chart-card" class="bento-card p-4 shadow-sm">
+                <div class="flex items-center justify-between mb-1">
+                  <div>
+                    <p class="font-grotesk font-semibold text-sm text-charcoal">
+                      This Week's Spend
+                    </p>
+                    <p class="text-xs font-dm text-slate">Daily breakdown · PKR</p>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green ai-pulse inline-block"></span>
+                    <span class="text-xs font-dm text-slate">Live</span>
+                  </div>
+                </div>
+                <div id="spend-chart" class="h-[160px]"></div>
+              </div>
+
+              <!-- AI Insight Card -->
+              <div id="ai-insight" class="bg-charcoal rounded-2xl p-4 shadow-sm">
+                <div class="flex items-center gap-2 mb-3">
+                  <div
+                    class="w-7 h-7 bg-green/20 rounded-lg flex items-center justify-center flex-shrink-0"
+                  >
+                    <i class="fa-solid fa-wand-magic-sparkles text-green text-xs"></i>
+                  </div>
+                  <span class="text-sm font-grotesk font-semibold text-white">AI Insight</span>
+                  <span class="ml-auto text-xs text-white/40 font-dm">Just now</span>
+                </div>
+                <p class="text-xs font-dm text-white/70 leading-relaxed mb-3">
+                  You're spending <span class="text-green font-semibold">18% less</span> than last
+                  week. If you keep this pace, you'll save
+                  <span class="text-green font-semibold">Rs. 3,200 extra</span> this month.
+                </p>
+                <div class="flex items-center gap-2">
+                  <button
+                    class="flex-1 bg-green/20 text-green text-xs font-grotesk font-semibold py-2 rounded-xl hover:bg-green/30 transition-colors"
+                  >
+                    See Full Report
+                  </button>
+                  <button
+                    class="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-colors"
+                  >
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Budget Breakdown -->
+              <div id="budget-breakdown" class="bento-card p-4 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                  <p class="font-grotesk font-semibold text-sm text-charcoal">Meal Budget Split</p>
+                  <span
+                    class="text-xs font-dm text-slate bg-canvas border border-sage px-2 py-0.5 rounded-full"
+                    >Week 3</span
+                  >
+                </div>
+                <div class="space-y-3">
+                  <div>
+                    <div class="flex justify-between text-xs mb-1.5">
+                      <span class="font-dm text-slate flex items-center gap-1.5">🍳 Breakfast</span>
+                      <span class="font-grotesk font-semibold text-charcoal"
+                        >Rs. 1,350 <span class="text-slate font-normal">/ 5,250</span></span
+                      >
+                    </div>
+                    <div class="h-2 bg-sage/40 rounded-full overflow-hidden">
+                      <div
+                        class="stat-bar-fill h-full bg-green/70 rounded-full"
+                        style="--target-width: 26%; width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs mb-1.5">
+                      <span class="font-dm text-slate flex items-center gap-1.5">🍚 Lunch</span>
+                      <span class="font-grotesk font-semibold text-charcoal"
+                        >Rs. 3,400 <span class="text-slate font-normal">/ 9,450</span></span
+                      >
+                    </div>
+                    <div class="h-2 bg-sage/40 rounded-full overflow-hidden">
+                      <div
+                        class="stat-bar-fill h-full bg-green rounded-full"
+                        style="--target-width: 36%; width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs mb-1.5">
+                      <span class="font-dm text-slate flex items-center gap-1.5">🥘 Dinner</span>
+                      <span class="font-grotesk font-semibold text-charcoal"
+                        >Rs. 1,750 <span class="text-slate font-normal">/ 6,300</span></span
+                      >
+                    </div>
+                    <div class="h-2 bg-sage/40 rounded-full overflow-hidden">
+                      <div
+                        class="stat-bar-fill h-full bg-green/80 rounded-full"
+                        style="--target-width: 28%; width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Nearby Restaurants -->
+              <div id="nearby-card" class="bento-card p-4 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                  <p class="font-grotesk font-semibold text-sm text-charcoal">Nearby Now</p>
+                  <button
+                    class="text-xs font-dm text-green hover:text-darkGreen underline underline-offset-2"
+                  >
+                    See all
+                  </button>
+                </div>
+                <div class="space-y-2.5">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-9 h-9 bg-canvas border border-sage rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <span class="text-base">🍛</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-dm font-semibold text-charcoal truncate">
+                        Student Biryani
+                      </p>
+                      <p class="text-xs text-slate font-dm">0.4 km · From Rs. 280</p>
+                    </div>
+                    <span class="text-xs font-grotesk font-bold text-green flex-shrink-0"
+                      >Open</span
+                    >
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-9 h-9 bg-canvas border border-sage rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <span class="text-base">🥗</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-dm font-semibold text-charcoal truncate">
+                        GreenBowl Co.
+                      </p>
+                      <p class="text-xs text-slate font-dm">0.8 km · From Rs. 450</p>
+                    </div>
+                    <span class="text-xs font-grotesk font-bold text-green flex-shrink-0"
+                      >Open</span
+                    >
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-9 h-9 bg-canvas border border-sage rounded-xl flex items-center justify-center flex-shrink-0"
+                    >
+                      <span class="text-base">☕</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-dm font-semibold text-charcoal truncate">
+                        Brewed Awakening
+                      </p>
+                      <p class="text-xs text-slate font-dm">1.1 km · From Rs. 190</p>
+                    </div>
+                    <span class="text-xs font-grotesk font-bold text-slate flex-shrink-0"
+                      >Closes 3PM</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ===== QUICK ACTION FABs ===== -->
+    <div
+      id="fab-group"
+      class="fixed bottom-24 lg:bottom-8 right-5 sm:right-8 flex flex-col gap-3 z-50"
+    >
+      <button
+        class="fab-btn tooltip w-12 h-12 bg-charcoal rounded-2xl shadow-xl flex items-center justify-center text-white hover:bg-slate"
+        data-tip="Re-plan with AI"
+      >
+        <i class="fa-solid fa-wand-magic-sparkles text-green text-base"></i>
+      </button>
+      <button
+        class="fab-btn tooltip w-12 h-12 bg-tomato rounded-2xl shadow-xl flex items-center justify-center text-white"
+        data-tip="Add Manual Expense"
+      >
+        <i class="fa-solid fa-plus text-white text-base"></i>
+      </button>
+    </div>
+
+    <!-- ===== BOTTOM MOBILE NAV ===== -->
+    <nav
+      id="mobile-bottom-nav"
+      class="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-sage"
+    >
+      <div class="grid grid-cols-5 px-2 py-2">
+        <button class="mobile-nav-item active flex flex-col items-center gap-0.5 py-1.5">
+          <i class="fa-solid fa-gauge-high text-base"></i>
+          <span class="text-xs font-dm font-medium" style="font-size: 10px">Home</span>
+        </button>
+        <button class="mobile-nav-item flex flex-col items-center gap-0.5 py-1.5">
+          <i class="fa-solid fa-calendar-days text-base"></i>
+          <span class="text-xs font-dm font-medium" style="font-size: 10px">Plan</span>
+        </button>
+        <button class="mobile-nav-item flex flex-col items-center gap-0.5 py-1.5">
+          <i class="fa-solid fa-chart-bar text-base"></i>
+          <span class="text-xs font-dm font-medium" style="font-size: 10px">Analytics</span>
+        </button>
+        <button class="mobile-nav-item flex flex-col items-center gap-0.5 py-1.5">
+          <i class="fa-solid fa-clock-rotate-left text-base"></i>
+          <span class="text-xs font-dm font-medium" style="font-size: 10px">History</span>
+        </button>
+        <button class="mobile-nav-item flex flex-col items-center gap-0.5 py-1.5">
+          <i class="fa-solid fa-gear text-base"></i>
+          <span class="text-xs font-dm font-medium" style="font-size: 10px">Settings</span>
+        </button>
+      </div>
+    </nav>
+
+    <script>
+      // ===== PLOTLY CHART =====
+      window.addEventListener('load', function () {
+        try {
+          var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+          var spent = [2800, 1950, 3100, 1830, null, null, null];
+          var budget = [3000, 3000, 3000, 3000, 3000, 3000, 3000];
+
+          var trace1 = {
+            type: 'bar',
+            name: 'Spent',
+            x: days,
+            y: spent,
+            marker: {
+              color: [
+                '#8cc63f',
+                '#8cc63f',
+                '#e84c3d',
+                '#8cc63f',
+                'rgba(0,0,0,0)',
+                'rgba(0,0,0,0)',
+                'rgba(0,0,0,0)',
+              ],
+              line: { color: 'transparent' },
+            },
+            hovertemplate: 'Rs. %{y}<extra></extra>',
+          };
+
+          var trace2 = {
+            type: 'scatter',
+            name: 'Budget',
+            x: days,
+            y: budget,
+            mode: 'lines',
+            line: { color: '#d4e8b0', width: 2, dash: 'dot' },
+            hovertemplate: 'Limit: Rs. %{y}<extra></extra>',
+          };
+
+          var layout = {
+            margin: { t: 8, r: 8, b: 28, l: 40 },
+            plot_bgcolor: 'white',
+            paper_bgcolor: 'white',
+            font: { family: 'DM Sans, sans-serif', size: 10, color: '#4a4a4a' },
+            showlegend: false,
+            xaxis: {
+              tickfont: { size: 10, family: 'Space Grotesk, sans-serif', color: '#4a4a4a' },
+              showgrid: false,
+              zeroline: false,
+              showline: false,
+            },
+            yaxis: {
+              tickfont: { size: 9, family: 'Space Grotesk, sans-serif', color: '#4a4a4a' },
+              showgrid: true,
+              gridcolor: 'rgba(212,232,176,0.4)',
+              zeroline: false,
+              showline: false,
+              tickformat: ',.0f',
+            },
+            bargap: 0.35,
+          };
+
+          var config = { responsive: true, displayModeBar: false, displaylogo: false };
+          Plotly.newPlot('spend-chart', [trace1, trace2], layout, config);
+        } catch (e) {
+          document.getElementById('spend-chart').innerHTML =
+            '<div class="flex items-center justify-center h-full text-slate text-xs font-dm">Chart unavailable</div>';
+        }
+      });
+
+      // ===== Day pill toggle =====
+      document.querySelectorAll('.day-pill').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.day-pill').forEach(function (b) {
+            b.classList.remove('active');
+            b.classList.add('text-slate');
+            b.classList.remove('border-green');
+            b.classList.add('border-sage');
+          });
+          this.classList.add('active');
+          this.classList.remove('text-slate');
+          this.classList.add('border-green');
+        });
+      });
+
+      // ===== Animate stat bars on load =====
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          document.querySelectorAll('.stat-bar-fill').forEach(function (bar) {
+            bar.style.width =
+              bar.style.getPropertyValue('--target-width') ||
+              getComputedStyle(bar).getPropertyValue('--target-width');
+            var target = bar.style.cssText.match(/--target-width:\s*([^;]+)/);
+            if (target) bar.style.width = target[1];
+          });
+        }, 400);
+      });
+
+      // ===== Suggestion card pick =====
+      document.querySelectorAll('.suggestion-card').forEach(function (card) {
+        card.addEventListener('click', function () {
+          document.querySelectorAll('.suggestion-card').forEach(function (c) {
+            c.classList.remove('border-green', 'bg-green/5');
+            c.classList.add('border-sage');
+          });
+          this.classList.add('border-green', 'bg-green/5');
+          this.classList.remove('border-sage');
+        });
+      });
+
+      // ===== Nav item click (sidebar) =====
+      document.querySelectorAll('.nav-item').forEach(function (item) {
+        item.addEventListener('click', function () {
+          document.querySelectorAll('.nav-item').forEach(function (i) {
+            i.classList.remove('active');
+          });
+          this.classList.add('active');
+        });
+      });
+
+      // ===== Mobile nav =====
+      document.querySelectorAll('.mobile-nav-item').forEach(function (item) {
+        item.addEventListener('click', function () {
+          document.querySelectorAll('.mobile-nav-item').forEach(function (i) {
+            i.classList.remove('active');
+          });
+          this.classList.add('active');
+        });
+      });
+    </script>
+  </body>
+</html>
