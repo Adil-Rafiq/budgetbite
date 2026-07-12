@@ -26,13 +26,13 @@ export function CardGridSkeleton({
         <div
           key={i}
           className={cn(
-            'w-full overflow-hidden rounded-2xl border border-lumen-dk bg-white p-5 shadow-[0_1px_0_rgba(0,0,0,0.02)]',
+            'w-full overflow-hidden rounded-2xl border border-sage bg-white p-5 shadow-sm',
             cardClassName,
           )}
         >
-          <div className="h-3 w-12 animate-pulse rounded bg-lumen" />
-          <div className="mt-3 h-5 w-32 animate-pulse rounded bg-lumen" />
-          <div className="mt-2 h-3 w-24 animate-pulse rounded bg-lumen" />
+          <div className="h-3 w-12 animate-pulse rounded bg-sage" />
+          <div className="mt-3 h-5 w-32 animate-pulse rounded bg-sage" />
+          <div className="mt-2 h-3 w-24 animate-pulse rounded bg-sage" />
         </div>
       ))}
     </div>

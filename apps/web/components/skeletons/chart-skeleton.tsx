@@ -31,13 +31,13 @@ export function ChartSkeleton({ variant, className }: ChartSkeletonProps) {
         className={cn('flex h-full w-full flex-col items-center justify-center gap-3', className)}
       >
         <div className="relative">
-          <div className="size-36 animate-pulse rounded-full bg-lumen" />
+          <div className="size-36 animate-pulse rounded-full bg-sage" />
           <div className="absolute inset-0 m-auto size-16 rounded-full bg-white" />
         </div>
         <div className="flex flex-wrap justify-center gap-2">
-          <div className={cn(shimmerCls, 'h-3 w-14 bg-lumen')} />
-          <div className={cn(shimmerCls, 'h-3 w-16 bg-lumen')} />
-          <div className={cn(shimmerCls, 'h-3 w-12 bg-lumen')} />
+          <div className={cn(shimmerCls, 'h-3 w-14 bg-sage')} />
+          <div className={cn(shimmerCls, 'h-3 w-16 bg-sage')} />
+          <div className={cn(shimmerCls, 'h-3 w-12 bg-sage')} />
         </div>
       </div>
     );
@@ -49,15 +49,15 @@ export function ChartSkeleton({ variant, className }: ChartSkeletonProps) {
         <div className="flex flex-1 items-end justify-between gap-3 px-2">
           {BAR_HEIGHTS_A.map((h, i) => (
             <div key={i} className="flex h-full flex-1 items-end justify-center gap-1">
-              <div className="w-3 animate-pulse rounded-sm bg-lumen" style={{ height: h }} />
+              <div className="w-3 animate-pulse rounded-sm bg-sage" style={{ height: h }} />
               <div
-                className="w-3 animate-pulse rounded-sm bg-lumen-dk opacity-60"
+                className="w-3 animate-pulse rounded-sm bg-sage opacity-60"
                 style={{ height: BAR_HEIGHTS_B[i] }}
               />
             </div>
           ))}
         </div>
-        <div className="h-px w-full bg-lumen-dk" />
+        <div className="h-px w-full bg-sage" />
       </div>
     );
   }
@@ -68,7 +68,7 @@ export function ChartSkeleton({ variant, className }: ChartSkeletonProps) {
         {[0, 1, 2, 3].map((i) => (
           <div
             key={`grid-${i}`}
-            className="absolute left-0 right-0 h-px bg-lumen-dk opacity-50"
+            className="absolute left-0 right-0 h-px bg-sage opacity-50"
             style={{ bottom: `${(i + 1) * 20}%` }}
           />
         ))}
@@ -76,18 +76,18 @@ export function ChartSkeleton({ variant, className }: ChartSkeletonProps) {
           <div key={i} className="relative flex h-full flex-1 items-end justify-center">
             {variant === 'area' && (
               <div
-                className="absolute bottom-0 left-0 right-0 animate-pulse bg-lumen opacity-60"
+                className="absolute bottom-0 left-0 right-0 animate-pulse bg-sage opacity-60"
                 style={{ height: h }}
               />
             )}
             <div
-              className="size-2 animate-pulse rounded-full bg-lumen-dk"
+              className="size-2 animate-pulse rounded-full bg-sage"
               style={{ marginBottom: h }}
             />
           </div>
         ))}
       </div>
-      <div className="h-px w-full bg-lumen-dk" />
+      <div className="h-px w-full bg-sage" />
     </div>
   );
 }
