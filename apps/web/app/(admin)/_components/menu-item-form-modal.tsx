@@ -18,9 +18,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
-const labelClass = 'text-[10px] uppercase text-soft';
+const labelClass = 'text-[10px] uppercase text-slate/60';
 const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
-const errorClass = 'text-[11px] text-pulse';
+const errorClass = 'text-[11px] text-tomato';
 
 // Empty string → undefined so optional fields are omitted, not sent as ''.
 const optionalString = (v: unknown) => (v === '' || v == null ? undefined : v);
@@ -65,18 +65,10 @@ export function MenuItemFormModal({ open, onOpenChange, restaurantId, menuItem }
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle
-            className="text-vast"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 22,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <DialogTitle className="font-display text-[22px] font-semibold tracking-tight text-charcoal">
             {isEdit ? 'Edit menu item' : 'Add menu item'}
           </DialogTitle>
-          <DialogDescription className="text-ink">
+          <DialogDescription className="text-slate">
             {isEdit ? 'Update this menu item.' : 'Add a dish to this restaurant’s menu.'}
           </DialogDescription>
         </DialogHeader>

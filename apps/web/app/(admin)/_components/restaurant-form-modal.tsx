@@ -17,9 +17,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-const labelClass = 'text-[10px] uppercase text-soft';
+const labelClass = 'text-[10px] uppercase text-slate/60';
 const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
-const errorClass = 'text-[11px] text-pulse';
+const errorClass = 'text-[11px] text-tomato';
 
 // Empty string → undefined so optional fields are omitted instead of coerced to 0.
 const optionalNumber = (v: unknown) => (v === '' || v == null ? undefined : Number(v));
@@ -71,18 +71,10 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
         <DialogHeader>
-          <DialogTitle
-            className="text-vast"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 22,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <DialogTitle className="font-display text-[22px] font-semibold tracking-tight text-charcoal">
             {isEdit ? 'Edit restaurant' : 'Add restaurant'}
           </DialogTitle>
-          <DialogDescription className="text-ink">
+          <DialogDescription className="text-slate">
             {isEdit
               ? 'Update this restaurant’s details.'
               : 'Create a restaurant manually. Menu items can be managed separately.'}

@@ -135,18 +135,10 @@ export default function AdminRestaurantsPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1
-        className="text-vast"
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 24,
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-        }}
-      >
+      <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">
         Restaurants
       </h1>
-      <p className="mt-1 text-[14px] text-ink">
+      <p className="mt-1 text-[14px] text-slate">
         Browse, edit, and remove restaurants and their menu items.
       </p>
 
@@ -201,7 +193,7 @@ export default function AdminRestaurantsPage() {
             </Button>
           )}
           {total > 0 && (
-            <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+            <span className="font-mono text-[12px] text-slate/60">
               {total} total
             </span>
           )}
@@ -214,17 +206,17 @@ export default function AdminRestaurantsPage() {
         </div>
       </div>
 
-      <div className="mt-4 rounded-xl border border-lumen-dk bg-white">
+      <div className="mt-4 rounded-xl border border-sage bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-soft" />
+            <Spinner className="size-5 text-slate/60" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-soft">
+          <div className="py-16 text-center text-[14px] text-slate/60">
             Could not load restaurants. Try again.
           </div>
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-soft">
+          <div className="py-16 text-center text-[14px] text-slate/60">
             {debouncedSearch ? 'No restaurants match your search.' : 'No restaurants yet.'}
           </div>
         ) : (
@@ -263,17 +255,17 @@ export default function AdminRestaurantsPage() {
                         />
                       </TableCell>
                     )}
-                    <TableCell className="font-medium text-vast">
-                      <Link href={`/admin/restaurants/${r.id}`} className="hover:text-fathom">
+                    <TableCell className="font-medium text-charcoal">
+                      <Link href={`/admin/restaurants/${r.id}`} className="hover:text-dark-green">
                         {r.name}
                       </Link>
                     </TableCell>
-                    <TableCell className="text-right text-ink">
+                    <TableCell className="text-right text-slate">
                       {r.rating == null ? '—' : r.rating.toFixed(1)}
                     </TableCell>
-                    <TableCell className="text-right text-ink">{money(r.deliveryFee)}</TableCell>
-                    <TableCell className="text-right text-ink">{money(r.minimumOrder)}</TableCell>
-                    <TableCell className="text-soft">
+                    <TableCell className="text-right text-slate">{money(r.deliveryFee)}</TableCell>
+                    <TableCell className="text-right text-slate">{money(r.minimumOrder)}</TableCell>
+                    <TableCell className="text-slate/60">
                       {new Date(r.createdAt).toLocaleDateString()}
                     </TableCell>
                     {(canWrite || canDelete) && (
@@ -286,7 +278,7 @@ export default function AdminRestaurantsPage() {
                               aria-label={`Edit ${r.name}`}
                               onClick={() => setForm({ open: true, restaurant: r })}
                             >
-                              <Pencil className="size-4 text-ink" />
+                              <Pencil className="size-4 text-slate" />
                             </Button>
                           )}
                           {canDelete && (
@@ -338,7 +330,7 @@ export default function AdminRestaurantsPage() {
 
       {total > PAGE_SIZE && (
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="font-mono text-[12px] text-slate/60">
             Page {page} of {pageCount}
           </span>
           <div className="flex gap-2">
