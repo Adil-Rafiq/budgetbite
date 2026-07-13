@@ -69,18 +69,8 @@ export default function AdminUsersPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1
-        className="text-vast"
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 24,
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-        }}
-      >
-        Users
-      </h1>
-      <p className="mt-1 text-[14px] text-ink">Manage accounts and admin access.</p>
+      <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">Users</h1>
+      <p className="mt-1 text-[14px] text-slate">Manage accounts and admin access.</p>
 
       <div className="mt-6 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -108,23 +98,23 @@ export default function AdminUsersPage() {
           </Select>
         </div>
         {total > 0 && (
-          <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="font-mono text-[12px] text-slate/60">
             {total} total
           </span>
         )}
       </div>
 
-      <div className="mt-4 rounded-xl border border-lumen-dk bg-white">
+      <div className="mt-4 rounded-xl border border-sage bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-soft" />
+            <Spinner className="size-5 text-slate/60" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-soft">
+          <div className="py-16 text-center text-[14px] text-slate/60">
             Could not load users. Try again.
           </div>
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-soft">No users match.</div>
+          <div className="py-16 text-center text-[14px] text-slate/60">No users match.</div>
         ) : (
           <Table>
             <TableHeader>
@@ -142,27 +132,26 @@ export default function AdminUsersPage() {
                 const nextRole = u.role === 'admin' ? 'user' : 'admin';
                 return (
                   <TableRow key={u.id}>
-                    <TableCell className="font-medium text-vast">{u.name}</TableCell>
-                    <TableCell className="text-ink">{u.email}</TableCell>
+                    <TableCell className="font-medium text-charcoal">{u.name}</TableCell>
+                    <TableCell className="text-slate">{u.email}</TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] ${
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[11px] ${
                           u.role === 'admin'
-                            ? 'bg-fathom/10 text-fathom'
-                            : 'bg-lumen-dk/40 text-soft'
+                            ? 'bg-green/15 text-dark-green'
+                            : 'bg-sage/50 text-slate/60'
                         }`}
-                        style={{ fontFamily: 'var(--font-mono)' }}
                       >
                         {u.role}
                       </span>
                     </TableCell>
-                    <TableCell className="text-soft">
+                    <TableCell className="text-slate/60">
                       {new Date(u.createdAt).toLocaleDateString()}
                     </TableCell>
                     {canWrite && (
                       <TableCell>
                         {isSelf ? (
-                          <span className="text-[12px] text-soft">You</span>
+                          <span className="text-[12px] text-slate/60">You</span>
                         ) : (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -208,7 +197,7 @@ export default function AdminUsersPage() {
 
       {total > PAGE_SIZE && (
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="font-mono text-[12px] text-slate/60">
             Page {page} of {pageCount}
           </span>
           <div className="flex gap-2">

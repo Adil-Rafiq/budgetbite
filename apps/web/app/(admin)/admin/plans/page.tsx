@@ -27,10 +27,10 @@ const PAGE_SIZE = 20;
 const money = (n: number): string => `₨ ${n.toLocaleString()}`;
 
 const genStatusClass: Record<AdminPlanGeneration['status'], string> = {
-  pending: 'bg-amber/15 text-amber',
-  succeeded: 'bg-fathom/10 text-fathom',
-  failed: 'bg-pulse/10 text-pulse',
-  superseded: 'bg-lumen-dk/40 text-soft',
+  pending: 'bg-[#f5a623]/15 text-[#9a6400]',
+  succeeded: 'bg-green/15 text-dark-green',
+  failed: 'bg-tomato/10 text-tomato',
+  superseded: 'bg-sage/50 text-slate/60',
 };
 
 export default function AdminPlansPage() {
@@ -50,18 +50,8 @@ export default function AdminPlansPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1
-        className="text-vast"
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 24,
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-        }}
-      >
-        Plans
-      </h1>
-      <p className="mt-1 text-[14px] text-ink">
+      <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">Plans</h1>
+      <p className="mt-1 text-[14px] text-slate">
         Inspect AI-generated budget plans across all users.
       </p>
 
@@ -84,23 +74,23 @@ export default function AdminPlansPage() {
           </SelectContent>
         </Select>
         {total > 0 && (
-          <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="font-mono text-[12px] text-slate/60">
             {total} total
           </span>
         )}
       </div>
 
-      <div className="mt-4 rounded-xl border border-lumen-dk bg-white">
+      <div className="mt-4 rounded-xl border border-sage bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-soft" />
+            <Spinner className="size-5 text-slate/60" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-soft">
+          <div className="py-16 text-center text-[14px] text-slate/60">
             Could not load plans. Try again.
           </div>
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-soft">No plans match.</div>
+          <div className="py-16 text-center text-[14px] text-slate/60">No plans match.</div>
         ) : (
           <Table>
             <TableHeader>
@@ -119,15 +109,15 @@ export default function AdminPlansPage() {
                   <TableCell>
                     <Link
                       href={`/admin/plans/${p.id}`}
-                      className="font-medium text-vast hover:text-fathom"
+                      className="font-medium text-charcoal hover:text-dark-green"
                     >
                       {p.user.name}
                     </Link>
-                    <span className="ml-2 text-[12px] text-soft">{p.user.email}</span>
+                    <span className="ml-2 text-[12px] text-slate/60">{p.user.email}</span>
                   </TableCell>
-                  <TableCell className="text-ink">{p.planType}</TableCell>
-                  <TableCell className="text-right text-ink">{money(p.totalBudget)}</TableCell>
-                  <TableCell className="text-soft">{p.status}</TableCell>
+                  <TableCell className="text-slate">{p.planType}</TableCell>
+                  <TableCell className="text-right text-slate">{money(p.totalBudget)}</TableCell>
+                  <TableCell className="text-slate/60">{p.status}</TableCell>
                   <TableCell>
                     {p.latestAttempt ? (
                       <span
@@ -137,10 +127,10 @@ export default function AdminPlansPage() {
                         {p.latestAttempt.status}
                       </span>
                     ) : (
-                      <span className="text-soft">—</span>
+                      <span className="text-slate/60">—</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-soft">
+                  <TableCell className="text-slate/60">
                     {new Date(p.createdAt).toLocaleDateString()}
                   </TableCell>
                 </TableRow>
@@ -152,7 +142,7 @@ export default function AdminPlansPage() {
 
       {total > PAGE_SIZE && (
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="font-mono text-[12px] text-slate/60">
             Page {page} of {pageCount}
           </span>
           <div className="flex gap-2">
