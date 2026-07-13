@@ -73,11 +73,7 @@ export default function AdminPlansPage() {
             <SelectItem value="cancelled">Cancelled</SelectItem>
           </SelectContent>
         </Select>
-        {total > 0 && (
-          <span className="font-mono text-[12px] text-slate/60">
-            {total} total
-          </span>
-        )}
+        {total > 0 && <span className="font-mono text-[12px] text-slate/60">{total} total</span>}
       </div>
 
       <div className="mt-4 rounded-xl border border-sage bg-white">

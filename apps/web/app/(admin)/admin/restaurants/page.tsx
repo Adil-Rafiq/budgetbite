@@ -192,11 +192,7 @@ export default function AdminRestaurantsPage() {
               Export CSV
             </Button>
           )}
-          {total > 0 && (
-            <span className="font-mono text-[12px] text-slate/60">
-              {total} total
-            </span>
-          )}
+          {total > 0 && <span className="font-mono text-[12px] text-slate/60">{total} total</span>}
           {canWrite && (
             <Button size="sm" onClick={() => setForm({ open: true })}>
               <Plus className="size-4" />

@@ -42,7 +42,9 @@ function Section({
             </li>
           ))}
           {group.count > group.sample.length && (
-            <li className="text-[12px] text-slate/60">+ {group.count - group.sample.length} more</li>
+            <li className="text-[12px] text-slate/60">
+              + {group.count - group.sample.length} more
+            </li>
           )}
         </ul>
       )}

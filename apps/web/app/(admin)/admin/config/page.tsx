@@ -34,7 +34,9 @@ export default function AdminConfigPage() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">Config</h1>
+      <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">
+        Config
+      </h1>
       <p className="mt-1 text-[14px] text-slate">
         Effective tuning values. These are environment-driven and read-only — change them in the
         deployment environment.

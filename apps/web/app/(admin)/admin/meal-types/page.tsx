@@ -62,7 +62,9 @@ export default function AdminMealTypesPage() {
           <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">
             Meal types
           </h1>
-          <p className="mt-1 text-[14px] text-slate">Manage the meal types users can plan around.</p>
+          <p className="mt-1 text-[14px] text-slate">
+            Manage the meal types users can plan around.
+          </p>
         </div>
         {canWrite && (
           <Button size="sm" onClick={() => setForm({ open: true })}>

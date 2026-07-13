@@ -69,11 +69,7 @@ export default function AdminAuditPage() {
             ))}
           </SelectContent>
         </Select>
-        {total > 0 && (
-          <span className="font-mono text-[12px] text-slate/60">
-            {total} total
-          </span>
-        )}
+        {total > 0 && <span className="font-mono text-[12px] text-slate/60">{total} total</span>}
       </div>
 
       <div className="mt-4 rounded-xl border border-sage bg-white">
@@ -86,7 +82,9 @@ export default function AdminAuditPage() {
             Could not load the audit log. Try again.
           </div>
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-slate/60">No activity recorded yet.</div>
+          <div className="py-16 text-center text-[14px] text-slate/60">
+            No activity recorded yet.
+          </div>
         ) : (
           <Table>
             <TableHeader>
@@ -111,9 +109,7 @@ export default function AdminAuditPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <span
-                      className="inline-flex items-center rounded-full bg-sage/50 px-2 py-0.5 font-mono text-[11px] text-slate"
-                    >
+                    <span className="inline-flex items-center rounded-full bg-sage/50 px-2 py-0.5 font-mono text-[11px] text-slate">
                       {entry.action}
                     </span>
                   </TableCell>
