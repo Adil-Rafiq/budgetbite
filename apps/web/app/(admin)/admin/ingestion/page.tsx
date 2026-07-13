@@ -17,9 +17,9 @@ import {
 const PAGE_SIZE = 25;
 
 const statusClass: Record<ScraperRun['status'], string> = {
-  running: 'bg-amber/15 text-amber',
-  succeeded: 'bg-fathom/10 text-fathom',
-  failed: 'bg-pulse/10 text-pulse',
+  running: 'bg-[#f5a623]/15 text-[#9a6400]',
+  succeeded: 'bg-green/15 text-dark-green',
+  failed: 'bg-tomato/10 text-tomato',
 };
 
 function duration(run: ScraperRun): string {
@@ -43,32 +43,24 @@ export default function AdminIngestionPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1
-        className="text-vast"
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 24,
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-        }}
-      >
+      <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">
         Ingestion
       </h1>
-      <p className="mt-1 text-[14px] text-ink">
+      <p className="mt-1 text-[14px] text-slate">
         Scraper runs and how much data each one brought in.
       </p>
 
-      <div className="mt-6 rounded-xl border border-lumen-dk bg-white">
+      <div className="mt-6 rounded-xl border border-sage bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-soft" />
+            <Spinner className="size-5 text-slate/60" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-soft">
+          <div className="py-16 text-center text-[14px] text-slate/60">
             Could not load scraper runs. Try again.
           </div>
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-soft">No scraper runs yet.</div>
+          <div className="py-16 text-center text-[14px] text-slate/60">No scraper runs yet.</div>
         ) : (
           <Table>
             <TableHeader>
@@ -84,7 +76,7 @@ export default function AdminIngestionPage() {
             <TableBody>
               {rows.map((run) => (
                 <TableRow key={run.id}>
-                  <TableCell className="text-soft">
+                  <TableCell className="text-slate/60">
                     {new Date(run.startedAt).toLocaleString()}
                   </TableCell>
                   <TableCell>
@@ -95,13 +87,13 @@ export default function AdminIngestionPage() {
                       {run.status}
                     </span>
                   </TableCell>
-                  <TableCell className="text-ink">
+                  <TableCell className="text-slate">
                     <span style={{ fontFamily: 'var(--font-mono)' }}>{run.source}</span>
-                    {run.area && <span className="ml-2 text-soft">{run.area}</span>}
+                    {run.area && <span className="ml-2 text-slate/60">{run.area}</span>}
                   </TableCell>
-                  <TableCell className="text-right text-ink">{run.restaurantsUpserted}</TableCell>
-                  <TableCell className="text-right text-ink">{run.itemsUpserted}</TableCell>
-                  <TableCell className="text-right text-soft">{duration(run)}</TableCell>
+                  <TableCell className="text-right text-slate">{run.restaurantsUpserted}</TableCell>
+                  <TableCell className="text-right text-slate">{run.itemsUpserted}</TableCell>
+                  <TableCell className="text-right text-slate/60">{duration(run)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -111,7 +103,7 @@ export default function AdminIngestionPage() {
 
       {total > PAGE_SIZE && (
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="font-mono text-[12px] text-slate/60">
             Page {page} of {pageCount}
           </span>
           <div className="flex gap-2">

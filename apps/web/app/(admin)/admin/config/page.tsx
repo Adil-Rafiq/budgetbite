@@ -34,48 +34,30 @@ export default function AdminConfigPage() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1
-        className="text-vast"
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 24,
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-        }}
-      >
-        Config
-      </h1>
-      <p className="mt-1 text-[14px] text-ink">
+      <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">Config</h1>
+      <p className="mt-1 text-[14px] text-slate">
         Effective tuning values. These are environment-driven and read-only — change them in the
         deployment environment.
       </p>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-16">
-          <Spinner className="size-5 text-soft" />
+          <Spinner className="size-5 text-slate/60" />
         </div>
       ) : isError || !data ? (
-        <div className="py-16 text-center text-[14px] text-soft">
+        <div className="py-16 text-center text-[14px] text-slate/60">
           Could not load config. Try again.
         </div>
       ) : (
-        <div className="mt-6 divide-y divide-lumen-dk rounded-xl border border-lumen-dk bg-white">
+        <div className="mt-6 divide-y divide-sage rounded-xl border border-sage bg-white">
           {rows.map(({ key, label, description }) => (
             <div key={key} className="flex items-center justify-between gap-4 px-4 py-3">
               <div className="min-w-0">
-                <div
-                  className="truncate text-[12px] text-ink"
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                >
-                  {label}
-                </div>
-                <div className="mt-0.5 text-[12px] text-soft">{description}</div>
+                <div className="truncate font-mono text-[12px] text-slate">{label}</div>
+                <div className="mt-0.5 text-[12px] text-slate/60">{description}</div>
               </div>
-              <div
-                className="shrink-0 text-[13px] font-medium text-vast"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                {data[key] ?? <span className="text-soft">unset</span>}
+              <div className="shrink-0 font-mono text-[13px] font-medium text-charcoal">
+                {data[key] ?? <span className="text-slate/60">unset</span>}
               </div>
             </div>
           ))}
