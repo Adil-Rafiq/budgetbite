@@ -39,9 +39,9 @@ import {
 const PAGE_SIZE = 20;
 
 const STATUS_PILL: Record<string, string> = {
-  pending: 'bg-amber/[0.12] text-amber',
-  approved: 'bg-fathom/10 text-fathom',
-  rejected: 'bg-pulse/10 text-pulse',
+  pending: 'bg-[#f5a623]/15 text-[#9a6400]',
+  approved: 'bg-green/15 text-dark-green',
+  rejected: 'bg-tomato/10 text-tomato',
 };
 
 export default function AdminRecommendationsPage() {
@@ -95,18 +95,10 @@ export default function AdminRecommendationsPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1
-        className="text-vast"
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 24,
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-        }}
-      >
+      <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">
         Recommendations
       </h1>
-      <p className="mt-1 text-[14px] text-ink">
+      <p className="mt-1 text-[14px] text-slate">
         Restaurants suggested by users, with the menu items they provided. Approving creates the
         restaurant and its menu automatically.
       </p>
@@ -130,23 +122,23 @@ export default function AdminRecommendationsPage() {
           </SelectContent>
         </Select>
         {total > 0 && (
-          <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="text-[12px] text-slate/60" style={{ fontFamily: 'var(--font-mono)' }}>
             {total} total
           </span>
         )}
       </div>
 
-      <div className="mt-4 rounded-xl border border-lumen-dk bg-white">
+      <div className="mt-4 rounded-xl border border-sage bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-soft" />
+            <Spinner className="size-5 text-slate/60" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-soft">
+          <div className="py-16 text-center text-[14px] text-slate/60">
             Could not load recommendations. Try again.
           </div>
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-soft">
+          <div className="py-16 text-center text-[14px] text-slate/60">
             No recommendations{statusFilter !== 'all' ? ` are ${statusFilter}` : ''}.
           </div>
         ) : (
@@ -166,20 +158,20 @@ export default function AdminRecommendationsPage() {
                 <TableRow key={r.id}>
                   <TableCell>
                     <div className="flex flex-col gap-1">
-                      <span className="font-medium text-vast">{r.name}</span>
+                      <span className="font-medium text-charcoal">{r.name}</span>
                       {r.link && (
                         <a
                           href={r.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[12px] text-fathom underline-offset-2 hover:underline"
+                          className="text-[12px] text-dark-green underline-offset-2 hover:underline"
                         >
                           link
                         </a>
                       )}
                       {r.phone && (
                         <span
-                          className="text-[12px] text-soft"
+                          className="text-[12px] text-slate/60"
                           style={{ fontFamily: 'var(--font-mono)' }}
                         >
                           {r.phone}
@@ -190,34 +182,33 @@ export default function AdminRecommendationsPage() {
                           {r.items.slice(0, 6).map((it, idx) => (
                             <span
                               key={idx}
-                              className="rounded bg-lumen px-1.5 py-0.5 text-[11px] text-ink"
-                              style={{ fontFamily: 'var(--font-mono)' }}
+                              className="rounded border border-sage bg-canvas px-1.5 py-0.5 font-mono text-[11px] text-slate"
                             >
                               {it.name} ₨{it.price}
                             </span>
                           ))}
                           {r.items.length > 6 && (
-                            <span className="text-[11px] text-soft">
+                            <span className="text-[11px] text-slate/60">
                               +{r.items.length - 6} more
                             </span>
                           )}
                         </div>
                       )}
-                      {r.note && <span className="text-[12px] text-soft">{r.note}</span>}
+                      {r.note && <span className="text-[12px] text-slate/60">{r.note}</span>}
                     </div>
                   </TableCell>
-                  <TableCell className="text-ink">
+                  <TableCell className="text-slate">
                     <div className="flex flex-col">
                       <span>{r.user.name}</span>
                       <span
-                        className="text-[11px] text-soft"
+                        className="text-[11px] text-slate/60"
                         style={{ fontFamily: 'var(--font-mono)' }}
                       >
                         {r.user.email}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-soft">
+                  <TableCell className="text-slate/60">
                     <div className="flex flex-col gap-1">
                       <span>{r.area ?? '—'}</span>
                       {r.latitude != null && r.longitude != null && (
@@ -225,7 +216,7 @@ export default function AdminRecommendationsPage() {
                           href={`https://www.openstreetmap.org/?mlat=${r.latitude}&mlon=${r.longitude}#map=17/${r.latitude}/${r.longitude}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[12px] text-fathom underline-offset-2 hover:underline"
+                          className="text-[12px] text-dark-green underline-offset-2 hover:underline"
                         >
                           view on map
                         </a>
@@ -240,10 +231,10 @@ export default function AdminRecommendationsPage() {
                       {r.status}
                     </span>
                     {r.adminNote && (
-                      <span className="mt-1 block text-[11px] text-soft">{r.adminNote}</span>
+                      <span className="mt-1 block text-[11px] text-slate/60">{r.adminNote}</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-soft">
+                  <TableCell className="text-slate/60">
                     {new Date(r.createdAt).toLocaleDateString()}
                   </TableCell>
                   {canWrite && (
@@ -270,7 +261,7 @@ export default function AdminRecommendationsPage() {
                           </Button>
                         </div>
                       ) : (
-                        <span className="text-[12px] text-soft">
+                        <span className="text-[12px] text-slate/60">
                           {r.reviewedAt ? new Date(r.reviewedAt).toLocaleDateString() : 'reviewed'}
                         </span>
                       )}
@@ -285,7 +276,7 @@ export default function AdminRecommendationsPage() {
 
       {total > PAGE_SIZE && (
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="text-[12px] text-slate/60" style={{ fontFamily: 'var(--font-mono)' }}>
             Page {page} of {pageCount}
           </span>
           <div className="flex gap-2">
