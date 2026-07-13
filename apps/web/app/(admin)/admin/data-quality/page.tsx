@@ -18,23 +18,22 @@ function Section({
 }) {
   const clean = group.count === 0;
   return (
-    <div className="rounded-xl border border-lumen-dk bg-white p-4">
+    <div className="rounded-xl border border-sage bg-white p-4">
       <div className="flex items-baseline justify-between">
-        <h2 className="text-[15px] font-medium text-vast">{title}</h2>
+        <h2 className="text-[15px] font-medium text-charcoal">{title}</h2>
         <span
-          className={`text-[18px] font-semibold ${clean ? 'text-fathom' : 'text-pulse'}`}
-          style={{ fontFamily: 'var(--font-mono)' }}
+          className={`font-mono text-[18px] font-semibold ${clean ? 'text-dark-green' : 'text-tomato'}`}
         >
           {group.count}
         </span>
       </div>
-      <p className="mt-1 text-[13px] text-soft">{description}</p>
+      <p className="mt-1 text-[13px] text-slate/60">{description}</p>
       {!clean && (
-        <ul className="mt-3 flex flex-col gap-1 border-t border-lumen-dk pt-3">
+        <ul className="mt-3 flex flex-col gap-1 border-t border-sage pt-3">
           {group.sample.map((e) => (
-            <li key={e.id} className="truncate text-[13px] text-ink">
+            <li key={e.id} className="truncate text-[13px] text-slate">
               {linkRestaurants ? (
-                <Link href={`/admin/restaurants/${e.id}`} className="hover:text-fathom">
+                <Link href={`/admin/restaurants/${e.id}`} className="hover:text-dark-green">
                   {e.name}
                 </Link>
               ) : (
@@ -43,7 +42,9 @@ function Section({
             </li>
           ))}
           {group.count > group.sample.length && (
-            <li className="text-[12px] text-soft">+ {group.count - group.sample.length} more</li>
+            <li className="text-[12px] text-slate/60">
+              + {group.count - group.sample.length} more
+            </li>
           )}
         </ul>
       )}
@@ -56,27 +57,19 @@ export default function AdminDataQualityPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1
-        className="text-vast"
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 24,
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-        }}
-      >
+      <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">
         Data quality
       </h1>
-      <p className="mt-1 text-[14px] text-ink">
+      <p className="mt-1 text-[14px] text-slate">
         Gaps in the catalog that degrade plan quality. Lower is better.
       </p>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-16">
-          <Spinner className="size-5 text-soft" />
+          <Spinner className="size-5 text-slate/60" />
         </div>
       ) : isError || !data ? (
-        <div className="py-16 text-center text-[14px] text-soft">
+        <div className="py-16 text-center text-[14px] text-slate/60">
           Could not load the report. Try again.
         </div>
       ) : (

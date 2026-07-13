@@ -2,7 +2,6 @@
 
 import { AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
-import { Pill } from '@/components/ui/pill';
 import { cn } from '@/lib/utils';
 import type { BudgetPlanDetail } from '@repo/shared';
 
@@ -58,16 +57,15 @@ export function GenerationStatusBanner({ plan }: GenerationStatusBannerProps) {
             </p>
           )}
         </div>
-        <Pill
-          variant="danger"
-          size="xs"
+        <button
+          type="button"
           onClick={() => generate.mutate(plan.id)}
           disabled={generate.isPending}
-          className="shrink-0"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-tomato/30 bg-white px-3 py-1.5 text-[12px] font-medium text-tomato transition-colors hover:bg-tomato/10 disabled:pointer-events-none disabled:opacity-50"
         >
           <RefreshCw className={cn('h-3.5 w-3.5', generate.isPending && 'animate-spin')} />
           Retry
-        </Pill>
+        </button>
       </BannerShell>
     );
   }
@@ -84,8 +82,8 @@ function BannerShell({
 }) {
   const toneClass =
     tone === 'pending'
-      ? 'border-amber/20 bg-amber/10 text-amber'
-      : 'border-pulse/20 bg-pulse/10 text-pulse';
+      ? 'border-[#f5a623]/30 bg-[#fef6e6] text-[#8a5a12]'
+      : 'border-tomato/20 bg-tomato/10 text-tomato';
   return (
     <div className={`flex items-start gap-3 rounded-xl border px-4 py-3 ${toneClass}`}>
       {children}

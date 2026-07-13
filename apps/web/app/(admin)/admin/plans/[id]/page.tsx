@@ -11,19 +11,19 @@ const money = (n: number): string => `₨ ${n.toLocaleString()}`;
 const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
 
 const genStatusClass: Record<AdminPlanGeneration['status'], string> = {
-  pending: 'bg-amber/15 text-amber',
-  succeeded: 'bg-fathom/10 text-fathom',
-  failed: 'bg-pulse/10 text-pulse',
-  superseded: 'bg-lumen-dk/40 text-soft',
+  pending: 'bg-[#f5a623]/15 text-[#9a6400]',
+  succeeded: 'bg-green/15 text-dark-green',
+  failed: 'bg-tomato/10 text-tomato',
+  superseded: 'bg-sage/50 text-slate/60',
 };
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-lumen-dk bg-white px-3 py-2.5">
-      <div className="text-[10px] uppercase text-soft" style={labelStyle}>
+    <div className="rounded-lg border border-sage bg-white px-3 py-2.5">
+      <div className="text-[10px] uppercase text-slate/60" style={labelStyle}>
         {label}
       </div>
-      <div className="mt-1 text-[15px] font-medium text-vast">{value}</div>
+      <div className="mt-1 text-[15px] font-medium text-charcoal">{value}</div>
     </div>
   );
 }
@@ -46,7 +46,7 @@ export default function AdminPlanDetailPage() {
     <div className="mx-auto max-w-5xl">
       <Link
         href="/admin/plans"
-        className="inline-flex items-center gap-1.5 text-[13px] text-soft transition-colors hover:text-ink"
+        className="inline-flex items-center gap-1.5 text-[13px] text-slate/60 transition-colors hover:text-slate"
       >
         <ArrowLeft className="size-4" />
         Plans
@@ -54,24 +54,16 @@ export default function AdminPlanDetailPage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-16">
-          <Spinner className="size-5 text-soft" />
+          <Spinner className="size-5 text-slate/60" />
         </div>
       ) : isError || !plan ? (
-        <div className="py-16 text-center text-[14px] text-soft">Could not load this plan.</div>
+        <div className="py-16 text-center text-[14px] text-slate/60">Could not load this plan.</div>
       ) : (
         <>
-          <h1
-            className="mt-3 text-vast"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 24,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <h1 className="mt-3 font-display text-[26px] font-semibold tracking-tight text-charcoal">
             {plan.user.name}
           </h1>
-          <p className="mt-1 text-[13px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <p className="mt-1 font-mono text-[13px] text-slate/60">
             {plan.user.email} · {plan.planType} · {plan.status} · {plan.startDate} → {plan.endDate}
           </p>
 
@@ -87,7 +79,7 @@ export default function AdminPlanDetailPage() {
               {plan.mealTypes.map((mt) => (
                 <span
                   key={mt.id}
-                  className="inline-flex items-center rounded-full bg-lumen-dk/40 px-2.5 py-0.5 text-[12px] text-ink"
+                  className="inline-flex items-center rounded-full bg-sage/50 px-2.5 py-0.5 text-[12px] text-slate"
                 >
                   {mt.label}
                 </span>
@@ -95,17 +87,17 @@ export default function AdminPlanDetailPage() {
             </div>
           )}
 
-          <h2 className="mt-8 text-[13px] uppercase text-soft" style={labelStyle}>
+          <h2 className="mt-8 text-[13px] uppercase text-slate/60" style={labelStyle}>
             Generations
           </h2>
           <div className="mt-3 flex flex-col gap-2">
             {plan.generations.length === 0 ? (
-              <p className="text-[14px] text-soft">No generations yet.</p>
+              <p className="text-[14px] text-slate/60">No generations yet.</p>
             ) : (
               plan.generations.map((g) => (
                 <div
                   key={g.id}
-                  className="flex items-center justify-between rounded-lg border border-lumen-dk bg-white px-3 py-2"
+                  className="flex items-center justify-between rounded-lg border border-sage bg-white px-3 py-2"
                 >
                   <div className="flex items-center gap-3">
                     <span
@@ -114,16 +106,16 @@ export default function AdminPlanDetailPage() {
                     >
                       {g.status}
                     </span>
-                    <span className="text-[13px] text-soft">
+                    <span className="text-[13px] text-slate/60">
                       {new Date(g.generatedAt).toLocaleString()}
                     </span>
                     {g.id === plan.activeGenerationId && (
-                      <span className="text-[11px] text-fathom">active</span>
+                      <span className="text-[11px] text-dark-green">active</span>
                     )}
                   </div>
                   {g.errorCode && (
                     <span
-                      className="text-[12px] text-pulse"
+                      className="text-[12px] text-tomato"
                       style={{ fontFamily: 'var(--font-mono)' }}
                     >
                       {g.errorCode}
@@ -134,32 +126,32 @@ export default function AdminPlanDetailPage() {
             )}
           </div>
 
-          <h2 className="mt-8 text-[13px] uppercase text-soft" style={labelStyle}>
+          <h2 className="mt-8 text-[13px] uppercase text-slate/60" style={labelStyle}>
             Active suggestions
           </h2>
           <div className="mt-3 flex flex-col gap-5">
             {plan.suggestions.length === 0 ? (
-              <p className="text-[14px] text-soft">No suggestions for the active generation.</p>
+              <p className="text-[14px] text-slate/60">No suggestions for the active generation.</p>
             ) : (
               groupByDate(plan.suggestions).map(([date, items]) => (
                 <div key={date}>
-                  <div className="text-[12px] font-medium text-ink">{date}</div>
+                  <div className="text-[12px] font-medium text-slate">{date}</div>
                   <div className="mt-2 flex flex-col gap-1.5">
                     {items.map((s) => (
                       <div
                         key={s.id}
-                        className="flex items-center justify-between rounded-lg border border-lumen-dk bg-white px-3 py-2"
+                        className="flex items-center justify-between rounded-lg border border-sage bg-white px-3 py-2"
                       >
                         <div className="flex min-w-0 flex-col">
-                          <span className="truncate text-[14px] text-vast">
+                          <span className="truncate text-[14px] text-charcoal">
                             {s.menuItems.map((mi) => mi.name).join(' + ') || '—'}
                           </span>
-                          <span className="truncate text-[12px] text-soft">
+                          <span className="truncate text-[12px] text-slate/60">
                             {s.mealType.label} · {s.restaurant.name}
                             {s.optionIndex > 0 && ` · option ${s.optionIndex + 1}`}
                           </span>
                         </div>
-                        <span className="text-[13px] text-ink">{money(s.estimatedPrice)}</span>
+                        <span className="text-[13px] text-slate">{money(s.estimatedPrice)}</span>
                       </div>
                     ))}
                   </div>

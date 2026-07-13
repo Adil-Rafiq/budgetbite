@@ -1,55 +1,34 @@
 'use client';
 
+import { BellOff } from 'lucide-react';
 import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-context';
 import { TimePicker } from '@/components/ui/time-picker';
-
-const labelClass = 'text-[11px] uppercase text-ink';
-const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)',
-  letterSpacing: '0.16em',
-};
 
 export const NotificationsStep = () => {
   const { steps } = useOnboardingContext();
   const { values, actions, errors } = steps.notifications;
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex flex-col gap-2">
-        <label className={labelClass} style={labelStyle}>
-          Reminder times
-        </label>
-        <p className="text-[13px] text-ink">
-          A single nudge per meal, at the time you choose. Toggle off any meal you don&apos;t want a
-          reminder for.
-        </p>
-      </div>
-
-      <div className="overflow-hidden rounded-xl border border-lumen-dk bg-white">
+    <div className="flex flex-col gap-4">
+      <div className="overflow-hidden rounded-[20px] border border-sage bg-white shadow-sm">
         {values.slots.map((slot, i) => (
           <div
             key={slot.mealTypeId}
-            className={`flex items-center justify-between gap-4 px-4 py-3 ${
-              i === 0 ? '' : 'border-t border-lumen-dk'
-            } ${i % 2 === 0 ? 'bg-white' : 'bg-lumen-dk/25'}`}
+            className={`flex items-center justify-between gap-4 px-5 py-4 ${
+              i === 0 ? '' : 'border-t border-sage/70'
+            }`}
           >
             <div
               className={`flex items-center gap-3 transition-opacity ${
-                slot.enabled ? '' : 'opacity-50'
+                slot.enabled ? '' : 'opacity-40'
               }`}
             >
-              <span
-                className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-fathom/10 text-[12px] text-fathom"
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontWeight: 600,
-                }}
-              >
-                {slot.label.slice(0, 1).toUpperCase()}
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-green/10 text-sm font-bold uppercase text-dark-green">
+                {slot.label.slice(0, 1)}
               </span>
-              <span className="text-[14px] font-medium capitalize text-vast">{slot.label}</span>
+              <span className="text-sm font-semibold capitalize text-charcoal">{slot.label}</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <TimePicker
                 value={slot.time}
                 onChange={(next) => actions.updateNotificationTime(slot.mealTypeId, next)}
@@ -60,18 +39,20 @@ export const NotificationsStep = () => {
               <button
                 type="button"
                 onClick={() => actions.toggleNotificationEnabled(slot.mealTypeId)}
-                aria-pressed={slot.enabled}
+                role="switch"
+                aria-checked={slot.enabled}
                 aria-label={
                   slot.enabled ? `Disable ${slot.label} reminder` : `Enable ${slot.label} reminder`
                 }
-                className={`rounded-full px-3 py-1.5 text-[11px] font-semibold transition active:scale-[0.96] ${
-                  slot.enabled
-                    ? 'bg-fathom text-lumen hover:bg-fathom/90'
-                    : 'border border-lumen-dk bg-white text-soft hover:border-fathom/40 hover:text-ink'
+                className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+                  slot.enabled ? 'bg-green' : 'bg-sage'
                 }`}
-                style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.1em' }}
               >
-                {slot.enabled ? 'ON' : 'OFF'}
+                <span
+                  className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-all ${
+                    slot.enabled ? 'left-6' : 'left-1'
+                  }`}
+                />
               </button>
             </div>
           </div>
@@ -79,23 +60,18 @@ export const NotificationsStep = () => {
       </div>
 
       {errors.notificationSlots && (
-        <p className="text-[11px] text-pulse">{errors.notificationSlots}</p>
+        <p className="text-xs text-tomato">{errors.notificationSlots}</p>
       )}
 
-      <div className="rounded-xl border border-lumen-dk bg-lumen p-4 text-[13px] text-vast">
-        <div className="flex items-start gap-3">
-          <span
-            aria-hidden
-            className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-fathom text-[11px] text-lumen"
-          >
-            ◉
-          </span>
-          <div>
-            <div className="font-medium">Quiet by default</div>
-            <div className="mt-0.5 text-[12px] text-ink">
-              We only send the reminders you opt in to. Toggle any meal off any time from settings.
-            </div>
-          </div>
+      <div className="flex items-start gap-3 rounded-[20px] border border-sage bg-white p-5 shadow-sm">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/60">
+          <BellOff className="h-4 w-4 text-dark-green" />
+        </span>
+        <div>
+          <p className="text-sm font-semibold text-charcoal">Quiet by default</p>
+          <p className="mt-0.5 text-xs leading-relaxed text-slate">
+            We only send the reminders you opt in to. Toggle any meal off any time from settings.
+          </p>
         </div>
       </div>
     </div>

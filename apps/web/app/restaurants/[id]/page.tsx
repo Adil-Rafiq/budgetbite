@@ -14,7 +14,6 @@ import { pricesUpdatedAgoLabel } from '@/lib/date';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Pill } from '@/components/ui/pill';
 import {
   Select,
   SelectContent,
@@ -30,9 +29,9 @@ import { MenuItemSkeleton } from '../_components/menu-item-skeleton';
 import { RestaurantHeaderSkeleton } from '../_components/restaurant-header-skeleton';
 
 const FIT_PILL: Record<BudgetFit, { className: string; label: string }> = {
-  green: { className: 'bg-fathom/[0.08] text-fathom', label: 'Fits budget' },
-  amber: { className: 'bg-amber/[0.08] text-amber', label: 'Tight' },
-  red: { className: 'bg-pulse/[0.08] text-pulse', label: 'Over budget' },
+  green: { className: 'bg-green/10 text-dark-green', label: 'Fits budget' },
+  amber: { className: 'bg-[#fef6e6] text-[#8a5a12]', label: 'Tight' },
+  red: { className: 'bg-tomato/10 text-tomato', label: 'Over budget' },
 };
 
 const MENU_CONTROLS_THRESHOLD = 6;
@@ -52,12 +51,8 @@ function buildFoodpandaUrl(externalId: string, slug: string): string {
 
 const formatPkr = (n: number) => `₨ ${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 
-const labelClass = 'text-[10px] uppercase text-soft';
-const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)',
-  letterSpacing: '0.18em',
-};
-const inputClass = 'bg-lumen border-lumen-dk text-vast';
+const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60';
+const inputClass = 'bg-canvas border-sage text-charcoal';
 
 export default function RestaurantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -152,53 +147,34 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
       <Link
         href="/restaurants"
-        className="inline-flex w-fit items-center gap-1.5 text-[12px] text-ink transition hover:opacity-80"
-        style={{ fontFamily: 'var(--font-mono)' }}
+        className="inline-flex w-fit items-center gap-1.5 text-[12px] text-slate transition-colors hover:text-green"
       >
-        ← back to restaurants
+        ← Back to restaurants
       </Link>
 
       {restaurantQuery.isLoading ? (
         <RestaurantHeaderSkeleton />
       ) : restaurantQuery.error ? (
-        <p className="rounded-xl border border-pulse/20 bg-pulse/[0.06] p-4 text-[13px] text-pulse">
+        <p className="rounded-xl border border-tomato/20 bg-tomato/[0.06] p-4 text-[13px] text-tomato">
           Could not load restaurant.
         </p>
       ) : !r ? (
-        <p className="text-[13px] text-ink">Restaurant not found.</p>
+        <p className="text-[13px] text-slate">Restaurant not found.</p>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+        <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex flex-col gap-2">
-              <div
-                className="text-[10px] uppercase text-fathom"
-                style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-              >
-                /restaurant
+              <div className="text-xs font-semibold uppercase tracking-widest text-green">
+                Restaurant
               </div>
-              <h1
-                className="text-vast"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(24px, 3vw, 32px)',
-                  fontWeight: 600,
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.05,
-                }}
-              >
+              <h1 className="font-display text-[clamp(24px,3vw,32px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
                 {r.name}
               </h1>
-              <div
-                className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[12px] text-ink"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[12px] text-slate">
                 {r.rating != null && (
                   <span className="inline-flex items-center gap-1">
-                    <Star
-                      className="h-3.5 w-3.5 text-amber"
-                      style={{ fill: 'var(--color-amber)' }}
-                    />
-                    <span className="font-semibold text-vast">{r.rating.toFixed(1)}</span>
+                    <Star className="h-3.5 w-3.5 text-[#f5a623]" style={{ fill: '#f5a623' }} />
+                    <span className="font-semibold text-charcoal">{r.rating.toFixed(1)}</span>
                     {r.ratingCount > 0 && <span>({r.ratingCount.toLocaleString()})</span>}
                   </span>
                 )}
@@ -216,29 +192,36 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                 size="md"
               />
               {foodpandaUrl ? (
-                <Pill asChild size="sm">
-                  <a href={foodpandaUrl} target="_blank" rel="noopener noreferrer">
-                    Order on Foodpanda
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
-                </Pill>
+                <a
+                  href={foodpandaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-green px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-dark-green"
+                >
+                  Order on Foodpanda
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
               ) : (
                 r.orderUrl && (
-                  <Pill asChild size="sm">
-                    <a href={r.orderUrl} target="_blank" rel="noopener noreferrer">
-                      Order online
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </a>
-                  </Pill>
+                  <a
+                    href={r.orderUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-green px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-dark-green"
+                  >
+                    Order online
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
                 )
               )}
               {r.phone && (
-                <Pill asChild variant="ghost" size="sm">
-                  <a href={`tel:${r.phone}`}>
-                    Call
-                    <Phone className="h-3.5 w-3.5" />
-                  </a>
-                </Pill>
+                <a
+                  href={`tel:${r.phone}`}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-sage bg-white px-4 py-2 text-[13px] font-medium text-slate transition-colors hover:bg-canvas"
+                >
+                  Call
+                  <Phone className="h-3.5 w-3.5" />
+                </a>
               )}
             </div>
           </div>
@@ -246,28 +229,17 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
       )}
 
       {hasActivePlan && avgPerMeal > 0 ? (
-        <div className="grid grid-cols-3 gap-3 rounded-2xl border border-lumen-dk bg-lumen p-4">
+        <div className="grid grid-cols-3 gap-3 rounded-2xl border border-sage bg-canvas p-4">
           {[
-            { label: 'avg / meal', value: formatPkr(avgPerMeal) },
-            { label: 'remaining', value: formatPkr(amountRemaining) },
-            { label: 'meals left', value: String(mealsRemaining) },
+            { label: 'Avg / meal', value: formatPkr(avgPerMeal) },
+            { label: 'Remaining', value: formatPkr(amountRemaining) },
+            { label: 'Meals left', value: String(mealsRemaining) },
           ].map(({ label, value }) => (
             <div key={label} className="flex flex-col">
-              <span
-                className="text-[10px] uppercase text-soft"
-                style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-              >
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60">
                 {label}
               </span>
-              <span
-                className="text-vast"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 16,
-                  fontWeight: 600,
-                  letterSpacing: '-0.01em',
-                }}
-              >
+              <span className="font-display text-base font-semibold tracking-tight text-charcoal">
                 {value}
               </span>
             </div>
@@ -275,16 +247,17 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         </div>
       ) : (
         !restaurantQuery.isLoading && (
-          <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-lumen-dk bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-[13px] text-ink">
+          <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-sage bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[13px] text-slate">
               Start a budget plan to see fit and log meals from here.
             </p>
-            <Pill asChild variant="ghost" size="xs" className="shrink-0">
-              <Link href="/plans">
-                Create a plan
-                <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
-              </Link>
-            </Pill>
+            <Link
+              href="/plans"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas"
+            >
+              Create a plan
+              <span className="opacity-70">→</span>
+            </Link>
           </div>
         )
       )}
@@ -292,26 +265,13 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div className="flex flex-col gap-1">
-            <span
-              className="text-[10px] uppercase text-fathom"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-            >
-              /menu
-            </span>
-            <h2
-              className="text-vast"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 22,
-                fontWeight: 600,
-                letterSpacing: '-0.02em',
-              }}
-            >
+            <span className="text-xs font-semibold uppercase tracking-widest text-green">Menu</span>
+            <h2 className="font-display text-[22px] font-semibold tracking-tight text-charcoal">
               Menu
             </h2>
           </div>
           {menuStats && (
-            <span className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+            <span className="text-[11px] text-slate/60">
               {menuStats.count} item{menuStats.count === 1 ? '' : 's'} · {formatPkr(menuStats.min)}{' '}
               – {formatPkr(menuStats.max)} · avg {formatPkr(menuStats.avg)}
               {menuStats.freshness ? ` · ${menuStats.freshness}` : ''}
@@ -320,14 +280,14 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         </div>
 
         {showMenuControls && (
-          <div className="overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+          <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
             <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-[1fr_180px_auto] sm:items-end">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="menu-search" className={labelClass} style={labelStyle}>
+                <Label htmlFor="menu-search" className={labelClass}>
                   Search menu
                 </Label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-soft" />
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate/60" />
                   <Input
                     id="menu-search"
                     value={menuSearch}
@@ -339,7 +299,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="menu-sort" className={labelClass} style={labelStyle}>
+                <Label htmlFor="menu-sort" className={labelClass}>
                   Sort
                 </Label>
                 <Select value={menuSort} onValueChange={(v) => setMenuSort(v as MenuSort)}>
@@ -360,12 +320,11 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                   type="button"
                   onClick={() => setBudgetOnly((v) => !v)}
                   aria-pressed={budgetOnly}
-                  className={`h-[38px] rounded-full border px-3 text-[12px] transition-colors ${
+                  className={`h-[38px] rounded-full border px-3 text-[12px] font-medium transition-colors ${
                     budgetOnly
-                      ? 'border-fathom bg-fathom/[0.08] text-fathom'
-                      : 'border-lumen-dk bg-lumen text-ink hover:border-fathom/40'
+                      ? 'border-green bg-green/10 text-dark-green'
+                      : 'border-sage bg-canvas text-slate hover:border-green/40'
                   }`}
-                  style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   {budgetOnly ? '✓ within budget' : 'within budget'}
                 </button>
@@ -381,15 +340,15 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
             ))}
           </div>
         ) : menuQuery.error ? (
-          <p className="rounded-xl border border-pulse/20 bg-pulse/[0.06] p-4 text-[13px] text-pulse">
+          <p className="rounded-xl border border-tomato/20 bg-tomato/[0.06] p-4 text-[13px] text-tomato">
             Could not load menu.
           </p>
         ) : !menuQuery.data?.length ? (
-          <div className="rounded-2xl border border-dashed border-lumen-dk bg-white p-6 text-center text-[13px] text-ink">
+          <div className="rounded-2xl border border-dashed border-sage bg-white p-6 text-center text-[13px] text-slate">
             No menu items yet.
           </div>
         ) : filteredMenu.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-lumen-dk bg-white p-6 text-center text-[13px] text-ink">
+          <div className="rounded-2xl border border-dashed border-sage bg-white p-6 text-center text-[13px] text-slate">
             No items match your filters.
             {filtersActive && (
               <button
@@ -399,8 +358,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                   setMenuSort('default');
                   setBudgetOnly(false);
                 }}
-                className="ml-1 text-fathom underline-offset-2 hover:underline"
-                style={{ fontFamily: 'var(--font-mono)' }}
+                className="ml-1 text-green underline-offset-2 hover:underline"
               >
                 clear
               </button>
@@ -420,7 +378,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
               return (
                 <div
                   key={item.id}
-                  className="flex flex-col overflow-hidden rounded-2xl border border-lumen-dk bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+                  className="flex flex-col overflow-hidden rounded-2xl border border-sage bg-white shadow-sm"
                 >
                   {item.imageUrl ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
@@ -433,42 +391,33 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                   ) : (
                     <div
                       aria-hidden
-                      className="flex h-32 w-full items-center justify-center bg-lumen"
+                      className="flex h-32 w-full items-center justify-center bg-canvas"
                     >
-                      <Utensils className="h-8 w-8 text-soft/50" />
+                      <Utensils className="h-8 w-8 text-slate/40" />
                     </div>
                   )}
                   <div className="flex flex-1 flex-col gap-3 p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="truncate text-[14px] font-medium text-vast">{item.name}</p>
+                          <p className="truncate text-[14px] font-medium text-charcoal">
+                            {item.name}
+                          </p>
                           {fit && (
                             <span
-                              className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] uppercase ${FIT_PILL[fit].className}`}
-                              style={{
-                                fontFamily: 'var(--font-mono)',
-                                letterSpacing: '0.18em',
-                              }}
+                              className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${FIT_PILL[fit].className}`}
                             >
                               {FIT_PILL[fit].label}
                             </span>
                           )}
                         </div>
                         {item.description && (
-                          <p className="mt-1 line-clamp-3 text-[12px] text-ink">
+                          <p className="mt-1 line-clamp-3 text-[12px] text-slate">
                             {item.description}
                           </p>
                         )}
                       </div>
-                      <span
-                        className="shrink-0 whitespace-nowrap text-right text-fathom"
-                        style={{
-                          fontFamily: 'var(--font-display)',
-                          fontSize: 16,
-                          fontWeight: 600,
-                        }}
-                      >
+                      <span className="shrink-0 whitespace-nowrap text-right font-display text-base font-semibold text-green">
                         ₨ {item.price.toLocaleString()}
                       </span>
                     </div>
@@ -480,15 +429,14 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                         name={item.name}
                       />
                       {hasActivePlan && (
-                        <Pill
-                          variant="ghost"
-                          size="sm"
+                        <button
+                          type="button"
                           onClick={() => setPickedItem(item)}
-                          className="flex-1"
+                          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas"
                         >
                           Add to plan
-                          <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>+</span>
-                        </Pill>
+                          <span className="opacity-70">+</span>
+                        </button>
                       )}
                     </div>
                   </div>

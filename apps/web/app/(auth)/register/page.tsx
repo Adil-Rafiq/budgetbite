@@ -5,31 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Inter, JetBrains_Mono, Bricolage_Grotesque } from 'next/font/google';
-import { Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { authClient, type AuthErrorCode } from '@/lib/auth-client';
 import { registerSchema, type RegisterInput } from '@repo/shared';
 import { showToast, type ToastOptions } from '@/lib/toast';
-import { Pill } from '@/components/ui/pill';
 import { LogoIcon, GoogleIcon, GitHubIcon } from '@/components/icons';
 
 type OAuthProvider = 'google' | 'github';
-
-const body = Inter({
-  subsets: ['latin'],
-  variable: '--font-body',
-  weight: ['400', '500', '600', '700'],
-});
-const display = Bricolage_Grotesque({
-  subsets: ['latin'],
-  variable: '--font-display',
-  axes: ['opsz'],
-});
-const mono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
-  weight: ['400', '500', '600'],
-});
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -117,87 +99,60 @@ export default function RegisterPage() {
   };
 
   const inputClass =
-    'w-full rounded-[10px] border border-lumen-dk bg-white px-3.5 py-[11px] text-[14px] text-vast outline-none';
-  const labelClass = 'text-[11px] uppercase text-ink';
-  const labelStyle: React.CSSProperties = {
-    fontFamily: 'var(--font-mono)',
-    letterSpacing: '0.16em',
-  };
+    'w-full rounded-xl border border-sage bg-white px-3.5 py-3 text-[14px] text-charcoal outline-none transition-colors placeholder:text-slate/50 focus:border-green';
+  const labelClass = 'text-xs font-semibold uppercase tracking-wide text-slate';
+  const busy = isSubmitting || oauthLoading !== null;
 
   return (
-    <div
-      className={`${body.variable} ${display.variable} ${mono.variable} relative min-h-screen bg-lumen text-vast antialiased`}
-      style={{ fontFamily: 'var(--font-body)' }}
-    >
+    <div className="relative min-h-screen bg-canvas text-charcoal antialiased">
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-32 -z-0 h-[360px] w-[700px] -translate-x-1/2 rounded-full"
+        className="pointer-events-none absolute inset-0 opacity-40"
         style={{
-          background:
-            'radial-gradient(closest-side, color-mix(in srgb, var(--color-fathom) 14%, transparent), color-mix(in srgb, var(--color-glow) 10%, transparent) 55%, transparent 75%)',
-          filter: 'blur(20px)',
+          backgroundImage: 'radial-gradient(circle at 1px 1px, #d4e8b0 1px, transparent 0)',
+          backgroundSize: '32px 32px',
         }}
       />
 
-      <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-8 py-6">
+      <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-6 py-6 sm:px-8">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-fathom text-lumen">
-            <LogoIcon />
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green text-white">
+            <LogoIcon size={16} />
           </span>
-          <span
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 18,
-              fontWeight: 600,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            BudgetBite
+          <span className="font-display text-xl font-bold tracking-tight">
+            Budget<span className="text-green">Bite</span>
           </span>
         </Link>
-        <Link href="/" className="text-[12px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
-          ← back to home
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-slate transition-colors hover:text-charcoal"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to home
         </Link>
       </header>
 
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[460px] flex-col justify-center px-6 pb-16">
         <div className="text-center">
-          <div
-            className="inline-flex items-center gap-2 rounded-full border border-lumen-dk bg-white px-3 py-1 text-[11px] text-ink"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-fathom" />
-            create your account
+          <div className="inline-flex items-center gap-2 rounded-full border border-sage bg-white px-4 py-1.5 shadow-sm">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-green" />
+            <span className="text-xs font-normal uppercase tracking-widest text-charcoal/70">
+              Create your account
+            </span>
           </div>
-          <h1
-            className="mt-6"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(28px, 3.4vw, 38px)',
-              fontWeight: 600,
-              lineHeight: 1.06,
-              letterSpacing: '-0.025em',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Welcome to <span className="text-fathom">BudgetBite.</span>
+          <h1 className="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tight">
+            Welcome to <span className="text-green">BudgetBite.</span>
           </h1>
-          <p className="mt-3 text-[15px] leading-[1.55] text-ink">
+          <p className="mt-3 text-[15px] leading-relaxed text-charcoal/60">
             Plan meals from real menus, on a real budget.
           </p>
         </div>
 
-        <div
-          className="mt-10 rounded-[14px] border border-lumen-dk bg-white p-7"
-          style={{
-            boxShadow:
-              '0 1px 0 rgba(0,0,0,0.04), 0 30px 80px -30px rgba(26,26,26,0.18), 0 8px 30px -10px rgba(26,26,26,0.06)',
-          }}
-        >
+        <div className="mt-8 rounded-3xl border border-sage bg-white p-7 shadow-2xl">
           <form onSubmit={handleSubmit(onSubmit)} autoComplete="on" className="flex flex-col gap-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <label htmlFor="firstName" className={labelClass} style={labelStyle}>
+                <label htmlFor="firstName" className={labelClass}>
                   First name
                 </label>
                 <input
@@ -208,11 +163,11 @@ export default function RegisterPage() {
                   {...register('firstName')}
                 />
                 {errors.firstName && (
-                  <p className="text-[12px] text-pulse">{errors.firstName.message}</p>
+                  <p className="text-xs text-tomato">{errors.firstName.message}</p>
                 )}
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="lastName" className={labelClass} style={labelStyle}>
+                <label htmlFor="lastName" className={labelClass}>
                   Last name
                 </label>
                 <input
@@ -223,13 +178,13 @@ export default function RegisterPage() {
                   {...register('lastName')}
                 />
                 {errors.lastName && (
-                  <p className="text-[12px] text-pulse">{errors.lastName.message}</p>
+                  <p className="text-xs text-tomato">{errors.lastName.message}</p>
                 )}
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="email" className={labelClass} style={labelStyle}>
+              <label htmlFor="email" className={labelClass}>
                 Email
               </label>
               <input
@@ -240,11 +195,11 @@ export default function RegisterPage() {
                 className={inputClass}
                 {...register('email')}
               />
-              {errors.email && <p className="text-[12px] text-pulse">{errors.email.message}</p>}
+              {errors.email && <p className="text-xs text-tomato">{errors.email.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="password" className={labelClass} style={labelStyle}>
+              <label htmlFor="password" className={labelClass}>
                 Password
               </label>
               <div className="relative">
@@ -253,97 +208,96 @@ export default function RegisterPage() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="At least 8 characters"
                   autoComplete="new-password"
-                  className={`${inputClass} pr-10`}
+                  className={`${inputClass} pr-11`}
                   {...register('password')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((p) => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-ink"
-                  style={{ fontFamily: 'var(--font-mono)' }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate transition-colors hover:text-charcoal"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? 'hide' : 'show'}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-[12px] text-pulse">{errors.password.message}</p>
-              )}
+              {errors.password && <p className="text-xs text-tomato">{errors.password.message}</p>}
             </div>
 
-            <p className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+            <p className="text-xs leading-relaxed text-charcoal/45">
               By creating an account you agree to our{' '}
-              <a href="#" className="text-fathom">
+              <a href="#" className="font-medium text-green hover:text-dark-green">
                 terms
               </a>{' '}
               and{' '}
-              <a href="#" className="text-fathom">
+              <a href="#" className="font-medium text-green hover:text-dark-green">
                 privacy policy
               </a>
               .
             </p>
 
-            <Pill
+            <button
               type="submit"
-              size="lg"
-              disabled={isSubmitting || oauthLoading !== null}
-              className="mt-1 w-full"
+              disabled={busy}
+              className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-green text-sm font-semibold text-white shadow-md transition-all hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
             >
               {isSubmitting ? (
-                'Creating account…'
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Creating account…
+                </>
               ) : (
                 <>
                   Create account
-                  <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
+                  <ArrowRight className="h-4 w-4" />
                 </>
               )}
-            </Pill>
+            </button>
           </form>
 
-          <div className="relative my-7">
-            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-lumen-dk" />
-            <span
-              className="relative mx-auto inline-block bg-white px-3 text-[10px] uppercase text-soft"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-            >
-              or
-            </span>
+          <div className="my-6 flex items-center gap-3">
+            <span className="h-px flex-1 bg-sage" />
+            <span className="text-xs font-normal text-charcoal/40">or</span>
+            <span className="h-px flex-1 bg-sage" />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <Pill
-              variant="ghost"
-              size="md"
+            <button
+              type="button"
               onClick={() => handleOAuthSignIn('google')}
-              disabled={oauthLoading !== null || isSubmitting}
+              disabled={busy}
+              className="flex min-h-11 items-center justify-center gap-2.5 rounded-xl border border-sage bg-white text-sm font-medium text-charcoal shadow-sm transition-all hover:border-green/40 hover:bg-canvas disabled:pointer-events-none disabled:opacity-50"
             >
               {oauthLoading === 'google' ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <GoogleIcon />
+                <GoogleIcon size={18} />
               )}
               {oauthLoading === 'google' ? 'Connecting…' : 'Google'}
-            </Pill>
-            <Pill
-              variant="ghost"
-              size="md"
+            </button>
+            <button
+              type="button"
               onClick={() => handleOAuthSignIn('github')}
-              disabled={oauthLoading !== null || isSubmitting}
+              disabled={busy}
+              className="flex min-h-11 items-center justify-center gap-2.5 rounded-xl bg-charcoal text-sm font-medium text-white transition-all hover:bg-charcoal/90 disabled:pointer-events-none disabled:opacity-50"
             >
               {oauthLoading === 'github' ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <GitHubIcon />
+                <GitHubIcon size={18} />
               )}
               {oauthLoading === 'github' ? 'Connecting…' : 'GitHub'}
-            </Pill>
+            </button>
           </div>
         </div>
 
-        <p className="mt-7 text-center text-[13px] text-ink">
+        <p className="mt-7 text-center text-[13px] text-charcoal/60">
           Already have an account?{' '}
-          <Link href="/login" className="font-medium text-fathom">
-            Sign in →
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1 font-semibold text-green transition-colors hover:text-dark-green"
+          >
+            Sign in
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </p>
       </main>

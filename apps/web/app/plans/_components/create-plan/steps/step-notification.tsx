@@ -7,34 +7,28 @@ export const StepNotifications = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[12px] text-ink">
+      <p className="text-[12px] text-slate">
         A single nudge per meal, at the time you choose. Toggle off any meal you don&apos;t want a
         reminder for.
       </p>
 
-      <div className="overflow-hidden rounded-xl border border-lumen-dk bg-white">
+      <div className="overflow-hidden rounded-xl border border-sage bg-white">
         {values.slots.map((slot, i) => (
           <div
             key={slot.mealTypeId}
             className={`flex items-center justify-between gap-3 px-3 py-2.5 ${
-              i === 0 ? '' : 'border-t border-lumen-dk'
-            } ${i % 2 === 0 ? 'bg-white' : 'bg-lumen-dk/25'}`}
+              i === 0 ? '' : 'border-t border-sage'
+            } ${i % 2 === 0 ? 'bg-white' : 'bg-canvas'}`}
           >
             <div
               className={`flex items-center gap-2.5 transition-opacity ${
                 slot.enabled ? '' : 'opacity-50'
               }`}
             >
-              <span
-                className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-fathom/10 text-[11px] text-fathom"
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontWeight: 600,
-                }}
-              >
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-green/10 text-[11px] font-semibold text-green">
                 {slot.label.slice(0, 1).toUpperCase()}
               </span>
-              <span className="text-[13px] font-medium capitalize text-vast">{slot.label}</span>
+              <span className="text-[13px] font-medium capitalize text-charcoal">{slot.label}</span>
             </div>
             <div className="flex items-center gap-2">
               <TimePicker
@@ -51,12 +45,11 @@ export const StepNotifications = () => {
                 aria-label={
                   slot.enabled ? `Disable ${slot.label} reminder` : `Enable ${slot.label} reminder`
                 }
-                className={`rounded-full px-2.5 py-1 text-[10px] font-semibold transition active:scale-[0.96] ${
+                className={`rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.1em] transition active:scale-[0.96] ${
                   slot.enabled
-                    ? 'bg-fathom text-lumen hover:bg-fathom/90'
-                    : 'border border-lumen-dk bg-white text-soft hover:border-fathom/40 hover:text-ink'
+                    ? 'bg-green text-white hover:bg-dark-green'
+                    : 'border border-sage bg-white text-slate/60 hover:border-green/40 hover:text-slate'
                 }`}
-                style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.1em' }}
               >
                 {slot.enabled ? 'ON' : 'OFF'}
               </button>
@@ -66,9 +59,7 @@ export const StepNotifications = () => {
       </div>
 
       {errors.notificationSlots ? (
-        <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
-          {errors.notificationSlots}
-        </p>
+        <p className="text-[11px] text-tomato">{errors.notificationSlots}</p>
       ) : null}
     </div>
   );

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { Bell, Plus, Trash2 } from 'lucide-react';
 
-import { Pill } from '@/components/ui/pill';
 import { TimePicker } from '@/components/ui/time-picker';
 import { useActiveBudgetPlan, useUpdateBudgetPlan } from '@/hooks/use-budget-plan';
 import { showToast } from '@/lib/toast';
@@ -54,7 +53,7 @@ export function NotificationTimesCard() {
   };
 
   if (isLoading) {
-    return <div className="h-64 w-full animate-pulse rounded-2xl bg-lumen-dk" />;
+    return <div className="h-64 w-full animate-pulse rounded-2xl bg-sage" />;
   }
 
   const hint = active ? 'When should we remind you?' : 'Create a plan to configure reminders.';
@@ -63,14 +62,12 @@ export function NotificationTimesCard() {
     <Section icon={Bell} title="Notification times" hint={hint}>
       <div className="flex flex-col gap-4">
         {!active ? (
-          <p className="text-[13px] text-ink">No active plan yet.</p>
+          <p className="text-[13px] text-slate">No active plan yet.</p>
         ) : (
           <>
             <div className="flex flex-col gap-2">
               {slots.length === 0 && (
-                <p className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
-                  no reminders configured. add one below.
-                </p>
+                <p className="text-[12px] text-slate/60">No reminders configured. Add one below.</p>
               )}
               {slots.map((slot, i) => (
                 <div key={i} className="flex items-center gap-2">
@@ -81,37 +78,48 @@ export function NotificationTimesCard() {
                     size="md"
                     aria-label={`Reminder ${i + 1} time`}
                   />
-                  <Pill
-                    variant={slot.enabled ? 'primary' : 'ghost'}
-                    size="xs"
+                  <button
+                    type="button"
                     onClick={() => toggleEnabled(i)}
                     aria-pressed={slot.enabled}
                     aria-label={slot.enabled ? 'Disable reminder' : 'Enable reminder'}
-                    className="min-w-[52px] justify-center"
+                    className={`inline-flex min-w-[52px] items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] font-medium transition-colors ${
+                      slot.enabled
+                        ? 'border-green bg-green/10 text-dark-green'
+                        : 'border-sage bg-canvas text-slate hover:border-green/40'
+                    }`}
                   >
                     {slot.enabled ? 'On' : 'Off'}
-                  </Pill>
-                  <Pill
-                    variant="subtle"
-                    size="iconSm"
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => remove(i)}
                     aria-label="Remove reminder"
-                    className="text-ink"
+                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate transition-colors hover:bg-canvas hover:text-tomato"
                   >
                     <Trash2 className="h-4 w-4" />
-                  </Pill>
+                  </button>
                 </div>
               ))}
             </div>
 
             <div className="flex gap-2">
-              <Pill variant="ghost" size="xs" onClick={add}>
+              <button
+                type="button"
+                onClick={add}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas"
+              >
                 <Plus className="h-3.5 w-3.5" />
                 Add time
-              </Pill>
-              <Pill size="xs" onClick={save} disabled={!isDirty || !allValid || isPending}>
+              </button>
+              <button
+                type="button"
+                onClick={save}
+                disabled={!isDirty || !allValid || isPending}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-green px-4 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+              >
                 {isPending ? 'Saving…' : 'Save'}
-              </Pill>
+              </button>
             </div>
           </>
         )}

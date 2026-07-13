@@ -21,7 +21,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Pill } from '@/components/ui/pill';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useRecordMealChoice } from '@/hooks/use-meal-choice';
 import { useCreateMealPin, useMealPins } from '@/hooks/use-meal-pin';
@@ -43,12 +42,8 @@ interface Props {
   menuItem: MenuItemPick;
 }
 
-const labelClass = 'text-[10px] uppercase text-soft';
-const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)',
-  letterSpacing: '0.18em',
-};
-const inputClass = 'bg-lumen border-lumen-dk text-vast';
+const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60';
+const inputClass = 'bg-canvas border-sage text-charcoal';
 
 export function AddToPlanModal({
   open,
@@ -137,51 +132,33 @@ export function AddToPlanModal({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <div
-            className="text-[10px] uppercase text-fathom"
-            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-          >
-            {isPastOrToday ? 'log · /meals' : 'pin · /plan'}
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-green">
+            {isPastOrToday ? 'Log a meal' : 'Pin to plan'}
           </div>
-          <DialogTitle
-            className="text-vast"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 22,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <DialogTitle className="font-display text-[22px] font-semibold tracking-tight text-charcoal">
             Add to plan
           </DialogTitle>
-          <DialogDescription className="text-ink">
+          <DialogDescription className="text-slate">
             {isPastOrToday
               ? 'Log this as a meal you ordered. Your budget updates immediately.'
               : 'Pin this for a future slot. Your AI plan will keep it locked.'}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="rounded-xl border border-lumen-dk bg-lumen p-3">
-          <p className="font-medium text-vast">{menuItem.name}</p>
-          <p className="text-[12px] text-ink">{restaurantName}</p>
-          <p
-            className="mt-1 text-fathom"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 16,
-              fontWeight: 600,
-            }}
-          >
+        <div className="rounded-xl border border-sage bg-canvas p-3">
+          <p className="font-medium text-charcoal">{menuItem.name}</p>
+          <p className="text-[12px] text-slate">{restaurantName}</p>
+          <p className="mt-1 font-display text-base font-semibold text-green">
             ₨ {menuItem.price.toLocaleString()}
           </p>
         </div>
 
         {!planId ? (
-          <p className="text-[13px] text-ink">Start a budget plan first to add meals to it.</p>
+          <p className="text-[13px] text-slate">Start a budget plan first to add meals to it.</p>
         ) : (
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="slot-date" className={labelClass} style={labelStyle}>
+              <Label htmlFor="slot-date" className={labelClass}>
                 Date
               </Label>
               <Input
@@ -196,9 +173,7 @@ export function AddToPlanModal({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label className={labelClass} style={labelStyle}>
-                Meal
-              </Label>
+              <Label className={labelClass}>Meal</Label>
               <Select value={mealTypeId} onValueChange={setMealTypeId}>
                 <SelectTrigger className={`w-full ${inputClass}`}>
                   <SelectValue placeholder="Pick a meal type" />
@@ -210,7 +185,7 @@ export function AddToPlanModal({
                       <SelectItem key={mt.id} value={mt.id}>
                         <span className="capitalize">{mt.label}</span>
                         {pin && (
-                          <span className="ml-2 text-[11px] text-soft">
+                          <span className="ml-2 text-[11px] text-slate/60">
                             already pinned: {pin.menuItemName}
                           </span>
                         )}
@@ -223,7 +198,7 @@ export function AddToPlanModal({
 
             {isPastOrToday && (
               <div className="flex flex-col gap-2">
-                <Label htmlFor="actual-amount" className={labelClass} style={labelStyle}>
+                <Label htmlFor="actual-amount" className={labelClass}>
                   Actual amount spent (PKR)
                 </Label>
                 <Input
@@ -232,21 +207,15 @@ export function AddToPlanModal({
                   inputMode="numeric"
                   value={actualAmount}
                   onChange={(e) => setActualAmount(Number(e.target.value) || 0)}
-                  className={`${inputClass} font-semibold`}
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 18,
-                  }}
+                  className={`${inputClass} font-display text-lg font-semibold`}
                 />
-                <p className="text-[11px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
-                  pre-filled from menu. adjust to actual.
-                </p>
+                <p className="text-[11px] text-slate/60">Pre-filled from menu. Adjust to actual.</p>
               </div>
             )}
 
             {isPastOrToday && (
               <div className="flex flex-col gap-2">
-                <Label htmlFor="meal-notes" className={labelClass} style={labelStyle}>
+                <Label htmlFor="meal-notes" className={labelClass}>
                   Notes (optional)
                 </Label>
                 <Textarea
@@ -263,23 +232,27 @@ export function AddToPlanModal({
         )}
 
         <DialogFooter>
-          <Pill
-            variant="ghost"
-            size="sm"
+          <button
+            type="button"
             onClick={() => onOpenChange(false)}
             disabled={isSaving}
-            style={{ fontFamily: 'var(--font-mono)' }}
+            className="inline-flex items-center justify-center rounded-lg border border-sage bg-white px-4 py-2 text-[13px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50"
           >
             Cancel
-          </Pill>
-          <Pill size="sm" onClick={handleSubmit} disabled={!planId || !mealTypeId || isSaving}>
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!planId || !mealTypeId || isSaving}
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-green px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+          >
             {isSaving
               ? 'Saving…'
               : isPastOrToday
                 ? `Log ₨ ${actualAmount.toLocaleString()}`
                 : 'Pin to plan'}
-            <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
-          </Pill>
+            <span className="opacity-70">↵</span>
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

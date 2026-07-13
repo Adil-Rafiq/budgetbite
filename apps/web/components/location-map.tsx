@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 
 import L from 'leaflet';
 import { useEffect, useRef, useState } from 'react';
+import { MapPin, Search } from 'lucide-react';
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 
 const LEAFLET_ICON_BASE = 'https://unpkg.com/leaflet@1.9.4/dist/images/';
@@ -17,8 +18,8 @@ L.Icon.Default.mergeOptions({
 const wisprIcon = L.divIcon({
   className: 'wispr-pin',
   html: `<svg width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M14 0C6.27 0 0 6.27 0 14c0 9.5 14 22 14 22s14-12.5 14-22C28 6.27 21.73 0 14 0z" fill="#0f766e"/>
-    <circle cx="14" cy="14" r="5" fill="#fafaf7"/>
+    <path d="M14 0C6.27 0 0 6.27 0 14c0 9.5 14 22 14 22s14-12.5 14-22C28 6.27 21.73 0 14 0z" fill="#e84c3d"/>
+    <circle cx="14" cy="14" r="5" fill="#ffffff"/>
   </svg>`,
   iconSize: [28, 36],
   iconAnchor: [14, 36],
@@ -229,27 +230,26 @@ export function LocationMap({
           aria-activedescendant={
             activeIndex >= 0 ? `loc-result-${results[activeIndex]?.place_id}` : undefined
           }
-          className="w-full rounded-[10px] border border-lumen-dk bg-white px-3.5 py-[11px] pr-9 text-[13px] text-vast outline-none placeholder:text-soft focus:border-fathom"
-          style={{ fontFamily: 'var(--font-mono)' }}
+          className="w-full rounded-xl border border-sage bg-white px-3.5 py-[11px] pr-9 text-[13px] text-charcoal outline-none transition-colors placeholder:text-slate/50 focus:border-green"
         />
         <span
           aria-hidden
-          className="pointer-events-none absolute right-3 top-1/2 flex h-3 w-3 -translate-y-1/2 items-center justify-center text-[13px] text-ink"
+          className="pointer-events-none absolute right-3 top-1/2 flex h-3 w-3 -translate-y-1/2 items-center justify-center text-[13px] text-slate"
         >
           {isSearching ? (
             <span
-              className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-fathom"
+              className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-green"
               style={{ borderTopColor: 'transparent' }}
             />
           ) : (
-            <span style={{ fontFamily: 'var(--font-mono)' }}>⌕</span>
+            <Search className="h-3.5 w-3.5" />
           )}
         </span>
         {showResults && results.length > 0 && (
           <ul
             ref={resultsListRef}
             role="listbox"
-            className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-56 overflow-y-auto rounded-[10px] border border-lumen-dk bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+            className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-56 overflow-y-auto rounded-xl border border-sage bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
           >
             {results.map((r, i) => (
               <li key={r.place_id}>
@@ -260,10 +260,9 @@ export function LocationMap({
                   aria-selected={i === activeIndex}
                   onMouseEnter={() => setActiveIndex(i)}
                   onClick={() => handleSelectResult(r)}
-                  className={`block w-full px-3.5 py-2 text-left text-[12px] text-vast ${
-                    i === activeIndex ? 'bg-lumen' : ''
+                  className={`block w-full px-3.5 py-2 text-left text-[12px] text-charcoal ${
+                    i === activeIndex ? 'bg-canvas' : ''
                   }`}
-                  style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   {r.display_name}
                 </button>
@@ -273,13 +272,13 @@ export function LocationMap({
         )}
       </div>
 
-      <div className="relative overflow-hidden rounded-[14px] border border-lumen-dk">
+      <div className="relative overflow-hidden rounded-2xl border border-sage">
         <MapContainer
           center={[latitude, longitude]}
           zoom={13}
           scrollWheelZoom={true}
           zoomControl={false}
-          style={{ height: `${height}px`, width: '100%', background: 'var(--color-lumen)' }}
+          style={{ height: `${height}px`, width: '100%', background: 'var(--color-canvas)' }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -303,8 +302,7 @@ export function LocationMap({
             type="button"
             aria-label="Zoom in"
             onClick={() => mapInstance?.zoomIn()}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-lumen-dk bg-white text-[15px] text-vast shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-lumen"
-            style={{ fontFamily: 'var(--font-mono)' }}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-sage bg-white text-[15px] text-charcoal shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-canvas"
           >
             +
           </button>
@@ -312,37 +310,30 @@ export function LocationMap({
             type="button"
             aria-label="Zoom out"
             onClick={() => mapInstance?.zoomOut()}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-lumen-dk bg-white text-[15px] text-vast shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-lumen"
-            style={{ fontFamily: 'var(--font-mono)' }}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-sage bg-white text-[15px] text-charcoal shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-canvas"
           >
             −
           </button>
         </div>
 
-        <div
-          className="pointer-events-none absolute right-3 top-3 rounded-full border border-lumen-dk bg-white/90 px-2.5 py-1 text-[10px] uppercase text-ink backdrop-blur"
-          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.16em' }}
-        >
+        <div className="pointer-events-none absolute right-3 top-3 rounded-full border border-sage bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate backdrop-blur">
           Tap or drag pin
         </div>
       </div>
 
-      <div className="flex items-start gap-3 rounded-[12px] border border-lumen-dk bg-white px-3.5 py-2.5">
+      <div className="flex items-start gap-3 rounded-xl border border-sage bg-white px-3.5 py-2.5">
         <span
           aria-hidden
-          className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-fathom text-[11px] text-lumen"
+          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-tomato text-white"
         >
-          ⛯
+          <MapPin className="h-3 w-3" />
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span
-            className="text-[10px] uppercase text-ink"
-            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.16em' }}
-          >
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate">
             {isResolvingAddress ? 'Resolving address' : 'Pinned location'}
           </span>
           <span
-            className={`text-[13px] leading-snug ${address ? 'text-vast' : 'text-ink italic'}`}
+            className={`text-[13px] leading-snug ${address ? 'text-charcoal' : 'italic text-slate'}`}
             title={address ?? undefined}
           >
             {addressRowLabel}
@@ -351,7 +342,7 @@ export function LocationMap({
         {isResolvingAddress && (
           <span
             aria-hidden
-            className="mt-1 inline-block h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-fathom"
+            className="mt-1 inline-block h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-green"
             style={{ borderTopColor: 'transparent' }}
           />
         )}

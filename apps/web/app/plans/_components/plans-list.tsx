@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { useBudgetPlans } from '@/hooks/use-budget-plan';
 import { Stagger, StaggerItem } from '@/components/motion';
-import { Pill } from '@/components/ui/pill';
 
 const formatDate = (dateStr: string, opts?: Intl.DateTimeFormatOptions) =>
   new Date(dateStr).toLocaleDateString('en-PK', opts);
@@ -14,35 +13,35 @@ const formatPkr = (n: number) => (n >= 1000 ? `₨ ${(n / 1000).toFixed(1)}k` : 
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-type StatusTone = 'fathom' | 'soft' | 'pulse';
+type StatusTone = 'active' | 'completed' | 'cancelled';
 
 const statusTone: Record<string, StatusTone> = {
-  active: 'fathom',
-  completed: 'soft',
-  cancelled: 'pulse',
+  active: 'active',
+  completed: 'completed',
+  cancelled: 'cancelled',
 };
 
-const STATUS_CLASS: Record<StatusTone, { pill: string; dot: string }> = {
-  fathom: { pill: 'bg-fathom/[0.08] text-fathom', dot: 'bg-fathom' },
-  soft: { pill: 'bg-soft/[0.08] text-soft', dot: 'bg-soft' },
-  pulse: { pill: 'bg-pulse/[0.08] text-pulse', dot: 'bg-pulse' },
+const STATUS_CLASS: Record<StatusTone, { pill: string; dot: string; fill: string }> = {
+  active: { pill: 'bg-green/10 text-dark-green', dot: 'bg-green', fill: 'bg-green' },
+  completed: { pill: 'bg-slate/10 text-slate', dot: 'bg-slate', fill: 'bg-slate/70' },
+  cancelled: { pill: 'bg-tomato/10 text-tomato', dot: 'bg-tomato', fill: 'bg-tomato' },
 };
 
 function PlansListSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="rounded-2xl border border-lumen-dk bg-white p-5">
+        <div key={i} className="rounded-2xl border border-sage bg-white p-5">
           <div className="flex items-center justify-between">
-            <div className="h-3 w-20 animate-pulse rounded bg-lumen" />
-            <div className="h-5 w-16 animate-pulse rounded-full bg-lumen" />
+            <div className="h-3 w-20 animate-pulse rounded bg-sage" />
+            <div className="h-5 w-16 animate-pulse rounded-full bg-sage" />
           </div>
-          <div className="mt-4 h-7 w-32 animate-pulse rounded bg-lumen" />
-          <div className="mt-3 h-2 w-full animate-pulse rounded-full bg-lumen" />
+          <div className="mt-4 h-7 w-32 animate-pulse rounded bg-sage" />
+          <div className="mt-3 h-2 w-full animate-pulse rounded-full bg-sage" />
           <div className="mt-4 grid grid-cols-3 gap-2">
-            <div className="h-10 animate-pulse rounded-lg bg-lumen" />
-            <div className="h-10 animate-pulse rounded-lg bg-lumen" />
-            <div className="h-10 animate-pulse rounded-lg bg-lumen" />
+            <div className="h-10 animate-pulse rounded-lg bg-sage" />
+            <div className="h-10 animate-pulse rounded-lg bg-sage" />
+            <div className="h-10 animate-pulse rounded-lg bg-sage" />
           </div>
         </div>
       ))}
@@ -52,8 +51,8 @@ function PlansListSkeleton() {
 
 function PlansListError({ message }: { message: string }) {
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-pulse bg-pulse/[0.06] p-4 text-[13px] text-pulse">
-      <span style={{ fontFamily: 'var(--font-mono)' }}>!</span>
+    <div className="flex items-center gap-2 rounded-xl border border-tomato/30 bg-tomato/[0.06] p-4 text-[13px] text-tomato">
+      <span className="font-semibold">!</span>
       <p>{message}</p>
     </div>
   );
@@ -61,12 +60,10 @@ function PlansListError({ message }: { message: string }) {
 
 function PlansListEmpty() {
   return (
-    <div className="rounded-2xl border border-dashed border-lumen-dk bg-white p-8 text-center">
-      <p className="text-[14px] text-ink">
+    <div className="rounded-2xl border border-dashed border-sage bg-white p-8 text-center">
+      <p className="text-sm text-slate">
         No plans yet.
-        <span className="ml-1.5 text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
-          create one to get started.
-        </span>
+        <span className="ml-1.5 text-[12px] text-slate/60">Create one to get started.</span>
       </p>
     </div>
   );
@@ -101,7 +98,7 @@ export default function PlansList() {
           const spent = plan.spentAmount;
           const spentPercent = Math.min(100, Math.round((spent / plan.totalBudget) * 100));
           const remaining = plan.totalBudget - spent;
-          const tone = statusTone[plan.status] ?? 'soft';
+          const tone = statusTone[plan.status] ?? 'completed';
           const code = String(idx + 1 + page * PAGE_SIZE).padStart(2, '0');
 
           const now = Date.now();
@@ -123,18 +120,14 @@ export default function PlansList() {
                 <motion.div
                   whileHover={{ y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }}
                   transition={{ duration: 0.22, ease: 'easeOut' }}
-                  className="rounded-2xl border border-lumen-dk bg-white p-5 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+                  className="rounded-2xl border border-sage bg-white p-5 shadow-sm"
                 >
                   <div className="flex items-start justify-between">
-                    <span
-                      className="text-[10px] uppercase text-soft"
-                      style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-                    >
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60">
                       {code}
                     </span>
                     <span
-                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] uppercase ${STATUS_CLASS[tone].pill}`}
-                      style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${STATUS_CLASS[tone].pill}`}
                     >
                       <span
                         className={`inline-block h-1.5 w-1.5 rounded-full ${STATUS_CLASS[tone].dot}`}
@@ -143,48 +136,29 @@ export default function PlansList() {
                     </span>
                   </div>
 
-                  <div
-                    className="mt-4 truncate capitalize text-vast"
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: 22,
-                      fontWeight: 600,
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1.05,
-                    }}
-                  >
+                  <div className="mt-4 truncate font-display text-xl font-semibold capitalize leading-[1.05] tracking-tight text-charcoal">
                     {plan.planType} plan
                   </div>
 
-                  <div
-                    className="mt-1 text-[12px] text-ink"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
+                  <div className="mt-1 text-[12px] text-slate">
                     {formatDate(plan.startDate, { month: 'short', day: 'numeric' })}
                     {' → '}
                     {formatDate(plan.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}
                   </div>
 
                   <div className="mt-4">
-                    <div
-                      className="mb-1.5 flex items-center justify-between text-[12px] text-ink"
-                      style={{ fontFamily: 'var(--font-mono)' }}
-                    >
+                    <div className="mb-1.5 flex items-center justify-between text-[12px] text-slate">
                       <span>₨ {spent.toLocaleString()} spent</span>
-                      <span className="font-semibold text-vast">
+                      <span className="font-semibold text-charcoal">
                         of ₨ {plan.totalBudget.toLocaleString()}
                       </span>
                     </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-lumen-dk">
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-sage/50">
                       <motion.div
-                        className="h-full rounded-full"
+                        className={`h-full rounded-full ${STATUS_CLASS[tone].fill}`}
                         initial={{ width: '0%' }}
                         animate={{ width: `${spentPercent}%` }}
                         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
-                        style={{
-                          background:
-                            'linear-gradient(90deg, var(--color-fathom), var(--color-amber))',
-                        }}
                       />
                     </div>
                   </div>
@@ -200,24 +174,12 @@ export default function PlansList() {
                     ].map(({ label, value }) => (
                       <div
                         key={label}
-                        className="rounded-lg border border-lumen-dk bg-lumen px-2 py-1.5"
+                        className="rounded-lg border border-sage bg-canvas px-2 py-1.5"
                       >
-                        <p
-                          className="text-[9px] uppercase text-soft"
-                          style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-                        >
+                        <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate/60">
                           {label}
                         </p>
-                        <p
-                          className="text-vast"
-                          style={{
-                            fontFamily: 'var(--font-display)',
-                            fontSize: 14,
-                            fontWeight: 600,
-                          }}
-                        >
-                          {value}
-                        </p>
+                        <p className="font-display text-sm font-semibold text-charcoal">{value}</p>
                       </div>
                     ))}
                   </div>
@@ -227,8 +189,7 @@ export default function PlansList() {
                       {plan.mealTypes.map((mt) => (
                         <span
                           key={mt.id}
-                          className="rounded-full border border-lumen-dk bg-lumen px-2.5 py-0.5 text-[10px] capitalize text-vast"
-                          style={{ fontFamily: 'var(--font-mono)' }}
+                          className="rounded-full border border-sage bg-canvas px-2.5 py-0.5 text-[10px] capitalize text-slate"
                         >
                           {mt.label}
                         </span>
@@ -244,28 +205,26 @@ export default function PlansList() {
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between pt-2">
-          <p className="text-[11px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
-            page {page + 1} of {totalPages} · {meta.total} total
+          <p className="text-[11px] text-slate">
+            Page {page + 1} of {totalPages} · {meta.total} total
           </p>
           <div className="flex gap-2">
-            <Pill
-              variant="ghost"
-              size="xs"
+            <button
+              type="button"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={!hasPrev || isFetching}
-              style={{ fontFamily: 'var(--font-mono)' }}
+              className="inline-flex items-center rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40"
             >
-              ← prev
-            </Pill>
-            <Pill
-              variant="ghost"
-              size="xs"
+              ← Prev
+            </button>
+            <button
+              type="button"
               onClick={() => setPage((p) => p + 1)}
               disabled={!hasNext || isFetching}
-              style={{ fontFamily: 'var(--font-mono)' }}
+              className="inline-flex items-center rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40"
             >
-              next →
-            </Pill>
+              Next →
+            </button>
           </div>
         </div>
       )}

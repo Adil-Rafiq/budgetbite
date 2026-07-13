@@ -42,18 +42,10 @@ export default function AdminAuditPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1
-        className="text-vast"
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 24,
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-        }}
-      >
+      <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">
         Audit log
       </h1>
-      <p className="mt-1 text-[14px] text-ink">
+      <p className="mt-1 text-[14px] text-slate">
         Every create, update, and delete performed by an admin or the scraper.
       </p>
 
@@ -77,24 +69,22 @@ export default function AdminAuditPage() {
             ))}
           </SelectContent>
         </Select>
-        {total > 0 && (
-          <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
-            {total} total
-          </span>
-        )}
+        {total > 0 && <span className="font-mono text-[12px] text-slate/60">{total} total</span>}
       </div>
 
-      <div className="mt-4 rounded-xl border border-lumen-dk bg-white">
+      <div className="mt-4 rounded-xl border border-sage bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-soft" />
+            <Spinner className="size-5 text-slate/60" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-soft">
+          <div className="py-16 text-center text-[14px] text-slate/60">
             Could not load the audit log. Try again.
           </div>
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-soft">No activity recorded yet.</div>
+          <div className="py-16 text-center text-[14px] text-slate/60">
+            No activity recorded yet.
+          </div>
         ) : (
           <Table>
             <TableHeader>
@@ -108,10 +98,10 @@ export default function AdminAuditPage() {
             <TableBody>
               {rows.map((entry) => (
                 <TableRow key={entry.id}>
-                  <TableCell className="text-soft">
+                  <TableCell className="text-slate/60">
                     {new Date(entry.createdAt).toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-ink">
+                  <TableCell className="text-slate">
                     {entry.actorType === 'service' ? (
                       <span style={{ fontFamily: 'var(--font-mono)' }}>scraper</span>
                     ) : (
@@ -119,17 +109,14 @@ export default function AdminAuditPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <span
-                      className="inline-flex items-center rounded-full bg-lumen-dk/40 px-2 py-0.5 text-[11px] text-ink"
-                      style={{ fontFamily: 'var(--font-mono)' }}
-                    >
+                    <span className="inline-flex items-center rounded-full bg-sage/50 px-2 py-0.5 font-mono text-[11px] text-slate">
                       {entry.action}
                     </span>
                   </TableCell>
-                  <TableCell className="text-soft">
+                  <TableCell className="text-slate/60">
                     <span style={{ fontFamily: 'var(--font-mono)' }}>{entry.entityType}</span>
                     {entry.entityId && (
-                      <span className="ml-2 text-[12px] text-soft/70">
+                      <span className="ml-2 font-mono text-[12px] text-slate/50">
                         {entry.entityId.slice(0, 8)}
                       </span>
                     )}
@@ -143,7 +130,7 @@ export default function AdminAuditPage() {
 
       {total > PAGE_SIZE && (
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-[12px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="font-mono text-[12px] text-slate/60">
             Page {page} of {pageCount}
           </span>
           <div className="flex gap-2">

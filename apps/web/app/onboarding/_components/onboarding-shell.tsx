@@ -1,31 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import { Inter, JetBrains_Mono, Bricolage_Grotesque } from 'next/font/google';
+import { ArrowLeft, ArrowRight, Rocket } from 'lucide-react';
 import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-context';
 import { ONBOARDING_STEPS } from '@/app/onboarding/constants';
-import { Pill } from '@/components/ui/pill';
+import type { OnboardingStepAccent } from '@/app/onboarding/types';
 import { LogoIcon } from '@/components/icons';
-
-const body = Inter({
-  subsets: ['latin'],
-  variable: '--font-body',
-  weight: ['400', '500', '600', '700'],
-});
-const display = Bricolage_Grotesque({
-  subsets: ['latin'],
-  variable: '--font-display',
-  axes: ['opsz'],
-});
-const mono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
-  weight: ['400', '500', '600'],
-});
 
 interface OnboardingShellProps {
   children: React.ReactNode;
 }
+
+const ACCENT_CHIP: Record<OnboardingStepAccent, string> = {
+  green: 'border-green/20 bg-green/10 text-dark-green',
+  'dark-green': 'border-green/20 bg-sage/60 text-dark-green',
+  tomato: 'border-tomato/20 bg-tomato/10 text-tomato',
+};
 
 export const OnboardingShell = ({ children }: OnboardingShellProps) => {
   const {
@@ -39,158 +29,140 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
 
   if (!currentStepData) return null;
 
-  return (
-    <div
-      className={`${body.variable} ${display.variable} ${mono.variable} relative min-h-screen bg-lumen text-vast antialiased`}
-      style={{ fontFamily: 'var(--font-body)' }}
-    >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-32 -z-0 h-[420px] w-[760px] -translate-x-1/2 rounded-full"
-        style={{
-          background:
-            'radial-gradient(closest-side, color-mix(in srgb, var(--color-fathom) 14%, transparent), color-mix(in srgb, var(--color-glow) 10%, transparent) 55%, transparent 75%)',
-          filter: 'blur(20px)',
-        }}
-      />
+  const StepIcon = currentStepData.icon;
+  const totalSteps = ONBOARDING_STEPS.length;
 
-      <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-8 py-6">
-        <Link href="/" className="flex items-center gap-2.5">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-fathom text-lumen">
-            <LogoIcon />
-          </span>
-          <span
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 18,
-              fontWeight: 600,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            BudgetBite
-          </span>
-        </Link>
-        <div className="text-[12px] text-ink" style={{ fontFamily: 'var(--font-mono)' }}>
-          setup · step {String(currentStep + 1).padStart(2, '0')} /{' '}
-          {String(ONBOARDING_STEPS.length).padStart(2, '0')}
+  return (
+    <div className="flex min-h-screen flex-col bg-canvas text-charcoal antialiased">
+      {/* ── Top header: brand bar + segmented progress ── */}
+      <header className="sticky top-0 z-50 border-b border-sage bg-canvas/95 backdrop-blur-sm">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6">
+          <div className="flex h-14 items-center justify-between">
+            <Link href="/" className="flex items-center gap-2.5">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-green text-white">
+                <LogoIcon size={14} />
+              </span>
+              <span className="font-display text-base font-bold tracking-tight">
+                Budget<span className="text-green">Bite</span>
+              </span>
+            </Link>
+            <span className="text-xs font-semibold text-slate">
+              Step {currentStep + 1} of {totalSteps}
+            </span>
+          </div>
+        </div>
+        <div className="mx-auto max-w-2xl px-4 pb-3 sm:px-6">
+          <div className="flex gap-1.5">
+            {ONBOARDING_STEPS.map((step, i) => (
+              <div key={step.id} className="h-1.5 flex-1 overflow-hidden rounded-full bg-sage/50">
+                <div
+                  className="h-full rounded-full bg-green transition-all duration-500 ease-out"
+                  style={{ width: i <= currentStep ? '100%' : '0%' }}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto w-full max-w-[560px] px-6 pb-16 pt-6">
-        <ol className="mb-10 flex items-center justify-between">
-          {ONBOARDING_STEPS.map((step, i) => {
-            const isCurrent = i === currentStep;
-            const isDone = i < currentStep;
-            return (
-              <li key={step.id} className="flex flex-1 items-center gap-3 last:flex-none">
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`inline-flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-semibold tabular-nums ${
-                      isCurrent || isDone
-                        ? 'border-fathom bg-fathom text-lumen'
-                        : 'border-lumen-dk bg-white text-ink'
-                    }`}
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
-                    {isDone ? '✓' : String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span
-                    className={`hidden text-[12px] sm:inline ${
-                      isCurrent ? 'font-medium text-vast' : 'font-normal text-ink'
-                    }`}
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
-                    {step.id}
-                  </span>
-                </div>
-                {i < ONBOARDING_STEPS.length - 1 && (
-                  <div className={`h-px flex-1 ${isDone ? 'bg-fathom' : 'bg-lumen-dk'}`} />
-                )}
-              </li>
-            );
-          })}
-        </ol>
-
-        <div
-          className="overflow-hidden rounded-[14px] border border-lumen-dk bg-white"
-          style={{
-            boxShadow:
-              '0 1px 0 rgba(0,0,0,0.04), 0 30px 80px -30px rgba(26,26,26,0.18), 0 8px 30px -10px rgba(26,26,26,0.06)',
-          }}
-        >
-          <div className="border-b border-lumen-dk bg-lumen px-7 py-6">
+      {/* ── Main content ── */}
+      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pb-40 pt-8 sm:px-6">
+        <div key={currentStep} className="bb-step-in">
+          <div className="mb-6">
             <div
-              className="text-[10px] uppercase text-fathom"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
+              className={`mb-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 ${ACCENT_CHIP[currentStepData.accent]}`}
             >
-              {String(currentStep + 1).padStart(2, '0')} · {currentStepData.id}
+              <StepIcon className="h-3 w-3" />
+              <span className="text-xs font-semibold uppercase tracking-wide">
+                Step {currentStep + 1} — {currentStepData.label}
+              </span>
             </div>
-            <h1
-              className="mt-2"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 28,
-                fontWeight: 600,
-                lineHeight: 1.1,
-                letterSpacing: '-0.02em',
-              }}
-            >
+            <h1 className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
               {currentStepData.title}
             </h1>
-            <p className="mt-1.5 text-[14px] text-ink">{currentStepData.description}</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate">{currentStepData.description}</p>
           </div>
 
-          <div className="px-7 py-7">{children}</div>
+          {children}
         </div>
-
-        <div className="mt-7 flex items-center justify-between">
-          <Pill
-            variant="ghost"
-            size="md"
-            onClick={handleBack}
-            disabled={currentStep === 0 || isSubmitting}
-          >
-            <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>←</span>
-            Back
-          </Pill>
-
-          {!isLastStep ? (
-            <Pill size="md" onClick={handleContinue} disabled={isSubmitting || !canAdvance}>
-              {isSubmitting ? (
-                'Saving…'
-              ) : (
-                <>
-                  Continue
-                  <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>→</span>
-                </>
-              )}
-            </Pill>
-          ) : (
-            <Pill
-              variant="accent"
-              size="md"
-              onClick={handleFinish}
-              disabled={isSubmitting || !canAdvance}
-            >
-              {isSubmitting ? (
-                'Finishing…'
-              ) : (
-                <>
-                  Finish setup
-                  <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
-                </>
-              )}
-            </Pill>
-          )}
-        </div>
-
-        <p
-          className="mt-7 text-center text-[11px] text-soft"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
-          you can change all of this later in settings
-        </p>
       </main>
+
+      {/* ── Sticky bottom nav ── */}
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-sage bg-canvas/95 backdrop-blur-sm">
+        <div className="mx-auto max-w-2xl px-4 py-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleBack}
+              disabled={currentStep === 0 || isSubmitting}
+              className="inline-flex items-center gap-2 rounded-xl border border-sage px-5 py-3.5 text-sm font-semibold text-slate transition-colors hover:border-charcoal hover:text-charcoal disabled:pointer-events-none disabled:invisible"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back
+            </button>
+
+            {!isLastStep ? (
+              <button
+                type="button"
+                onClick={handleContinue}
+                disabled={isSubmitting || !canAdvance}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-tomato py-3.5 text-sm font-semibold text-white transition-all hover:bg-tomato/90 hover:shadow-lg hover:shadow-tomato/25 disabled:pointer-events-none disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  'Saving…'
+                ) : (
+                  <>
+                    Continue
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleFinish}
+                disabled={isSubmitting || !canAdvance}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-green py-3.5 text-sm font-semibold text-white transition-all hover:bg-dark-green hover:shadow-lg hover:shadow-green/25 disabled:pointer-events-none disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <>
+                    <span
+                      className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white"
+                      style={{ borderTopColor: 'transparent' }}
+                    />
+                    Generating your plan…
+                  </>
+                ) : (
+                  <>
+                    Launch my BudgetBite
+                    <Rocket className="h-3.5 w-3.5" />
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+
+          {/* Step dots */}
+          <div className="mt-3 flex justify-center gap-2">
+            {ONBOARDING_STEPS.map((step, i) => (
+              <div
+                key={step.id}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === currentStep
+                    ? 'w-6 bg-green'
+                    : i < currentStep
+                      ? 'w-1.5 bg-green'
+                      : 'w-1.5 bg-sage'
+                }`}
+              />
+            ))}
+          </div>
+
+          <p className="mt-3 text-center text-[11px] text-slate/70">
+            You can change all of this later in settings.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

@@ -3,7 +3,7 @@
 import type { SubmitHandler, Control } from 'react-hook-form';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Star, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Star, ThumbsUp, ThumbsDown, CornerDownLeft } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -14,18 +14,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Pill } from '@/components/ui/pill';
 import { logSuggestionSchema, logCustomSchema, logHomeSchema } from '../_schemas/log-meal.schema';
 import type { LogSuggestionForm, LogCustomForm, LogHomeForm } from '../_schemas/log-meal.schema';
 import type { LogModalState, SavePayload } from '../_hooks/use-meal-slots';
 import { optionLabel } from '@/lib/suggestion';
 
-const labelClass = 'text-[10px] uppercase text-soft';
-const labelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)',
-  letterSpacing: '0.18em',
-};
-const inputClass = 'bg-lumen border-lumen-dk text-vast';
+const labelClass = 'text-xs font-semibold uppercase tracking-wide text-slate';
+const inputClass = 'bg-canvas border-sage text-charcoal';
+const errorClass = 'text-[11px] text-tomato';
 
 function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeForm>({
   control,
@@ -35,9 +31,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
   return (
     <>
       <div className="flex flex-col gap-2">
-        <Label className={labelClass} style={labelStyle}>
-          Rating
-        </Label>
+        <Label className={labelClass}>Rating</Label>
         <Controller
           name={'rating' as never}
           control={control}
@@ -55,11 +49,9 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                   >
                     <Star
                       className={`h-6 w-6 transition-colors ${
-                        filled ? 'text-amber' : 'text-lumen-dk'
+                        filled ? 'text-[#f5a623]' : 'text-sage'
                       }`}
-                      style={{
-                        fill: filled ? 'var(--color-amber)' : 'transparent',
-                      }}
+                      style={{ fill: filled ? '#f5a623' : 'transparent' }}
                     />
                   </button>
                 );
@@ -70,9 +62,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label className={labelClass} style={labelStyle}>
-          Did you enjoy it?
-        </Label>
+        <Label className={labelClass}>Did you enjoy it?</Label>
         <Controller
           name={'liked' as never}
           control={control}
@@ -83,12 +73,11 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                 <button
                   type="button"
                   onClick={() => field.onChange(v === true ? null : true)}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] transition ${
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition ${
                     v === true
-                      ? 'border-fathom bg-fathom/[0.08] text-fathom'
-                      : 'border-lumen-dk bg-transparent text-ink'
+                      ? 'border-green bg-green/10 text-dark-green'
+                      : 'border-sage bg-transparent text-slate'
                   }`}
-                  style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   <ThumbsUp className="h-3.5 w-3.5" />
                   Yes
@@ -96,12 +85,11 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                 <button
                   type="button"
                   onClick={() => field.onChange(v === false ? null : false)}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] transition ${
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition ${
                     v === false
-                      ? 'border-pulse bg-pulse/[0.08] text-pulse'
-                      : 'border-lumen-dk bg-transparent text-ink'
+                      ? 'border-tomato bg-tomato/10 text-tomato'
+                      : 'border-sage bg-transparent text-slate'
                   }`}
-                  style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   <ThumbsDown className="h-3.5 w-3.5" />
                   No
@@ -113,11 +101,8 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="comment" className={labelClass} style={labelStyle}>
-          Comment{' '}
-          <span className="ml-1 normal-case text-soft" style={{ letterSpacing: 0 }}>
-            (optional)
-          </span>
+        <Label htmlFor="comment" className={labelClass}>
+          Comment <span className="ml-1 font-normal normal-case text-slate/60">(optional)</span>
         </Label>
         <Controller
           name={'comment' as never}
@@ -138,12 +123,16 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
   );
 }
 
-function PrimaryPill({ children, disabled }: { children: React.ReactNode; disabled: boolean }) {
+function PrimaryButton({ children, disabled }: { children: React.ReactNode; disabled: boolean }) {
   return (
-    <Pill type="submit" size="md" disabled={disabled} className="w-full">
+    <button
+      type="submit"
+      disabled={disabled}
+      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+    >
       {children}
-      <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>↵</span>
-    </Pill>
+      <CornerDownLeft className="h-3.5 w-3.5 opacity-70" />
+    </button>
   );
 }
 
@@ -177,29 +166,23 @@ function SuggestionForm({
       className="flex flex-col gap-4"
     >
       <div className="flex flex-col gap-2">
-        <Label htmlFor="actual-amount" className={labelClass} style={labelStyle}>
+        <Label htmlFor="actual-amount" className={labelClass}>
           Actual amount spent (PKR)
         </Label>
         <Input
           id="actual-amount"
           type="number"
           {...register('actualAmountSpent', { valueAsNumber: true })}
-          className={`${inputClass} font-semibold`}
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 18,
-          }}
+          className={`${inputClass} font-display text-lg font-semibold`}
         />
         {errors.actualAmountSpent && (
-          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
-            {errors.actualAmountSpent.message}
-          </p>
+          <p className={errorClass}>{errors.actualAmountSpent.message}</p>
         )}
       </div>
 
       <FeedbackFields control={control} />
 
-      <PrimaryPill disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryPill>
+      <PrimaryButton disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryButton>
     </form>
   );
 }
@@ -228,7 +211,7 @@ function CustomForm({ onSave, isSaving }: { onSave: (p: SavePayload) => void; is
       className="flex flex-col gap-4"
     >
       <div className="flex flex-col gap-2">
-        <Label htmlFor="restaurant-name" className={labelClass} style={labelStyle}>
+        <Label htmlFor="restaurant-name" className={labelClass}>
           Restaurant name
         </Label>
         <Input
@@ -237,15 +220,11 @@ function CustomForm({ onSave, isSaving }: { onSave: (p: SavePayload) => void; is
           {...register('restaurantName')}
           className={inputClass}
         />
-        {errors.restaurantName && (
-          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
-            {errors.restaurantName.message}
-          </p>
-        )}
+        {errors.restaurantName && <p className={errorClass}>{errors.restaurantName.message}</p>}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="manual-desc" className={labelClass} style={labelStyle}>
+        <Label htmlFor="manual-desc" className={labelClass}>
           What did you have?
         </Label>
         <Input
@@ -255,36 +234,28 @@ function CustomForm({ onSave, isSaving }: { onSave: (p: SavePayload) => void; is
           className={inputClass}
         />
         {errors.manualDescription && (
-          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
-            {errors.manualDescription.message}
-          </p>
+          <p className={errorClass}>{errors.manualDescription.message}</p>
         )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="custom-amount" className={labelClass} style={labelStyle}>
+        <Label htmlFor="custom-amount" className={labelClass}>
           Actual amount spent (PKR)
         </Label>
         <Input
           id="custom-amount"
           type="number"
           {...register('actualAmountSpent', { valueAsNumber: true })}
-          className={`${inputClass} font-semibold`}
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 18,
-          }}
+          className={`${inputClass} font-display text-lg font-semibold`}
         />
         {errors.actualAmountSpent && (
-          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
-            {errors.actualAmountSpent.message}
-          </p>
+          <p className={errorClass}>{errors.actualAmountSpent.message}</p>
         )}
       </div>
 
       <FeedbackFields control={control} />
 
-      <PrimaryPill disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryPill>
+      <PrimaryButton disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryButton>
     </form>
   );
 }
@@ -318,11 +289,9 @@ function HomeCookedForm({
       className="flex flex-col gap-4"
     >
       <div className="flex flex-col gap-2">
-        <Label htmlFor="home-desc" className={labelClass} style={labelStyle}>
+        <Label htmlFor="home-desc" className={labelClass}>
           What did you cook?{' '}
-          <span className="ml-1 normal-case text-soft" style={{ letterSpacing: 0 }}>
-            (optional)
-          </span>
+          <span className="ml-1 font-normal normal-case text-slate/60">(optional)</span>
         </Label>
         <Input
           id="home-desc"
@@ -331,36 +300,28 @@ function HomeCookedForm({
           className={inputClass}
         />
         {errors.manualDescription && (
-          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
-            {errors.manualDescription.message}
-          </p>
+          <p className={errorClass}>{errors.manualDescription.message}</p>
         )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="home-amount" className={labelClass} style={labelStyle}>
+        <Label htmlFor="home-amount" className={labelClass}>
           Ingredient / cooking cost (PKR)
         </Label>
         <Input
           id="home-amount"
           type="number"
           {...register('actualAmountSpent', { valueAsNumber: true })}
-          className={`${inputClass} font-semibold`}
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 18,
-          }}
+          className={`${inputClass} font-display text-lg font-semibold`}
         />
         {errors.actualAmountSpent && (
-          <p className="text-[11px] text-pulse" style={{ fontFamily: 'var(--font-mono)' }}>
-            {errors.actualAmountSpent.message}
-          </p>
+          <p className={errorClass}>{errors.actualAmountSpent.message}</p>
         )}
       </div>
 
       <FeedbackFields control={control} />
 
-      <PrimaryPill disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryPill>
+      <PrimaryButton disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryButton>
     </form>
   );
 }
@@ -378,7 +339,7 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
   const isHome = mode === 'home';
   const option = state.mode?.type === 'suggestion' ? state.mode.option : null;
 
-  const eyebrow = isHome ? 'cook at home · /log' : isCustom ? 'custom · /log' : 'choose · /log';
+  const eyebrow = isHome ? 'Cook at home' : isCustom ? 'Custom entry' : 'Confirm meal';
   const title = isHome ? 'Log a home-cooked meal' : isCustom ? 'Log custom meal' : 'Log your meal';
   const description = isHome
     ? 'You cooked this yourself — just note what it cost.'
@@ -390,39 +351,25 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
     <Dialog open={state.open} onOpenChange={onClose}>
       <DialogContent className="max-h-[90vh] max-w-sm overflow-y-auto">
         <DialogHeader>
-          <div
-            className="text-[10px] uppercase text-fathom"
-            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-          >
+          <div className="text-xs font-semibold uppercase tracking-widest text-green">
             {eyebrow}
           </div>
-          <DialogTitle
-            className="text-vast"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 22,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <DialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
             {title}
           </DialogTitle>
-          <DialogDescription className="text-ink">{description}</DialogDescription>
+          <DialogDescription className="text-slate">{description}</DialogDescription>
         </DialogHeader>
 
         {option && (
-          <div className="rounded-xl border border-lumen-dk bg-lumen p-3">
-            <p className="font-medium text-vast">{optionLabel(option)}</p>
-            <p className="text-[12px] text-ink">{option.restaurantName ?? '—'}</p>
+          <div className="rounded-xl border border-sage bg-canvas p-3">
+            <p className="font-medium text-charcoal">{optionLabel(option)}</p>
+            <p className="text-[12px] text-slate">{option.restaurantName ?? '—'}</p>
             {option.items.length > 1 && (
-              <div className="mt-2 flex flex-col gap-0.5 border-t border-lumen-dk pt-2">
+              <div className="mt-2 flex flex-col gap-0.5 border-t border-sage pt-2">
                 {option.items.map((item) => (
                   <div key={item.menuItemId} className="flex items-center justify-between gap-3">
-                    <p className="truncate text-[12px] text-ink">{item.menuItemName ?? '—'}</p>
-                    <span
-                      className="shrink-0 text-[11px] text-soft"
-                      style={{ fontFamily: 'var(--font-mono)' }}
-                    >
+                    <p className="truncate text-[12px] text-slate">{item.menuItemName ?? '—'}</p>
+                    <span className="shrink-0 text-[11px] text-slate/60">
                       ₨ {item.price.toLocaleString()}
                     </span>
                   </div>

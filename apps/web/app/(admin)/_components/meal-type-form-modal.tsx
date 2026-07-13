@@ -18,9 +18,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 
-const labelClass = 'text-[10px] uppercase text-soft';
+const labelClass = 'text-[10px] uppercase text-slate/60';
 const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
-const errorClass = 'text-[11px] text-pulse';
+const errorClass = 'text-[11px] text-tomato';
 
 const optionalNumber = (v: unknown) => (v === '' || v == null ? undefined : Number(v));
 
@@ -64,18 +64,10 @@ export function MealTypeFormModal({ open, onOpenChange, mealType }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle
-            className="text-vast"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 22,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <DialogTitle className="font-display text-[22px] font-semibold tracking-tight text-charcoal">
             {isEdit ? 'Edit meal type' : 'Add meal type'}
           </DialogTitle>
-          <DialogDescription className="text-ink">
+          <DialogDescription className="text-slate">
             {isEdit ? 'Update this meal type.' : 'Create a meal type users can plan around.'}
           </DialogDescription>
         </DialogHeader>
@@ -116,7 +108,7 @@ export function MealTypeFormModal({ open, onOpenChange, mealType }: Props) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border border-lumen-dk px-3 py-2.5">
+          <div className="flex items-center justify-between rounded-lg border border-sage px-3 py-2.5">
             <Label htmlFor="active" className={labelClass} style={labelStyle}>
               Active
             </Label>

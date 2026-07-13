@@ -52,18 +52,11 @@ const sections = [
   },
 ];
 
-const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
-
 function MetricTile({ label, value }: { label: string; value: number | undefined }) {
   return (
-    <div className="rounded-xl border border-lumen-dk bg-white px-4 py-3">
-      <div className="text-[10px] uppercase text-soft" style={labelStyle}>
-        {label}
-      </div>
-      <div
-        className="mt-1 text-[22px] font-semibold text-vast"
-        style={{ fontFamily: 'var(--font-mono)' }}
-      >
+    <div className="rounded-xl border border-sage bg-white px-4 py-3 shadow-sm">
+      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate/60">{label}</div>
+      <div className="mt-1 font-mono text-[22px] font-semibold tabular-nums text-charcoal">
         {value ?? '—'}
       </div>
     </div>
@@ -75,22 +68,19 @@ export default function AdminOverviewPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1
-        className="text-vast"
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 28,
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-        }}
-      >
-        Admin
-      </h1>
-      <p className="mt-1 text-[14px] text-ink">Manage the data that powers BudgetBite.</p>
+      <header className="flex flex-col gap-2">
+        <div className="text-xs font-semibold uppercase tracking-widest text-green">
+          Admin · Overview
+        </div>
+        <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
+          Admin.
+        </h1>
+        <p className="text-[14px] text-slate">Manage the data that powers BudgetBite.</p>
+      </header>
 
       {isLoading ? (
         <div className="mt-6 flex items-center justify-center py-10">
-          <Spinner className="size-5 text-soft" />
+          <Spinner className="size-5 text-slate" />
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -103,7 +93,7 @@ export default function AdminOverviewPage() {
         </div>
       )}
 
-      <h2 className="mt-10 text-[13px] uppercase text-soft" style={labelStyle}>
+      <h2 className="mt-10 font-mono text-[13px] uppercase tracking-[0.18em] text-slate/60">
         Manage
       </h2>
       <div className="mt-3 grid gap-4 sm:grid-cols-2">
@@ -111,17 +101,17 @@ export default function AdminOverviewPage() {
           <Link
             key={href}
             href={href}
-            className="group flex flex-col gap-3 rounded-xl border border-lumen-dk bg-white p-5 transition-all hover:shadow-[0_4px_16px_-8px_rgba(0,0,0,0.2)]"
+            className="group flex flex-col gap-3 rounded-2xl border border-sage bg-white p-5 shadow-sm transition-all hover:border-green/40 hover:shadow-md"
           >
             <div className="flex items-center justify-between">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-fathom/10 text-fathom">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-green/15 text-green">
                 <Icon className="h-4.5 w-4.5" />
               </span>
-              <ArrowUpRight className="h-4 w-4 text-soft transition-colors group-hover:text-vast" />
+              <ArrowUpRight className="h-4 w-4 text-slate transition-colors group-hover:text-charcoal" />
             </div>
             <div>
-              <div className="text-[15px] font-medium text-vast">{label}</div>
-              <div className="mt-0.5 text-[13px] text-ink">{description}</div>
+              <div className="font-display text-[15px] font-semibold text-charcoal">{label}</div>
+              <div className="mt-0.5 text-[13px] text-slate">{description}</div>
             </div>
           </Link>
         ))}

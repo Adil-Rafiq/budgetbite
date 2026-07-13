@@ -11,7 +11,6 @@ import { CreatePlanProvider } from '@/app/plans/_context/create-plan-context';
 import { StepBudgetDetails } from '@/app/plans/_components/create-plan/steps/step-budget';
 import { StepNotifications } from '@/app/plans/_components/create-plan/steps/step-notification';
 import { StepPreview } from '@/app/plans/_components/create-plan/steps/step-preview';
-import { Pill } from '@/components/ui/pill';
 
 type Props = {
   open: boolean;
@@ -32,35 +31,21 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <div
-              className="text-[10px] uppercase text-fathom"
-              style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.22em' }}
-            >
-              step {stepNumber} · /new-plan
+            <div className="text-xs font-semibold uppercase tracking-widest text-green">
+              Step {stepNumber} · New plan
             </div>
-            <DialogTitle
-              className="text-vast"
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 22,
-                fontWeight: 600,
-                letterSpacing: '-0.02em',
-              }}
-            >
+            <DialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
               {currentStepData?.title}
             </DialogTitle>
-            <DialogDescription className="text-ink">
+            <DialogDescription className="text-slate">
               {currentStepData?.description}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-lumen-dk">
+          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-sage/50">
             <div
-              className="h-full rounded-full transition-all"
-              style={{
-                width: `${progress}%`,
-                background: 'linear-gradient(90deg, var(--color-fathom), var(--color-vast))',
-              }}
+              className="h-full rounded-full bg-green transition-all"
+              style={{ width: `${progress}%` }}
             />
           </div>
 
@@ -70,27 +55,28 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
 
           <DialogFooter>
             {currentStep > 0 && (
-              <Pill variant="ghost" size="sm" onClick={actions.handleBack} disabled={isSubmitting}>
-                ← back
-              </Pill>
+              <button
+                type="button"
+                onClick={actions.handleBack}
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-sage bg-white px-4 py-2 text-sm font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50"
+              >
+                ← Back
+              </button>
             )}
-            <Pill
-              size="sm"
+            <button
+              type="button"
               onClick={isLastStep ? actions.handleSubmit : actions.handleNext}
               disabled={isSubmitting || !canAdvance}
+              className="inline-flex items-center gap-2 rounded-xl bg-green px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
             >
               {isLastStep ? (isSubmitting ? 'Creating…' : 'Create plan') : 'Next'}
-              <span style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>
-                {isLastStep ? '↵' : '→'}
-              </span>
-            </Pill>
+              <span className="opacity-70">{isLastStep ? '↵' : '→'}</span>
+            </button>
           </DialogFooter>
 
-          <p
-            className="mt-1 text-center text-[10px] text-soft"
-            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' }}
-          >
-            you can change every value later.
+          <p className="mt-1 text-center text-[11px] text-slate/60">
+            You can change every value later.
           </p>
         </DialogContent>
       </Dialog>

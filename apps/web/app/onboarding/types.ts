@@ -3,9 +3,15 @@ import type { LucideIcon } from 'lucide-react';
 
 export type OnboardingStepId = 'location' | 'dietary' | 'budget' | 'notifications';
 
+export type OnboardingStepAccent = 'green' | 'dark-green' | 'tomato';
+
 export type OnboardingStep = {
   id: OnboardingStepId;
   icon: LucideIcon;
+  /** Short eyebrow label, e.g. "Your location". */
+  label: string;
+  /** Accent used for the eyebrow chip / step icon. */
+  accent: OnboardingStepAccent;
   title: string;
   description: string;
 };

@@ -141,7 +141,15 @@ export const useOnboarding = () => {
     ]);
 
     if (!isBudgetValid || !isNotificationsValid) {
-      send({ type: 'FINISH_SUBMIT_FAILURE' });
+      // The machine is still in `editing` here (START_FINISH_SUBMIT hasn't been
+      // sent), so a FINISH_SUBMIT_FAILURE would be a no-op — surface a toast
+      // instead of leaving the Launch click with no feedback.
+      showToast.error({
+        title: 'A few details need fixing',
+        description: !isBudgetValid
+          ? 'Check your budget and meal selection before launching.'
+          : 'Set a reminder time for each meal before launching.',
+      });
       return;
     }
 

@@ -59,18 +59,12 @@ export default function AdminMealTypesPage() {
     <div className="mx-auto max-w-5xl">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1
-            className="text-vast"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 24,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">
             Meal types
           </h1>
-          <p className="mt-1 text-[14px] text-ink">Manage the meal types users can plan around.</p>
+          <p className="mt-1 text-[14px] text-slate">
+            Manage the meal types users can plan around.
+          </p>
         </div>
         {canWrite && (
           <Button size="sm" onClick={() => setForm({ open: true })}>
@@ -80,17 +74,17 @@ export default function AdminMealTypesPage() {
         )}
       </div>
 
-      <div className="mt-6 rounded-xl border border-lumen-dk bg-white">
+      <div className="mt-6 rounded-xl border border-sage bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-soft" />
+            <Spinner className="size-5 text-slate/60" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-soft">
+          <div className="py-16 text-center text-[14px] text-slate/60">
             Could not load meal types. Try again.
           </div>
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-soft">No meal types yet.</div>
+          <div className="py-16 text-center text-[14px] text-slate/60">No meal types yet.</div>
         ) : (
           <Table>
             <TableHeader>
@@ -107,22 +101,21 @@ export default function AdminMealTypesPage() {
                 const isDeleting = deleteMealType.isPending && deleteMealType.variables === mt.id;
                 return (
                   <TableRow key={mt.id}>
-                    <TableCell className="text-right text-soft">{mt.sortOrder}</TableCell>
+                    <TableCell className="text-right text-slate/60">{mt.sortOrder}</TableCell>
                     <TableCell>
                       <span
-                        className="text-[13px] text-ink"
+                        className="text-[13px] text-slate"
                         style={{ fontFamily: 'var(--font-mono)' }}
                       >
                         {mt.key}
                       </span>
                     </TableCell>
-                    <TableCell className="font-medium text-vast">{mt.label}</TableCell>
+                    <TableCell className="font-medium text-charcoal">{mt.label}</TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] ${
-                          mt.active ? 'bg-fathom/10 text-fathom' : 'bg-lumen-dk/40 text-soft'
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[11px] ${
+                          mt.active ? 'bg-green/15 text-dark-green' : 'bg-sage/50 text-slate/60'
                         }`}
-                        style={{ fontFamily: 'var(--font-mono)' }}
                       >
                         {mt.active ? 'active' : 'inactive'}
                       </span>
@@ -139,7 +132,7 @@ export default function AdminMealTypesPage() {
                                 disabled={index === 0 || updateMealType.isPending}
                                 onClick={() => move(index, -1)}
                               >
-                                <ChevronUp className="size-4 text-ink" />
+                                <ChevronUp className="size-4 text-slate" />
                               </Button>
                               <Button
                                 variant="ghost"
@@ -148,7 +141,7 @@ export default function AdminMealTypesPage() {
                                 disabled={index === rows.length - 1 || updateMealType.isPending}
                                 onClick={() => move(index, 1)}
                               >
-                                <ChevronDown className="size-4 text-ink" />
+                                <ChevronDown className="size-4 text-slate" />
                               </Button>
                             </>
                           )}
@@ -159,7 +152,7 @@ export default function AdminMealTypesPage() {
                               aria-label={`Edit ${mt.label}`}
                               onClick={() => setForm({ open: true, mealType: mt })}
                             >
-                              <Pencil className="size-4 text-ink" />
+                              <Pencil className="size-4 text-slate" />
                             </Button>
                           )}
                           {canDelete && (

@@ -59,7 +59,7 @@ export default function AdminRestaurantDetailPage() {
     <div className="mx-auto max-w-5xl">
       <Link
         href="/admin/restaurants"
-        className="inline-flex items-center gap-1.5 text-[13px] text-soft transition-colors hover:text-ink"
+        className="inline-flex items-center gap-1.5 text-[13px] text-slate transition-colors hover:text-charcoal"
       >
         <ArrowLeft className="size-4" />
         Restaurants
@@ -67,19 +67,11 @@ export default function AdminRestaurantDetailPage() {
 
       <div className="mt-3 flex items-start justify-between gap-3">
         <div>
-          <h1
-            className="text-vast"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 24,
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <h1 className="font-display text-[26px] font-semibold tracking-tight text-charcoal">
             {restaurant?.name ?? 'Restaurant'}
           </h1>
           {restaurant && (
-            <p className="mt-1 text-[13px] text-soft" style={{ fontFamily: 'var(--font-mono)' }}>
+            <p className="mt-1 font-mono text-[13px] text-slate/60">
               {restaurant.rating == null ? 'No rating' : `★ ${restaurant.rating.toFixed(1)}`}
               {' · '}delivery {money(restaurant.deliveryFee)}
               {' · '}min {money(restaurant.minimumOrder)}
@@ -94,21 +86,21 @@ export default function AdminRestaurantDetailPage() {
         )}
       </div>
 
-      <h2 className="mt-8 text-[13px] uppercase text-soft" style={labelStyle}>
+      <h2 className="mt-8 font-mono text-[13px] uppercase tracking-[0.18em] text-slate/60">
         Menu items
       </h2>
 
-      <div className="mt-3 rounded-xl border border-lumen-dk bg-white">
+      <div className="mt-3 rounded-xl border border-sage bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-soft" />
+            <Spinner className="size-5 text-slate/60" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-soft">
+          <div className="py-16 text-center text-[14px] text-slate/60">
             Could not load menu items. Try again.
           </div>
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-soft">No menu items yet.</div>
+          <div className="py-16 text-center text-[14px] text-slate/60">No menu items yet.</div>
         ) : (
           <Table>
             <TableHeader>
@@ -124,11 +116,11 @@ export default function AdminRestaurantDetailPage() {
                 const isDeleting = deleteItem.isPending && deleteItem.variables === item.id;
                 return (
                   <TableRow key={item.id}>
-                    <TableCell className="font-medium text-vast">{item.name}</TableCell>
-                    <TableCell className="max-w-md truncate text-soft">
+                    <TableCell className="font-medium text-charcoal">{item.name}</TableCell>
+                    <TableCell className="max-w-md truncate text-slate/60">
                       {item.description ?? '—'}
                     </TableCell>
-                    <TableCell className="text-right text-ink">{money(item.price)}</TableCell>
+                    <TableCell className="text-right text-slate">{money(item.price)}</TableCell>
                     {(canWrite || canDelete) && (
                       <TableCell>
                         <div className="flex items-center justify-end gap-1">
@@ -139,7 +131,7 @@ export default function AdminRestaurantDetailPage() {
                               aria-label={`Edit ${item.name}`}
                               onClick={() => setForm({ open: true, menuItem: item })}
                             >
-                              <Pencil className="size-4 text-ink" />
+                              <Pencil className="size-4 text-slate" />
                             </Button>
                           )}
                           {canDelete && (
@@ -200,5 +192,3 @@ export default function AdminRestaurantDetailPage() {
     </div>
   );
 }
-
-const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };

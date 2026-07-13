@@ -1,0 +1,1397 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'bb-cream': '#f7fbf0',
+              'bb-mint': '#d4e8b0',
+              'bb-green': '#8cc63f',
+              'bb-red': '#e84c3d',
+              'bb-charcoal': '#1a1a1a',
+            },
+            fontFamily: {
+              sora: ['Sora', 'sans-serif'],
+              manrope: ['Manrope', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      ::-webkit-scrollbar {
+        display: none;
+      }
+      body {
+        font-family: 'Manrope', sans-serif;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: 'Sora', sans-serif;
+      }
+      .step-active {
+        border-color: #8cc63f;
+        background: linear-gradient(135deg, #f7fbf0, #d4e8b0);
+      }
+      .progress-bar-fill {
+        animation: fillProgress 2s ease-in-out forwards;
+      }
+      @keyframes fillProgress {
+        from {
+          width: 0%;
+        }
+        to {
+          width: 68%;
+        }
+      }
+      .budget-ring {
+        stroke-dasharray: 283;
+        stroke-dashoffset: 90;
+      }
+      .floating-card {
+        box-shadow:
+          0 32px 80px rgba(26, 26, 26, 0.12),
+          0 8px 24px rgba(140, 198, 63, 0.08);
+      }
+      .hero-img-overlay {
+        background: linear-gradient(
+          to bottom,
+          rgba(26, 26, 26, 0.18) 0%,
+          rgba(26, 26, 26, 0.55) 100%
+        );
+      }
+      .nav-glass {
+        backdrop-filter: blur(16px);
+        background: rgba(247, 251, 240, 0.88);
+      }
+      .glow-green {
+        box-shadow: 0 0 0 3px rgba(140, 198, 63, 0.25);
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+      .float-anim {
+        animation: float 4s ease-in-out infinite;
+      }
+      .step-card:hover {
+        transform: translateY(-4px);
+        transition: transform 0.3s ease;
+      }
+      .step-connector {
+        background: linear-gradient(to right, #8cc63f, #d4e8b0);
+      }
+      input[type='range'] {
+        accent-color: #8cc63f;
+      }
+    </style>
+    <script>
+      window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
+    </script>
+  </head>
+  <body class="bg-bb-cream text-bb-charcoal overflow-x-hidden">
+    <!-- NAV -->
+    <nav id="header" class="nav-glass fixed top-0 left-0 right-0 z-50 border-b border-bb-mint/60">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 lg:h-18">
+          <!-- Logo -->
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 bg-bb-green rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-leaf text-white text-sm"></i>
+            </div>
+            <span class="font-sora font-700 text-xl font-bold text-bb-charcoal tracking-tight"
+              >Budget<span class="text-bb-green">Bite</span></span
+            >
+          </div>
+          <!-- Desktop Nav -->
+          <div class="hidden md:flex items-center gap-8">
+            <a
+              href="#how-it-works"
+              class="font-manrope text-sm font-500 text-bb-charcoal/70 hover:text-bb-green transition-colors"
+              >How It Works</a
+            >
+            <a
+              href="#features"
+              class="font-manrope text-sm font-500 text-bb-charcoal/70 hover:text-bb-green transition-colors"
+              >Features</a
+            >
+            <a
+              href="#pricing"
+              class="font-manrope text-sm font-500 text-bb-charcoal/70 hover:text-bb-green transition-colors"
+              >Pricing</a
+            >
+            <a
+              href="#testimonials"
+              class="font-manrope text-sm font-500 text-bb-charcoal/70 hover:text-bb-green transition-colors"
+              >Stories</a
+            >
+          </div>
+          <!-- CTA -->
+          <div class="flex items-center gap-3">
+            <a
+              href="#auth-card"
+              class="hidden md:inline-flex text-sm font-600 font-manrope text-bb-charcoal/70 hover:text-bb-charcoal transition-colors"
+              >Sign In</a
+            >
+            <a
+              href="#auth-card"
+              class="inline-flex items-center gap-2 bg-bb-green hover:bg-bb-green/90 text-white font-manrope font-600 text-sm px-5 py-2.5 rounded-xl transition-all min-h-[48px] items-center"
+            >
+              <i class="fa-solid fa-bolt text-xs"></i> Get Started Free
+            </a>
+            <!-- Mobile menu btn -->
+            <button
+              class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg border border-bb-mint text-bb-charcoal/70"
+            >
+              <i class="fa-solid fa-bars text-sm"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero" class="pt-24 lg:pt-28 pb-0 min-h-[700px] relative overflow-hidden">
+      <!-- Background subtle grid -->
+      <div
+        class="absolute inset-0 opacity-30"
+        style="
+          background-image: radial-gradient(circle at 1px 1px, #d4e8b0 1px, transparent 0);
+          background-size: 32px 32px;
+        "
+      ></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <!-- Badge -->
+        <div class="flex justify-center mb-6">
+          <div
+            class="inline-flex items-center gap-2 bg-white border border-bb-mint rounded-full px-4 py-1.5 shadow-sm"
+          >
+            <span class="w-2 h-2 rounded-full bg-bb-green animate-pulse"></span>
+            <span
+              class="font-manrope text-xs font-600 text-bb-charcoal/70 uppercase tracking-widest"
+              >AI-Powered Meal Planning</span
+            >
+          </div>
+        </div>
+
+        <!-- Headline -->
+        <div class="text-center max-w-4xl mx-auto mb-6">
+          <h1
+            class="font-sora font-800 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl leading-tight text-bb-charcoal tracking-tight"
+          >
+            Eat well from
+            <span class="text-bb-green relative inline-block"
+              >local restaurants
+              <svg
+                class="absolute -bottom-1 left-0 w-full"
+                viewBox="0 0 300 8"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 5.5C60 2.5 140 1 300 5.5"
+                  stroke="#e84c3d"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                />
+              </svg> </span
+            ><br />without breaking the bank.
+          </h1>
+          <p
+            class="font-manrope text-lg sm:text-xl text-bb-charcoal/60 mt-6 max-w-2xl mx-auto leading-relaxed"
+          >
+            BudgetBite's AI tracks your food spending in real-time and curates daily meal
+            suggestions from nearby spots — always within what you have left.
+          </p>
+        </div>
+
+        <!-- SPLIT PERSONALITY HERO VISUAL -->
+        <div class="relative max-w-4xl mx-auto mt-10">
+          <!-- The vibrant food image -->
+          <div
+            class="relative rounded-3xl overflow-hidden h-[320px] sm:h-[400px] lg:h-[460px] shadow-2xl"
+          >
+            <img
+              class="w-full h-full object-cover"
+              src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_dc7e48d24e_c5ee1a17586b957a.png"
+              alt="vibrant overhead flat lay of delicious colorful local restaurant dishes, ramen bowl, tacos, salad, w"
+            />
+            <div class="hero-img-overlay absolute inset-0 rounded-3xl"></div>
+
+            <!-- Floating spend bar overlaid on image -->
+            <div
+              class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl float-anim"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <p
+                    class="font-manrope text-xs text-bb-charcoal/50 uppercase tracking-wide font-600"
+                  >
+                    Weekly Budget
+                  </p>
+                  <p class="font-sora font-700 text-lg text-bb-charcoal">
+                    $120 <span class="text-sm font-400 text-bb-charcoal/50">/ week</span>
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p
+                    class="font-manrope text-xs text-bb-charcoal/50 uppercase tracking-wide font-600"
+                  >
+                    Remaining
+                  </p>
+                  <p class="font-sora font-700 text-lg text-bb-green">$38.40</p>
+                </div>
+              </div>
+              <!-- Progress Bar -->
+              <div class="w-full h-3 bg-bb-mint/60 rounded-full overflow-hidden">
+                <div
+                  class="progress-bar-fill h-full rounded-full bg-gradient-to-r from-bb-green to-bb-green/80"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <div class="flex justify-between mt-1">
+                <span class="font-manrope text-xs text-bb-charcoal/40">$0</span>
+                <span class="font-manrope text-xs text-bb-charcoal/40">68% used · 4 days left</span>
+                <span class="font-manrope text-xs text-bb-charcoal/40">$120</span>
+              </div>
+              <!-- Meal suggestion chip -->
+              <div class="mt-3 flex items-center gap-2 bg-bb-cream rounded-xl px-3 py-2">
+                <i class="fa-solid fa-sparkles text-bb-green text-xs"></i>
+                <p class="font-manrope text-xs text-bb-charcoal font-600">
+                  AI suggests: <span class="text-bb-red">Pho Bà Nội</span> — $9.50 nearby · fits
+                  your budget
+                </p>
+                <i class="fa-solid fa-arrow-right text-bb-green text-xs ml-auto"></i>
+              </div>
+            </div>
+
+            <!-- Top-left stat bubble -->
+            <div
+              class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg"
+            >
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-bb-green/15 rounded-xl flex items-center justify-center">
+                  <i class="fa-solid fa-robot text-bb-green text-sm"></i>
+                </div>
+                <div>
+                  <p class="font-sora font-700 text-sm text-bb-charcoal">AI Re-planned!</p>
+                  <p class="font-manrope text-xs text-bb-charcoal/50">Saved you $14 today</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top-right stat bubble -->
+            <div
+              class="absolute top-4 right-4 bg-bb-red text-white rounded-2xl px-3 py-2.5 shadow-lg"
+            >
+              <div class="flex items-center gap-1.5">
+                <i class="fa-solid fa-fire text-white text-xs"></i>
+                <p class="font-sora font-700 text-sm">3-day streak</p>
+              </div>
+              <p class="font-manrope text-xs opacity-80 mt-0.5">On budget 🎉</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- AUTH CARD — Floating at base of hero -->
+        <div id="auth-card" class="max-w-md mx-auto -mt-6 relative z-20 mb-0">
+          <div class="floating-card bg-white rounded-3xl p-6 sm:p-7 border border-bb-mint/40">
+            <div class="text-center mb-5">
+              <h3 class="font-sora font-700 text-xl text-bb-charcoal">
+                Start saving on every meal
+              </h3>
+              <p class="font-manrope text-sm text-bb-charcoal/50 mt-1">
+                Free forever · No credit card · Set up in 60 seconds
+              </p>
+            </div>
+
+            <!-- OAuth Buttons -->
+            <div class="flex flex-col gap-3">
+              <button
+                class="flex items-center justify-center gap-3 w-full h-12 bg-white border border-gray-200 rounded-xl hover:border-bb-green/40 hover:bg-bb-cream/50 transition-all font-manrope font-600 text-sm text-bb-charcoal shadow-sm min-h-[48px]"
+              >
+                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                  <path
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    fill="#4285F4"
+                  />
+                  <path
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    fill="#34A853"
+                  />
+                  <path
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    fill="#FBBC05"
+                  />
+                  <path
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    fill="#EA4335"
+                  />
+                </svg>
+                Continue with Google
+              </button>
+              <button
+                class="flex items-center justify-center gap-3 w-full h-12 bg-bb-charcoal border border-bb-charcoal rounded-xl hover:bg-bb-charcoal/90 transition-all font-manrope font-600 text-sm text-white min-h-[48px]"
+              >
+                <i class="fa-brands fa-github text-white text-lg"></i>
+                Continue with GitHub
+              </button>
+            </div>
+
+            <!-- Divider -->
+            <div class="flex items-center gap-3 my-4">
+              <div class="flex-1 h-px bg-gray-100"></div>
+              <span class="font-manrope text-xs text-bb-charcoal/40 font-500">or use email</span>
+              <div class="flex-1 h-px bg-gray-100"></div>
+            </div>
+
+            <!-- Email Input -->
+            <div class="flex gap-2">
+              <input
+                type="email"
+                placeholder="your@email.com"
+                class="flex-1 h-12 px-4 rounded-xl border border-gray-200 font-manrope text-sm text-bb-charcoal placeholder-bb-charcoal/30 focus:outline-none focus:border-bb-green focus:ring-2 focus:ring-bb-green/20 transition-all min-h-[48px]"
+              />
+              <button
+                class="h-12 px-5 bg-bb-green hover:bg-bb-green/90 text-white font-manrope font-700 text-sm rounded-xl transition-all min-h-[48px] shadow-md"
+                style="box-shadow: 0 4px 16px rgba(140, 198, 63, 0.35)"
+              >
+                <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+
+            <p class="font-manrope text-xs text-bb-charcoal/30 text-center mt-3">
+              By continuing, you agree to our Terms & Privacy Policy
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOCIAL PROOF TICKER -->
+    <section id="social-proof" class="py-10 bg-bb-charcoal overflow-hidden mt-16">
+      <div
+        class="flex gap-12 whitespace-nowrap items-center"
+        style="animation: marquee 20s linear infinite"
+      >
+        <div class="flex items-center gap-3 text-white/60 font-manrope text-sm font-500 shrink-0">
+          <i class="fa-solid fa-star text-bb-green text-xs"></i> 14,200+ active users
+        </div>
+        <div class="flex items-center gap-3 text-white/60 font-manrope text-sm font-500 shrink-0">
+          <i class="fa-solid fa-piggy-bank text-bb-green text-xs"></i> $2.4M saved collectively
+        </div>
+        <div class="flex items-center gap-3 text-white/60 font-manrope text-sm font-500 shrink-0">
+          <i class="fa-solid fa-utensils text-bb-green text-xs"></i> 89,000+ meals logged
+        </div>
+        <div class="flex items-center gap-3 text-white/60 font-manrope text-sm font-500 shrink-0">
+          <i class="fa-solid fa-location-dot text-bb-green text-xs"></i> Available in 50+ cities
+        </div>
+        <div class="flex items-center gap-3 text-white/60 font-manrope text-sm font-500 shrink-0">
+          <i class="fa-solid fa-robot text-bb-green text-xs"></i> AI-powered re-planning
+        </div>
+        <!-- Repeat for infinite look -->
+        <div class="flex items-center gap-3 text-white/60 font-manrope text-sm font-500 shrink-0">
+          <i class="fa-solid fa-star text-bb-green text-xs"></i> 14,200+ active users
+        </div>
+        <div class="flex items-center gap-3 text-white/60 font-manrope text-sm font-500 shrink-0">
+          <i class="fa-solid fa-piggy-bank text-bb-green text-xs"></i> $2.4M saved collectively
+        </div>
+        <div class="flex items-center gap-3 text-white/60 font-manrope text-sm font-500 shrink-0">
+          <i class="fa-solid fa-utensils text-bb-green text-xs"></i> 89,000+ meals logged
+        </div>
+        <div class="flex items-center gap-3 text-white/60 font-manrope text-sm font-500 shrink-0">
+          <i class="fa-solid fa-location-dot text-bb-green text-xs"></i> Available in 50+ cities
+        </div>
+      </div>
+      <style>
+        @keyframes marquee {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-50%);
+          }
+        }
+      </style>
+    </section>
+
+    <!-- HOW IT WORKS — THE LIVING WORKFLOW -->
+    <section id="how-it-works" class="py-32 bg-bb-cream">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Section Header -->
+        <div class="text-center max-w-2xl mx-auto mb-20">
+          <div class="inline-flex items-center gap-2 bg-bb-mint/50 rounded-full px-4 py-1.5 mb-4">
+            <i class="fa-solid fa-wand-magic-sparkles text-bb-green text-xs"></i>
+            <span class="font-manrope text-xs font-700 text-bb-green uppercase tracking-widest"
+              >The Living Workflow</span
+            >
+          </div>
+          <h2 class="font-sora font-800 text-4xl lg:text-5xl text-bb-charcoal leading-tight">
+            Four steps. Zero stress.<br />Every single week.
+          </h2>
+          <p class="font-manrope text-lg text-bb-charcoal/55 mt-4 leading-relaxed">
+            BudgetBite's AI doesn't just plan once — it adapts every time you eat.
+          </p>
+        </div>
+
+        <!-- Steps Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-4 relative">
+          <!-- Connector line desktop -->
+          <div
+            class="hidden lg:block absolute top-16 left-[12.5%] right-[12.5%] h-0.5 step-connector z-0 rounded-full opacity-50"
+          ></div>
+
+          <!-- STEP 1: Set Your Limit -->
+          <div
+            id="step-1"
+            class="step-card step-active rounded-3xl p-6 border-2 relative z-10 cursor-pointer"
+          >
+            <div class="flex items-center gap-3 mb-5">
+              <div
+                class="w-10 h-10 bg-bb-green rounded-2xl flex items-center justify-center shadow-md"
+              >
+                <span class="font-sora font-800 text-white text-sm">01</span>
+              </div>
+              <i class="fa-solid fa-sliders text-bb-green text-lg ml-auto"></i>
+            </div>
+            <h3 class="font-sora font-700 text-lg text-bb-charcoal mb-2">Set Your Limit</h3>
+            <p class="font-manrope text-sm text-bb-charcoal/60 leading-relaxed mb-5">
+              Input your weekly or monthly food budget. One number is all we need to get started.
+            </p>
+            <!-- Live UI: Budget Slider -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-bb-mint/40">
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-manrope text-xs text-bb-charcoal/50 font-600">Weekly Budget</span>
+                <span class="font-sora font-700 text-bb-green text-lg">$120</span>
+              </div>
+              <input
+                type="range"
+                min="40"
+                max="400"
+                value="120"
+                class="w-full h-2 rounded-full appearance-none cursor-pointer"
+              />
+              <div class="flex justify-between mt-1">
+                <span class="font-manrope text-xs text-bb-charcoal/30">$40</span>
+                <span class="font-manrope text-xs text-bb-charcoal/30">$400</span>
+              </div>
+              <div class="mt-3 flex gap-2">
+                <button
+                  class="flex-1 py-1.5 rounded-xl bg-bb-mint/60 font-manrope text-xs font-600 text-bb-charcoal/70"
+                >
+                  Weekly
+                </button>
+                <button
+                  class="flex-1 py-1.5 rounded-xl bg-bb-cream font-manrope text-xs font-600 text-bb-charcoal/40 border border-bb-mint/40"
+                >
+                  Monthly
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: AI Meal Curation -->
+          <div
+            id="step-2"
+            class="step-card rounded-3xl p-6 border-2 border-bb-mint/30 bg-white relative z-10 cursor-pointer hover:border-bb-green/30 transition-all"
+          >
+            <div class="flex items-center gap-3 mb-5">
+              <div
+                class="w-10 h-10 bg-bb-charcoal rounded-2xl flex items-center justify-center shadow-md"
+              >
+                <span class="font-sora font-800 text-white text-sm">02</span>
+              </div>
+              <i class="fa-solid fa-brain text-bb-charcoal/30 text-lg ml-auto"></i>
+            </div>
+            <h3 class="font-sora font-700 text-lg text-bb-charcoal mb-2">AI Meal Curation</h3>
+            <p class="font-manrope text-sm text-bb-charcoal/60 leading-relaxed mb-5">
+              Get daily suggestions from nearby spots that fit your remaining balance — curated
+              fresh every morning.
+            </p>
+            <!-- Live UI: Meal Cards -->
+            <div class="space-y-2">
+              <div
+                class="bg-bb-cream rounded-2xl px-3 py-2.5 flex items-center gap-3 border border-bb-mint/30"
+              >
+                <div
+                  class="w-8 h-8 bg-bb-red/10 rounded-xl flex items-center justify-center shrink-0"
+                >
+                  <i class="fa-solid fa-bowl-hot text-bb-red text-xs"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-manrope font-700 text-xs text-bb-charcoal truncate">Pho Bà Nội</p>
+                  <p class="font-manrope text-xs text-bb-charcoal/40">0.3mi · Vietnamese</p>
+                </div>
+                <span class="font-sora font-700 text-sm text-bb-green shrink-0">$9.50</span>
+              </div>
+              <div
+                class="bg-bb-cream rounded-2xl px-3 py-2.5 flex items-center gap-3 border border-bb-mint/30"
+              >
+                <div
+                  class="w-8 h-8 bg-bb-green/10 rounded-xl flex items-center justify-center shrink-0"
+                >
+                  <i class="fa-solid fa-burger text-bb-green text-xs"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-manrope font-700 text-xs text-bb-charcoal truncate">
+                    Corner Burger Co.
+                  </p>
+                  <p class="font-manrope text-xs text-bb-charcoal/40">0.6mi · American</p>
+                </div>
+                <span class="font-sora font-700 text-sm text-bb-green shrink-0">$11.00</span>
+              </div>
+              <div
+                class="bg-bb-cream rounded-2xl px-3 py-2.5 flex items-center gap-3 border border-bb-mint/30 opacity-60"
+              >
+                <div
+                  class="w-8 h-8 bg-orange-100 rounded-xl flex items-center justify-center shrink-0"
+                >
+                  <i class="fa-solid fa-pepper-hot text-orange-400 text-xs"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-manrope font-700 text-xs text-bb-charcoal truncate">
+                    Taco Hermanos
+                  </p>
+                  <p class="font-manrope text-xs text-bb-charcoal/40">0.9mi · Mexican</p>
+                </div>
+                <span class="font-sora font-700 text-sm text-bb-green shrink-0">$8.25</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: Real-Time Logging -->
+          <div
+            id="step-3"
+            class="step-card rounded-3xl p-6 border-2 border-bb-mint/30 bg-white relative z-10 cursor-pointer hover:border-bb-green/30 transition-all"
+          >
+            <div class="flex items-center gap-3 mb-5">
+              <div
+                class="w-10 h-10 bg-bb-charcoal rounded-2xl flex items-center justify-center shadow-md"
+              >
+                <span class="font-sora font-800 text-white text-sm">03</span>
+              </div>
+              <i class="fa-solid fa-camera text-bb-charcoal/30 text-lg ml-auto"></i>
+            </div>
+            <h3 class="font-sora font-700 text-lg text-bb-charcoal mb-2">Real-Time Logging</h3>
+            <p class="font-manrope text-sm text-bb-charcoal/60 leading-relaxed mb-5">
+              Snap a photo or tap to log what you actually spent. Our AI reads receipts and menus
+              instantly.
+            </p>
+            <!-- Live UI: Snap UI -->
+            <div class="bg-bb-cream rounded-2xl p-4 border border-bb-mint/40">
+              <div
+                class="w-full h-20 bg-bb-charcoal/5 rounded-xl flex items-center justify-center mb-3 border-2 border-dashed border-bb-mint"
+              >
+                <div class="text-center">
+                  <i class="fa-solid fa-camera text-bb-green text-xl mb-1"></i>
+                  <p class="font-manrope text-xs text-bb-charcoal/40">Snap receipt</p>
+                </div>
+              </div>
+              <div
+                class="flex items-center gap-2 bg-white rounded-xl px-3 py-2 border border-bb-mint/30"
+              >
+                <i class="fa-solid fa-pen text-bb-charcoal/30 text-xs"></i>
+                <input
+                  type="text"
+                  value="Pho Bà Nội — $9.50"
+                  class="bg-transparent font-manrope text-xs text-bb-charcoal flex-1 outline-none"
+                  readonly
+                />
+                <div
+                  class="w-5 h-5 bg-bb-green rounded-full flex items-center justify-center shrink-0"
+                >
+                  <i class="fa-solid fa-check text-white text-xs" style="font-size: 8px"></i>
+                </div>
+              </div>
+              <div class="mt-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-check text-bb-green text-xs"></i>
+                <span class="font-manrope text-xs text-bb-green font-600"
+                  >Logged · Budget updated</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4: Auto-Pivot -->
+          <div
+            id="step-4"
+            class="step-card rounded-3xl p-6 border-2 border-bb-mint/30 bg-white relative z-10 cursor-pointer hover:border-bb-green/30 transition-all"
+          >
+            <div class="flex items-center gap-3 mb-5">
+              <div
+                class="w-10 h-10 bg-bb-red rounded-2xl flex items-center justify-center shadow-md"
+              >
+                <span class="font-sora font-800 text-white text-sm">04</span>
+              </div>
+              <i class="fa-solid fa-rotate text-bb-red/30 text-lg ml-auto"></i>
+            </div>
+            <h3 class="font-sora font-700 text-lg text-bb-charcoal mb-2">Auto-Pivot</h3>
+            <p class="font-manrope text-sm text-bb-charcoal/60 leading-relaxed mb-5">
+              The AI instantly re-plans your next meal based on what's left — so you finish the week
+              on track.
+            </p>
+            <!-- Live UI: Re-calculated plan -->
+            <div class="bg-bb-cream rounded-2xl p-4 border border-bb-mint/40 space-y-2">
+              <div class="flex items-center justify-between">
+                <span
+                  class="font-manrope text-xs font-700 text-bb-charcoal/60 uppercase tracking-wide"
+                  >New Plan — Rest of Week</span
+                >
+                <span class="font-sora font-700 text-sm text-bb-red">$38.40 left</span>
+              </div>
+              <div class="space-y-1.5">
+                <div
+                  class="flex items-center gap-2 bg-white rounded-xl px-3 py-2 border border-bb-mint/20"
+                >
+                  <span class="font-manrope text-xs text-bb-charcoal/40 w-8 shrink-0">Thu</span>
+                  <span class="font-manrope text-xs text-bb-charcoal font-600"
+                    >Noodle Bar Express</span
+                  >
+                  <span class="font-sora font-700 text-xs text-bb-green ml-auto">$8.50</span>
+                </div>
+                <div
+                  class="flex items-center gap-2 bg-white rounded-xl px-3 py-2 border border-bb-mint/20"
+                >
+                  <span class="font-manrope text-xs text-bb-charcoal/40 w-8 shrink-0">Fri</span>
+                  <span class="font-manrope text-xs text-bb-charcoal font-600"
+                    >Street Taco Stand</span
+                  >
+                  <span class="font-sora font-700 text-xs text-bb-green ml-auto">$7.25</span>
+                </div>
+                <div
+                  class="flex items-center gap-2 bg-white rounded-xl px-3 py-2 border border-bb-mint/20"
+                >
+                  <span class="font-manrope text-xs text-bb-charcoal/40 w-8 shrink-0">Sat</span>
+                  <span class="font-manrope text-xs text-bb-charcoal font-600">Curry House</span>
+                  <span class="font-sora font-700 text-xs text-bb-green ml-auto">$11.00</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 pt-1">
+                <i class="fa-solid fa-sparkles text-bb-red text-xs"></i>
+                <span class="font-manrope text-xs text-bb-red font-600"
+                  >AI re-planned instantly</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section id="features" class="py-32 bg-bb-charcoal">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <!-- Left: Content -->
+          <div>
+            <div
+              class="inline-flex items-center gap-2 bg-bb-green/20 rounded-full px-4 py-1.5 mb-6"
+            >
+              <i class="fa-solid fa-gem text-bb-green text-xs"></i>
+              <span class="font-manrope text-xs font-700 text-bb-green uppercase tracking-widest"
+                >Premium Features</span
+              >
+            </div>
+            <h2 class="font-sora font-800 text-4xl lg:text-5xl text-white leading-tight mb-6">
+              Built for people who love food <span class="text-bb-green">and</span> their finances.
+            </h2>
+            <p class="font-manrope text-lg text-white/50 leading-relaxed mb-10">
+              No spreadsheets. No guilt. Just a smart concierge that knows what's near you, what
+              fits your budget, and what you'll actually enjoy.
+            </p>
+
+            <!-- Feature List -->
+            <div class="space-y-5">
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-10 h-10 bg-bb-green/15 rounded-2xl flex items-center justify-center shrink-0 mt-0.5"
+                >
+                  <i class="fa-solid fa-location-crosshairs text-bb-green text-sm"></i>
+                </div>
+                <div>
+                  <h4 class="font-sora font-700 text-base text-white mb-1">
+                    Hyper-local restaurant discovery
+                  </h4>
+                  <p class="font-manrope text-sm text-white/45 leading-relaxed">
+                    Surfacing hidden gems within walking distance that your budget actually loves.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-10 h-10 bg-bb-red/15 rounded-2xl flex items-center justify-center shrink-0 mt-0.5"
+                >
+                  <i class="fa-solid fa-chart-line text-bb-red text-sm"></i>
+                </div>
+                <div>
+                  <h4 class="font-sora font-700 text-base text-white mb-1">
+                    Predictive spend forecasting
+                  </h4>
+                  <p class="font-manrope text-sm text-white/45 leading-relaxed">
+                    Know before Friday if you're trending over. Adjust today, not regret tomorrow.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-10 h-10 bg-bb-mint/20 rounded-2xl flex items-center justify-center shrink-0 mt-0.5"
+                >
+                  <i class="fa-solid fa-receipt text-bb-mint text-sm"></i>
+                </div>
+                <div>
+                  <h4 class="font-sora font-700 text-base text-white mb-1">
+                    One-snap receipt logging
+                  </h4>
+                  <p class="font-manrope text-sm text-white/45 leading-relaxed">
+                    Our AI reads your receipt photo and logs it automatically. Zero typing required.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-10 h-10 bg-bb-green/15 rounded-2xl flex items-center justify-center shrink-0 mt-0.5"
+                >
+                  <i class="fa-solid fa-bell text-bb-green text-sm"></i>
+                </div>
+                <div>
+                  <h4 class="font-sora font-700 text-base text-white mb-1">
+                    Smart nudges, not nagging alerts
+                  </h4>
+                  <p class="font-manrope text-sm text-white/45 leading-relaxed">
+                    Gentle, helpful notifications at mealtimes — never during a meeting.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Dashboard Mock -->
+          <div class="relative">
+            <div class="relative rounded-3xl overflow-hidden h-[500px] shadow-2xl">
+              <img
+                class="w-full h-full object-cover"
+                src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_044b5e18c5_2105ce1efe613edf.png"
+                alt="modern smartphone app showing food budget tracker dashboard with green and charcoal colors, minimal "
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-bb-charcoal/40 to-transparent rounded-3xl"
+              ></div>
+            </div>
+            <!-- Floating metric card -->
+            <div
+              class="absolute -left-6 top-1/3 bg-white rounded-2xl p-4 shadow-2xl float-anim hidden lg:block"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-bb-green/15 rounded-xl flex items-center justify-center">
+                  <i class="fa-solid fa-arrow-trend-down text-bb-green"></i>
+                </div>
+                <div>
+                  <p class="font-sora font-800 text-xl text-bb-charcoal">-23%</p>
+                  <p class="font-manrope text-xs text-bb-charcoal/50">vs last month</p>
+                </div>
+              </div>
+            </div>
+            <!-- Floating streak card -->
+            <div
+              class="absolute -right-4 bottom-16 bg-bb-green rounded-2xl p-4 shadow-2xl hidden lg:block"
+            >
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-fire text-white"></i>
+                <span class="font-sora font-700 text-white">7-Day Streak!</span>
+              </div>
+              <p class="font-manrope text-xs text-white/70">Under budget every day</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section id="testimonials" class="py-32 bg-bb-cream">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-xl mx-auto mb-16">
+          <div class="inline-flex items-center gap-2 bg-bb-mint/50 rounded-full px-4 py-1.5 mb-4">
+            <i class="fa-solid fa-heart text-bb-red text-xs"></i>
+            <span
+              class="font-manrope text-xs font-700 text-bb-charcoal/70 uppercase tracking-widest"
+              >Real Stories</span
+            >
+          </div>
+          <h2 class="font-sora font-800 text-4xl lg:text-5xl text-bb-charcoal leading-tight">
+            People eating smarter, spending less.
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Card 1 -->
+          <div
+            id="testimonial-1"
+            class="bg-white rounded-3xl p-6 border border-bb-mint/30 shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div class="flex items-center gap-1 mb-4">
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+            </div>
+            <p class="font-manrope text-base text-bb-charcoal/70 leading-relaxed mb-6">
+              "I was spending $400/month eating out. BudgetBite got me to $195 in 6 weeks without
+              eating sad desk salads. The Auto-Pivot is genuinely impressive."
+            </p>
+            <div class="flex items-center gap-3">
+              <img
+                src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg"
+                class="w-10 h-10 rounded-full object-cover"
+                alt="avatar"
+              />
+              <div>
+                <p class="font-sora font-700 text-sm text-bb-charcoal">Priya M.</p>
+                <p class="font-manrope text-xs text-bb-charcoal/40">
+                  Product Designer · Austin, TX
+                </p>
+              </div>
+              <div class="ml-auto bg-bb-green/10 rounded-xl px-3 py-1">
+                <span class="font-sora font-700 text-sm text-bb-green">-$205</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 — Featured -->
+          <div
+            id="testimonial-2"
+            class="bg-bb-charcoal rounded-3xl p-6 shadow-xl relative overflow-hidden"
+          >
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-bb-green/10 rounded-full -translate-y-1/2 translate-x-1/2"
+            ></div>
+            <div class="flex items-center gap-1 mb-4">
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+            </div>
+            <p class="font-manrope text-base text-white/80 leading-relaxed mb-6">
+              "This is the first budgeting app that doesn't make me feel guilty. The meal
+              suggestions are actually good. I discovered three new favorite spots through it."
+            </p>
+            <div class="flex items-center gap-3 relative z-10">
+              <img
+                src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg"
+                class="w-10 h-10 rounded-full object-cover"
+                alt="avatar"
+              />
+              <div>
+                <p class="font-sora font-700 text-sm text-white">Marcus J.</p>
+                <p class="font-manrope text-xs text-white/40">Software Engineer · NYC</p>
+              </div>
+              <div class="ml-auto bg-bb-red/20 rounded-xl px-3 py-1">
+                <span class="font-sora font-700 text-sm text-bb-red">-$310</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div
+            id="testimonial-3"
+            class="bg-white rounded-3xl p-6 border border-bb-mint/30 shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div class="flex items-center gap-1 mb-4">
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+              <i class="fa-solid fa-star text-bb-green text-sm"></i>
+            </div>
+            <p class="font-manrope text-base text-bb-charcoal/70 leading-relaxed mb-6">
+              "The receipt snap is magic. I just photograph my food and BudgetBite does the rest. My
+              weekly tracking went from 0% to 100% compliance with zero effort."
+            </p>
+            <div class="flex items-center gap-3">
+              <img
+                src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-7.jpg"
+                class="w-10 h-10 rounded-full object-cover"
+                alt="avatar"
+              />
+              <div>
+                <p class="font-sora font-700 text-sm text-bb-charcoal">Leila T.</p>
+                <p class="font-manrope text-xs text-bb-charcoal/40">
+                  Freelance Writer · Chicago, IL
+                </p>
+              </div>
+              <div class="ml-auto bg-bb-green/10 rounded-xl px-3 py-1">
+                <span class="font-sora font-700 text-sm text-bb-green">-$180</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing" class="py-32 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-xl mx-auto mb-16">
+          <div class="inline-flex items-center gap-2 bg-bb-mint/50 rounded-full px-4 py-1.5 mb-4">
+            <i class="fa-solid fa-tag text-bb-green text-xs"></i>
+            <span
+              class="font-manrope text-xs font-700 text-bb-charcoal/70 uppercase tracking-widest"
+              >Simple Pricing</span
+            >
+          </div>
+          <h2 class="font-sora font-800 text-4xl lg:text-5xl text-bb-charcoal leading-tight">
+            One plan pays for itself<br />in the first week.
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <!-- Free -->
+          <div id="plan-free" class="rounded-3xl p-8 border-2 border-bb-mint/50 bg-bb-cream">
+            <div class="mb-6">
+              <p
+                class="font-manrope text-sm font-700 text-bb-charcoal/50 uppercase tracking-wide mb-2"
+              >
+                Starter
+              </p>
+              <div class="flex items-end gap-1">
+                <span class="font-sora font-800 text-5xl text-bb-charcoal">$0</span>
+                <span class="font-manrope text-sm text-bb-charcoal/40 mb-2">/forever</span>
+              </div>
+              <p class="font-manrope text-sm text-bb-charcoal/55 mt-2">
+                All the essentials. No card needed.
+              </p>
+            </div>
+            <ul class="space-y-3 mb-8">
+              <li class="flex items-center gap-3 font-manrope text-sm text-bb-charcoal/70">
+                <i class="fa-solid fa-circle-check text-bb-green text-sm shrink-0"></i> Weekly
+                budget tracking
+              </li>
+              <li class="flex items-center gap-3 font-manrope text-sm text-bb-charcoal/70">
+                <i class="fa-solid fa-circle-check text-bb-green text-sm shrink-0"></i> 5 AI meal
+                suggestions/week
+              </li>
+              <li class="flex items-center gap-3 font-manrope text-sm text-bb-charcoal/70">
+                <i class="fa-solid fa-circle-check text-bb-green text-sm shrink-0"></i> Manual meal
+                logging
+              </li>
+              <li class="flex items-center gap-3 font-manrope text-sm text-bb-charcoal/40">
+                <i class="fa-solid fa-circle-xmark text-bb-charcoal/20 text-sm shrink-0"></i>
+                Receipt photo scanning
+              </li>
+              <li class="flex items-center gap-3 font-manrope text-sm text-bb-charcoal/40">
+                <i class="fa-solid fa-circle-xmark text-bb-charcoal/20 text-sm shrink-0"></i>
+                Auto-Pivot re-planning
+              </li>
+            </ul>
+            <a
+              href="#auth-card"
+              class="flex items-center justify-center gap-2 w-full h-12 border-2 border-bb-green text-bb-green font-manrope font-700 text-sm rounded-2xl hover:bg-bb-green hover:text-white transition-all min-h-[48px]"
+            >
+              Get Started Free
+            </a>
+          </div>
+
+          <!-- Pro -->
+          <div
+            id="plan-pro"
+            class="rounded-3xl p-8 border-2 border-bb-green bg-bb-charcoal relative overflow-hidden"
+          >
+            <div
+              class="absolute top-4 right-4 bg-bb-red text-white font-manrope font-700 text-xs px-3 py-1.5 rounded-full"
+            >
+              Most Popular
+            </div>
+            <div
+              class="absolute bottom-0 right-0 w-40 h-40 bg-bb-green/8 rounded-full translate-x-1/3 translate-y-1/3"
+            ></div>
+            <div class="mb-6">
+              <p class="font-manrope text-sm font-700 text-bb-green uppercase tracking-wide mb-2">
+                Pro
+              </p>
+              <div class="flex items-end gap-1">
+                <span class="font-sora font-800 text-5xl text-white">$7</span>
+                <span class="font-manrope text-sm text-white/40 mb-2">/month</span>
+              </div>
+              <p class="font-manrope text-sm text-white/50 mt-2">
+                Typically saves users $150+/month.
+              </p>
+            </div>
+            <ul class="space-y-3 mb-8 relative z-10">
+              <li class="flex items-center gap-3 font-manrope text-sm text-white/80">
+                <i class="fa-solid fa-circle-check text-bb-green text-sm shrink-0"></i> Unlimited
+                budget periods
+              </li>
+              <li class="flex items-center gap-3 font-manrope text-sm text-white/80">
+                <i class="fa-solid fa-circle-check text-bb-green text-sm shrink-0"></i> Unlimited AI
+                meal suggestions
+              </li>
+              <li class="flex items-center gap-3 font-manrope text-sm text-white/80">
+                <i class="fa-solid fa-circle-check text-bb-green text-sm shrink-0"></i> Receipt
+                photo scanning (AI)
+              </li>
+              <li class="flex items-center gap-3 font-manrope text-sm text-white/80">
+                <i class="fa-solid fa-circle-check text-bb-green text-sm shrink-0"></i> Auto-Pivot
+                dynamic re-planning
+              </li>
+              <li class="flex items-center gap-3 font-manrope text-sm text-white/80">
+                <i class="fa-solid fa-circle-check text-bb-green text-sm shrink-0"></i> Predictive
+                spend forecasting
+              </li>
+            </ul>
+            <a
+              href="#auth-card"
+              class="flex items-center justify-center gap-2 w-full h-12 bg-bb-green hover:bg-bb-green/90 text-white font-manrope font-700 text-sm rounded-2xl transition-all min-h-[48px] relative z-10"
+              style="box-shadow: 0 8px 24px rgba(140, 198, 63, 0.3)"
+            >
+              <i class="fa-solid fa-bolt text-xs"></i> Start Pro Free — 14 days
+            </a>
+          </div>
+        </div>
+
+        <p class="text-center font-manrope text-sm text-bb-charcoal/35 mt-8">
+          Cancel anytime · No hidden fees · Full data export always available
+        </p>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section id="final-cta" class="py-32 bg-bb-green relative overflow-hidden">
+      <div
+        class="absolute inset-0 opacity-20"
+        style="
+          background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0);
+          background-size: 28px 28px;
+        "
+      ></div>
+      <div
+        class="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"
+      ></div>
+      <div
+        class="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"
+      ></div>
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <h2
+          class="font-sora font-800 text-4xl sm:text-5xl lg:text-6xl text-white leading-tight mb-6"
+        >
+          Your next great meal is <br class="hidden sm:block" />
+          $9.50 and 0.3 miles away.
+        </h2>
+        <p class="font-manrope text-xl text-white/75 mb-10 max-w-2xl mx-auto leading-relaxed">
+          Join 14,200+ people eating well and spending smarter — without the spreadsheets.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a
+            href="#auth-card"
+            class="flex items-center justify-center gap-2.5 bg-white text-bb-green font-manrope font-700 text-base px-8 py-4 rounded-2xl hover:bg-bb-cream transition-all min-h-[56px] shadow-xl"
+          >
+            <i class="fa-solid fa-leaf"></i> Start Free Today
+          </a>
+          <a
+            href="#how-it-works"
+            class="flex items-center justify-center gap-2.5 border-2 border-white/50 text-white font-manrope font-600 text-base px-8 py-4 rounded-2xl hover:border-white hover:bg-white/10 transition-all min-h-[56px]"
+          >
+            <i class="fa-solid fa-play text-xs"></i> See How It Works
+          </a>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-6 mt-10">
+          <div class="flex items-center gap-2 text-white/70">
+            <i class="fa-solid fa-shield-halved text-white/50 text-sm"></i>
+            <span class="font-manrope text-sm">Bank-level encryption</span>
+          </div>
+          <div class="flex items-center gap-2 text-white/70">
+            <i class="fa-solid fa-lock text-white/50 text-sm"></i>
+            <span class="font-manrope text-sm">GDPR compliant</span>
+          </div>
+          <div class="flex items-center gap-2 text-white/70">
+            <i class="fa-solid fa-bolt text-white/50 text-sm"></i>
+            <span class="font-manrope text-sm">Set up in 60 seconds</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="footer" class="bg-bb-charcoal pt-16 pb-24 md:pb-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-white/10">
+          <!-- Brand -->
+          <div class="md:col-span-1">
+            <div class="flex items-center gap-2.5 mb-4">
+              <div class="w-8 h-8 bg-bb-green rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-leaf text-white text-sm"></i>
+              </div>
+              <span class="font-sora font-700 text-xl text-white"
+                >Budget<span class="text-bb-green">Bite</span></span
+              >
+            </div>
+            <p class="font-manrope text-sm text-white/40 leading-relaxed">
+              The AI-powered meal planner that keeps your food budget healthy — and your taste buds
+              happier.
+            </p>
+            <div class="flex items-center gap-3 mt-5">
+              <a
+                href="#"
+                class="w-9 h-9 bg-white/10 hover:bg-bb-green rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-all"
+              >
+                <i class="fa-brands fa-x-twitter text-sm"></i>
+              </a>
+              <a
+                href="#"
+                class="w-9 h-9 bg-white/10 hover:bg-bb-green rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-all"
+              >
+                <i class="fa-brands fa-instagram text-sm"></i>
+              </a>
+              <a
+                href="#"
+                class="w-9 h-9 bg-white/10 hover:bg-bb-green rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-all"
+              >
+                <i class="fa-brands fa-linkedin text-sm"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Links -->
+          <div>
+            <p class="font-sora font-700 text-sm text-white mb-4 uppercase tracking-wide">
+              Product
+            </p>
+            <ul class="space-y-3">
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >How It Works</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >Features</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >Pricing</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >Changelog</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p class="font-sora font-700 text-sm text-white mb-4 uppercase tracking-wide">
+              Company
+            </p>
+            <ul class="space-y-3">
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >About</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >Blog</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >Careers</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >Press</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p class="font-sora font-700 text-sm text-white mb-4 uppercase tracking-wide">Legal</p>
+            <ul class="space-y-3">
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >Privacy Policy</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >Terms of Service</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >Cookie Policy</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="font-manrope text-sm text-white/45 hover:text-bb-green transition-colors"
+                  >Security</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8">
+          <p class="font-manrope text-sm text-white/30">© 2024 BudgetBite. All rights reserved.</p>
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-bb-green animate-pulse"></div>
+            <span class="font-manrope text-xs text-white/30">All systems operational</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- MOBILE BOTTOM NAV (App-like) -->
+    <div
+      id="mobile-nav"
+      class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-bb-mint/50 md:hidden z-50 safe-area-pb"
+    >
+      <div class="flex items-center justify-around px-2 pt-2 pb-3">
+        <a href="#hero" class="flex flex-col items-center gap-1 min-w-[60px] py-1">
+          <div class="w-10 h-10 bg-bb-green/10 rounded-2xl flex items-center justify-center">
+            <i class="fa-solid fa-house text-bb-green text-base"></i>
+          </div>
+          <span class="font-manrope text-xs text-bb-green font-600">Home</span>
+        </a>
+        <a href="#how-it-works" class="flex flex-col items-center gap-1 min-w-[60px] py-1">
+          <div class="w-10 h-10 rounded-2xl flex items-center justify-center">
+            <i class="fa-solid fa-route text-bb-charcoal/40 text-base"></i>
+          </div>
+          <span class="font-manrope text-xs text-bb-charcoal/40 font-500">How</span>
+        </a>
+        <a href="#auth-card" class="flex flex-col items-center gap-1 min-w-[60px] py-1">
+          <div
+            class="w-12 h-12 bg-bb-green rounded-2xl flex items-center justify-center shadow-lg -mt-3"
+            style="box-shadow: 0 4px 16px rgba(140, 198, 63, 0.4)"
+          >
+            <i class="fa-solid fa-bolt text-white text-lg"></i>
+          </div>
+          <span class="font-manrope text-xs text-bb-charcoal/40 font-500 mt-0.5">Start</span>
+        </a>
+        <a href="#features" class="flex flex-col items-center gap-1 min-w-[60px] py-1">
+          <div class="w-10 h-10 rounded-2xl flex items-center justify-center">
+            <i class="fa-solid fa-gem text-bb-charcoal/40 text-base"></i>
+          </div>
+          <span class="font-manrope text-xs text-bb-charcoal/40 font-500">Features</span>
+        </a>
+        <a href="#pricing" class="flex flex-col items-center gap-1 min-w-[60px] py-1">
+          <div class="w-10 h-10 rounded-2xl flex items-center justify-center">
+            <i class="fa-solid fa-tag text-bb-charcoal/40 text-base"></i>
+          </div>
+          <span class="font-manrope text-xs text-bb-charcoal/40 font-500">Pricing</span>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      window.addEventListener('load', function () {
+        // Animate progress bar when in view
+        const progressBar = document.querySelector('.progress-bar-fill');
+        if (progressBar) {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                progressBar.style.width = '68%';
+              }
+            });
+          });
+          observer.observe(progressBar);
+        }
+
+        // Budget slider live update
+        const slider = document.querySelector('input[type="range"]');
+        if (slider) {
+          slider.addEventListener('input', function () {
+            const val = parseInt(this.value);
+            const display = this.closest('.bg-white');
+            if (display) {
+              const amtDisplay = display.querySelector('.text-bb-green');
+              if (amtDisplay) amtDisplay.textContent = '$' + val;
+            }
+          });
+        }
+
+        // Step card interactions
+        const stepCards = document.querySelectorAll('.step-card');
+        stepCards.forEach((card) => {
+          card.addEventListener('click', function () {
+            stepCards.forEach((c) => {
+              c.classList.remove('step-active', 'border-bb-green');
+              c.classList.add('border-bb-mint/30', 'bg-white');
+            });
+            this.classList.add('step-active');
+            this.classList.remove('border-bb-mint/30', 'bg-white');
+          });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener('click', function (e) {
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+              e.preventDefault();
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
