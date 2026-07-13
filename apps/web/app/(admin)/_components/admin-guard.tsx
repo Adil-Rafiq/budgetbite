@@ -25,8 +25,8 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Spinner className="size-6 text-soft" />
+      <div className="flex min-h-screen items-center justify-center bg-canvas">
+        <Spinner className="size-6 text-slate" />
       </div>
     );
   }
