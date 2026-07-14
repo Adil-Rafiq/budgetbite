@@ -1,4 +1,7 @@
-playwright
-seleniumbase
-python-dotenv>=1.0.0
-playsound3
+# Pinned to the versions verified working on 2026-07-14. Bump deliberately
+# and re-run a scrape to confirm Foodpanda's DOM still parses before committing.
+# To refresh: pip install -U <pkg> then paste the new == version here.
+playwright==1.61.0
+seleniumbase==4.51.0
+python-dotenv==1.2.2
+playsound3==3.3.1

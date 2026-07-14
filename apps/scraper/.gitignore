@@ -1,0 +1,6 @@
+# Python virtualenv (created by `python -m venv .venv`)
+.venv/
+venv/
+
+# Test / tooling caches
+.pytest_cache/

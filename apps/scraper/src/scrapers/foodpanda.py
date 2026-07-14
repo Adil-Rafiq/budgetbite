@@ -1,9 +1,9 @@
 """Foodpanda-specific scraper implementation."""
 
 from typing import List
-from scrapers import BaseScraper
-from parsers import FoodpandaParser
-from models import Restaurant, MenuItem
+from .base import BaseScraper
+from ..parsers import FoodpandaParser
+from ..models import Restaurant, MenuItem
 
 class FoodpandaScraper(BaseScraper):
     """Scraper for Foodpanda restaurant data."""

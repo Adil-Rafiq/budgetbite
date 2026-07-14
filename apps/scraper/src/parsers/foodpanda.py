@@ -3,7 +3,7 @@
 import re
 from playwright.sync_api import Page, Locator
 from typing import List, Optional
-from models import MenuItem
+from ..models import MenuItem
 
 
 class FoodpandaParser:

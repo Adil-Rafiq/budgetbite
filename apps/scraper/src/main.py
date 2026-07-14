@@ -1,9 +1,8 @@
 """Main entry point for the scraper."""
 
-import json
-from scrapers import FoodpandaScraper
-from config import config
-from upload import upload_all
+from .scrapers import FoodpandaScraper
+from .config import config
+from .upload import upload_all
 
 
 def main():

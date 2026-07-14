@@ -1,8 +1,8 @@
 """Base scraper with common functionality."""
 
 from abc import ABC, abstractmethod
-from core import BrowserManager
-from config import config
+from ..core import BrowserManager
+from ..config import config
 
 class BaseScraper(ABC):
     """Base class for all scrapers."""

@@ -1,7 +1,7 @@
 """
 Upload scraped restaurant and menu data to the BudgetBite API (admin endpoints).
 
-Requires ADMIN_API_KEY and optionally BUDGETBITE_API_URL in the environment.
+Requires ADMIN_API_KEY and optionally API_URL in the environment.
 """
 
 import json
@@ -10,8 +10,8 @@ import urllib.parse
 import urllib.request
 from typing import Any
 
-from config import config
-from models import Restaurant
+from .config import config
+from .models import Restaurant
 
 
 def _api_headers() -> dict[str, str]:
@@ -69,9 +69,13 @@ def _restaurant_payload(restaurant: Restaurant, lat: float, lng: float) -> dict[
         "longitude": lng,
         "deliveryFee": restaurant.get("delivery_fee"),
         "minimumOrder": restaurant.get("minimum_order"),
-        "rating": restaurant.get("rating"),
         "ratingCount": restaurant.get("rating_count") or 0,
     }
+    # Omit rating when unknown. Sending `null` would let the API's
+    # z.coerce.number() turn it into 0, which reads as a real 0-star rating.
+    rating = restaurant.get("rating")
+    if rating is not None:
+        payload["rating"] = rating
     # Foodpanda URL slug — drives the "Order on Foodpanda" deep-link on the
     # web app. Optional so older restaurant rows scraped before this field
     # was tracked stay valid; the API column is nullable.
@@ -84,12 +88,15 @@ def _menu_item_payload(item: dict) -> dict[str, Any]:
     """Build API create-menu-item payload from scraped menu item."""
     payload = {
         "name": (item.get("name") or "Unnamed")[:300],
-        "price": float(item.get("price", 0)),
+        "price": float(item.get("price") or 0),
     }
     if item.get("description"):
         payload["description"] = (item["description"])[:2000]
-    if item.get("image_url"):
-        payload["imageUrl"] = item["image_url"][:2000]
+    # Only forward absolute http(s) URLs — the API validates imageUrl with
+    # z.url(), so a relative/malformed src would 400 the whole batch.
+    image_url = item.get("image_url")
+    if image_url and image_url.startswith("http"):
+        payload["imageUrl"] = image_url[:2000]
     return payload
 
 
@@ -134,7 +141,17 @@ def upload_restaurant_and_menu(
         print(f"[INFO] No menu items for {restaurant.get('vendor_id')}, skipping menu upload")
         return 0
 
-    items_payload = [_menu_item_payload(item) for item in menu]
+    # Drop items whose price didn't parse (price <= 0). The API requires a
+    # positive price and validates the array as a unit, so a single bad item
+    # would 400 the entire batch and lose the whole restaurant's menu.
+    items_payload = [p for item in menu if (p := _menu_item_payload(item))["price"] > 0]
+    skipped = len(menu) - len(items_payload)
+    if skipped:
+        print(f"[INFO] Skipped {skipped} item(s) with non-positive price for {restaurant.get('vendor_id')}")
+    if not items_payload:
+        print(f"[INFO] No valid-priced menu items for {restaurant.get('vendor_id')}, skipping menu upload")
+        return 0
+
     status, body = _request("POST", url_menu, items_payload)
     if status not in (200, 201):
         raise RuntimeError(f"Failed to upload menu: {status} {body}")
