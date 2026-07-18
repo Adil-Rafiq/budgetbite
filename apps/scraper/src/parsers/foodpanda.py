@@ -124,6 +124,41 @@ class FoodpandaParser:
         return None
 
     @staticmethod
+    def _to_float(value) -> Optional[float]:
+        """Coerce a JSON scalar to float, tolerating numeric strings."""
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def parse_restaurant_geo(page: Page) -> tuple[Optional[float], Optional[float]]:
+        """Extract the restaurant's own coordinates as (latitude, longitude).
+
+        Without this every vendor inherits the scrape-origin coords, so they all
+        sit at the same point and distance-based sorting is meaningless.
+
+        Only the JSON-LD `geo` block is trusted: it is scoped to the Restaurant
+        entity. A page-wide regex for "latitude"/"longitude" is deliberately NOT
+        used, because the embedded app state also carries the *search* location
+        and would silently attach the runner's coords to the vendor — worse than
+        an honest fallback. Returns (None, None) when nothing is found.
+        """
+        try:
+            for entry in FoodpandaParser._json_ld_restaurants(page):
+                geo = entry.get("geo")
+                if not isinstance(geo, dict):
+                    continue
+                lat = FoodpandaParser._to_float(geo.get("latitude"))
+                lng = FoodpandaParser._to_float(geo.get("longitude"))
+                if lat is not None and lng is not None:
+                    return (lat, lng)
+            return (None, None)
+        except Exception as e:
+            print(f"[WARN] Failed to parse restaurant geo: {e}")
+            return (None, None)
+
+    @staticmethod
     def parse_rating(page: Page) -> Optional[float]:
         """Extract restaurant rating from page.
         

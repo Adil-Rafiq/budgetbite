@@ -70,6 +70,7 @@ class FoodpandaScraper(BaseScraper):
 
         # Parse restaurant details
         name = self.parser.parse_restaurant_name(page)
+        latitude, longitude = self.parser.parse_restaurant_geo(page)
         rating = self.parser.parse_rating(page)
         rating_count = self.parser.parse_rating_count(page)
         delivery_fee = self.parser.parse_delivery_fee(page)
@@ -85,6 +86,8 @@ class FoodpandaScraper(BaseScraper):
             vendor_id=vendor_id,
             slug=restaurant_slug,
             name=name,
+            latitude=latitude,
+            longitude=longitude,
             rating=rating,
             rating_count=rating_count,
             minimum_order=minimum_order,

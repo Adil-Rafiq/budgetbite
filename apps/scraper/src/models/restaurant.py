@@ -17,6 +17,10 @@ class Restaurant(TypedDict):
     vendor_id: str
     slug: str
     name: Optional[str]
+    # The vendor's own coordinates. None when the page exposes none, in which
+    # case the uploader falls back to the scrape-origin coords.
+    latitude: Optional[float]
+    longitude: Optional[float]
     rating: Optional[float]
     rating_count: Optional[int]
     minimum_order: float

@@ -76,11 +76,18 @@ def _restaurant_payload(restaurant: Restaurant, lat: float, lng: float) -> dict[
         or restaurant.get("vendor_id")
         or "Unknown"
     )
+    # Prefer the vendor's own coordinates. Falling back to the scrape origin
+    # parks every restaurant on the runner's location, which flattens distance
+    # sorting — so that path is a last resort, and the scraper warns about it.
+    latitude = restaurant.get("latitude")
+    longitude = restaurant.get("longitude")
+    if latitude is None or longitude is None:
+        latitude, longitude = lat, lng
     payload: dict[str, Any] = {
         "externalId": restaurant["vendor_id"],
         "name": name[:300],
-        "latitude": lat,
-        "longitude": lng,
+        "latitude": latitude,
+        "longitude": longitude,
         "deliveryFee": restaurant.get("delivery_fee"),
         "minimumOrder": restaurant.get("minimum_order"),
         "ratingCount": restaurant.get("rating_count") or 0,
