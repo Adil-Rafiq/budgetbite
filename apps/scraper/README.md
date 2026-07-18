@@ -55,4 +55,14 @@ Required env (in `apps/scraper/.env`):
 | `API_URL`       | Base URL of the BudgetBite API       |
 | `ADMIN_API_KEY` | Must match the API's `ADMIN_API_KEY` |
 
+Optional env (override the search location / run size without editing code):
+
+| Var                      | Default                    | Purpose                                       |
+| ------------------------ | -------------------------- | --------------------------------------------- |
+| `SCRAPE_LAT`             | `31.461658`                | Search-origin latitude                        |
+| `SCRAPE_LNG`             | `74.364802`                | Search-origin longitude                       |
+| `SCRAPE_AREA`            | _(unset)_                  | Human-readable area label recorded on the run |
+| `SCRAPE_MAX_RESTAURANTS` | `10`                       | Max restaurants to scrape; `all` for no limit |
+| `SCRAPE_BASE_URL`        | `https://www.foodpanda.pk` | Foodpanda base URL                            |
+
 Run only against a local API you control unless you have explicit permission to do otherwise.

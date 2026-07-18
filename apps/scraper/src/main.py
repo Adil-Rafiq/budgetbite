@@ -11,8 +11,8 @@ def main():
 
     scraper = FoodpandaScraper(
         base_url=config.base_url,
-        lat=config.lahore_lat,
-        lng=config.lahore_lng,
+        lat=config.scrape_lat,
+        lng=config.scrape_lng,
     )
 
     try:
@@ -24,7 +24,7 @@ def main():
         # print(json.dumps(restaurants, indent=2))
 
         # Upload to BudgetBite API (admin endpoints); skips if ADMIN_API_KEY not set
-        upload_all(restaurants, lat=config.lahore_lat, lng=config.lahore_lng)
+        upload_all(restaurants, lat=config.scrape_lat, lng=config.scrape_lng)
 
     finally:
         scraper.close()

@@ -204,7 +204,9 @@ def _start_scraper_run(lat: float, lng: float) -> str | None:
     """
     base = config.api_base_url.rstrip("/")
     url = f"{base}/api/admin/scraper-runs"
-    payload = {"source": "foodpanda", "latitude": lat, "longitude": lng}
+    payload: dict[str, Any] = {"source": "foodpanda", "latitude": lat, "longitude": lng}
+    if config.area:
+        payload["area"] = config.area
     try:
         status, body = _request("POST", url, payload)
         if status in (200, 201) and isinstance(body, dict) and "id" in body:
