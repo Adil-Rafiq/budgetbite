@@ -121,9 +121,24 @@ def _menu_item_payload(item: dict) -> dict[str, Any]:
     return payload
 
 
+def _refresh_restaurant(restaurant_id: str, payload: dict[str, Any]) -> None:
+    """PATCH an existing restaurant so re-runs keep rating/fees/name current.
+
+    Best-effort: a failed refresh must not block the menu upload.
+    """
+    base = config.api_base_url.rstrip("/")
+    url = f"{base}/api/admin/restaurants/{restaurant_id}"
+    # externalId is the immutable key we matched on — never send it in an update.
+    update = {k: v for k, v in payload.items() if k != "externalId"}
+    status, body = _request("PATCH", url, update)
+    if status != 200:
+        print(f"[WARN] Could not refresh restaurant {restaurant_id}: {status} {body}")
+
+
 def ensure_restaurant_id(restaurant: Restaurant, lat: float, lng: float) -> str:
     """
     Create restaurant or get existing id by externalId. Returns restaurant id (UUID).
+    On an existing restaurant, refreshes its fields with the latest scrape.
     """
     base = config.api_base_url.rstrip("/")
     url_create = f"{base}/api/admin/restaurants"
@@ -134,11 +149,13 @@ def ensure_restaurant_id(restaurant: Restaurant, lat: float, lng: float) -> str:
     if status == 201 and isinstance(body, dict) and "id" in body:
         return body["id"]
     if status == 409:
-        # Already exists: fetch by externalId
+        # Already exists: fetch its id, then refresh its fields with this scrape.
         url_get = f"{base}/api/admin/restaurants/external/{urllib.parse.quote(restaurant['vendor_id'], safe='')}"
         status2, body2 = _request("GET", url_get)
         if status2 == 200 and isinstance(body2, dict) and "id" in body2:
-            return body2["id"]
+            restaurant_id = body2["id"]
+            _refresh_restaurant(restaurant_id, payload)
+            return restaurant_id
         print(f"[WARN] Got 409 but could not fetch by externalId: {status2} {body2}")
     raise RuntimeError(f"Failed to ensure restaurant: {status} {body}")
 
