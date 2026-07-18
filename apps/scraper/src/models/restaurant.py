@@ -16,6 +16,7 @@ class Restaurant(TypedDict):
     url: str
     vendor_id: str
     slug: str
+    name: Optional[str]
     rating: Optional[float]
     rating_count: Optional[int]
     minimum_order: float

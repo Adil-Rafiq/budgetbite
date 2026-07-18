@@ -57,11 +57,25 @@ def _request(
         raise
 
 
+def _prettify_slug(slug: str | None) -> str | None:
+    """Turn a URL slug like 'broadway-pizza-z-block' into 'Broadway Pizza Z Block'."""
+    if not slug:
+        return None
+    return slug.replace("-", " ").strip().title() or None
+
+
 def _restaurant_payload(restaurant: Restaurant, lat: float, lng: float) -> dict[str, Any]:
     """Build API create-restaurant payload from scraped restaurant."""
-    # Use slug as display name (vendor_id is internal id)
     slug = restaurant.get("slug")
-    name = slug or restaurant.get("vendor_id") or "Unknown"
+    # Prefer the real name scraped off the page; degrade to a prettified slug,
+    # then the internal vendor_id, so a missed selector still yields something
+    # readable rather than a raw "broadway-pizza-z-block" slug.
+    name = (
+        restaurant.get("name")
+        or _prettify_slug(slug)
+        or restaurant.get("vendor_id")
+        or "Unknown"
+    )
     payload: dict[str, Any] = {
         "externalId": restaurant["vendor_id"],
         "name": name[:300],

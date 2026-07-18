@@ -1,5 +1,6 @@
 """Parsers for extracting data from Foodpanda pages."""
 
+import json
 import re
 from playwright.sync_api import Page, Locator
 from typing import List, Optional
@@ -56,7 +57,72 @@ class FoodpandaParser:
         return [link.get_attribute("href") for link in links if link.get_attribute("href")]
     
     # ========== Restaurant Details Parsing ==========
-    
+
+    @staticmethod
+    def parse_restaurant_name(page: Page) -> Optional[str]:
+        """Extract the restaurant's actual display name from the page.
+
+        Foodpanda renders the vendor name as the page's main heading. We try a
+        few stable anchors, then fall back to structured data, returning None if
+        nothing matches so the caller can prettify the URL slug instead.
+        """
+        try:
+            # 1) Confirmed vendor title heading on foodpanda.pk
+            title = page.locator("h1.main-info__title")
+            if title.count() > 0:
+                name = title.first.inner_text().strip()
+                if name:
+                    return name
+
+            # 2) Any main <h1> (guards against class-name changes)
+            h1 = page.locator("h1")
+            if h1.count() > 0:
+                name = h1.first.inner_text().strip()
+                if name:
+                    return name
+
+            # 3) JSON-LD structured data (locale-independent last resort)
+            return FoodpandaParser._name_from_json_ld(page)
+        except Exception as e:
+            print(f"[WARN] Failed to parse restaurant name: {e}")
+            return None
+
+    @staticmethod
+    def _json_ld_restaurants(page: Page) -> List[dict]:
+        """Collect Restaurant/FoodEstablishment entries from any ld+json blob."""
+        found: List[dict] = []
+        for script in page.locator('script[type="application/ld+json"]').all():
+            raw = script.text_content()
+            if not raw:
+                continue
+            try:
+                data = json.loads(raw)
+            except json.JSONDecodeError:
+                continue
+            # Blob may be a bare object, a list, or a {"@graph": [...]} wrapper.
+            if isinstance(data, dict):
+                entries = data.get("@graph", [data])
+            elif isinstance(data, list):
+                entries = data
+            else:
+                continue
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    continue
+                types = entry.get("@type")
+                types = types if isinstance(types, list) else [types]
+                if any(t in ("Restaurant", "FoodEstablishment") for t in types):
+                    found.append(entry)
+        return found
+
+    @staticmethod
+    def _name_from_json_ld(page: Page) -> Optional[str]:
+        """Pull a Restaurant/FoodEstablishment name from any ld+json blob."""
+        for entry in FoodpandaParser._json_ld_restaurants(page):
+            if entry.get("name"):
+                return str(entry["name"]).strip()
+        return None
+
     @staticmethod
     def parse_rating(page: Page) -> Optional[float]:
         """Extract restaurant rating from page.

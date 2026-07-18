@@ -69,6 +69,7 @@ class FoodpandaScraper(BaseScraper):
         self.scroll_to_bottom(step=1000, delay=1.0)
 
         # Parse restaurant details
+        name = self.parser.parse_restaurant_name(page)
         rating = self.parser.parse_rating(page)
         rating_count = self.parser.parse_rating_count(page)
         delivery_fee = self.parser.parse_delivery_fee(page)
@@ -77,12 +78,13 @@ class FoodpandaScraper(BaseScraper):
         # Parse menu items
         menu = self.parser.parse_menu_items(page)
         
-        print(f"[SUCCESS] Scraped {len(menu)} items from {vendor_id}")
+        print(f"[SUCCESS] Scraped {len(menu)} items from {name or vendor_id}")
 
         return Restaurant(
             url=url,
             vendor_id=vendor_id,
             slug=restaurant_slug,
+            name=name,
             rating=rating,
             rating_count=rating_count,
             minimum_order=minimum_order,
