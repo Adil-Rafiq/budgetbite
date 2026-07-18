@@ -96,6 +96,23 @@ class FoodpandaScraper(BaseScraper):
         # Parse menu items
         menu = self.parser.parse_menu_items(page)
         
+        # Flag empty fields so selector drift surfaces immediately. Delivery fee
+        # and minimum order are omitted: their 0.0 is ambiguous — it can mean
+        # "free" / "no minimum" rather than a parse miss.
+        missing = [
+            label
+            for label, value in (
+                ("name", name),
+                ("coordinates", latitude if longitude is not None else None),
+                ("rating", rating),
+                ("rating_count", rating_count),
+                ("menu", menu),
+            )
+            if not value
+        ]
+        if missing:
+            print(f"[WARN] {vendor_id}: missing/empty fields -> {', '.join(missing)}")
+
         print(f"[SUCCESS] Scraped {len(menu)} items from {name or vendor_id}")
 
         return Restaurant(
