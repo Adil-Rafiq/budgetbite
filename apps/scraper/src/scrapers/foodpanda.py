@@ -45,9 +45,26 @@ class FoodpandaScraper(BaseScraper):
             for link in links
             if '/restaurant/' in link
         ]
-        
-        print(f"[INFO] Found {len(absolute_links)} restaurant links")
-        return absolute_links
+
+        # The homepage lists the same restaurant across multiple carousels, so
+        # dedupe by vendor id to avoid scraping any vendor more than once.
+        seen: set[str] = set()
+        unique_links: List[str] = []
+        for link in absolute_links:
+            try:
+                vendor_id = self.parser.extract_vendor_id(link)
+            except ValueError:
+                vendor_id = link
+            if vendor_id in seen:
+                continue
+            seen.add(vendor_id)
+            unique_links.append(link)
+
+        print(
+            f"[INFO] Found {len(unique_links)} unique restaurant links "
+            f"({len(absolute_links)} before dedupe)"
+        )
+        return unique_links
 
     def scrape_restaurant(self, url: str) -> Restaurant:
         """Scrape data from a single restaurant page."""
