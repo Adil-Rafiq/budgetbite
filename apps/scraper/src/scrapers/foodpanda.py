@@ -78,9 +78,8 @@ class FoodpandaScraper(BaseScraper):
         page.goto(url, wait_until="domcontentloaded")
         self.browser.delay(self.config.page_load_delay)
 
-        # Handle CAPTCHA
+        # Handle CAPTCHA (owns its own settle delay when one actually appears)
         self.handle_captcha()
-        self.browser.delay(self.config.page_load_delay)
 
         # Scroll to load lazy-loaded content
         self.scroll_to_bottom()

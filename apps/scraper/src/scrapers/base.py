@@ -52,10 +52,22 @@ class BaseScraper(ABC):
                 last_scroll = curr_scroll
 
     def handle_captcha(self):
-        """Handle CAPTCHA if present."""
+        """Solve a CAPTCHA if one is on the page; do nothing, and wait for
+        nothing, when there isn't.
+
+        The check is cheap and the common case is no CAPTCHA at all, so paying
+        solve_captcha() plus captcha_wait_delay on every restaurant was several
+        seconds of waiting for an event that usually never happened. This also
+        owns the post-solve settle, so callers no longer pad the call site.
+        """
+        if not self.browser.is_captcha_present():
+            return
+
         self.browser.solve_captcha()
         self.browser.delay(self.config.captcha_wait_delay)
+        # Re-checks presence: the auto-solve above may already have cleared it.
         self.browser.wait_for_manual_captcha()
+        self.browser.delay(self.config.page_load_delay)
 
     def close(self):
         """Cleanup resources."""
