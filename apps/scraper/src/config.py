@@ -57,9 +57,12 @@ class ScraperConfig:
     # Human-readable area label recorded on the scraper run (optional).
     area: str | None = _env("SCRAPE_AREA")
 
-    # Scraping settings
-    scroll_step: int = 500
-    scroll_delay: float = 0.5
+    # Scraping settings. Bigger steps with a shorter pause cover a long menu
+    # page in far fewer iterations; scroll_stable_rounds is what keeps that
+    # from ending the scroll early while items are still lazy-loading.
+    scroll_step: int = 2000
+    scroll_delay: float = 0.3
+    scroll_stable_rounds: int = 3
     page_load_delay: float = 2.0
     captcha_wait_delay: float = 2.0
 

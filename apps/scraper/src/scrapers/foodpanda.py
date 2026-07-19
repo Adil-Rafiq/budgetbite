@@ -83,7 +83,7 @@ class FoodpandaScraper(BaseScraper):
         self.browser.delay(self.config.page_load_delay)
 
         # Scroll to load lazy-loaded content
-        self.scroll_to_bottom(step=1000, delay=1.0)
+        self.scroll_to_bottom()
 
         # Parse restaurant details
         name = self.parser.parse_restaurant_name(page)
