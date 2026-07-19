@@ -13,28 +13,38 @@ class FoodpandaParser:
     # ========== URL Parsing ==========
     
     @staticmethod
+    def _clean_segment(segment: str) -> str:
+        """Drop any query string / fragment from a URL path segment.
+
+        Homepage carousel links carry tracking params
+        (?eo=large_order_swimlane&vco=vendor_swimlane) which would otherwise be
+        baked into the slug and break the "Order on Foodpanda" deep-link.
+        """
+        return segment.split('?')[0].split('#')[0]
+
+    @staticmethod
     def extract_vendor_id(url: str) -> str:
         """Extract vendor ID from restaurant URL.
-        
+
         Example: /restaurant/s9vx/ny-212-dha -> s9vx
         """
         parts = url.split('/')
         try:
             restaurant_idx = parts.index('restaurant')
-            return parts[restaurant_idx + 1]
+            return FoodpandaParser._clean_segment(parts[restaurant_idx + 1])
         except (ValueError, IndexError):
             raise ValueError(f"Could not extract vendor ID from URL: {url}")
 
     @staticmethod
     def extract_restaurant_slug(url: str) -> str:
         """Extract restaurant name slug from URL.
-        
+
         Example: /restaurant/s9vx/ny-212-dha -> ny-212-dha
         """
         parts = url.split('/')
         try:
             restaurant_idx = parts.index('restaurant')
-            return parts[restaurant_idx + 2]
+            return FoodpandaParser._clean_segment(parts[restaurant_idx + 2])
         except (ValueError, IndexError):
             raise ValueError(f"Could not extract restaurant slug from URL: {url}")
 
