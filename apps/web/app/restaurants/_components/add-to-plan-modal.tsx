@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { formatPKR } from '@/lib/currency';
 import {
   Select,
   SelectContent,
@@ -104,7 +105,7 @@ export function AddToPlanModal({
         });
         showToast.success({
           title: 'Meal logged',
-          description: `₨ ${actualAmount.toLocaleString()} for ${slotDate}`,
+          description: `${formatPKR(actualAmount)} for ${slotDate}`,
         });
       } else {
         await createPin({
@@ -149,7 +150,7 @@ export function AddToPlanModal({
           <p className="font-medium text-charcoal">{menuItem.name}</p>
           <p className="text-[12px] text-slate">{restaurantName}</p>
           <p className="mt-1 font-display text-base font-semibold text-green">
-            ₨ {menuItem.price.toLocaleString()}
+            {formatPKR(menuItem.price)}
           </p>
         </div>
 
@@ -249,7 +250,7 @@ export function AddToPlanModal({
             {isSaving
               ? 'Saving…'
               : isPastOrToday
-                ? `Log ₨ ${actualAmount.toLocaleString()}`
+                ? `Log ${formatPKR(actualAmount)}`
                 : 'Pin to plan'}
             <span className="opacity-70">↵</span>
           </button>

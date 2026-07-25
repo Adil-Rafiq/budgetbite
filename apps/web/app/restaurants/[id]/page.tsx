@@ -11,6 +11,7 @@ import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useRestaurant, useRestaurantMenu } from '@/hooks/use-restaurant';
 import { useUser } from '@/hooks/use-user';
 import { pricesUpdatedAgoLabel } from '@/lib/date';
+import { formatPKR } from '@/lib/currency';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -48,8 +49,6 @@ const FIT_RANK: Record<BudgetFit | 'none', number> = {
 function buildFoodpandaUrl(externalId: string, slug: string): string {
   return `https://www.foodpanda.pk/restaurant/${externalId}/${slug}`;
 }
-
-const formatPkr = (n: number) => `₨ ${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 
 const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60';
 const inputClass = 'bg-canvas border-sage text-charcoal';
@@ -179,8 +178,8 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                   </span>
                 )}
                 {distanceKm != null && <span>{distanceKm.toFixed(1)} km away</span>}
-                {r.deliveryFee != null && <span>delivery ₨ {r.deliveryFee}</span>}
-                {r.minimumOrder != null && <span>min order ₨ {r.minimumOrder}</span>}
+                {r.deliveryFee != null && <span>delivery {formatPKR(r.deliveryFee)}</span>}
+                {r.minimumOrder != null && <span>min order {formatPKR(r.minimumOrder)}</span>}
               </div>
             </div>
 
@@ -231,8 +230,8 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
       {hasActivePlan && avgPerMeal > 0 ? (
         <div className="grid grid-cols-3 gap-3 rounded-2xl border border-sage bg-canvas p-4">
           {[
-            { label: 'Avg / meal', value: formatPkr(avgPerMeal) },
-            { label: 'Remaining', value: formatPkr(amountRemaining) },
+            { label: 'Avg / meal', value: formatPKR(avgPerMeal) },
+            { label: 'Remaining', value: formatPKR(amountRemaining) },
             { label: 'Meals left', value: String(mealsRemaining) },
           ].map(({ label, value }) => (
             <div key={label} className="flex flex-col">
@@ -272,8 +271,8 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
           </div>
           {menuStats && (
             <span className="text-[11px] text-slate/60">
-              {menuStats.count} item{menuStats.count === 1 ? '' : 's'} · {formatPkr(menuStats.min)}{' '}
-              – {formatPkr(menuStats.max)} · avg {formatPkr(menuStats.avg)}
+              {menuStats.count} item{menuStats.count === 1 ? '' : 's'} · {formatPKR(menuStats.min)}{' '}
+              – {formatPKR(menuStats.max)} · avg {formatPKR(menuStats.avg)}
               {menuStats.freshness ? ` · ${menuStats.freshness}` : ''}
             </span>
           )}
@@ -418,7 +417,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                         )}
                       </div>
                       <span className="shrink-0 whitespace-nowrap text-right font-display text-base font-semibold text-green">
-                        ₨ {item.price.toLocaleString()}
+                        {formatPKR(item.price)}
                       </span>
                     </div>
 

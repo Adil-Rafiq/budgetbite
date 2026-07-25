@@ -5,9 +5,10 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import type { AdminPlanGeneration, AdminPlanSuggestion } from '@repo/shared';
 import { useAdminPlan } from '@/hooks/use-admin-plans';
+import { formatPKR } from '@/lib/currency';
 import { Spinner } from '@/components/ui/spinner';
 
-const money = (n: number): string => `₨ ${n.toLocaleString()}`;
+const money = (n: number): string => formatPKR(n);
 const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
 
 const genStatusClass: Record<AdminPlanGeneration['status'], string> = {

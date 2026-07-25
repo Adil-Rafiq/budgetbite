@@ -3,6 +3,7 @@
 import { CalendarDays, CalendarRange, Check, Wand2 } from 'lucide-react';
 import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-context';
 import type { BudgetPlanType } from '@/app/onboarding/types';
+import { formatPKR } from '@/lib/currency';
 
 const SLIDER_CONFIG: Record<
   BudgetPlanType,
@@ -11,8 +12,6 @@ const SLIDER_CONFIG: Record<
   weekly: { min: 1000, max: 50000, step: 500, presets: [3500, 7500, 12000, 20000], days: 7 },
   monthly: { min: 5000, max: 200000, step: 2000, presets: [15000, 30000, 45000, 60000], days: 30 },
 };
-
-const formatRs = (n: number) => `₨ ${Math.round(n).toLocaleString('en-PK')}`;
 
 const cardClass = 'rounded-[20px] border border-sage bg-white p-5 shadow-sm sm:p-6';
 
@@ -88,8 +87,8 @@ export const BudgetStep = () => {
           className="bb-range mb-3 w-full"
         />
         <div className="mb-5 flex justify-between text-xs text-slate">
-          <span>{formatRs(config.min)}</span>
-          <span>{formatRs(config.max)}</span>
+          <span>{formatPKR(config.min)}</span>
+          <span>{formatPKR(config.max)}</span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -107,7 +106,7 @@ export const BudgetStep = () => {
                     : 'border-sage text-slate hover:border-green hover:text-green'
                 }`}
               >
-                {formatRs(preset)}
+                {formatPKR(preset)}
               </button>
             );
           })}
@@ -204,7 +203,7 @@ export const BudgetStep = () => {
               </span>
               <span className="text-sm font-semibold">Budget breakdown</span>
             </div>
-            <span className="text-xs text-slate">≈ {formatRs(perMeal)} per meal</span>
+            <span className="text-xs text-slate">≈ {formatPKR(perMeal)} per meal</span>
           </div>
           <div className="space-y-3">
             {mealTypeOptions
@@ -213,7 +212,7 @@ export const BudgetStep = () => {
                 <div key={type.id}>
                   <div className="mb-1.5 flex justify-between text-xs">
                     <span className="capitalize text-slate">{type.label}</span>
-                    <span className="font-semibold text-charcoal">{formatRs(perMeal)}</span>
+                    <span className="font-semibold text-charcoal">{formatPKR(perMeal)}</span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-sage/50">
                     <div
@@ -226,7 +225,7 @@ export const BudgetStep = () => {
           </div>
           <p className="mt-4 text-xs text-slate">
             Split evenly across {values.mealsPerDay} meal{values.mealsPerDay > 1 ? 's' : ''} a day ·
-            about {formatRs(perDay)} daily. The AI adjusts per meal as it plans.
+            about {formatPKR(perDay)} daily. The AI adjusts per meal as it plans.
           </p>
         </div>
       )}

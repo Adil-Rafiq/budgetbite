@@ -34,10 +34,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { formatPKR } from '@/lib/currency';
 
 const PAGE_SIZE = 20;
 
-const money = (n: number | null): string => (n == null ? '—' : `₨ ${n.toLocaleString()}`);
+const money = (n: number | null): string => (n == null ? '—' : formatPKR(n));
 
 const csvCell = (v: unknown): string => {
   const s = v == null ? '' : String(v);

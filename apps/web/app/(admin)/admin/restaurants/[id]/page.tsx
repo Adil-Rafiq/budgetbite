@@ -31,8 +31,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { formatPKR } from '@/lib/currency';
 
-const money = (n: number | null): string => (n == null ? '—' : `₨ ${n.toLocaleString()}`);
+const money = (n: number | null): string => (n == null ? '—' : formatPKR(n));
 
 export default function AdminRestaurantDetailPage() {
   const params = useParams<{ id: string }>();

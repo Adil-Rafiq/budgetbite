@@ -12,6 +12,7 @@ import {
   useMyRecommendations,
   useWithdrawRecommendation,
 } from '@/hooks/use-restaurant-recommendations';
+import { formatPKR } from '@/lib/currency';
 import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
 import { RecommendRestaurantButton } from '@/components/recommend-restaurant-button';
 import { Button } from '@/components/ui/button';
@@ -85,7 +86,7 @@ function RecommendationCard({
               className="flex items-baseline justify-between gap-2 text-[13px]"
             >
               <span className="truncate text-charcoal">{item.name}</span>
-              <span className="shrink-0 text-slate">₨ {item.price.toLocaleString()}</span>
+              <span className="shrink-0 text-slate">{formatPKR(item.price)}</span>
             </li>
           ))}
           {extra > 0 && <li className="text-[11px] text-slate/60">+{extra} more</li>}

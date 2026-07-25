@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { can, type AdminRestaurantRecommendation } from '@repo/shared';
 import { useUser } from '@/hooks/use-user';
+import { formatPKR } from '@/lib/currency';
 import {
   useAdminRecommendations,
   useReviewRecommendation,
@@ -184,7 +185,7 @@ export default function AdminRecommendationsPage() {
                               key={idx}
                               className="rounded border border-sage bg-canvas px-1.5 py-0.5 font-mono text-[11px] text-slate"
                             >
-                              {it.name} ₨{it.price}
+                              {it.name} {formatPKR(it.price)}
                             </span>
                           ))}
                           {r.items.length > 6 && (

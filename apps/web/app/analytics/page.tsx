@@ -44,6 +44,7 @@ import { motion } from 'motion/react';
 import { useBudgetPlans } from '@/hooks/use-budget-plan';
 import { useListActiveMealTypes } from '@/hooks/use-meal-type';
 import { useMealHistory, useSpendingAnalytics } from '@/hooks/use-analytics';
+import { formatPKR } from '@/lib/currency';
 
 // Recharts needs concrete color values (not Tailwind classes), so mirror the
 // fresh-greens @theme tokens as hex constants here.
@@ -98,7 +99,6 @@ function thisMonth(): Range {
   };
 }
 
-const formatPKR = (value: number) => `₨ ${value.toLocaleString()}`;
 const formatPKRCompact = (value: number) => {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
   if (value >= 1_000) return `${Math.round(value / 1000)}k`;
@@ -487,7 +487,7 @@ export default function AnalyticsPage() {
                           </span>
                         </div>
                         <span className="text-right font-display text-[14px] font-semibold tabular-nums text-charcoal">
-                          ₨ {item.actualAmountSpent.toLocaleString()}
+                          {formatPKR(item.actualAmountSpent)}
                         </span>
                       </motion.div>
                     );

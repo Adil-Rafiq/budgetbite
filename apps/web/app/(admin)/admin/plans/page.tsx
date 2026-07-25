@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import type { AdminPlanGeneration } from '@repo/shared';
 import { useAdminPlans } from '@/hooks/use-admin-plans';
+import { formatPKR } from '@/lib/currency';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import {
@@ -24,7 +25,7 @@ import {
 
 const PAGE_SIZE = 20;
 
-const money = (n: number): string => `₨ ${n.toLocaleString()}`;
+const money = (n: number): string => formatPKR(n);
 
 const genStatusClass: Record<AdminPlanGeneration['status'], string> = {
   pending: 'bg-[#f5a623]/15 text-[#9a6400]',

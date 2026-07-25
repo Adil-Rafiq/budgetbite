@@ -20,6 +20,7 @@ import {
 import { Slider } from '@/components/ui/slider';
 
 import { pricesUpdatedAgoLabel } from '@/lib/date';
+import { formatPKR } from '@/lib/currency';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { useRestaurants } from '@/hooks/use-restaurant';
@@ -236,12 +237,9 @@ function RestaurantsPageInner() {
                   Avg target / meal
                 </p>
                 <p className="font-display text-[22px] font-semibold tracking-tight text-charcoal">
-                  ₨ {avgPerMeal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  {formatPKR(avgPerMeal)}
                 </p>
-                <p className="text-[11px] text-slate">
-                  ₨ {amountRemaining.toLocaleString(undefined, { maximumFractionDigits: 0 })}{' '}
-                  remaining
-                </p>
+                <p className="text-[11px] text-slate">{formatPKR(amountRemaining)} remaining</p>
               </div>
             )}
             <div className="flex flex-col items-start gap-1.5 sm:items-end">
@@ -490,7 +488,7 @@ function RestaurantsPageInner() {
 
                       <div className="mt-1 flex items-center gap-3 text-[12px] text-slate">
                         {r.distanceKm != null && <span>{r.distanceKm.toFixed(1)} km</span>}
-                        {r.deliveryFee != null && <span>₨ {r.deliveryFee} fee</span>}
+                        {r.deliveryFee != null && <span>{formatPKR(r.deliveryFee)} fee</span>}
                       </div>
 
                       <div className="mt-auto flex flex-col gap-2 pt-4">
@@ -502,11 +500,11 @@ function RestaurantsPageInner() {
                                 From
                               </span>
                               <span className="font-display text-base font-semibold text-charcoal">
-                                ₨ {r.minItemPrice.toLocaleString()}
+                                {formatPKR(r.minItemPrice)}
                               </span>
                               {showAvg && (
                                 <span className="text-[11px] text-slate/60">
-                                  avg ₨ {Math.round(r.avgItemPrice as number).toLocaleString()}
+                                  avg {formatPKR(r.avgItemPrice as number)}
                                 </span>
                               )}
                             </div>
@@ -515,7 +513,7 @@ function RestaurantsPageInner() {
                           )}
                           {r.minimumOrder != null && (
                             <span className="text-[11px] text-slate">
-                              min order ₨ {r.minimumOrder}
+                              min order {formatPKR(r.minimumOrder)}
                             </span>
                           )}
                         </div>
