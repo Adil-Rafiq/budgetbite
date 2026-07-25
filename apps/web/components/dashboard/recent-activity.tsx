@@ -3,6 +3,7 @@
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useMealChoices } from '@/hooks/use-meal-choice';
 import { useListActiveMealTypes } from '@/hooks/use-meal-type';
+import { formatPKR } from '@/lib/currency';
 
 export function RecentActivity() {
   const { data: activePlan } = useActiveBudgetPlan();
@@ -15,14 +16,9 @@ export function RecentActivity() {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <span className="text-xs font-semibold uppercase tracking-widest text-green">
-            History
-          </span>
-          <h2 className="font-display text-2xl font-semibold tracking-tight text-charcoal">
-            Recent activity
-          </h2>
-        </div>
+        <h2 className="font-display text-2xl font-semibold tracking-tight text-charcoal">
+          Recent activity
+        </h2>
         <span className="text-[12px] text-slate">Last 5 entries</span>
       </div>
 
@@ -48,7 +44,7 @@ export function RecentActivity() {
             <p className="text-[12px] text-slate">Choose a meal above to start tracking.</p>
           </div>
         ) : (
-          <div className="flex flex-col">
+          <ul className="flex flex-col">
             {data.data.map((item, i) => {
               const mt = mealTypesById.get(item.mealTypeId);
               const label = mt?.label ?? 'Meal';
@@ -60,7 +56,7 @@ export function RecentActivity() {
                 : (item.restaurantName ?? '—');
 
               return (
-                <div
+                <li
                   key={item.id}
                   className={`flex items-center justify-between gap-4 px-5 py-3.5 ${
                     i === 0 ? '' : 'border-t border-sage'
@@ -71,7 +67,7 @@ export function RecentActivity() {
                       {label.slice(0, 1).toUpperCase()}
                     </span>
                     <div className="flex min-w-0 flex-col">
-                      <span className="text-[10px] font-semibold uppercase capitalize tracking-wide text-slate/60">
+                      <span className="text-[10px] font-semibold uppercase capitalize tracking-wide text-slate">
                         {label}
                       </span>
                       <span className="truncate text-[14px] font-medium text-charcoal">{name}</span>
@@ -80,7 +76,7 @@ export function RecentActivity() {
                   </div>
                   <div className="flex flex-col items-end gap-0.5">
                     <span className="font-display text-[15px] font-bold text-charcoal">
-                      ₨ {item.actualAmountSpent.toLocaleString()}
+                      {formatPKR(item.actualAmountSpent)}
                     </span>
                     <span className="text-[11px] text-slate">
                       {new Date(item.slotDate).toLocaleDateString('en-PK', {
@@ -89,13 +85,13 @@ export function RecentActivity() {
                       })}
                     </span>
                   </div>
-                </div>
+                </li>
               );
             })}
-          </div>
+          </ul>
         )}
       </div>
-      <p className="px-1 text-center text-[11px] text-slate/60">
+      <p className="px-1 text-center text-[11px] text-slate">
         All logged meals are private to your account.
       </p>
     </section>

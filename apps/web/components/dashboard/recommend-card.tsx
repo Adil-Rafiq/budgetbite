@@ -19,7 +19,7 @@ export function RecommendCard() {
         {pendingCount > 0 && (
           <Link
             href="/restaurants/recommendations"
-            className="text-[12px] font-medium text-green underline-offset-2 hover:text-dark-green hover:underline"
+            className="rounded text-[12px] font-medium text-green underline-offset-2 hover:text-dark-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
           >
             {pendingCount} pending review — view yours →
           </Link>

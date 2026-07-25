@@ -11,12 +11,13 @@ import {
 import { LogMealModal } from '@/components/dashboard/meal-slots/_components/log-meal-modal';
 import { useMealSlots } from '@/components/dashboard/meal-slots/_hooks/use-meal-slots';
 import { optionLabel } from '@/lib/suggestion';
+import { formatPKR } from '@/lib/currency';
 import type { SuggestionSlot, SuggestionOption } from '@repo/shared';
 
-const primaryBtn =
-  'inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50';
-const ghostBtn =
-  'inline-flex w-full items-center justify-center gap-2 rounded-xl border border-sage bg-white px-4 py-2 text-sm font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50';
+const focusRing =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+const primaryBtn = `inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50 ${focusRing}`;
+const ghostBtn = `inline-flex w-full items-center justify-center gap-2 rounded-xl border border-sage bg-white px-4 py-2 text-sm font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${focusRing}`;
 
 function SkeletonCard() {
   return (
@@ -59,14 +60,15 @@ export function MealSlots() {
     return (
       <div className="flex items-center gap-3 rounded-2xl border border-tomato/30 bg-tomato/[0.06] p-4 text-[13px] text-tomato">
         <TriangleAlert className="h-4 w-4 shrink-0" />
-        Failed to load meal slots: {slotsError.message}
+        We couldn&apos;t load today&apos;s meals just now. Please refresh to try again.
       </div>
     );
 
   if (!slotsData?.slots.length)
     return (
       <div className="rounded-2xl border border-dashed border-sage bg-white p-5 text-[13px] text-slate">
-        No meal suggestions available — create or activate a plan to get started.
+        No meals suggested for today yet. Once your plan generates today&apos;s options,
+        they&apos;ll show up here.
       </div>
     );
 
@@ -117,7 +119,7 @@ export function MealSlots() {
                   ) : isPinned ? (
                     <StatusPill tone="sage" label="Pinned" icon={<Pin className="h-3 w-3" />} />
                   ) : (
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate/60">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate">
                       Ready
                     </span>
                   )}
@@ -126,8 +128,8 @@ export function MealSlots() {
                 <div className="flex flex-1 flex-col gap-3 p-5">
                   {isLogged && loggedMeal ? (
                     <>
-                      <div className="rounded-xl border border-green/20 bg-white p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-green">
+                      <div className="rounded-xl bg-white/70 p-4">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-dark-green">
                           Logged
                         </div>
                         <div className="mt-1.5 flex items-start justify-between gap-3">
@@ -154,14 +156,14 @@ export function MealSlots() {
                             )}
                           </div>
                           <span className="font-display text-base font-bold text-charcoal">
-                            ₨ {loggedMeal.actualAmountSpent.toLocaleString()}
+                            {formatPKR(loggedMeal.actualAmountSpent)}
                           </span>
                         </div>
                       </div>
 
                       {slot.options.length > 0 && (
                         <div className="flex flex-col gap-1.5">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-slate/60">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate">
                             Other options
                           </p>
                           {slot.options.slice(0, 2).map((option: SuggestionOption) => (
@@ -172,8 +174,8 @@ export function MealSlots() {
                               <p className="mr-2 truncate text-[12px] text-slate">
                                 {optionLabel(option)}
                               </p>
-                              <span className="shrink-0 text-[11px] text-slate/60">
-                                ₨ {option.estimatedPrice.toLocaleString()}
+                              <span className="shrink-0 text-[11px] text-slate">
+                                {formatPKR(option.estimatedPrice)}
                               </span>
                             </div>
                           ))}
@@ -206,7 +208,7 @@ export function MealSlots() {
                               </p>
                             </div>
                             <span className="shrink-0 font-display text-[14px] font-bold text-green">
-                              ₨ {option.estimatedPrice.toLocaleString()}
+                              {formatPKR(option.estimatedPrice)}
                             </span>
                           </div>
                         </div>
@@ -261,8 +263,8 @@ export function MealSlots() {
                           <p className="truncate text-[12px] text-slate">
                             {item.menuItemName ?? '—'}
                           </p>
-                          <span className="shrink-0 text-[11px] text-slate/60">
-                            ₨ {item.price.toLocaleString()}
+                          <span className="shrink-0 text-[11px] text-slate">
+                            {formatPKR(item.price)}
                           </span>
                         </div>
                       ))}
@@ -275,10 +277,10 @@ export function MealSlots() {
                     )
                   )}
                   {option.notes && (
-                    <p className="mt-0.5 text-[12px] italic text-slate/60">{option.notes}</p>
+                    <p className="mt-0.5 text-[12px] italic text-slate">{option.notes}</p>
                   )}
                   <p className="mt-1 font-display text-base font-bold text-charcoal">
-                    ₨ {option.estimatedPrice.toLocaleString()}
+                    {formatPKR(option.estimatedPrice)}
                   </p>
                 </div>
 
@@ -287,7 +289,7 @@ export function MealSlots() {
                   onClick={() =>
                     actions.openLogModal(expandedSlotId!, { type: 'suggestion', option })
                   }
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-green px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-dark-green"
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-green px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-dark-green ${focusRing}`}
                 >
                   Choose
                 </button>
@@ -333,7 +335,7 @@ export function MealSlots() {
               <button
                 type="button"
                 onClick={() => actions.openLogModal(expandedSlotId!, { type: 'home' })}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sage bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas"
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sage bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas ${focusRing}`}
               >
                 Log
               </button>
@@ -354,7 +356,7 @@ export function MealSlots() {
               <button
                 type="button"
                 onClick={() => actions.openLogModal(expandedSlotId!, { type: 'custom' })}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sage bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas"
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sage bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas ${focusRing}`}
               >
                 Enter
               </button>
@@ -394,18 +396,10 @@ function StatusPill({ tone, label, icon }: StatusPillProps) {
 function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <div className="flex items-end justify-between gap-4">
-      <div className="flex flex-col gap-1">
-        <span className="text-xs font-semibold uppercase tracking-widest text-green">Meals</span>
-        <h2 className="font-display text-2xl font-semibold tracking-tight text-charcoal">
-          {title}
-        </h2>
-      </div>
-      {subtitle && (
-        <span className="flex items-center gap-1.5 text-[12px] text-slate">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green" />
-          {subtitle}
-        </span>
-      )}
+      <h2 className="font-display text-2xl font-semibold tracking-tight text-charcoal sm:text-[28px]">
+        {title}
+      </h2>
+      {subtitle && <span className="text-[12px] text-slate">{subtitle}</span>}
     </div>
   );
 }

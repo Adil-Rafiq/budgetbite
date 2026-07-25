@@ -18,6 +18,7 @@ import { logSuggestionSchema, logCustomSchema, logHomeSchema } from '../_schemas
 import type { LogSuggestionForm, LogCustomForm, LogHomeForm } from '../_schemas/log-meal.schema';
 import type { LogModalState, SavePayload } from '../_hooks/use-meal-slots';
 import { optionLabel } from '@/lib/suggestion';
+import { formatPKR } from '@/lib/currency';
 
 const labelClass = 'text-xs font-semibold uppercase tracking-wide text-slate';
 const inputClass = 'bg-canvas border-sage text-charcoal';
@@ -102,7 +103,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="comment" className={labelClass}>
-          Comment <span className="ml-1 font-normal normal-case text-slate/60">(optional)</span>
+          Comment <span className="ml-1 font-normal normal-case text-slate">(optional)</span>
         </Label>
         <Controller
           name={'comment' as never}
@@ -291,7 +292,7 @@ function HomeCookedForm({
       <div className="flex flex-col gap-2">
         <Label htmlFor="home-desc" className={labelClass}>
           What did you cook?{' '}
-          <span className="ml-1 font-normal normal-case text-slate/60">(optional)</span>
+          <span className="ml-1 font-normal normal-case text-slate">(optional)</span>
         </Label>
         <Input
           id="home-desc"
@@ -369,9 +370,7 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
                 {option.items.map((item) => (
                   <div key={item.menuItemId} className="flex items-center justify-between gap-3">
                     <p className="truncate text-[12px] text-slate">{item.menuItemName ?? '—'}</p>
-                    <span className="shrink-0 text-[11px] text-slate/60">
-                      ₨ {item.price.toLocaleString()}
-                    </span>
+                    <span className="shrink-0 text-[11px] text-slate">{formatPKR(item.price)}</span>
                   </div>
                 ))}
               </div>
