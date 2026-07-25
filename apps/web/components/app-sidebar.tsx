@@ -15,6 +15,7 @@ import {
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { LogoIcon } from '@/components/icons';
+import { formatPKR } from '@/lib/currency';
 
 interface NavItem {
   href: string;
@@ -56,7 +57,10 @@ export function AppSidebar() {
   return (
     <aside className="fixed inset-y-0 hidden border-r border-sage bg-white text-charcoal lg:flex lg:w-64 lg:flex-col">
       {/* Logo */}
-      <Link href="/dashboard" className="flex items-center gap-2.5 border-b border-sage px-6 py-5">
+      <Link
+        href="/dashboard"
+        className="flex items-center gap-2.5 border-b border-sage px-6 py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green/40"
+      >
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green text-white shadow-sm">
           <LogoIcon size={16} />
         </span>
@@ -85,9 +89,7 @@ export function AppSidebar() {
 
       {/* Nav */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-        <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-widest text-slate/60">
-          Main
-        </p>
+        <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-widest text-slate">Main</p>
         {items.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
           const Icon = item.icon;
@@ -95,7 +97,8 @@ export function AppSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${
+              aria-current={isActive ? 'page' : undefined}
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
                 isActive
                   ? 'bg-[#f0f9e0] text-dark-green'
                   : 'text-slate hover:bg-canvas hover:text-charcoal'
@@ -125,11 +128,9 @@ export function AppSidebar() {
               <span className="text-xs font-bold text-dark-green">{spentPercent}%</span>
             </div>
             <div className="mt-2.5 font-display text-2xl font-bold tracking-tight text-charcoal">
-              ₨ {remaining.toLocaleString()}
+              {formatPKR(remaining)}
             </div>
-            <div className="mt-0.5 text-xs text-slate">
-              left of ₨ {totalBudget.toLocaleString()}
-            </div>
+            <div className="mt-0.5 text-xs text-slate">left of {formatPKR(totalBudget)}</div>
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-sage">
               <motion.div
                 className={`h-full rounded-full ${spentPercent >= 90 ? 'bg-tomato' : 'bg-green'}`}

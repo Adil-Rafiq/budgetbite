@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutGrid,
   CalendarDays,
+  Store,
   BarChart3,
   User as UserIcon,
   type LucideIcon,
@@ -19,6 +20,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: '/dashboard', label: 'Home', icon: LayoutGrid },
   { href: '/plans', label: 'Plans', icon: CalendarDays },
+  { href: '/restaurants', label: 'Food', icon: Store },
   { href: '/analytics', label: 'Stats', icon: BarChart3 },
   { href: '/profile', label: 'Me', icon: UserIcon },
 ];
@@ -39,7 +41,8 @@ export function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-1 flex-col items-center gap-1 rounded-lg px-2 py-1.5 transition-colors ${
+              aria-current={isActive ? 'page' : undefined}
+              className={`flex flex-1 flex-col items-center gap-1 rounded-lg px-2 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 ${
                 isActive ? 'text-green' : 'text-slate hover:text-green'
               }`}
             >

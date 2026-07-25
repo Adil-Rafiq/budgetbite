@@ -53,40 +53,12 @@
   --sidebar-ring: #8cc63f;
 }
 
-.dark {
-  --background: #14170f;
-  --foreground: #f2f6ea;
-  --card: #1c2016;
-  --card-foreground: #f2f6ea;
-  --popover: #1c2016;
-  --popover-foreground: #f2f6ea;
-  --primary: #8cc63f;
-  --primary-foreground: #14170f;
-  --secondary: #2a3120;
-  --secondary-foreground: #f2f6ea;
-  --muted: #262c1c;
-  --muted-foreground: #a6b491;
-  --accent: #2a3120;
-  --accent-foreground: #f2f6ea;
-  --destructive: #e84c3d;
-  --destructive-foreground: #ffffff;
-  --border: #303826;
-  --input: #303826;
-  --ring: #8cc63f;
-  --chart-1: #8cc63f;
-  --chart-2: #a7d96a;
-  --chart-3: #e84c3d;
-  --chart-4: #f5a623;
-  --chart-5: #60a5fa;
-  --sidebar: #101309;
-  --sidebar-foreground: #f2f6ea;
-  --sidebar-primary: #8cc63f;
-  --sidebar-primary-foreground: #14170f;
-  --sidebar-accent: #262c1c;
-  --sidebar-accent-foreground: #f2f6ea;
-  --sidebar-border: #303826;
-  --sidebar-ring: #8cc63f;
-}
+/* BudgetBite ships a single, deliberate light "fresh greens" theme. A dark
+   token set used to live here but nothing ever applied a `.dark` class (no
+   theme provider, and the shell hardcodes the light palette), so it was dead
+   weight that read as a half-finished feature. If dark mode is wanted later,
+   reintroduce these tokens together with a real theme toggle and swap the
+   hardcoded brand classes for the semantic tokens. */
 
 @theme inline {
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
@@ -232,6 +204,11 @@
   .bb-progress,
   .bb-step-in {
     animation: none;
+  }
+  /* Tailwind's animate-pulse (status dots, skeletons) is perpetual — honor the
+     user's reduced-motion preference and hold it still. */
+  .animate-pulse {
+    animation: none !important;
   }
 }
 

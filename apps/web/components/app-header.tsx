@@ -9,6 +9,7 @@ import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { LogoIcon } from '@/components/icons';
 import { authClient } from '@/lib/auth-client';
+import { formatPKR } from '@/lib/currency';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,16 +64,19 @@ export function AppHeader() {
           </span>
         </Link>
 
-        <div className="hidden text-xs font-semibold uppercase tracking-widest text-slate/60 lg:block">
+        <div className="hidden text-xs font-semibold uppercase tracking-widest text-slate lg:block">
           Home · Dashboard
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Budget pill: only where the sidebar's persistent budget card is not
+              visible (below lg). On desktop the sidebar already shows this, so
+              the pill would be a third copy of the same number. */}
           {active && (
-            <div className="hidden items-center gap-3 rounded-full border border-sage bg-white px-4 py-1.5 shadow-sm sm:flex">
+            <div className="hidden items-center gap-3 rounded-full border border-sage bg-white px-4 py-1.5 shadow-sm sm:flex lg:hidden">
               <span className="text-xs font-semibold uppercase tracking-wide text-slate">Left</span>
               <span className="font-display text-sm font-semibold text-charcoal">
-                ₨ {remaining.toLocaleString()}
+                {formatPKR(remaining)}
               </span>
               <div className="h-1.5 w-20 overflow-hidden rounded-full bg-sage">
                 <motion.div
