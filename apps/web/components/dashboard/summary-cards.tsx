@@ -91,11 +91,28 @@ export function SummaryCards() {
   if (!ctx) return <BudgetSkeleton />;
 
   const daysLeft = getDaysLeft(activePlan.endDate);
-  const health = getSpendingHealth(ctx.amountSpent, ctx.totalBudget);
+  const isOver = ctx.amountRemaining < 0;
+  const health = isOver ? 'over' : getSpendingHealth(ctx.amountSpent, ctx.totalBudget);
   const spentPercent =
     ctx.totalBudget > 0 ? Math.round((ctx.amountSpent / ctx.totalBudget) * 100) : 0;
-  const onTrack = health !== 'danger';
-  const fillClass = health === 'danger' ? 'bg-tomato' : 'bg-green';
+  const alarm = health === 'over' || health === 'danger';
+  const fillClass = alarm ? 'bg-tomato' : 'bg-green';
+
+  const pill =
+    health === 'over'
+      ? { cls: 'bg-tomato/10 text-tomato', Icon: TriangleAlert, label: 'Over budget' }
+      : health === 'danger'
+        ? { cls: 'bg-tomato/10 text-tomato', Icon: TriangleAlert, label: 'Watch spending' }
+        : { cls: 'bg-green/10 text-dark-green', Icon: CircleCheck, label: 'On track' };
+
+  // Plain-language standing, rendered as visible copy — not a `title` tooltip
+  // that never fires on touch and is skipped by keyboard/screen-reader users.
+  const statusCaption =
+    health === 'over'
+      ? `You've spent ${formatPKR(Math.abs(ctx.amountRemaining))} more than this period's budget.`
+      : health === 'danger'
+        ? "You're spending faster than your budget for the days left — ease off to make it last."
+        : "You're spending in line with your budget for the days left.";
 
   return (
     <section className="rounded-2xl border border-sage bg-white p-5 shadow-sm sm:p-6">
@@ -103,16 +120,25 @@ export function SummaryCards() {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="mb-1 flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-green" />
+            <span className={`h-2 w-2 rounded-full ${alarm ? 'bg-tomato' : 'bg-green'}`} />
             <span className="text-xs font-semibold uppercase tracking-widest text-slate">
               {activePlan.planType} budget
             </span>
           </div>
           <div className="flex items-end gap-2">
-            <span className="font-display text-4xl font-bold leading-none tracking-tight text-charcoal">
-              <CountUp value={ctx.amountRemaining} prefix="₨ " />
+            <span
+              className={`font-display text-4xl font-bold leading-none tracking-tight ${
+                isOver ? 'text-tomato' : 'text-charcoal'
+              }`}
+            >
+              <CountUp
+                value={isOver ? Math.abs(ctx.amountRemaining) : ctx.amountRemaining}
+                format={formatPKR}
+              />
             </span>
-            <span className="pb-0.5 text-sm font-medium text-slate">left</span>
+            <span className={`pb-0.5 text-sm font-medium ${isOver ? 'text-tomato' : 'text-slate'}`}>
+              {isOver ? 'over' : 'left'}
+            </span>
           </div>
           <p className="mt-1.5 text-xs text-slate">
             of {formatPKR(ctx.totalBudget)} ·{' '}
@@ -121,21 +147,10 @@ export function SummaryCards() {
         </div>
 
         <div
-          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
-            onTrack ? 'bg-green/10 text-dark-green' : 'bg-tomato/10 text-tomato'
-          }`}
-          title={
-            onTrack
-              ? "You're spending in line with your budget for the days left."
-              : "You're spending faster than your budget for the days left — ease off to make it last."
-          }
+          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${pill.cls}`}
         >
-          {onTrack ? (
-            <CircleCheck className="h-3.5 w-3.5" />
-          ) : (
-            <TriangleAlert className="h-3.5 w-3.5" />
-          )}
-          {onTrack ? 'On track' : 'Watch spending'}
+          <pill.Icon className="h-3.5 w-3.5" aria-hidden />
+          {pill.label}
         </div>
       </div>
 
@@ -154,10 +169,17 @@ export function SummaryCards() {
             style={{ width: `${Math.min(spentPercent, 100)}%` }}
           />
         </div>
-        <span className="shrink-0 text-xs font-semibold tabular-nums text-slate">
+        <span
+          className={`shrink-0 text-xs font-semibold tabular-nums ${
+            alarm ? 'text-tomato' : 'text-slate'
+          }`}
+        >
           {spentPercent}% spent
         </span>
       </div>
+
+      {/* Plain-language standing — visible to everyone, not hidden in a tooltip */}
+      <p className={`mt-2 text-[12px] ${alarm ? 'text-tomato' : 'text-slate'}`}>{statusCaption}</p>
 
       {/* The few numbers that inform the next meal choice */}
       <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-sage/70 pt-4">
@@ -173,13 +195,27 @@ export function SummaryCards() {
             {ctx.mealsRemaining}
           </dd>
         </div>
-        <div title="Your remaining budget shared evenly across the meals you have left.">
+        <div>
           <dt className="text-[11px] text-slate sm:text-xs">Per meal left</dt>
-          <dd className="font-display text-base font-bold tabular-nums text-green">
-            {formatPKR(ctx.avgBudgetPerRemainingMeal)}
+          <dd
+            className={`font-display text-base font-bold tabular-nums ${
+              isOver ? 'text-tomato' : 'text-green'
+            }`}
+          >
+            {formatPKR(Math.max(0, ctx.avgBudgetPerRemainingMeal))}
           </dd>
         </div>
       </dl>
+
+      {isOver && (
+        <Link
+          href="/plans"
+          className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-tomato/30 bg-tomato/[0.06] px-4 py-3 text-[13px] font-medium text-tomato transition-colors hover:bg-tomato/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tomato/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+        >
+          Adjust your plan to recover the rest of the period
+          <ArrowRight className="h-4 w-4 shrink-0" />
+        </Link>
+      )}
     </section>
   );
 }

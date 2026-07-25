@@ -51,6 +51,17 @@ export function useMealSlots() {
   const { data: activePlanData } = useActiveBudgetPlan();
   const planId = activePlanData?.plan.id ?? '';
 
+  // Budget context for the decision itself: the per-meal target and remaining
+  // money let each option wear a fit cue (see classifyBudgetFit) and let the
+  // log form warn on an over-budget amount — so the choice is a glance, not
+  // mental math done against a number on a screen behind the dialog.
+  const budgetState = activePlanData?.budgetState;
+  const budget = {
+    avgPerMeal: budgetState?.avgBudgetPerRemainingMeal ?? 0,
+    amountRemaining: budgetState?.amountRemaining ?? 0,
+    hasBudget: !!budgetState && (budgetState.avgBudgetPerRemainingMeal ?? 0) > 0,
+  };
+
   const {
     data: slotsData,
     isLoading: isSlotsLoading,
@@ -163,6 +174,7 @@ export function useMealSlots() {
     expandedSlot,
     logModal,
     loggedByMealType,
+    budget,
     actions: {
       setExpandedSlotId,
       openLogModal,

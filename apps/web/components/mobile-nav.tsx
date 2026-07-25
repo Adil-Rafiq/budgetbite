@@ -17,12 +17,14 @@ interface NavItem {
   icon: LucideIcon;
 }
 
+// Same route vocabulary as the desktop sidebar — one name per destination so
+// switching between phone and desktop never renames the same place.
 const navItems: NavItem[] = [
-  { href: '/dashboard', label: 'Home', icon: LayoutGrid },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
   { href: '/plans', label: 'Plans', icon: CalendarDays },
-  { href: '/restaurants', label: 'Food', icon: Store },
-  { href: '/analytics', label: 'Stats', icon: BarChart3 },
-  { href: '/profile', label: 'Me', icon: UserIcon },
+  { href: '/restaurants', label: 'Restaurants', icon: Store },
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/profile', label: 'Profile', icon: UserIcon },
 ];
 
 export function MobileNav() {
@@ -42,12 +44,16 @@ export function MobileNav() {
               key={item.href}
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
-              className={`flex flex-1 flex-col items-center gap-1 rounded-lg px-2 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 ${
+              className={`flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-1.5 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 ${
                 isActive ? 'text-green' : 'text-slate hover:text-green'
               }`}
             >
-              <Icon className="h-5 w-5" />
-              <span className={`text-[10px] ${isActive ? 'font-semibold' : 'font-medium'}`}>
+              <Icon className="h-5 w-5 shrink-0" />
+              <span
+                className={`w-full truncate text-center text-[10px] tracking-tight ${
+                  isActive ? 'font-semibold' : 'font-medium'
+                }`}
+              >
                 {item.label}
               </span>
             </Link>

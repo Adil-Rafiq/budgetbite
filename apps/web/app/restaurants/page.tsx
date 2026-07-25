@@ -8,6 +8,8 @@ import { Search, Star, X } from 'lucide-react';
 import type { RestaurantSort } from '@repo/shared';
 import { classifyBudgetFit } from '@repo/shared';
 
+import { BudgetFitBadge } from '@/components/budget-fit-badge';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -46,25 +48,6 @@ const RATING_PRESETS = [
 ] as const;
 
 type SortValue = RestaurantSort | 'auto';
-
-type FitTone = 'green' | 'amber' | 'red';
-const FIT_TONE: Record<FitTone, { dot: string; pill: string; label: string }> = {
-  green: { dot: 'bg-green', pill: 'bg-green/10 text-dark-green', label: 'Fits budget' },
-  amber: { dot: 'bg-[#f5a623]', pill: 'bg-[#fef6e6] text-[#8a5a12]', label: 'Tight' },
-  red: { dot: 'bg-tomato', pill: 'bg-tomato/10 text-tomato', label: 'Over budget' },
-};
-
-function FitPill({ fit }: { fit: FitTone }) {
-  const v = FIT_TONE[fit];
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${v.pill}`}
-    >
-      <span className={`inline-block h-1.5 w-1.5 rounded-full ${v.dot}`} />
-      {v.label}
-    </span>
-  );
-}
 
 const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60';
 const inputClass = 'bg-canvas border-sage text-charcoal';
@@ -492,7 +475,7 @@ function RestaurantsPageInner() {
                       </div>
 
                       <div className="mt-auto flex flex-col gap-2 pt-4">
-                        {fit && <FitPill fit={fit} />}
+                        {fit && <BudgetFitBadge fit={fit} showDot />}
                         <div className="flex items-end justify-between gap-2">
                           {r.minItemPrice != null ? (
                             <div className="flex flex-col gap-0.5">

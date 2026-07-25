@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type HTMLMotionProps } from 'motion/react';
+import { motion, useReducedMotion, type HTMLMotionProps } from 'motion/react';
 import type { ReactNode } from 'react';
 
 interface FadeUpProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
@@ -11,11 +11,14 @@ interface FadeUpProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
 }
 
 export function FadeUp({ children, delay = 0, duration = 0.45, y = 12, ...rest }: FadeUpProps) {
+  const prefersReducedMotion = useReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y }}
+      initial={prefersReducedMotion ? false : { opacity: 0, y }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={
+        prefersReducedMotion ? { duration: 0 } : { duration, delay, ease: [0.22, 1, 0.36, 1] }
+      }
       {...rest}
     >
       {children}

@@ -61,7 +61,7 @@ export function NoPlanState() {
                 </span>
                 <div className="flex flex-col gap-0.5">
                   <span className="flex items-center gap-1.5 font-display text-sm font-semibold text-charcoal">
-                    <span className="text-slate/70 tabular-nums">{i + 1}.</span>
+                    <span className="text-slate tabular-nums">{i + 1}.</span>
                     {step.title}
                   </span>
                   <span className="text-[13px] leading-snug text-slate">{step.body}</span>

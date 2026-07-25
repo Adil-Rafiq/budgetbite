@@ -10,13 +10,14 @@ import {
 } from '@/components/ui/dialog';
 import { LogMealModal } from '@/components/dashboard/meal-slots/_components/log-meal-modal';
 import { useMealSlots } from '@/components/dashboard/meal-slots/_hooks/use-meal-slots';
+import { BudgetFitBadge } from '@/components/budget-fit-badge';
 import { optionLabel } from '@/lib/suggestion';
 import { formatPKR } from '@/lib/currency';
-import type { SuggestionSlot, SuggestionOption } from '@repo/shared';
+import { classifyBudgetFit } from '@repo/shared';
+import type { SuggestionSlot, SuggestionOption, BudgetFit } from '@repo/shared';
 
 const focusRing =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
-const primaryBtn = `inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50 ${focusRing}`;
 const ghostBtn = `inline-flex w-full items-center justify-center gap-2 rounded-xl border border-sage bg-white px-4 py-2 text-sm font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${focusRing}`;
 
 function SkeletonCard() {
@@ -41,8 +42,21 @@ export function MealSlots() {
     expandedSlot,
     logModal,
     loggedByMealType,
+    budget,
     actions,
   } = useMealSlots();
+
+  // Fit cue for one option's price against the budget, or null when there's no
+  // usable per-meal target yet. Same helper the restaurants surface uses, so
+  // "Fits budget / Tight / Over budget" means the same thing everywhere.
+  const fitOf = (price: number): BudgetFit | null =>
+    budget.hasBudget
+      ? classifyBudgetFit({
+          itemPrice: price,
+          avgBudgetPerRemainingMeal: budget.avgPerMeal,
+          amountRemaining: budget.amountRemaining,
+        })
+      : null;
 
   if (isSlotsLoading)
     return (
@@ -120,7 +134,7 @@ export function MealSlots() {
                     <StatusPill tone="sage" label="Pinned" icon={<Pin className="h-3 w-3" />} />
                   ) : (
                     <span className="text-xs font-semibold uppercase tracking-wide text-slate">
-                      Ready
+                      Undecided
                     </span>
                   )}
                 </div>
@@ -193,34 +207,44 @@ export function MealSlots() {
                     </>
                   ) : (
                     <>
-                      {slot.options.slice(0, 2).map((option: SuggestionOption) => (
-                        <div
-                          key={option.id}
-                          className="rounded-xl border border-sage bg-canvas px-4 py-3"
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <p className="truncate font-display text-[14px] font-semibold text-charcoal">
-                                {optionLabel(option)}
-                              </p>
-                              <p className="mt-0.5 truncate text-[12px] text-slate">
-                                {option.restaurantName ?? '—'}
-                              </p>
+                      {slot.options.slice(0, 3).map((option: SuggestionOption) => {
+                        const fit = fitOf(option.estimatedPrice);
+                        return (
+                          <button
+                            key={option.id}
+                            type="button"
+                            onClick={() =>
+                              actions.openLogModal(slot.mealTypeId, { type: 'suggestion', option })
+                            }
+                            className={`rounded-xl border border-sage bg-canvas px-4 py-3 text-left transition-colors hover:border-green/60 hover:bg-[#f0f9e0]/50 ${focusRing}`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <p className="truncate font-display text-[14px] font-semibold text-charcoal">
+                                  {optionLabel(option)}
+                                </p>
+                                <p className="mt-0.5 truncate text-[12px] text-slate">
+                                  {option.restaurantName ?? '—'}
+                                </p>
+                              </div>
+                              <div className="flex shrink-0 flex-col items-end gap-1">
+                                <span className="font-display text-[14px] font-bold text-green">
+                                  {formatPKR(option.estimatedPrice)}
+                                </span>
+                                {fit && <BudgetFitBadge fit={fit} />}
+                              </div>
                             </div>
-                            <span className="shrink-0 font-display text-[14px] font-bold text-green">
-                              {formatPKR(option.estimatedPrice)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                          </button>
+                        );
+                      })}
 
                       <button
                         type="button"
                         onClick={() => actions.setExpandedSlotId(slot.mealTypeId)}
-                        className={`${primaryBtn} mt-auto`}
+                        className={`${ghostBtn} mt-auto`}
                       >
-                        View all options
-                        <ArrowRight className="h-4 w-4" />
+                        More options
+                        <ArrowRight className="h-3.5 w-3.5" />
                       </button>
                     </>
                   )}
@@ -240,61 +264,74 @@ export function MealSlots() {
             <DialogDescription className="text-[13px] text-slate">
               Pick a suggested meal or log your own.
             </DialogDescription>
+            {budget.hasBudget && (
+              <p className="text-[12px] text-slate">
+                Per meal left:{' '}
+                <span className="font-semibold text-green">{formatPKR(budget.avgPerMeal)}</span> ·{' '}
+                {formatPKR(budget.amountRemaining)} remaining
+              </p>
+            )}
           </DialogHeader>
 
           <div className="flex flex-col gap-3 overflow-y-auto py-2 pr-1">
-            {expandedSlot?.options.map((option: SuggestionOption) => (
-              <div
-                key={option.id}
-                className="flex items-start justify-between gap-4 rounded-xl border border-sage bg-white p-4"
-              >
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <p className="font-display text-[14px] font-semibold text-charcoal">
-                    {optionLabel(option)}
-                  </p>
-                  <p className="text-[12px] text-slate">{option.restaurantName ?? '—'}</p>
-                  {option.items.length > 1 ? (
-                    <div className="mt-0.5 flex flex-col gap-0.5">
-                      {option.items.map((item) => (
-                        <div
-                          key={item.menuItemId}
-                          className="flex items-center justify-between gap-3"
-                        >
-                          <p className="truncate text-[12px] text-slate">
-                            {item.menuItemName ?? '—'}
-                          </p>
-                          <span className="shrink-0 text-[11px] text-slate">
-                            {formatPKR(item.price)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    option.items[0]?.description && (
-                      <p className="mt-0.5 line-clamp-2 text-[12px] text-slate">
-                        {option.items[0].description}
-                      </p>
-                    )
-                  )}
-                  {option.notes && (
-                    <p className="mt-0.5 text-[12px] italic text-slate">{option.notes}</p>
-                  )}
-                  <p className="mt-1 font-display text-base font-bold text-charcoal">
-                    {formatPKR(option.estimatedPrice)}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    actions.openLogModal(expandedSlotId!, { type: 'suggestion', option })
-                  }
-                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-green px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-dark-green ${focusRing}`}
+            {expandedSlot?.options.map((option: SuggestionOption) => {
+              const fit = fitOf(option.estimatedPrice);
+              return (
+                <div
+                  key={option.id}
+                  className="flex items-start justify-between gap-4 rounded-xl border border-sage bg-white p-4"
                 >
-                  Choose
-                </button>
-              </div>
-            ))}
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <p className="font-display text-[14px] font-semibold text-charcoal">
+                      {optionLabel(option)}
+                    </p>
+                    <p className="text-[12px] text-slate">{option.restaurantName ?? '—'}</p>
+                    {option.items.length > 1 ? (
+                      <div className="mt-0.5 flex flex-col gap-0.5">
+                        {option.items.map((item) => (
+                          <div
+                            key={item.menuItemId}
+                            className="flex items-center justify-between gap-3"
+                          >
+                            <p className="truncate text-[12px] text-slate">
+                              {item.menuItemName ?? '—'}
+                            </p>
+                            <span className="shrink-0 text-[11px] text-slate">
+                              {formatPKR(item.price)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      option.items[0]?.description && (
+                        <p className="mt-0.5 line-clamp-2 text-[12px] text-slate">
+                          {option.items[0].description}
+                        </p>
+                      )
+                    )}
+                    {option.notes && (
+                      <p className="mt-0.5 text-[12px] italic text-slate">{option.notes}</p>
+                    )}
+                    <div className="mt-1 flex items-center gap-2">
+                      <p className="font-display text-base font-bold text-charcoal">
+                        {formatPKR(option.estimatedPrice)}
+                      </p>
+                      {fit && <BudgetFitBadge fit={fit} />}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      actions.openLogModal(expandedSlotId!, { type: 'suggestion', option })
+                    }
+                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-green px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-dark-green ${focusRing}`}
+                  >
+                    Choose
+                  </button>
+                </div>
+              );
+            })}
 
             {expandedSlotId &&
               !loggedByMealType[expandedSlotId] &&
@@ -370,6 +407,7 @@ export function MealSlots() {
         onClose={actions.closeLogModal}
         onSave={actions.handleSave}
         isSaving={isSaving}
+        budget={budget}
       />
     </>
   );

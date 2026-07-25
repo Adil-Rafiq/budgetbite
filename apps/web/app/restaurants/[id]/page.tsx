@@ -28,12 +28,7 @@ import { FoodPreferenceToggle } from '@/components/food-preference-toggle';
 import { AddToPlanModal } from '../_components/add-to-plan-modal';
 import { MenuItemSkeleton } from '../_components/menu-item-skeleton';
 import { RestaurantHeaderSkeleton } from '../_components/restaurant-header-skeleton';
-
-const FIT_PILL: Record<BudgetFit, { className: string; label: string }> = {
-  green: { className: 'bg-green/10 text-dark-green', label: 'Fits budget' },
-  amber: { className: 'bg-[#fef6e6] text-[#8a5a12]', label: 'Tight' },
-  red: { className: 'bg-tomato/10 text-tomato', label: 'Over budget' },
-};
+import { BudgetFitBadge } from '@/components/budget-fit-badge';
 
 const MENU_CONTROLS_THRESHOLD = 6;
 
@@ -402,13 +397,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                           <p className="truncate text-[14px] font-medium text-charcoal">
                             {item.name}
                           </p>
-                          {fit && (
-                            <span
-                              className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${FIT_PILL[fit].className}`}
-                            >
-                              {FIT_PILL[fit].label}
-                            </span>
-                          )}
+                          {fit && <BudgetFitBadge fit={fit} />}
                         </div>
                         {item.description && (
                           <p className="mt-1 line-clamp-3 text-[12px] text-slate">

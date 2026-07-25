@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import {
   LayoutGrid,
   CalendarDays,
@@ -44,10 +44,16 @@ export function AppSidebar() {
   const { data: active } = useActiveBudgetPlan();
   const { data: user } = useUser();
 
-  const totalBudget = active?.plan.totalBudget ?? 0;
-  const spent = active?.plan.spentAmount ?? 0;
-  const remaining = Math.max(0, totalBudget - spent);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Same pin-adjusted budgetState the dashboard and header read, so the figure
+  // is identical across the shell; fall back to plan totals. Honest when over.
+  const bs = active?.budgetState;
+  const totalBudget = bs?.totalBudget ?? active?.plan.totalBudget ?? 0;
+  const spent = bs?.amountSpent ?? active?.plan.spentAmount ?? 0;
+  const remaining = bs ? bs.amountRemaining : totalBudget - spent;
   const spentPercent = totalBudget > 0 ? Math.round((spent / totalBudget) * 100) : 0;
+  const isOver = remaining < 0;
 
   const items =
     user?.role === 'admin'
@@ -125,18 +131,32 @@ export function AppSidebar() {
               <span className="text-xs font-semibold uppercase tracking-wide text-slate">
                 {active.plan.planType} budget
               </span>
-              <span className="text-xs font-bold text-dark-green">{spentPercent}%</span>
+              <span className={`text-xs font-bold ${isOver ? 'text-tomato' : 'text-dark-green'}`}>
+                {spentPercent}%
+              </span>
             </div>
-            <div className="mt-2.5 font-display text-2xl font-bold tracking-tight text-charcoal">
-              {formatPKR(remaining)}
+            <div
+              className={`mt-2.5 font-display text-2xl font-bold tracking-tight ${
+                isOver ? 'text-tomato' : 'text-charcoal'
+              }`}
+            >
+              {formatPKR(Math.abs(remaining))}
             </div>
-            <div className="mt-0.5 text-xs text-slate">left of {formatPKR(totalBudget)}</div>
+            <div className="mt-0.5 text-xs text-slate">
+              {isOver ? 'over' : 'left'} of {formatPKR(totalBudget)}
+            </div>
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-sage">
               <motion.div
-                className={`h-full rounded-full ${spentPercent >= 90 ? 'bg-tomato' : 'bg-green'}`}
-                initial={{ width: '0%' }}
+                className={`h-full rounded-full ${
+                  isOver || spentPercent >= 90 ? 'bg-tomato' : 'bg-green'
+                }`}
+                initial={prefersReducedMotion ? false : { width: '0%' }}
                 animate={{ width: `${Math.min(100, spentPercent)}%` }}
-                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+                transition={
+                  prefersReducedMotion
+                    ? { duration: 0 }
+                    : { duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }
+                }
               />
             </div>
           </div>

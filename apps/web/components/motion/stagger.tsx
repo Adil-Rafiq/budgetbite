@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, type HTMLMotionProps } from 'motion/react';
+import { motion, useReducedMotion, type HTMLMotionProps } from 'motion/react';
 import type { ReactNode } from 'react';
 
 interface StaggerProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
@@ -10,6 +10,7 @@ interface StaggerProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
 }
 
 export function Stagger({ children, delay = 0, stagger = 0.06, ...rest }: StaggerProps) {
+  const prefersReducedMotion = useReducedMotion();
   return (
     <motion.div
       initial="hidden"
@@ -17,7 +18,10 @@ export function Stagger({ children, delay = 0, stagger = 0.06, ...rest }: Stagge
       variants={{
         hidden: {},
         show: {
-          transition: { staggerChildren: stagger, delayChildren: delay },
+          transition: {
+            staggerChildren: prefersReducedMotion ? 0 : stagger,
+            delayChildren: prefersReducedMotion ? 0 : delay,
+          },
         },
       }}
       {...rest}
@@ -33,14 +37,15 @@ interface StaggerItemProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
 }
 
 export function StaggerItem({ children, y = 12, ...rest }: StaggerItemProps) {
+  const prefersReducedMotion = useReducedMotion();
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y },
+        hidden: prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y },
         show: {
           opacity: 1,
           y: 0,
-          transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+          transition: { duration: prefersReducedMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] },
         },
       }}
       {...rest}

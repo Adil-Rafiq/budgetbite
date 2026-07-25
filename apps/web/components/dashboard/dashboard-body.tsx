@@ -33,7 +33,7 @@ export function DashboardBody() {
             </span>
           </div>
           <h1 className="font-display text-3xl font-semibold leading-[1.05] tracking-tight text-charcoal sm:text-4xl">
-            Welcome back.
+            What&apos;s for today?
           </h1>
           <p className="max-w-[540px] text-[15px] leading-relaxed text-slate">
             Choose today&apos;s meals and keep an eye on your budget — no spreadsheets, no math.

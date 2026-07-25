@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
@@ -33,10 +33,17 @@ export function AppHeader() {
   const { data: user } = useUser();
   const [signingOut, setSigningOut] = useState(false);
 
-  const totalBudget = active?.plan.totalBudget ?? 0;
-  const spent = active?.plan.spentAmount ?? 0;
-  const remaining = Math.max(0, totalBudget - spent);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Prefer the pin-adjusted budgetState (the same source the dashboard budget
+  // card reads) so every budget figure in the shell agrees; fall back to plan
+  // totals. Remaining is honest — negative when over — and the pill labels it.
+  const bs = active?.budgetState;
+  const totalBudget = bs?.totalBudget ?? active?.plan.totalBudget ?? 0;
+  const spent = bs?.amountSpent ?? active?.plan.spentAmount ?? 0;
+  const remaining = bs ? bs.amountRemaining : totalBudget - spent;
   const spentPercent = totalBudget > 0 ? Math.round((spent / totalBudget) * 100) : 0;
+  const isOver = remaining < 0;
 
   const handleSignOut = async () => {
     setSigningOut(true);
@@ -73,20 +80,34 @@ export function AppHeader() {
               visible (below lg). On desktop the sidebar already shows this, so
               the pill would be a third copy of the same number. */}
           {active && (
-            <div className="hidden items-center gap-3 rounded-full border border-sage bg-white px-4 py-1.5 shadow-sm sm:flex lg:hidden">
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate">Left</span>
-              <span className="font-display text-sm font-semibold text-charcoal">
-                {formatPKR(remaining)}
+            <div className="flex items-center gap-2.5 rounded-full border border-sage bg-white px-3.5 py-1.5 shadow-sm sm:gap-3 sm:px-4 lg:hidden">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate">
+                {isOver ? 'Over' : 'Left'}
               </span>
-              <div className="h-1.5 w-20 overflow-hidden rounded-full bg-sage">
+              <span
+                className={`font-display text-sm font-semibold ${
+                  isOver ? 'text-tomato' : 'text-charcoal'
+                }`}
+              >
+                {formatPKR(Math.abs(remaining))}
+              </span>
+              <div className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-sage sm:block">
                 <motion.div
-                  className={`h-full rounded-full ${spentPercent >= 90 ? 'bg-tomato' : 'bg-green'}`}
-                  initial={{ width: '0%' }}
+                  className={`h-full rounded-full ${
+                    isOver || spentPercent >= 90 ? 'bg-tomato' : 'bg-green'
+                  }`}
+                  initial={prefersReducedMotion ? false : { width: '0%' }}
                   animate={{ width: `${Math.min(100, spentPercent)}%` }}
-                  transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+                  transition={
+                    prefersReducedMotion
+                      ? { duration: 0 }
+                      : { duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }
+                  }
                 />
               </div>
-              <span className="text-[10px] font-medium text-slate">{spentPercent}%</span>
+              <span className="hidden text-[10px] font-medium text-slate sm:block">
+                {spentPercent}%
+              </span>
             </div>
           )}
           <DropdownMenu>

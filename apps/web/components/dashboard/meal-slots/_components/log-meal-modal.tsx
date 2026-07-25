@@ -3,7 +3,7 @@
 import type { SubmitHandler, Control } from 'react-hook-form';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Star, ThumbsUp, ThumbsDown, CornerDownLeft } from 'lucide-react';
+import { Star, ThumbsUp, ThumbsDown, CornerDownLeft, TriangleAlert } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,51 @@ import { formatPKR } from '@/lib/currency';
 const labelClass = 'text-xs font-semibold uppercase tracking-wide text-slate';
 const inputClass = 'bg-canvas border-sage text-charcoal';
 const errorClass = 'text-[11px] text-tomato';
+
+export interface LogBudget {
+  avgPerMeal: number;
+  amountRemaining: number;
+  hasBudget: boolean;
+}
+
+/**
+ * Soft guardrail on the one number the whole product trusts. Names the overage
+ * when a typed amount clearly blows the budget, so a fat-fingered value can't
+ * silently re-plan the rest of the period. Non-blocking by design — the user
+ * can still log an over-budget meal (eating out happens); they just can't do it
+ * without seeing it.
+ */
+function amountWarning(amount: number | undefined, budget: LogBudget | undefined): string | null {
+  if (!budget || !amount || amount <= 0) return null;
+  if (budget.amountRemaining > 0 && amount > budget.amountRemaining) {
+    return `That's ${formatPKR(amount - budget.amountRemaining)} more than the ${formatPKR(
+      budget.amountRemaining,
+    )} you have left. Double-check the amount.`;
+  }
+  if (budget.avgPerMeal > 0 && amount > budget.avgPerMeal * 1.3) {
+    return `That's well over your per-meal budget of about ${formatPKR(
+      budget.avgPerMeal,
+    )}. Double-check the amount.`;
+  }
+  return null;
+}
+
+function AmountWarning({
+  amount,
+  budget,
+}: {
+  amount: number | undefined;
+  budget: LogBudget | undefined;
+}) {
+  const msg = amountWarning(amount, budget);
+  if (!msg) return null;
+  return (
+    <p className="flex items-start gap-1.5 text-[11px] text-tomato" role="status">
+      <TriangleAlert className="mt-px h-3 w-3 shrink-0" aria-hidden />
+      {msg}
+    </p>
+  );
+}
 
 function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeForm>({
   control,
@@ -47,6 +92,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                     onClick={() => field.onChange(i + 1)}
                     className="p-0.5 transition"
                     aria-label={`Rate ${i + 1} stars`}
+                    aria-pressed={filled}
                   >
                     <Star
                       className={`h-6 w-6 transition-colors ${
@@ -74,6 +120,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                 <button
                   type="button"
                   onClick={() => field.onChange(v === true ? null : true)}
+                  aria-pressed={v === true}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition ${
                     v === true
                       ? 'border-green bg-green/10 text-dark-green'
@@ -86,6 +133,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                 <button
                   type="button"
                   onClick={() => field.onChange(v === false ? null : false)}
+                  aria-pressed={v === false}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition ${
                     v === false
                       ? 'border-tomato bg-tomato/10 text-tomato'
@@ -124,6 +172,30 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
   );
 }
 
+/**
+ * Feedback is optional and improves future suggestions, but it shouldn't stand
+ * between the user and the one required step (the amount). Tuck it behind a
+ * native disclosure — the fields stay mounted, so anything entered still
+ * submits, and it's keyboard- and screen-reader-accessible for free.
+ */
+function FeedbackDisclosure<T extends LogSuggestionForm | LogCustomForm | LogHomeForm>({
+  control,
+}: {
+  control: Control<T>;
+}) {
+  return (
+    <details className="rounded-xl border border-sage bg-canvas/60 px-4 py-3">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-[13px] font-medium text-charcoal [&::-webkit-details-marker]:hidden">
+        Add feedback
+        <span className="text-[11px] font-normal text-slate">optional · helps future picks</span>
+      </summary>
+      <div className="mt-4 flex flex-col gap-4">
+        <FeedbackFields control={control} />
+      </div>
+    </details>
+  );
+}
+
 function PrimaryButton({ children, disabled }: { children: React.ReactNode; disabled: boolean }) {
   return (
     <button
@@ -139,16 +211,19 @@ function PrimaryButton({ children, disabled }: { children: React.ReactNode; disa
 
 function SuggestionForm({
   estimatedPrice,
+  budget,
   onSave,
   isSaving,
 }: {
   estimatedPrice: number;
+  budget?: LogBudget;
   onSave: (p: SavePayload) => void;
   isSaving: boolean;
 }) {
   const {
     register,
     control,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<LogSuggestionForm>({
@@ -173,25 +248,36 @@ function SuggestionForm({
         <Input
           id="actual-amount"
           type="number"
+          inputMode="numeric"
           {...register('actualAmountSpent', { valueAsNumber: true })}
           className={`${inputClass} font-display text-lg font-semibold`}
         />
         {errors.actualAmountSpent && (
           <p className={errorClass}>{errors.actualAmountSpent.message}</p>
         )}
+        <AmountWarning amount={watch('actualAmountSpent')} budget={budget} />
       </div>
 
-      <FeedbackFields control={control} />
+      <FeedbackDisclosure control={control} />
 
       <PrimaryButton disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryButton>
     </form>
   );
 }
 
-function CustomForm({ onSave, isSaving }: { onSave: (p: SavePayload) => void; isSaving: boolean }) {
+function CustomForm({
+  budget,
+  onSave,
+  isSaving,
+}: {
+  budget?: LogBudget;
+  onSave: (p: SavePayload) => void;
+  isSaving: boolean;
+}) {
   const {
     register,
     control,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<LogCustomForm>({
@@ -246,15 +332,17 @@ function CustomForm({ onSave, isSaving }: { onSave: (p: SavePayload) => void; is
         <Input
           id="custom-amount"
           type="number"
+          inputMode="numeric"
           {...register('actualAmountSpent', { valueAsNumber: true })}
           className={`${inputClass} font-display text-lg font-semibold`}
         />
         {errors.actualAmountSpent && (
           <p className={errorClass}>{errors.actualAmountSpent.message}</p>
         )}
+        <AmountWarning amount={watch('actualAmountSpent')} budget={budget} />
       </div>
 
-      <FeedbackFields control={control} />
+      <FeedbackDisclosure control={control} />
 
       <PrimaryButton disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryButton>
     </form>
@@ -262,15 +350,18 @@ function CustomForm({ onSave, isSaving }: { onSave: (p: SavePayload) => void; is
 }
 
 function HomeCookedForm({
+  budget,
   onSave,
   isSaving,
 }: {
+  budget?: LogBudget;
   onSave: (p: SavePayload) => void;
   isSaving: boolean;
 }) {
   const {
     register,
     control,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<LogHomeForm>({
@@ -312,15 +403,17 @@ function HomeCookedForm({
         <Input
           id="home-amount"
           type="number"
+          inputMode="numeric"
           {...register('actualAmountSpent', { valueAsNumber: true })}
           className={`${inputClass} font-display text-lg font-semibold`}
         />
         {errors.actualAmountSpent && (
           <p className={errorClass}>{errors.actualAmountSpent.message}</p>
         )}
+        <AmountWarning amount={watch('actualAmountSpent')} budget={budget} />
       </div>
 
-      <FeedbackFields control={control} />
+      <FeedbackDisclosure control={control} />
 
       <PrimaryButton disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryButton>
     </form>
@@ -332,9 +425,10 @@ interface Props {
   onClose: () => void;
   onSave: (payload: SavePayload) => void;
   isSaving: boolean;
+  budget?: LogBudget;
 }
 
-export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
+export function LogMealModal({ state, onClose, onSave, isSaving, budget }: Props) {
   const mode = state.mode?.type;
   const isCustom = mode === 'custom';
   const isHome = mode === 'home';
@@ -345,8 +439,8 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
   const description = isHome
     ? 'You cooked this yourself — just note what it cost.'
     : isCustom
-      ? 'Enter the details of what you had.'
-      : 'Confirm the amount and leave feedback.';
+      ? 'Enter what you had and what it cost.'
+      : 'Confirm what you spent. Feedback is optional.';
 
   return (
     <Dialog open={state.open} onOpenChange={onClose}>
@@ -379,13 +473,14 @@ export function LogMealModal({ state, onClose, onSave, isSaving }: Props) {
         )}
 
         {isHome ? (
-          <HomeCookedForm key="home" onSave={onSave} isSaving={isSaving} />
+          <HomeCookedForm key="home" budget={budget} onSave={onSave} isSaving={isSaving} />
         ) : isCustom ? (
-          <CustomForm key="custom" onSave={onSave} isSaving={isSaving} />
+          <CustomForm key="custom" budget={budget} onSave={onSave} isSaving={isSaving} />
         ) : (
           <SuggestionForm
             key={option?.id ?? 'suggestion'}
             estimatedPrice={option?.estimatedPrice ?? 0}
+            budget={budget}
             onSave={onSave}
             isSaving={isSaving}
           />

@@ -16,7 +16,7 @@ export function RecentActivity() {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-end justify-between gap-4">
-        <h2 className="font-display text-2xl font-semibold tracking-tight text-charcoal">
+        <h2 className="font-display text-2xl font-semibold tracking-tight text-charcoal sm:text-[28px]">
           Recent activity
         </h2>
         <span className="text-[12px] text-slate">Last 5 entries</span>
@@ -79,7 +79,7 @@ export function RecentActivity() {
                       {formatPKR(item.actualAmountSpent)}
                     </span>
                     <span className="text-[11px] text-slate">
-                      {new Date(item.slotDate).toLocaleDateString('en-PK', {
+                      {new Date(`${item.slotDate}T00:00:00`).toLocaleDateString('en-PK', {
                         month: 'short',
                         day: 'numeric',
                       })}
