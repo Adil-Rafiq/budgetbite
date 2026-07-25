@@ -6,13 +6,12 @@ import { motion } from 'motion/react';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
 import { useUser } from '@/hooks/use-user';
 import { cn } from '@/lib/utils';
+import { formatPKR } from '@/lib/currency';
 import type { BudgetPlanDetail } from '@repo/shared';
 
 interface PlanSummaryCardProps {
   plan: BudgetPlanDetail;
 }
-
-const fmtPkr = (n: number) => `₨ ${n.toLocaleString()}`;
 
 export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
   const generate = useGenerateMealPlan();
@@ -65,9 +64,9 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
               Budget summary
             </div>
             <p className="font-display text-[32px] font-semibold leading-tight tracking-tight text-charcoal">
-              {fmtPkr(remaining)}
+              {formatPKR(remaining)}
               <span className="ml-2 text-[13px] font-normal text-slate">
-                of {fmtPkr(total)} left
+                of {formatPKR(total)} left
               </span>
             </p>
           </div>
@@ -113,7 +112,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between text-[12px] text-slate">
-            <span>{fmtPkr(spent)} spent</span>
+            <span>{formatPKR(spent)} spent</span>
             <span className="font-semibold text-charcoal">{spentPercent}%</span>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-sage/50">
@@ -131,14 +130,14 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
           <SummaryStat label="Remaining" value={String(ctx.mealsRemaining)} />
           <SummaryStat
             label="Avg / meal"
-            value={fmtPkr(Math.round(ctx.avgBudgetPerRemainingMeal))}
+            value={formatPKR(Math.round(ctx.avgBudgetPerRemainingMeal))}
           />
           <SummaryStat
             label="Variance"
             value={
               ctx.cumulativeVariance >= 0
-                ? `+${fmtPkr(Math.round(ctx.cumulativeVariance))}`
-                : `−${fmtPkr(Math.round(Math.abs(ctx.cumulativeVariance)))}`
+                ? `+${formatPKR(Math.round(ctx.cumulativeVariance))}`
+                : `−${formatPKR(Math.round(Math.abs(ctx.cumulativeVariance)))}`
             }
             toneClass={varianceTone}
           />

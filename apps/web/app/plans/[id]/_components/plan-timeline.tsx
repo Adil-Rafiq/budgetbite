@@ -12,6 +12,7 @@ import type {
 import { usePlanTimeline } from '@/hooks/use-budget-plan';
 import { getMealTypeVisual } from '@/lib/meal-type-visuals';
 import { optionLabel } from '@/lib/suggestion';
+import { formatPKR } from '@/lib/currency';
 
 const dayFmt = new Intl.DateTimeFormat('en-PK', {
   weekday: 'long',
@@ -66,7 +67,7 @@ function LoggedBody({ slot }: { slot: PlanTimelineSlot }) {
         )}
       </div>
       <span className="shrink-0 whitespace-nowrap text-right font-display text-sm font-semibold text-charcoal">
-        ₨ {c.actualAmountSpent.toLocaleString()}
+        {formatPKR(c.actualAmountSpent)}
       </span>
     </div>
   );
@@ -82,7 +83,7 @@ function PinnedBody({ option }: { option: SuggestionOption }) {
         )}
       </div>
       <span className="shrink-0 whitespace-nowrap text-right font-display text-sm font-semibold text-green">
-        ₨ {option.estimatedPrice.toLocaleString()}
+        {formatPKR(option.estimatedPrice)}
       </span>
     </div>
   );
@@ -112,7 +113,7 @@ function SuggestedBody({ options }: { options: SuggestionOption[] }) {
             </div>
           </div>
           <span className="shrink-0 whitespace-nowrap text-right font-display text-[13px] font-semibold text-green">
-            ₨ {option.estimatedPrice.toLocaleString()}
+            {formatPKR(option.estimatedPrice)}
           </span>
         </div>
       ))}

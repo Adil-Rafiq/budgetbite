@@ -13,9 +13,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { formatPKR } from '@/lib/currency';
 import type { BudgetPlanDetail } from '@repo/shared';
-
-const fmtPkr = (n: number) => `₨ ${Math.round(n).toLocaleString()}`;
 
 export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
   const { data: summary, isLoading } = usePlanSummary(plan.id);
@@ -41,7 +40,7 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
               className={`font-display text-[32px] font-semibold leading-tight tracking-tight ${varianceTone}`}
             >
               {saved ? '+' : '−'}
-              {fmtPkr(Math.abs(summary.variance))}
+              {formatPKR(Math.abs(summary.variance))}
               <span className="ml-2 text-[13px] font-normal text-slate">
                 {saved ? 'saved' : 'over budget'}
               </span>
@@ -66,7 +65,7 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <SummaryStat
             label="Spent"
-            value={`${fmtPkr(summary.amountSpent)} / ${fmtPkr(summary.totalBudget)}`}
+            value={`${formatPKR(summary.amountSpent)} / ${formatPKR(summary.totalBudget)}`}
           />
           <SummaryStat
             label="Meals logged"

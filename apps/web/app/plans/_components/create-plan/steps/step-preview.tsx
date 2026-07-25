@@ -1,8 +1,8 @@
 import { Bell, BellOff, CalendarDays, Utensils } from 'lucide-react';
 import { format } from 'date-fns';
 import { useCreatePlanContext } from '@/app/plans/_context/create-plan-context';
+import { formatPKR } from '@/lib/currency';
 
-const fmtPkr = (n: number) => `₨ ${Math.round(n).toLocaleString()}`;
 const eyebrowClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60';
 
 const formatTime = (time: string) => {
@@ -49,7 +49,7 @@ export const StepPreview = () => {
           <div className="flex min-w-0 flex-col gap-1">
             <span className={eyebrowClass}>Total budget</span>
             <p className="font-display text-[28px] font-semibold leading-tight tracking-tight text-charcoal">
-              {fmtPkr(totalBudget)}
+              {formatPKR(totalBudget)}
             </p>
           </div>
           <span className="shrink-0 rounded-full border border-sage bg-white px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal">
@@ -58,8 +58,8 @@ export const StepPreview = () => {
         </div>
 
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <PreviewStat label="Per day" value={fmtPkr(avgPerDay)} />
-          <PreviewStat label="Per meal" value={fmtPkr(avgPerMeal)} />
+          <PreviewStat label="Per day" value={formatPKR(avgPerDay)} />
+          <PreviewStat label="Per meal" value={formatPKR(avgPerMeal)} />
         </div>
       </div>
 

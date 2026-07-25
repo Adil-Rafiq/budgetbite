@@ -5,11 +5,10 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { useBudgetPlans } from '@/hooks/use-budget-plan';
 import { Stagger, StaggerItem } from '@/components/motion';
+import { formatPKR } from '@/lib/currency';
 
 const formatDate = (dateStr: string, opts?: Intl.DateTimeFormatOptions) =>
   new Date(dateStr).toLocaleDateString('en-PK', opts);
-
-const formatPkr = (n: number) => (n >= 1000 ? `₨ ${(n / 1000).toFixed(1)}k` : `₨ ${Math.round(n)}`);
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -148,9 +147,9 @@ export default function PlansList() {
 
                   <div className="mt-4">
                     <div className="mb-1.5 flex items-center justify-between text-[12px] text-slate">
-                      <span>₨ {spent.toLocaleString()} spent</span>
+                      <span>{formatPKR(spent)} spent</span>
                       <span className="font-semibold text-charcoal">
-                        of ₨ {plan.totalBudget.toLocaleString()}
+                        of {formatPKR(plan.totalBudget)}
                       </span>
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-sage/50">
@@ -167,9 +166,9 @@ export default function PlansList() {
                     {[
                       {
                         label: 'Remaining',
-                        value: remaining > 0 ? formatPkr(remaining) : '₨ 0',
+                        value: formatPKR(Math.max(0, remaining)),
                       },
-                      { label: 'Daily avg', value: formatPkr(dailyAvg) },
+                      { label: 'Daily avg', value: formatPKR(dailyAvg) },
                       { label: 'Days left', value: String(daysLeft) },
                     ].map(({ label, value }) => (
                       <div

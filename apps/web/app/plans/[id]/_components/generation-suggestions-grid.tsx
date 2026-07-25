@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react';
 import { useBudgetPlanGenerationDetail } from '@/hooks/use-budget-plan';
 import { getMealTypeVisual } from '@/lib/meal-type-visuals';
 import { optionLabel } from '@/lib/suggestion';
+import { formatPKR } from '@/lib/currency';
 import type { SuggestionOption, SuggestionSlot } from '@repo/shared';
 
 interface GenerationSuggestionsGridProps {
@@ -76,7 +77,7 @@ function SlotCard({ slot }: { slot: SuggestionSlot }) {
                 <p className="truncate text-[11px] text-slate">{option.restaurantName ?? '—'}</p>
               </div>
               <span className="shrink-0 text-right font-display text-[13px] font-semibold tabular-nums text-green">
-                ₨ {option.estimatedPrice.toLocaleString()}
+                {formatPKR(option.estimatedPrice)}
               </span>
             </div>
           ))
