@@ -1,6 +1,7 @@
 'use client';
 
-import { ArrowRight, Check, Pin, RotateCw, ChefHat, PenLine } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, Check, Pin, RotateCw, ChefHat, PenLine, Trash2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -45,8 +46,12 @@ export function MealSlots() {
     loggedByMealType,
     budget,
     refetchSlots,
+    isRemoving,
     actions,
   } = useMealSlots();
+
+  // Which logged slot is showing its inline "remove this meal?" confirm.
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
 
   // Fit cue for one option's price against the budget, or null when there's no
   // usable per-meal target yet. Same helper the restaurants surface uses, so
@@ -94,10 +99,17 @@ export function MealSlots() {
     day: 'numeric',
   });
 
+  const loggedCount = slotsData.slots.filter((s) => loggedByMealType[s.mealTypeId]).length;
+  const totalSlots = slotsData.slots.length;
+
   return (
     <>
       <section className="flex flex-col gap-4">
-        <SectionHeader title="Today's meals" subtitle={dateStr} />
+        <SectionHeader
+          title="Today's meals"
+          subtitle={dateStr}
+          progress={{ logged: loggedCount, total: totalSlots }}
+        />
 
         <div className="grid gap-4 lg:grid-cols-3">
           {slotsData.slots.map((slot: SuggestionSlot) => {
@@ -198,14 +210,54 @@ export function MealSlots() {
                         </div>
                       )}
 
-                      <button
-                        type="button"
-                        onClick={() => actions.setExpandedSlotId(slot.mealTypeId)}
-                        className={`${ghostBtn} mt-auto`}
-                      >
-                        Change choice
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </button>
+                      {confirmRemoveId === loggedMeal.id ? (
+                        <div className="mt-auto flex items-center gap-2 rounded-xl border border-tomato/30 bg-tomato/[0.06] p-2">
+                          <span className="px-1 text-[12px] font-medium text-tomato">
+                            Remove this meal?
+                          </span>
+                          <div className="ml-auto flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setConfirmRemoveId(null)}
+                              disabled={isRemoving}
+                              className={`rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:opacity-50 ${focusRing}`}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isRemoving}
+                              onClick={async () => {
+                                await actions.removeChoice(loggedMeal.id);
+                                setConfirmRemoveId(null);
+                              }}
+                              className={`rounded-lg bg-tomato px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-tomato/90 disabled:opacity-50 ${focusRing}`}
+                            >
+                              {isRemoving ? 'Removing…' : 'Remove'}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-auto flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => actions.setExpandedSlotId(slot.mealTypeId)}
+                            className={`${ghostBtn} flex-1`}
+                          >
+                            Change choice
+                            <ArrowRight className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setConfirmRemoveId(loggedMeal.id)}
+                            aria-label="Remove this logged meal"
+                            className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-sage bg-white px-4 py-2 text-sm font-medium text-slate transition-colors hover:border-tomato/40 hover:text-tomato ${focusRing}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Remove
+                          </button>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <>
@@ -433,13 +485,34 @@ function StatusPill({ tone, label, icon }: StatusPillProps) {
   );
 }
 
-function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
+function SectionHeader({
+  title,
+  subtitle,
+  progress,
+}: {
+  title: string;
+  subtitle: string;
+  progress?: { logged: number; total: number };
+}) {
+  const done = progress && progress.total > 0 && progress.logged >= progress.total;
   return (
     <div className="flex items-end justify-between gap-4">
       <h2 className="font-display text-2xl font-semibold tracking-tight text-charcoal sm:text-[28px]">
         {title}
       </h2>
-      {subtitle && <span className="text-[12px] text-slate">{subtitle}</span>}
+      <div className="flex flex-col items-end gap-0.5 text-right">
+        {progress && progress.total > 0 && (
+          <span
+            className={`inline-flex items-center gap-1.5 text-[12px] font-semibold ${
+              done ? 'text-dark-green' : 'text-slate'
+            }`}
+          >
+            {done && <Check className="h-3.5 w-3.5" />}
+            {done ? 'All set for today' : `${progress.logged} of ${progress.total} logged`}
+          </span>
+        )}
+        {subtitle && <span className="text-[12px] text-slate">{subtitle}</span>}
+      </div>
     </div>
   );
 }

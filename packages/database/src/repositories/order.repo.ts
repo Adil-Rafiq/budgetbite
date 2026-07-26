@@ -156,6 +156,15 @@ export const orderRepository = {
     return inserted;
   },
 
+  /**
+   * Delete a single meal_choice row. Used to undo a logged meal; the caller is
+   * responsible for reversing the plan_context delta in the same transaction.
+   */
+  async deleteById(id: string, tx?: DbOrTx): Promise<void> {
+    const exec = tx ?? db;
+    await exec.delete(mealChoice).where(eq(mealChoice.id, id));
+  },
+
   async listByUserAndPlanWithPagination(
     userId: string,
     budgetPlanId: string,

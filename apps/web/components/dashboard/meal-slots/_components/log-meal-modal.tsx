@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { SubmitHandler, Control } from 'react-hook-form';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -196,17 +197,67 @@ function FeedbackDisclosure<T extends LogSuggestionForm | LogCustomForm | LogHom
   );
 }
 
-function PrimaryButton({ children, disabled }: { children: React.ReactNode; disabled: boolean }) {
+function PrimaryButton({
+  children,
+  disabled,
+  armed = false,
+}: {
+  children: React.ReactNode;
+  disabled: boolean;
+  armed?: boolean;
+}) {
   return (
     <button
       type="submit"
       disabled={disabled}
-      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+      className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:pointer-events-none disabled:opacity-50 ${
+        armed ? 'bg-tomato hover:bg-tomato/90' : 'bg-green hover:bg-dark-green'
+      }`}
     >
       {children}
       <CornerDownLeft className="h-3.5 w-3.5 opacity-70" />
     </button>
   );
+}
+
+/**
+ * Hard confirm for an amount that's more than double the per-meal budget — a
+ * likely fat-finger that would silently re-plan the rest of the period. The
+ * first submit arms the confirm (button turns "Log anyway"); a second submit
+ * goes through. Dropping back under the threshold disarms it implicitly.
+ */
+function useWildOverGuard(budget: LogBudget | undefined, amount: number | undefined) {
+  const [armed, setArmed] = useState(false);
+  const wildlyOver = !!budget && budget.avgPerMeal > 0 && (amount ?? 0) > budget.avgPerMeal * 2;
+  const showArmed = armed && wildlyOver;
+  const gate = (): boolean => {
+    if (wildlyOver && !armed) {
+      setArmed(true);
+      return false;
+    }
+    return true;
+  };
+  return { showArmed, gate };
+}
+
+function AmountField({
+  showArmed,
+  amount,
+  budget,
+}: {
+  showArmed: boolean;
+  amount: number | undefined;
+  budget: LogBudget | undefined;
+}) {
+  if (showArmed) {
+    return (
+      <p className="flex items-start gap-1.5 text-[11px] font-medium text-tomato">
+        <TriangleAlert className="mt-px h-3 w-3 shrink-0" aria-hidden />
+        That&apos;s more than double your per-meal budget — tap &ldquo;Log anyway&rdquo; to confirm.
+      </p>
+    );
+  }
+  return <AmountWarning amount={amount} budget={budget} />;
 }
 
 function SuggestionForm({
@@ -236,11 +287,15 @@ function SuggestionForm({
     },
   });
 
+  const amount = watch('actualAmountSpent');
+  const guard = useWildOverGuard(budget, amount);
+  const guardedSave: SubmitHandler<LogSuggestionForm> = (data) => {
+    if (!guard.gate()) return;
+    (onSave as SubmitHandler<LogSuggestionForm>)(data);
+  };
+
   return (
-    <form
-      onSubmit={handleSubmit(onSave as SubmitHandler<LogSuggestionForm>)}
-      className="flex flex-col gap-4"
-    >
+    <form onSubmit={handleSubmit(guardedSave)} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <Label htmlFor="actual-amount" className={labelClass}>
           Actual amount spent (PKR)
@@ -255,12 +310,14 @@ function SuggestionForm({
         {errors.actualAmountSpent && (
           <p className={errorClass}>{errors.actualAmountSpent.message}</p>
         )}
-        <AmountWarning amount={watch('actualAmountSpent')} budget={budget} />
+        <AmountField showArmed={guard.showArmed} amount={amount} budget={budget} />
       </div>
 
       <FeedbackDisclosure control={control} />
 
-      <PrimaryButton disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryButton>
+      <PrimaryButton disabled={isSaving} armed={guard.showArmed}>
+        {isSaving ? 'Saving…' : guard.showArmed ? 'Log anyway' : 'Save meal'}
+      </PrimaryButton>
     </form>
   );
 }
@@ -292,11 +349,15 @@ function CustomForm({
     },
   });
 
+  const amount = watch('actualAmountSpent');
+  const guard = useWildOverGuard(budget, amount);
+  const guardedSave: SubmitHandler<LogCustomForm> = (data) => {
+    if (!guard.gate()) return;
+    (onSave as SubmitHandler<LogCustomForm>)(data);
+  };
+
   return (
-    <form
-      onSubmit={handleSubmit(onSave as SubmitHandler<LogCustomForm>)}
-      className="flex flex-col gap-4"
-    >
+    <form onSubmit={handleSubmit(guardedSave)} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <Label htmlFor="restaurant-name" className={labelClass}>
           Restaurant name
@@ -339,12 +400,14 @@ function CustomForm({
         {errors.actualAmountSpent && (
           <p className={errorClass}>{errors.actualAmountSpent.message}</p>
         )}
-        <AmountWarning amount={watch('actualAmountSpent')} budget={budget} />
+        <AmountField showArmed={guard.showArmed} amount={amount} budget={budget} />
       </div>
 
       <FeedbackDisclosure control={control} />
 
-      <PrimaryButton disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryButton>
+      <PrimaryButton disabled={isSaving} armed={guard.showArmed}>
+        {isSaving ? 'Saving…' : guard.showArmed ? 'Log anyway' : 'Save meal'}
+      </PrimaryButton>
     </form>
   );
 }
@@ -375,11 +438,15 @@ function HomeCookedForm({
     },
   });
 
+  const amount = watch('actualAmountSpent');
+  const guard = useWildOverGuard(budget, amount);
+  const guardedSave: SubmitHandler<LogHomeForm> = (data) => {
+    if (!guard.gate()) return;
+    (onSave as SubmitHandler<LogHomeForm>)(data);
+  };
+
   return (
-    <form
-      onSubmit={handleSubmit(onSave as SubmitHandler<LogHomeForm>)}
-      className="flex flex-col gap-4"
-    >
+    <form onSubmit={handleSubmit(guardedSave)} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <Label htmlFor="home-desc" className={labelClass}>
           What did you cook?{' '}
@@ -410,12 +477,14 @@ function HomeCookedForm({
         {errors.actualAmountSpent && (
           <p className={errorClass}>{errors.actualAmountSpent.message}</p>
         )}
-        <AmountWarning amount={watch('actualAmountSpent')} budget={budget} />
+        <AmountField showArmed={guard.showArmed} amount={amount} budget={budget} />
       </div>
 
       <FeedbackDisclosure control={control} />
 
-      <PrimaryButton disabled={isSaving}>{isSaving ? 'Saving…' : 'Save meal'}</PrimaryButton>
+      <PrimaryButton disabled={isSaving} armed={guard.showArmed}>
+        {isSaving ? 'Saving…' : guard.showArmed ? 'Log anyway' : 'Save meal'}
+      </PrimaryButton>
     </form>
   );
 }

@@ -84,6 +84,12 @@ export async function recordChoice(req: AuthRequest, res: Response): Promise<voi
   res.status(201).json(choice);
 }
 
+export async function deleteChoice(req: AuthRequest, res: Response): Promise<void> {
+  const { id, choiceId } = req.params as IdParams & { choiceId: string };
+  await mealChoiceService.deleteChoice(req.userId!, id, choiceId);
+  res.status(204).send();
+}
+
 export async function generateMealPlan(req: AuthRequest, res: Response): Promise<void> {
   const { id } = req.params as IdParams;
   // Returns 202 immediately with the pending generation's id; the LLM runs in

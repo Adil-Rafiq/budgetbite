@@ -91,4 +91,41 @@ export const planContextRepository = {
     if (!updated) throw new Error('PlanContext not found');
     return updated;
   },
+
+  /**
+   * Exact inverse of `updateForChoice`: undo a meal-choice's delta when the
+   * choice is deleted, so the budget returns to where it was before the log.
+   * Same read-modify-write-in-SQL shape so an undo cannot race a concurrent
+   * confirmation into a wrong amountSpent.
+   */
+  async reverseChoice(
+    budgetPlanId: string,
+    delta: PlanContextChoiceDelta,
+    tx?: DbOrTx,
+  ): Promise<PlanContext> {
+    const exec = tx ?? db;
+    const spent = delta.spentAmount.toString();
+    const planned = delta.plannedMealBudget.toString();
+
+    const [updated] = await exec
+      .update(planContext)
+      .set({
+        amountSpent: sql`${planContext.amountSpent} - ${spent}::numeric`,
+        amountRemaining: sql`${planContext.amountRemaining} + ${spent}::numeric`,
+        mealsConsumed: sql`${planContext.mealsConsumed} - 1`,
+        mealsRemaining: sql`${planContext.mealsRemaining} + 1`,
+        avgBudgetPerRemainingMeal: sql`CASE
+          WHEN ${planContext.mealsRemaining} + 1 > 0
+          THEN (${planContext.amountRemaining} + ${spent}::numeric) / (${planContext.mealsRemaining} + 1)
+          ELSE 0
+        END`,
+        cumulativeVariance: sql`${planContext.cumulativeVariance} - (${planned}::numeric - ${spent}::numeric)`,
+        updatedAt: new Date(),
+      })
+      .where(eq(planContext.budgetPlanId, budgetPlanId))
+      .returning();
+
+    if (!updated) throw new Error('PlanContext not found');
+    return updated;
+  },
 };

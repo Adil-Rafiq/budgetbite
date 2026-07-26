@@ -16,4 +16,7 @@ export const mealChoiceApi = {
     apiClient
       .get(`api/budget-plans/${planId}/choices`, { searchParams: params })
       .json<Paginated<MealChoiceResponse>>(),
+
+  remove: (planId: string, choiceId: string) =>
+    apiClient.delete(`api/budget-plans/${planId}/choices/${choiceId}`).then(() => undefined),
 };

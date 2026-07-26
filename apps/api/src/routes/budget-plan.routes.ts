@@ -90,6 +90,13 @@ router.post(
   asyncHandler(budgetPlanController.recordChoice),
 );
 
+/** Undo a confirmed meal choice and atomically reverse its plan_context delta. Returns 204. */
+router.delete(
+  '/:id/choices/:choiceId',
+  validate({ params: z.object({ id: uuidSchema, choiceId: uuidSchema }) }),
+  asyncHandler(budgetPlanController.deleteChoice),
+);
+
 /** Kick off AI suggestions. Returns 202 with { generationId, budgetPlanId, generatedAt }; the LLM runs in the background and the FE polls for the result. */
 router.post(
   '/:id/meal-plan/generate',

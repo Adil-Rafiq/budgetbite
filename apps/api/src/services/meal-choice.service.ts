@@ -185,6 +185,38 @@ export const mealChoiceService = {
     return toMealChoiceResponse(choice);
   },
 
+  /**
+   * Undo a logged meal: delete the choice and reverse the exact plan_context
+   * delta it applied, in one transaction, so amountSpent / mealsRemaining /
+   * variance return to where they were before the log. Deleting a choice does
+   * not restore any pin the choice had superseded — the slot simply returns to
+   * its suggested (un-logged) state.
+   */
+  async deleteChoice(userId: string, budgetPlanId: string, choiceId: string): Promise<void> {
+    const plan = await loadOwnedActive(userId, budgetPlanId);
+    if (plan.status !== 'active') {
+      throw new AppError(400, 'Plan is not active', 'PLAN_NOT_ACTIVE');
+    }
+
+    const choice = await orderRepository.findById(choiceId);
+    if (!choice || choice.budgetPlanId !== budgetPlanId || choice.userId !== userId) {
+      throw new AppError(404, 'Meal choice not found', 'NOT_FOUND');
+    }
+
+    const ctx = await planContextRepository.findByPlanId(budgetPlanId);
+    if (!ctx) throw new AppError(500, 'Plan context missing', 'PLAN_CONTEXT_MISSING');
+    const plannedMealBudget = toNumber(ctx.totalBudget) / Math.max(1, ctx.totalMeals);
+
+    await db.transaction(async (tx) => {
+      await planContextRepository.reverseChoice(
+        budgetPlanId,
+        { spentAmount: toNumber(choice.actualAmountSpent), plannedMealBudget },
+        tx,
+      );
+      await orderRepository.deleteById(choiceId, tx);
+    });
+  },
+
   async listByPlan(
     userId: string,
     budgetPlanId: string,

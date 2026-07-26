@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { localDateString } from '@/lib/date';
 import { useMealPlanSuggestions, useRerollSlot } from '@/hooks/use-meal-plan';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
-import { useRecordMealChoice, useMealChoices } from '@/hooks/use-meal-choice';
+import { useRecordMealChoice, useDeleteMealChoice, useMealChoices } from '@/hooks/use-meal-choice';
 import { useSubmitFeedback } from '@/hooks/use-feedback';
 import { showToast } from '@/lib/toast';
 import { getErrorMessage } from '@/lib/api/errors';
@@ -90,6 +90,7 @@ export function useMealSlots() {
   }, [choicesData, today]);
 
   const { mutateAsync: recordChoice, isPending: isSaving } = useRecordMealChoice(planId);
+  const { mutateAsync: deleteChoice, isPending: isRemoving } = useDeleteMealChoice(planId);
   const { mutateAsync: submitFeedback } = useSubmitFeedback();
   const { mutateAsync: rerollSlot, isPending: isRerolling } = useRerollSlot(planId);
 
@@ -164,12 +165,25 @@ export function useMealSlots() {
     }
   };
 
+  // Undo a logged meal — the API reverses the budget delta; on success the slot
+  // returns to its suggested state and the budget figures restore.
+  const removeChoice = async (choiceId: string) => {
+    if (!planId) return;
+    try {
+      await deleteChoice(choiceId);
+      showToast.success({ title: 'Meal removed', description: 'Your budget has been restored.' });
+    } catch (err) {
+      showToast.error({ title: 'Could not remove meal', description: getErrorMessage(err) });
+    }
+  };
+
   return {
     today,
     slotsData,
     isSlotsLoading,
     slotsError,
     isSaving,
+    isRemoving,
     isRerolling,
     expandedSlotId,
     expandedSlot,
@@ -183,6 +197,7 @@ export function useMealSlots() {
       closeLogModal,
       handleSave,
       handleReroll,
+      removeChoice,
     },
   };
 }
