@@ -28,9 +28,15 @@ export const useStartNextPlan = (source: BudgetPlanDetail) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const submit = async () => {
+    // See `use-create-plan.ts`: the cancel must precede the create, so a
+    // failure in between leaves the user with no active plan. Report that
+    // plainly rather than a generic "something went wrong".
+    let cancelledPriorPlan = false;
+
     try {
       if (active?.plan) {
         await cancelBudgetPlan(active.plan.id);
+        cancelledPriorPlan = true;
       }
 
       const mealTypeIds = source.mealTypes.map((mt) => mt.id);
@@ -65,9 +71,13 @@ export const useStartNextPlan = (source: BudgetPlanDetail) => {
         });
         return;
       }
+      queryClient.invalidateQueries({ queryKey: ['activeBudgetPlan'] });
+      queryClient.invalidateQueries({ queryKey: ['budgetPlans'] });
       showToast.error({
         title: 'Failed to start next plan',
-        description: getErrorMessage(err, 'Something went wrong. Please try again.'),
+        description: cancelledPriorPlan
+          ? 'Your previous plan was already cancelled, so you have no active plan right now. Try again from the plans page.'
+          : getErrorMessage(err, 'Something went wrong. Please try again.'),
       });
     }
   };

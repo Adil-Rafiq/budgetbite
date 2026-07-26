@@ -1,52 +1,16 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   notificationPreferencesSchema,
   type BudgetPlanMealTypeOption,
   type NotificationPreferencesInput,
-} from '@/app/plans/types';
-
-type NotificationSlot = NotificationPreferencesInput['notificationSlots'][number];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-/**
- * Builds notification slots aligned to the current meal type selection.
- * Preserves existing times where the meal type already has one set.
- * New meal types get an empty time so the user must fill them in.
- */
-const buildSlotsForMealTypes = (
-  current: NotificationSlot[],
-  selectedMealTypeIds: string[],
-): NotificationSlot[] => {
-  const ids =
-    selectedMealTypeIds.length > 0 ? selectedMealTypeIds : current.map((slot) => slot.mealTypeId);
-
-  return ids.map((mealTypeId) => {
-    const existing = current.find((slot) => slot.mealTypeId === mealTypeId);
-    return {
-      mealTypeId,
-      time: existing?.time ?? '',
-      enabled: existing?.enabled ?? true,
-    };
-  });
-};
-
-/**
- * Returns true if two slot arrays are identical in order, id, time, and enabled.
- * Used to avoid unnecessary form updates that would trigger re-renders.
- */
-const areSlotsEqual = (a: NotificationSlot[], b: NotificationSlot[]): boolean =>
-  a.length === b.length &&
-  a.every(
-    (slot, i) =>
-      slot.mealTypeId === b[i]?.mealTypeId &&
-      slot.time === b[i]?.time &&
-      slot.enabled === b[i]?.enabled,
-  );
+} from '@/lib/budget-plan/schema';
+import { areSlotsEqual, buildSlotsForMealTypes } from '@/lib/budget-plan/reminders';
+import { PLANS_DRAFT_KEY } from '@/app/plans/_lib/draft';
+import { patchDraftIn, readDraftFrom } from '@/lib/budget-plan/draft-storage';
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
@@ -61,19 +25,33 @@ export const useNotificationStep = (
     },
   });
 
-  // Sync notification slots when selected meal types change.
-  // Preserves existing times, adds empty slots for new meal types,
-  // removes slots for deselected meal types.
+  const restoredDraft = useRef(false);
+
+  // Restore reminder times before the reconciliation effect runs, so a restored
+  // slot counts as "existing" and keeps its time instead of reverting to the
+  // per-meal default.
+  useEffect(() => {
+    if (restoredDraft.current) return;
+    restoredDraft.current = true;
+
+    const slots = readDraftFrom(PLANS_DRAFT_KEY).notificationSlots;
+    if (slots?.length) form.setValue('notificationSlots', slots);
+  }, [form]);
+
+  // Sync slots when the meal-type selection changes. New meal types arrive
+  // pre-filled with a sensible time (see `buildSlotsForMealTypes`) — this step
+  // used to seed them empty, which made it invalid on arrival and turned "Next"
+  // into a silent no-op.
   useEffect(() => {
     const current = form.getValues('notificationSlots');
-    const next = buildSlotsForMealTypes(current, selectedMealTypeIds);
+    const next = buildSlotsForMealTypes(current, selectedMealTypeIds, mealTypeOptions);
 
     if (areSlotsEqual(current, next)) return;
 
-    // Set without shouldValidate — user hasn't interacted yet,
-    // triggering errors immediately would be jarring
+    // Set without shouldValidate — the user hasn't interacted yet, and
+    // triggering errors immediately would be jarring.
     form.setValue('notificationSlots', next, { shouldDirty: true });
-  }, [selectedMealTypeIds, form]);
+  }, [selectedMealTypeIds, mealTypeOptions, form]);
 
   // ─── Actions ────────────────────────────────────────────────────────────────
 
@@ -101,7 +79,14 @@ export const useNotificationStep = (
 
   const notificationSlots = form.watch('notificationSlots');
 
-  // Enrich slots with labels for display — decoupled from raw form data
+  // Mirror to the draft so an interruption restores the times the user set, not
+  // the defaults they had already replaced.
+  useEffect(() => {
+    if (notificationSlots.length === 0) return;
+    patchDraftIn(PLANS_DRAFT_KEY, { notificationSlots });
+  }, [notificationSlots]);
+
+  // Enrich slots with labels for display — decoupled from raw form data.
   const slots = notificationSlots.map((slot) => ({
     mealTypeId: slot.mealTypeId,
     time: slot.time,
@@ -109,7 +94,21 @@ export const useNotificationStep = (
     label: mealTypeOptions.find((opt) => opt.id === slot.mealTypeId)?.label ?? 'Meal slot',
   }));
 
-  // ─── Exposed API ──────────────────────────────────────────────────────────
+  /**
+   * Per-row messages. React-hook-form files item failures under
+   * `notificationSlots[i].time`, so reading `.message` off the array — as this
+   * step used to — returns `undefined` and renders nothing while validation
+   * quietly blocks the user.
+   */
+  const slotErrors = notificationSlots.map(
+    (_, i) => form.formState.errors.notificationSlots?.[i]?.time?.message,
+  );
+
+  /** Mirrors `useBudgetStep.reset`: clear, then re-apply any surviving draft. */
+  const reset = useCallback(() => {
+    const slots = readDraftFrom(PLANS_DRAFT_KEY).notificationSlots;
+    form.reset({ notificationSlots: slots?.length ? slots : [] });
+  }, [form]);
 
   return {
     handleSubmit: form.handleSubmit,
@@ -117,6 +116,7 @@ export const useNotificationStep = (
     getValues: () => form.getValues(),
     isValid: form.formState.isValid,
     isDirty: form.formState.isDirty,
+    reset,
 
     values: {
       slots,
@@ -125,6 +125,7 @@ export const useNotificationStep = (
 
     errors: {
       notificationSlots: form.formState.errors.notificationSlots?.message,
+      slots: slotErrors,
     },
 
     actions: {

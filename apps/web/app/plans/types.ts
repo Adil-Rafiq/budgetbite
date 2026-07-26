@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import type { LucideIcon } from 'lucide-react';
+import type { NotificationPreferencesInput } from '@/lib/budget-plan/schema';
 
 export type CreatePlanStepId = 'budget' | 'notifications' | 'preview';
 
@@ -10,40 +10,31 @@ export type CreatePlanStep = {
   description: string;
 };
 
-export type BudgetPlanType = 'weekly' | 'monthly';
+/**
+ * The budget and reminder contracts are shared with onboarding via
+ * `@/lib/budget-plan/schema`. This file used to define its own, which is how
+ * the dialog ended up accepting a ₨99,999,999 budget and a 6th meal type that
+ * the API rejects — onboarding had capped both.
+ */
+export {
+  MAX_TOTAL_BUDGET,
+  MAX_MEALS_PER_DAY,
+  budgetPlanPreferencesSchema,
+  notificationSlotSchema,
+  notificationPreferencesSchema,
+} from '@/lib/budget-plan/schema';
 
-export interface BudgetPlanMealTypeOption {
-  id: string;
-  key: string;
-  label: string;
-  sortOrder: number;
-}
-
-export const budgetPlanPreferencesSchema = z.object({
-  planType: z.enum(['weekly', 'monthly']),
-  totalBudget: z.number().positive(),
-  mealTypeIds: z.array(z.string().uuid()).min(1, 'Select at least one meal type'),
-});
-
-export type BudgetPlanPreferencesInput = z.infer<typeof budgetPlanPreferencesSchema>;
-
-export const notificationSlotSchema = z.object({
-  mealTypeId: z.string().uuid(),
-  time: z.string().regex(/^\d{2}:\d{2}$/),
-  enabled: z.boolean(),
-});
-
-export type NotificationSlotInput = z.infer<typeof notificationSlotSchema>;
-
-export const notificationPreferencesSchema = z.object({
-  notificationSlots: z.array(notificationSlotSchema).min(1),
-});
-
-export type NotificationPreferencesInput = z.infer<typeof notificationPreferencesSchema>;
+export type {
+  BudgetPlanType,
+  BudgetPlanMealTypeOption,
+  BudgetPlanPreferencesInput,
+  NotificationSlotInput,
+  NotificationPreferencesInput,
+} from '@/lib/budget-plan/schema';
 
 export interface OnboardingSubmissionInput {
   budget: {
-    planType: BudgetPlanType;
+    planType: 'weekly' | 'monthly';
     totalBudget: number;
     mealTypeIds: string[];
     mealsPerDay: number;

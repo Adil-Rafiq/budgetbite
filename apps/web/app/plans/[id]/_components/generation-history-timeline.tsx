@@ -1,9 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { useBudgetPlanGenerations } from '@/hooks/use-budget-plan';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
+import { DataError } from '@/components/data-error';
+import { FOCUS_RING } from '@/lib/focus-ring';
 import { GenerationAttemptItem } from './generation-attempt-item';
 import type { BudgetGeneration, BudgetPlanDetail } from '@repo/shared';
 
@@ -27,15 +29,6 @@ function TimelineSkeleton() {
   );
 }
 
-function TimelineError({ message }: { message: string }) {
-  return (
-    <div className="flex items-center gap-2 rounded-xl border border-tomato/20 bg-tomato/[0.06] p-3 text-[13px] text-tomato">
-      <span className="font-semibold">!</span>
-      <span>{message}</span>
-    </div>
-  );
-}
-
 function TimelineEmpty({ planId }: { planId: string }) {
   const generate = useGenerateMealPlan();
   return (
@@ -53,17 +46,25 @@ function TimelineEmpty({ planId }: { planId: string }) {
         type="button"
         onClick={() => generate.mutate(planId)}
         disabled={generate.isPending}
-        className="inline-flex items-center gap-2 rounded-xl bg-green px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+        className={`inline-flex min-h-11 items-center gap-2 rounded-xl bg-green px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
       >
-        <Sparkles className="h-3.5 w-3.5" />
+        <Sparkles aria-hidden className="h-3.5 w-3.5" />
         Generate now
       </button>
     </div>
   );
 }
 
+const PAGE_SIZE = 20;
+
 export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTimelineProps) {
-  const { data, isLoading, error } = useBudgetPlanGenerations(planId);
+  // "Showing the latest 20 of 47 attempts" used to be the end of the road —
+  // a count of what you could not reach. Now it loads more.
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  const { data, isLoading, isFetching, error, refetch } = useBudgetPlanGenerations(planId, {
+    limit,
+    offset: 0,
+  });
 
   const activeId = plan.activeGeneration?.id ?? null;
   const latestId = plan.latestAttempt?.id ?? null;
@@ -106,7 +107,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
     return (
       <div className="flex flex-col gap-4">
         {header}
-        <TimelineError message={`Failed to load generation history: ${error.message}`} />
+        <DataError message="We couldn't load this plan's history." onRetry={() => refetch()} />
       </div>
     );
   }
@@ -135,6 +136,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
                 isActive={gen.id === activeId}
                 isLatest={gen.id === latestId}
                 canTriggerRetry={!newerPending}
+                ctx={plan.context}
               />
             </li>
           ))}
@@ -142,9 +144,19 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
       </div>
 
       {data?.meta && total > items.length && (
-        <p className="text-center text-[11px] text-slate/60">
-          Showing the latest {items.length} of {total} attempts
-        </p>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-[11px] text-slate/60">
+            Showing the latest {items.length} of {total} attempts
+          </p>
+          <button
+            type="button"
+            onClick={() => setLimit((n) => n + PAGE_SIZE)}
+            disabled={isFetching}
+            className={`min-h-11 rounded-lg border border-sage bg-white px-4 text-[12px] font-semibold text-dark-green transition-colors hover:border-dark-green disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+          >
+            {isFetching ? 'Loading…' : 'Show older attempts'}
+          </button>
+        </div>
       )}
     </div>
   );

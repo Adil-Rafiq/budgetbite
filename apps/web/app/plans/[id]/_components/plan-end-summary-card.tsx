@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { formatPKR } from '@/lib/currency';
+import { FOCUS_RING } from '@/lib/focus-ring';
 import type { BudgetPlanDetail } from '@repo/shared';
 
 export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
@@ -37,7 +38,7 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
               Plan {statusLabel} · summary
             </div>
             <p
-              className={`font-display text-[32px] font-semibold leading-tight tracking-tight ${varianceTone}`}
+              className={`font-display text-[32px] font-semibold leading-tight tracking-tight tabular-nums ${varianceTone}`}
             >
               {saved ? '+' : '−'}
               {formatPKR(Math.abs(summary.variance))}
@@ -51,12 +52,12 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
             type="button"
             onClick={start}
             disabled={isPending}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-green px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-green px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
           >
             {isPending ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
+              <RefreshCw aria-hidden className="h-4 w-4 animate-spin" />
             ) : (
-              <Sparkles className="h-4 w-4" />
+              <Sparkles aria-hidden className="h-4 w-4" />
             )}
             Start next plan
           </button>
@@ -71,15 +72,23 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
             label="Meals logged"
             value={`${summary.mealsLogged}/${summary.totalMeals}`}
           />
+          {/* "Adherence to AI 62%" was the most interesting number on the card
+              and the most opaque — a percentage of nothing the user was told
+              about. */}
           <SummaryStat
-            label="Adherence to AI"
+            label="Followed suggestions"
             value={summary.adherencePercent === null ? '—' : `${summary.adherencePercent}%`}
+            hint={
+              summary.adherencePercent === null
+                ? 'No logged meals to compare.'
+                : 'Share of logged meals that came from a suggested option.'
+            }
           />
         </div>
 
         {summary.favoriteRestaurant && (
           <div className="flex items-center gap-2 rounded-xl border border-sage bg-canvas px-4 py-3">
-            <Store className="h-4 w-4 shrink-0 text-slate/60" />
+            <Store aria-hidden className="h-4 w-4 shrink-0 text-slate/60" />
             <p className="min-w-0 text-[13px] text-charcoal">
               Ordered most from{' '}
               <span className="font-semibold">{summary.favoriteRestaurant.name}</span>
@@ -106,12 +115,14 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl border border-sage bg-white px-4 py-2 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97]">
+            <AlertDialogCancel
+              className={`min-h-11 rounded-xl border border-sage bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+            >
               Keep current plan
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmReplace}
-              className="rounded-xl bg-green px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-dark-green active:scale-[0.97]"
+              className={`min-h-11 rounded-xl bg-green px-5 text-[13px] font-semibold text-white transition-colors hover:bg-dark-green active:scale-[0.97] ${FOCUS_RING}`}
             >
               Replace plan
             </AlertDialogAction>
@@ -122,13 +133,14 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
   );
 }
 
-function SummaryStat({ label, value }: { label: string; value: string }) {
+function SummaryStat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="rounded-lg border border-sage bg-canvas p-3">
       <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate/60">{label}</p>
-      <p className="mt-0.5 font-display text-[15px] font-semibold tracking-tight text-charcoal">
+      <p className="mt-0.5 font-display text-[15px] font-semibold tabular-nums tracking-tight text-charcoal">
         {value}
       </p>
+      {hint && <p className="mt-1 text-[10px] leading-snug text-slate/70">{hint}</p>}
     </div>
   );
 }

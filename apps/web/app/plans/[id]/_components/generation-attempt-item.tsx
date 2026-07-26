@@ -15,8 +15,10 @@ import type { LucideIcon } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
+import { describeGenerationError } from '@/lib/budget-plan/generation-errors';
+import { FOCUS_RING } from '@/lib/focus-ring';
 import { GenerationSuggestionsGrid } from './generation-suggestions-grid';
-import type { BudgetGeneration } from '@repo/shared';
+import type { BudgetGeneration, BudgetStateContext } from '@repo/shared';
 
 type Tone = 'amber' | 'green' | 'tomato' | 'slate';
 
@@ -50,14 +52,14 @@ const STATUS_VISUALS: Record<BudgetGeneration['status'], StatusVisual> = {
 };
 
 const TONE_DOT: Record<Tone, string> = {
-  amber: 'bg-[#f5a623]/20 border-[#f5a623]',
+  amber: 'bg-amber/20 border-amber',
   green: 'bg-green/20 border-green',
   tomato: 'bg-tomato/20 border-tomato',
   slate: 'bg-slate/20 border-slate',
 };
 
 const TONE_ICON: Record<Tone, string> = {
-  amber: 'text-[#f5a623]',
+  amber: 'text-amber',
   green: 'text-green',
   tomato: 'text-tomato',
   slate: 'text-slate',
@@ -69,6 +71,8 @@ interface GenerationAttemptItemProps {
   isActive: boolean;
   isLatest: boolean;
   canTriggerRetry: boolean;
+  /** Budget state, so expanded suggestions can show budget fit. */
+  ctx: BudgetStateContext;
 }
 
 export function GenerationAttemptItem({
@@ -77,6 +81,7 @@ export function GenerationAttemptItem({
   isActive,
   isLatest,
   canTriggerRetry,
+  ctx,
 }: GenerationAttemptItemProps) {
   const [open, setOpen] = useState(false);
 
@@ -85,6 +90,7 @@ export function GenerationAttemptItem({
   const isPending = generation.status === 'pending';
   const isFailed = generation.status === 'failed';
   const showRetry = isFailed && isLatest && canTriggerRetry;
+  const failure = describeGenerationError(generation.errorCode);
 
   const generate = useGenerateMealPlan();
 
@@ -97,7 +103,7 @@ export function GenerationAttemptItem({
     >
       <span
         aria-hidden
-        className={`absolute left-2 top-3 inline-block h-4 w-4 rounded-full border-2 shadow-[0_0_0_4px_#f7fbf0] ${TONE_DOT[visual.tone]}`}
+        className={`absolute left-2 top-3 inline-block h-4 w-4 rounded-full border-2 shadow-[0_0_0_4px_var(--color-canvas)] ${TONE_DOT[visual.tone]}`}
       />
 
       <div
@@ -139,7 +145,7 @@ export function GenerationAttemptItem({
                 type="button"
                 onClick={() => generate.mutate(planId)}
                 disabled={generate.isPending}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-tomato/30 bg-white px-3 py-1.5 text-[12px] font-medium text-tomato transition-colors hover:bg-tomato/10 disabled:pointer-events-none disabled:opacity-50"
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-tomato/30 bg-white px-3 text-[12px] font-medium text-tomato transition-colors hover:bg-tomato/10 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
               >
                 <RefreshCw className={cn('h-3.5 w-3.5', generate.isPending && 'animate-spin')} />
                 Retry
@@ -150,8 +156,9 @@ export function GenerationAttemptItem({
                 <button
                   type="button"
                   className={cn(
-                    'inline-flex items-center gap-1.5 rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas',
+                    'inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-sage bg-white px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas',
                     open && 'bg-canvas',
+                    FOCUS_RING,
                   )}
                 >
                   <ChevronDown
@@ -164,10 +171,26 @@ export function GenerationAttemptItem({
           </div>
         </div>
 
-        {isFailed && generation.errorMessage && (
+        {/* Was `AI_GENERATION_FAILED: <raw server message>`. The code is
+            engineering's vocabulary, not the user's; it moves to a details
+            disclosure for bug reports and the visible copy says what happened
+            and what to do. */}
+        {isFailed && (
           <div className="rounded-lg border border-tomato/20 bg-tomato/[0.06] p-3 text-[12px] text-tomato">
-            <span className="font-medium">{generation.errorCode ?? 'GENERATION_FAILED'}:</span>{' '}
-            {generation.errorMessage}
+            <p className="font-medium">{failure.title}</p>
+            <p className="mt-0.5 opacity-80">{failure.fix}</p>
+            {generation.errorMessage && (
+              <details className="mt-1.5">
+                <summary
+                  className={`inline-flex cursor-pointer list-none rounded text-[11px] underline underline-offset-2 opacity-70 ${FOCUS_RING}`}
+                >
+                  Technical details
+                </summary>
+                <p className="mt-1 break-words font-mono text-[11px] opacity-70">
+                  {generation.errorCode ?? 'UNKNOWN'}: {generation.errorMessage}
+                </p>
+              </details>
+            )}
           </div>
         )}
       </div>
@@ -175,7 +198,13 @@ export function GenerationAttemptItem({
       {isSucceeded && (
         <CollapsibleContent className="data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
           <div className="ml-2 mt-3 rounded-xl border border-dashed border-sage bg-canvas p-4">
-            {open && <GenerationSuggestionsGrid planId={planId} generationId={generation.id} />}
+            {open && (
+              <GenerationSuggestionsGrid
+                planId={planId}
+                generationId={generation.id}
+                ctx={ctx}
+              />
+            )}
           </div>
         </CollapsibleContent>
       )}

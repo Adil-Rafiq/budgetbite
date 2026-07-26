@@ -1,9 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
-import { Check, Pin, Sparkles, Utensils } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Check, ChevronDown, Pin, Sparkles, Utensils } from 'lucide-react';
+import { classifyBudgetFit } from '@repo/shared';
 import type {
   BudgetPlanDetail,
+  BudgetStateContext,
   PlanTimelineDay,
   PlanTimelineSlot,
   SuggestionOption,
@@ -13,6 +15,39 @@ import { usePlanTimeline } from '@/hooks/use-budget-plan';
 import { getMealTypeVisual } from '@/lib/meal-type-visuals';
 import { optionLabel } from '@/lib/suggestion';
 import { formatPKR } from '@/lib/currency';
+import { BudgetFitBadge } from '@/components/budget-fit-badge';
+import { DataError } from '@/components/data-error';
+import { FOCUS_RING } from '@/lib/focus-ring';
+
+/**
+ * Whether a suggested price fits what is left, using the same classifier the
+ * dashboard meal decision and the restaurant menus use.
+ *
+ * This surface printed every price in the same brand green — ₨350 against a
+ * ₨400 per-meal target looked exactly like ₨1,800 against it. The one screen
+ * where a whole period of AI suggestions is reviewed was the only place in the
+ * app that would not say whether a suggestion fit the budget.
+ */
+function OptionPrice({ option, ctx }: { option: SuggestionOption; ctx: BudgetStateContext }) {
+  const fit = classifyBudgetFit({
+    itemPrice: option.estimatedPrice,
+    avgBudgetPerRemainingMeal: ctx.avgBudgetPerRemainingMeal,
+    amountRemaining: ctx.amountRemaining,
+  });
+
+  return (
+    <div className="flex shrink-0 flex-col items-end gap-1">
+      <span
+        className={`whitespace-nowrap text-right font-display text-[13px] font-semibold tabular-nums ${
+          fit === 'red' ? 'text-tomato' : fit === 'amber' ? 'text-amber-ink' : 'text-dark-green'
+        }`}
+      >
+        {formatPKR(option.estimatedPrice)}
+      </span>
+      <BudgetFitBadge fit={fit} />
+    </div>
+  );
+}
 
 const dayFmt = new Intl.DateTimeFormat('en-PK', {
   weekday: 'long',
@@ -73,7 +108,7 @@ function LoggedBody({ slot }: { slot: PlanTimelineSlot }) {
   );
 }
 
-function PinnedBody({ option }: { option: SuggestionOption }) {
+function PinnedBody({ option, ctx }: { option: SuggestionOption; ctx: BudgetStateContext }) {
   return (
     <div className="flex items-start justify-between gap-3 rounded-lg border border-green/30 bg-green/[0.05] p-3">
       <div className="min-w-0">
@@ -82,14 +117,18 @@ function PinnedBody({ option }: { option: SuggestionOption }) {
           <p className="mt-0.5 truncate text-[11px] text-slate">{option.restaurantName}</p>
         )}
       </div>
-      <span className="shrink-0 whitespace-nowrap text-right font-display text-sm font-semibold text-green">
-        {formatPKR(option.estimatedPrice)}
-      </span>
+      <OptionPrice option={option} ctx={ctx} />
     </div>
   );
 }
 
-function SuggestedBody({ options }: { options: SuggestionOption[] }) {
+function SuggestedBody({
+  options,
+  ctx,
+}: {
+  options: SuggestionOption[];
+  ctx: BudgetStateContext;
+}) {
   return (
     <div className="flex flex-col">
       {options.map((option, i) => (
@@ -100,7 +139,7 @@ function SuggestedBody({ options }: { options: SuggestionOption[] }) {
           }`}
         >
           <div className="flex min-w-0 items-start gap-2.5">
-            <span className="mt-0.5 w-4 shrink-0 text-[11px] tabular-nums text-slate/60">
+            <span aria-hidden className="mt-0.5 w-4 shrink-0 text-[11px] tabular-nums text-slate/60">
               {String(i + 1).padStart(2, '0')}
             </span>
             <div className="min-w-0">
@@ -112,9 +151,7 @@ function SuggestedBody({ options }: { options: SuggestionOption[] }) {
               )}
             </div>
           </div>
-          <span className="shrink-0 whitespace-nowrap text-right font-display text-[13px] font-semibold text-green">
-            {formatPKR(option.estimatedPrice)}
-          </span>
+          <OptionPrice option={option} ctx={ctx} />
         </div>
       ))}
     </div>
@@ -136,14 +173,25 @@ function EmptyBody({ relative }: { relative: PlanTimelineDay['relative'] }) {
   );
 }
 
-function MealSection({ slot, day }: { slot: PlanTimelineSlot; day: PlanTimelineDay }) {
+function MealSection({
+  slot,
+  day,
+  ctx,
+}: {
+  slot: PlanTimelineSlot;
+  day: PlanTimelineDay;
+  ctx: BudgetStateContext;
+}) {
   const { Icon } = getMealTypeVisual(slot.mealTypeKey);
 
   return (
     <div className="flex flex-col gap-2.5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-green/10 text-green">
+          <div
+            aria-hidden
+            className="flex h-7 w-7 items-center justify-center rounded-md bg-green/10 text-green"
+          >
             <Icon className="h-3.5 w-3.5" />
           </div>
           <span className="text-[10px] font-semibold uppercase capitalize tracking-[0.18em] text-slate/60">
@@ -154,14 +202,16 @@ function MealSection({ slot, day }: { slot: PlanTimelineSlot; day: PlanTimelineD
       </div>
 
       {slot.status === 'logged' && <LoggedBody slot={slot} />}
-      {slot.status === 'pinned' && slot.options[0] && <PinnedBody option={slot.options[0]} />}
-      {slot.status === 'suggested' && <SuggestedBody options={slot.options} />}
+      {slot.status === 'pinned' && slot.options[0] && (
+        <PinnedBody option={slot.options[0]} ctx={ctx} />
+      )}
+      {slot.status === 'suggested' && <SuggestedBody options={slot.options} ctx={ctx} />}
       {slot.status === 'empty' && <EmptyBody relative={day.relative} />}
     </div>
   );
 }
 
-function DayCard({ day }: { day: PlanTimelineDay }) {
+function DayCard({ day, ctx }: { day: PlanTimelineDay; ctx: BudgetStateContext }) {
   const isToday = day.relative === 'today';
   const isPast = day.relative === 'past';
 
@@ -223,7 +273,7 @@ function DayCard({ day }: { day: PlanTimelineDay }) {
         {day.slots.map((slot, i) => (
           <div key={`${day.slotDate}-${slot.mealTypeId}`} className="flex flex-col gap-2.5">
             {i > 0 && <div className="-mx-1 h-px bg-sage" />}
-            <MealSection slot={slot} day={day} />
+            <MealSection slot={slot} day={day} ctx={ctx} />
           </div>
         ))}
       </div>
@@ -251,7 +301,17 @@ interface PlanTimelineProps {
 
 export function PlanTimeline({ plan }: PlanTimelineProps) {
   const isPendingGeneration = plan.latestAttempt?.status === 'pending';
-  const { data, isLoading, error } = usePlanTimeline(plan.id, isPendingGeneration);
+  const { data, isLoading, error, refetch } = usePlanTimeline(plan.id, isPendingGeneration);
+
+  /**
+   * Past days start folded away.
+   *
+   * On a phone at 8pm the question is "what am I eating tonight and can I
+   * afford it", and the timeline answered it by rendering every day of the
+   * period at equal weight and making the user scroll through a week of
+   * already-spent money to reach today.
+   */
+  const [showPast, setShowPast] = useState(false);
 
   const grouped = useMemo(() => {
     const past: PlanTimelineDay[] = [];
@@ -298,10 +358,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
     return (
       <div className="flex flex-col gap-4">
         {header}
-        <div className="flex items-center gap-2 rounded-xl border border-tomato/20 bg-tomato/[0.06] p-3 text-[13px] text-tomato">
-          <span className="font-semibold">!</span>
-          <span>Failed to load timeline: {error.message}</span>
-        </div>
+        <DataError message="We couldn't load this plan's timeline." onRetry={() => refetch()} />
       </div>
     );
   }
@@ -317,18 +374,48 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
     );
   }
 
+  const ctx = plan.context;
+
   return (
     <div className="flex flex-col gap-6">
       {header}
 
+      {/* Principle 2: prices are best-effort, never guarantees. This screen
+          lays out a whole period of them, so it says so once, up front, rather
+          than presenting every estimate as a commitment. */}
+      <p className="text-[11px] text-slate/70">
+        Prices are estimates from the latest menu data — what you log after ordering is what counts
+        against the budget.
+      </p>
+
       {grouped.past.length > 0 && (
         <div className="flex flex-col gap-3">
-          <SectionBanner label="Past" count={grouped.past.length} />
-          <div className="flex flex-col gap-3">
-            {grouped.past.map((day) => (
-              <DayCard key={day.slotDate} day={day} />
-            ))}
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowPast((v) => !v)}
+            aria-expanded={showPast}
+            className={`flex min-h-11 items-center gap-3 rounded-lg text-left ${FOCUS_RING}`}
+          >
+            <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate/60">
+              Earlier
+            </span>
+            <span className="text-[11px] text-slate/60">
+              {grouped.past.length} day{grouped.past.length === 1 ? '' : 's'}
+            </span>
+            <ChevronDown
+              aria-hidden
+              className={`h-3.5 w-3.5 text-slate/60 transition-transform ${showPast ? 'rotate-180' : ''}`}
+            />
+            <span className="h-px flex-1 bg-sage" />
+          </button>
+
+          {showPast && (
+            <div className="flex flex-col gap-3">
+              {grouped.past.map((day) => (
+                <DayCard key={day.slotDate} day={day} ctx={ctx} />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -337,7 +424,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
           <SectionBanner label="Today" count={grouped.today.length} />
           <div className="flex flex-col gap-3">
             {grouped.today.map((day) => (
-              <DayCard key={day.slotDate} day={day} />
+              <DayCard key={day.slotDate} day={day} ctx={ctx} />
             ))}
           </div>
         </div>
@@ -348,7 +435,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
           <SectionBanner label="Coming up" count={grouped.future.length} />
           <div className="flex flex-col gap-3">
             {grouped.future.map((day) => (
-              <DayCard key={day.slotDate} day={day} />
+              <DayCard key={day.slotDate} day={day} ctx={ctx} />
             ))}
           </div>
         </div>

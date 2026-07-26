@@ -6,6 +6,11 @@ import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { CountUp } from '@/components/motion';
 import { DataError } from '@/components/data-error';
 import { formatPKR } from '@/lib/currency';
+import {
+  getSpendingHealth,
+  isAlarming,
+  spendingHealthCaption,
+} from '@/lib/budget-plan/spending-health';
 
 const getDaysLeft = (endDateStr: string): number => {
   const today = new Date();
@@ -16,13 +21,6 @@ const getDaysLeft = (endDateStr: string): number => {
     0,
     Math.ceil((endLocal.getTime() - todayLocal.getTime()) / (1000 * 60 * 60 * 24)),
   );
-};
-
-const getSpendingHealth = (spent: number, total: number): 'good' | 'warning' | 'danger' => {
-  const ratio = total > 0 ? spent / total : 0;
-  if (ratio < 0.7) return 'good';
-  if (ratio < 0.9) return 'warning';
-  return 'danger';
 };
 
 function BudgetSkeleton() {
@@ -90,10 +88,14 @@ export function SummaryCards() {
 
   const daysLeft = getDaysLeft(activePlan.endDate);
   const isOver = ctx.amountRemaining < 0;
-  const health = isOver ? 'over' : getSpendingHealth(ctx.amountSpent, ctx.totalBudget);
+  const health = getSpendingHealth({
+    spent: ctx.amountSpent,
+    total: ctx.totalBudget,
+    remaining: ctx.amountRemaining,
+  });
   const spentPercent =
     ctx.totalBudget > 0 ? Math.round((ctx.amountSpent / ctx.totalBudget) * 100) : 0;
-  const alarm = health === 'over' || health === 'danger';
+  const alarm = isAlarming(health);
   const fillClass = alarm ? 'bg-tomato' : 'bg-green';
 
   const pill =
@@ -105,12 +107,7 @@ export function SummaryCards() {
 
   // Plain-language standing, rendered as visible copy — not a `title` tooltip
   // that never fires on touch and is skipped by keyboard/screen-reader users.
-  const statusCaption =
-    health === 'over'
-      ? `You've spent ${formatPKR(Math.abs(ctx.amountRemaining))} more than this period's budget.`
-      : health === 'danger'
-        ? "You're spending faster than your budget for the days left — ease off to make it last."
-        : "You're spending in line with your budget for the days left.";
+  const statusCaption = spendingHealthCaption(health, ctx.amountRemaining);
 
   return (
     <section className="rounded-2xl border border-sage bg-white p-5 shadow-sm sm:p-6">

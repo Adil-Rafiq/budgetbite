@@ -12,16 +12,12 @@ import {
 } from '@/app/onboarding/types';
 import { MAX_MEALS_PER_DAY } from '@/app/onboarding/constants';
 import { patchDraft, readDraft } from '@/app/onboarding/_lib/draft-storage';
+import {
+  BUDGET_PRESETS,
+  DEFAULT_PLAN_TYPE,
+  DEFAULT_TOTAL_BUDGET,
+} from '@/lib/budget-plan/schema';
 import type { MealType } from '@repo/shared';
-
-const DEFAULT_PLAN_TYPE = 'monthly' as const;
-const DEFAULT_BUDGET = 45000;
-
-/** Quick-pick amounts per plan type. Calibrated to Pakistani takeout spend. */
-export const BUDGET_PRESETS: Record<BudgetPlanPreferencesInput['planType'], number[]> = {
-  weekly: [3500, 7500, 12000, 20000],
-  monthly: [15000, 30000, 45000, 60000],
-};
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
@@ -30,7 +26,7 @@ export const useBudgetStep = (activeMealTypes: MealType[]) => {
     resolver: zodResolver(budgetPlanPreferencesSchema),
     defaultValues: {
       planType: DEFAULT_PLAN_TYPE,
-      totalBudget: DEFAULT_BUDGET,
+      totalBudget: DEFAULT_TOTAL_BUDGET,
       mealTypeIds: [],
     },
   });

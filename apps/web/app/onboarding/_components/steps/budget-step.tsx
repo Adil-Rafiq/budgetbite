@@ -1,8 +1,8 @@
 'use client';
 
-import { CalendarDays, CalendarRange, Check, RefreshCw } from 'lucide-react';
+import { CalendarDays, CalendarRange, RefreshCw } from 'lucide-react';
 import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-context';
-import { MAX_MEALS_PER_DAY } from '@/app/onboarding/constants';
+import { MealTypeChoiceGroup } from '@/components/budget/meal-type-choice-group';
 import { formatPKR } from '@/lib/currency';
 import { FOCUS_RING } from '@/lib/focus-ring';
 
@@ -192,46 +192,14 @@ export const BudgetStep = () => {
 
         {mealTypes.status === 'ready' && (
           <>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {mealTypeOptions.map((type) => {
-                const checked = values.selectedMealTypeIds.includes(type.id);
-                const blocked = !checked && atMealTypeLimit;
-                return (
-                  <button
-                    key={type.id}
-                    type="button"
-                    role="checkbox"
-                    aria-checked={checked}
-                    disabled={blocked}
-                    onClick={() => actions.toggleMealType(type.id)}
-                    className={`flex min-h-11 items-center gap-2.5 rounded-xl border-2 px-3.5 py-3 text-left text-sm capitalize transition-all ${FOCUS_RING} ${
-                      checked
-                        ? 'border-dark-green bg-green/10 font-semibold text-charcoal'
-                        : blocked
-                          ? 'cursor-not-allowed border-sage bg-white font-medium text-slate/40'
-                          : 'border-sage bg-white font-medium text-slate hover:border-dark-green/50'
-                    }`}
-                  >
-                    <span
-                      aria-hidden
-                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                        checked
-                          ? 'border-dark-green bg-dark-green text-white'
-                          : 'border-sage bg-white'
-                      }`}
-                    >
-                      {checked && <Check className="h-3 w-3" />}
-                    </span>
-                    {type.label}
-                  </button>
-                );
-              })}
-            </div>
-            {atMealTypeLimit && (
-              <p className="mt-3 text-xs text-slate">
-                That&apos;s the maximum of {MAX_MEALS_PER_DAY} meals a day. Deselect one to swap.
-              </p>
-            )}
+            <MealTypeChoiceGroup
+              label="Which meals do you eat out?"
+              options={mealTypeOptions}
+              selectedIds={values.selectedMealTypeIds}
+              onToggle={actions.toggleMealType}
+              atLimit={atMealTypeLimit}
+              variant="grid"
+            />
             {errors.mealTypeIds && (
               <p role="alert" className="mt-3 text-xs font-medium text-tomato">
                 {errors.mealTypeIds}

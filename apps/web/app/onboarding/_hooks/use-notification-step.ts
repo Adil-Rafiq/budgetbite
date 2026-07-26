@@ -9,65 +9,7 @@ import {
   type NotificationPreferencesInput,
 } from '@/app/onboarding/types';
 import { patchDraft, readDraft } from '@/app/onboarding/_lib/draft-storage';
-
-type NotificationSlot = NotificationPreferencesInput['notificationSlots'][number];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-/**
- * Sensible default reminder times per meal, keyed by meal-type key. New slots
- * start pre-filled with these so the user can finish onboarding without opening
- * a single time picker — they only adjust the ones they care about. Unknown
- * keys fall back to midday.
- */
-const DEFAULT_TIME_BY_KEY: Record<string, string> = {
-  breakfast: '08:00',
-  lunch: '13:00',
-  dinner: '20:00',
-  snack: '16:00',
-};
-const FALLBACK_TIME = '12:00';
-
-const defaultTimeForMealType = (option?: BudgetPlanMealTypeOption): string =>
-  (option && DEFAULT_TIME_BY_KEY[option.key]) ?? FALLBACK_TIME;
-
-/**
- * Builds notification slots aligned to the current meal type selection.
- * Preserves existing times where the meal type already has one set; new meal
- * types get a sensible default time so the plan can be launched as-is.
- */
-const buildSlotsForMealTypes = (
-  current: NotificationSlot[],
-  selectedMealTypeIds: string[],
-  mealTypeOptions: BudgetPlanMealTypeOption[],
-): NotificationSlot[] => {
-  const ids =
-    selectedMealTypeIds.length > 0 ? selectedMealTypeIds : current.map((slot) => slot.mealTypeId);
-
-  return ids.map((mealTypeId) => {
-    const existing = current.find((slot) => slot.mealTypeId === mealTypeId);
-    const option = mealTypeOptions.find((opt) => opt.id === mealTypeId);
-    return {
-      mealTypeId,
-      // `||` (not `??`) so a previously empty time is replaced with a default.
-      time: existing?.time || defaultTimeForMealType(option),
-      enabled: existing?.enabled ?? true,
-    };
-  });
-};
-
-/**
- * Returns true if two slot arrays are identical in order, id, time, and enabled.
- * Used to avoid unnecessary form updates that would trigger re-renders.
- */
-const areSlotsEqual = (a: NotificationSlot[], b: NotificationSlot[]): boolean =>
-  a.length === b.length &&
-  a.every(
-    (slot, i) =>
-      slot.mealTypeId === b[i]?.mealTypeId &&
-      slot.time === b[i]?.time &&
-      slot.enabled === b[i]?.enabled,
-  );
+import { areSlotsEqual, buildSlotsForMealTypes } from '@/lib/budget-plan/reminders';
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 

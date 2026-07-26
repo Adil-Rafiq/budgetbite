@@ -41,6 +41,8 @@ type TimePickerProps = {
   size?: 'sm' | 'md';
   className?: string;
   'aria-label'?: string;
+  /** Marks the trigger invalid so a rejected time is announced, not just red. */
+  'aria-invalid'?: boolean;
 };
 
 export function TimePicker({
@@ -50,6 +52,7 @@ export function TimePicker({
   size = 'md',
   className,
   'aria-label': ariaLabel,
+  'aria-invalid': ariaInvalid,
 }: TimePickerProps) {
   const [hh, mm] = parse(value);
   const [open, setOpen] = useState(false);
@@ -64,6 +67,7 @@ export function TimePicker({
           type="button"
           disabled={disabled}
           aria-label={ariaLabel ?? `Time, ${formatTimeOfDay(value)}`}
+          aria-invalid={ariaInvalid}
           className={cn(
             'inline-flex items-center justify-between gap-2 rounded-xl border bg-white outline-none transition',
             'focus-visible:border-dark-green focus-visible:ring-2 focus-visible:ring-dark-green focus-visible:ring-offset-2 focus-visible:ring-offset-white',
@@ -71,7 +75,9 @@ export function TimePicker({
             'disabled:cursor-not-allowed',
             disabled
               ? 'border-sage/60 text-slate/50 line-through'
-              : 'border-sage text-charcoal hover:border-dark-green/50',
+              : ariaInvalid
+                ? 'border-tomato text-charcoal hover:border-tomato'
+                : 'border-sage text-charcoal hover:border-dark-green/50',
             size === 'sm'
               ? 'min-h-9 w-[112px] px-2.5 py-1.5 text-[12px]'
               : 'min-h-11 w-[136px] px-3.5 py-2.5 text-[14px]',

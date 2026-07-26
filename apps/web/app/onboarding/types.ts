@@ -16,44 +16,28 @@ export type OnboardingStep = {
   description: string;
 };
 
-export type BudgetPlanType = 'weekly' | 'monthly';
+/**
+ * The budget and reminder contracts live in `@/lib/budget-plan/schema` so this
+ * flow and the /plans wizard cannot drift apart on caps or error copy. Only the
+ * onboarding-specific steps (location, dietary) are defined here.
+ */
+export {
+  MAX_TOTAL_BUDGET,
+  MAX_MEALS_PER_DAY,
+  budgetPlanPreferencesSchema,
+  notificationSlotSchema,
+  notificationPreferencesSchema,
+} from '@/lib/budget-plan/schema';
 
-export interface BudgetPlanMealTypeOption {
-  id: string;
-  key: string;
-  label: string;
-  sortOrder: number;
-}
+export type {
+  BudgetPlanType,
+  BudgetPlanMealTypeOption,
+  BudgetPlanPreferencesInput,
+  NotificationSlotInput,
+  NotificationPreferencesInput,
+} from '@/lib/budget-plan/schema';
 
-export const MAX_TOTAL_BUDGET = 1_000_000;
-
-export const budgetPlanPreferencesSchema = z.object({
-  planType: z.enum(['weekly', 'monthly']),
-  totalBudget: z
-    .number({ message: 'Enter a budget amount' })
-    .positive('Enter an amount above zero')
-    .max(MAX_TOTAL_BUDGET, `Keep this under ${MAX_TOTAL_BUDGET.toLocaleString('en-US')}`),
-  // The API caps a plan at 5 meals/day; stop the user here rather than at the
-  // final Launch click, which would fail validation server-side.
-  mealTypeIds: z
-    .array(z.string().uuid())
-    .min(1, 'Select at least one meal type')
-    .max(5, 'Pick up to 5 meals a day'),
-});
-
-export type BudgetPlanPreferencesInput = z.infer<typeof budgetPlanPreferencesSchema>;
-
-export const notificationSlotSchema = z.object({
-  mealTypeId: z.string().uuid(),
-  time: z.string().regex(/^\d{2}:\d{2}$/),
-  enabled: z.boolean(),
-});
-
-export type NotificationSlotInput = z.infer<typeof notificationSlotSchema>;
-
-export const notificationPreferencesSchema = z.object({
-  notificationSlots: z.array(notificationSlotSchema).min(1),
-});
+import type { NotificationPreferencesInput } from '@/lib/budget-plan/schema';
 
 /**
  * Both coordinates are required. They used to be optional, which let the map's
@@ -70,7 +54,6 @@ export const dietaryPreferencesSchema = z.object({
   allergens: z.array(z.string().trim().min(1).max(60)).max(20),
 });
 
-export type NotificationPreferencesInput = z.infer<typeof notificationPreferencesSchema>;
 export type LocationPreferencesInput = z.infer<typeof locationPreferencesSchema>;
 export type DietaryPreferencesInput = z.infer<typeof dietaryPreferencesSchema>;
 

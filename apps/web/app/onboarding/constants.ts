@@ -66,11 +66,11 @@ export const DEFAULT_MAP_VIEW = {
 export const ONBOARDING_NEARBY_RADIUS_KM = 10;
 
 /**
- * The API caps a plan at 5 meals per day (`createBudgetPlanSchema`). Surfaced
- * here so the budget step can stop the user at the limit instead of letting the
- * final Launch click fail with a 400.
+ * The API caps a plan at 5 meals per day (`createBudgetPlanSchema`). Defined in
+ * `@/lib/budget-plan/schema` and re-exported here so the /plans wizard enforces
+ * the same ceiling; existing imports from this module keep working.
  */
-export const MAX_MEALS_PER_DAY = 5;
+export { MAX_MEALS_PER_DAY } from '@/lib/budget-plan/schema';
 
 /** Common quick-pick dietary preferences; users can also add their own. */
 export const DIETARY_PREFERENCE_OPTIONS = [

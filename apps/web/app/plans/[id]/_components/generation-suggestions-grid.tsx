@@ -1,15 +1,20 @@
 'use client';
 
 import { Loader2 } from 'lucide-react';
+import { classifyBudgetFit } from '@repo/shared';
 import { useBudgetPlanGenerationDetail } from '@/hooks/use-budget-plan';
 import { getMealTypeVisual } from '@/lib/meal-type-visuals';
 import { optionLabel } from '@/lib/suggestion';
 import { formatPKR } from '@/lib/currency';
-import type { SuggestionOption, SuggestionSlot } from '@repo/shared';
+import { BudgetFitBadge } from '@/components/budget-fit-badge';
+import { DataError } from '@/components/data-error';
+import type { BudgetStateContext, SuggestionOption, SuggestionSlot } from '@repo/shared';
 
 interface GenerationSuggestionsGridProps {
   planId: string;
   generationId: string;
+  /** Budget state, so each price can say whether it fits what is left. */
+  ctx: BudgetStateContext;
 }
 
 const dateFormatter = new Intl.DateTimeFormat('en-PK', {
@@ -39,21 +44,15 @@ function GridSkeleton() {
   );
 }
 
-function GridError({ message }: { message: string }) {
-  return (
-    <div className="flex items-center gap-2 rounded-xl border border-tomato/20 bg-tomato/[0.06] p-3 text-[13px] text-tomato">
-      <span className="font-semibold">!</span>
-      <span>{message}</span>
-    </div>
-  );
-}
-
-function SlotCard({ slot }: { slot: SuggestionSlot }) {
+function SlotCard({ slot, ctx }: { slot: SuggestionSlot; ctx: BudgetStateContext }) {
   const { Icon } = getMealTypeVisual(slot.mealTypeKey);
   return (
     <div className="flex h-full flex-col rounded-xl border border-sage bg-white p-4">
       <div className="mb-2 flex items-center gap-2">
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-green/10 text-green">
+        <div
+          aria-hidden
+          className="flex h-7 w-7 items-center justify-center rounded-md bg-green/10 text-green"
+        >
           <Icon className="h-3.5 w-3.5" />
         </div>
         <span className="text-[10px] font-semibold uppercase capitalize tracking-[0.18em] text-slate/60">
@@ -65,22 +64,40 @@ function SlotCard({ slot }: { slot: SuggestionSlot }) {
         {slot.options.length === 0 ? (
           <p className="text-[12px] italic text-slate/60">No options generated.</p>
         ) : (
-          slot.options.map((option: SuggestionOption) => (
-            <div
-              key={option.id}
-              className="flex items-start justify-between gap-3 rounded-lg border border-sage bg-canvas p-2.5 transition hover:-translate-y-px"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-medium text-charcoal">
-                  {optionLabel(option)}
-                </p>
-                <p className="truncate text-[11px] text-slate">{option.restaurantName ?? '—'}</p>
+          slot.options.map((option: SuggestionOption) => {
+            const fit = classifyBudgetFit({
+              itemPrice: option.estimatedPrice,
+              avgBudgetPerRemainingMeal: ctx.avgBudgetPerRemainingMeal,
+              amountRemaining: ctx.amountRemaining,
+            });
+            return (
+              <div
+                key={option.id}
+                className="flex items-start justify-between gap-3 rounded-lg border border-sage bg-canvas p-2.5 transition hover:-translate-y-px"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-medium text-charcoal">
+                    {optionLabel(option)}
+                  </p>
+                  <p className="truncate text-[11px] text-slate">{option.restaurantName ?? '—'}</p>
+                </div>
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  <span
+                    className={`text-right font-display text-[13px] font-semibold tabular-nums ${
+                      fit === 'red'
+                        ? 'text-tomato'
+                        : fit === 'amber'
+                          ? 'text-amber-ink'
+                          : 'text-dark-green'
+                    }`}
+                  >
+                    {formatPKR(option.estimatedPrice)}
+                  </span>
+                  <BudgetFitBadge fit={fit} />
+                </div>
               </div>
-              <span className="shrink-0 text-right font-display text-[13px] font-semibold tabular-nums text-green">
-                {formatPKR(option.estimatedPrice)}
-              </span>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
@@ -90,14 +107,15 @@ function SlotCard({ slot }: { slot: SuggestionSlot }) {
 export function GenerationSuggestionsGrid({
   planId,
   generationId,
+  ctx,
 }: GenerationSuggestionsGridProps) {
-  const { data, isLoading, error } = useBudgetPlanGenerationDetail(planId, generationId);
+  const { data, isLoading, error, refetch } = useBudgetPlanGenerationDetail(planId, generationId);
 
   if (isLoading) {
     return (
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2 text-[12px] text-slate">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          <Loader2 aria-hidden className="h-3.5 w-3.5 animate-spin" />
           <span>Loading suggestions…</span>
         </div>
         <GridSkeleton />
@@ -106,7 +124,12 @@ export function GenerationSuggestionsGrid({
   }
 
   if (error) {
-    return <GridError message={`Failed to load suggestions: ${error.message}`} />;
+    return (
+      <DataError
+        message="We couldn't load this attempt's suggestions."
+        onRetry={() => refetch()}
+      />
+    );
   }
 
   if (!data || data.days.length === 0) {
@@ -126,7 +149,7 @@ export function GenerationSuggestionsGrid({
           </h4>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {day.slots.map((slot) => (
-              <SlotCard key={slot.mealTypeId} slot={slot} />
+              <SlotCard key={slot.mealTypeId} slot={slot} ctx={ctx} />
             ))}
           </div>
         </div>

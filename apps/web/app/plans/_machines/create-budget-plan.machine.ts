@@ -10,7 +10,8 @@ type CreatePlanEvent =
   | { type: 'BACK' }
   | { type: 'START_SUBMIT' }
   | { type: 'SUBMIT_SUCCESS' }
-  | { type: 'SUBMIT_FAILURE' };
+  | { type: 'SUBMIT_FAILURE' }
+  | { type: 'RESET' };
 
 export const createBudgetPlanMachine = setup({
   types: {
@@ -26,6 +27,8 @@ export const createBudgetPlanMachine = setup({
     previousStep: assign({
       step: ({ context }) => Math.max(context.step - 1, 0),
     }),
+
+    firstStep: assign({ step: 0 }),
   },
 }).createMachine({
   id: 'createBudgetPlan',
@@ -35,6 +38,24 @@ export const createBudgetPlanMachine = setup({
   context: {
     step: 0,
     totalSteps: 3,
+  },
+
+  /**
+   * Reopening the dialog starts a new plan, from any state.
+   *
+   * The dialog mounts this machine above `<Dialog>`, so Radix unmounting the
+   * content on close never unmounts the machine. Without a reset the second
+   * "New plan" click opened on "Step 03 · Review and confirm" showing the plan
+   * that had just been created — and because `completed` is a final state,
+   * `START_SUBMIT` was silently ignored there while the submit code below it
+   * still ran, so the button never disabled and a double-tap could create two
+   * plans. Declared at the root so it is honoured even from `completed`.
+   */
+  on: {
+    RESET: {
+      target: '.editing',
+      actions: 'firstStep',
+    },
   },
 
   states: {
@@ -70,8 +91,12 @@ export const createBudgetPlanMachine = setup({
       },
     },
 
-    completed: {
-      type: 'final',
-    },
+    /**
+     * Deliberately not `type: 'final'`. A final child state stops the actor
+     * outright, which is what made every later event — including RESET — a
+     * no-op on a dialog the user can reopen. The flow is done; the machine is
+     * not.
+     */
+    completed: {},
   },
 });

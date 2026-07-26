@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'motion/react';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
@@ -19,6 +19,31 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+/**
+ * The desktop breadcrumb used to be the literal string "Home · Dashboard" on
+ * every route, so `/plans/[id]` announced "Dashboard" directly above a page
+ * headed "Budget plans". A breadcrumb that cannot be wrong is one derived from
+ * where you actually are.
+ */
+const SECTION_LABELS: Record<string, string> = {
+  dashboard: 'Dashboard',
+  plans: 'Budget plans',
+  restaurants: 'Restaurants',
+  analytics: 'Analytics',
+  profile: 'Profile',
+  onboarding: 'Setup',
+};
+
+function breadcrumbFor(pathname: string): string {
+  const [section, second] = pathname.split('/').filter(Boolean);
+  if (!section) return 'Home';
+
+  const label = SECTION_LABELS[section] ?? section.charAt(0).toUpperCase() + section.slice(1);
+  // A nested id segment means "inside" that section, not a new one.
+  const isDetail = !!second && !SECTION_LABELS[second];
+  return isDetail ? `Home · ${label} · Detail` : `Home · ${label}`;
+}
+
 function initials(name: string | undefined): string {
   if (!name) return '•';
   const parts = name.trim().split(/\s+/);
@@ -29,6 +54,7 @@ function initials(name: string | undefined): string {
 
 export function AppHeader() {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: active } = useActiveBudgetPlan();
   const { data: user } = useUser();
   const [signingOut, setSigningOut] = useState(false);
@@ -72,7 +98,7 @@ export function AppHeader() {
         </Link>
 
         <div className="hidden text-xs font-semibold uppercase tracking-widest text-slate lg:block">
-          Home · Dashboard
+          {breadcrumbFor(pathname)}
         </div>
 
         <div className="flex items-center gap-3">

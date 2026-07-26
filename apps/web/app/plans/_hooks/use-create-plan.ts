@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMachine } from '@xstate/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCancelBudgetPlan, useCreateBudgetPlan } from '@/hooks/use-budget-plan';
 import { useListActiveMealTypes } from '@/hooks/use-meal-type';
 import { showToast } from '@/lib/toast';
+import { clearPlansDraft } from '@/app/plans/_lib/draft';
 import { CREATE_PLAN_STEPS } from '@/app/plans/constants';
 import { createBudgetPlanMachine } from '@/app/plans/_machines/create-budget-plan.machine';
 import { useBudgetStep } from '@/app/plans/_hooks/use-budget-step';
@@ -37,6 +39,7 @@ export const useCreatePlan = (
 ) => {
   // ─── Data dependencies ──────────────────────────────────────────────────
 
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { mutateAsync: createBudgetPlan } = useCreateBudgetPlan();
   const { mutateAsync: cancelBudgetPlan } = useCancelBudgetPlan();
@@ -81,8 +84,21 @@ export const useCreatePlan = (
   const currentStepData = CREATE_PLAN_STEPS[currentStep];
   const isLastStep = currentStep === CREATE_PLAN_STEPS.length - 1;
 
-  // Both steps of this dialog (budget, notifications) depend on meal types.
-  const canAdvance = mealTypesStatus === 'ready';
+  /**
+   * Both steps depend on meal types — and the current step must actually be
+   * satisfiable. Gating on data-load alone left a fully enabled green "Next"
+   * that ran validation, failed, and returned without moving or saying
+   * anything. A disabled button is honest about a blocked step; an enabled one
+   * that does nothing reads as a broken app.
+   */
+  const stepIsSatisfied =
+    currentStep === 0
+      ? budgetStep.isComplete
+      : currentStep === 1
+        ? notificationStep.values.slots.every((slot) => /^\d{2}:\d{2}$/.test(slot.time))
+        : true;
+
+  const canAdvance = mealTypesStatus === 'ready' && stepIsSatisfied;
 
   // ─── Step handlers ───────────────────────────────────────────────────────
 
@@ -96,6 +112,14 @@ export const useCreatePlan = (
 
     send({ type: 'START_SUBMIT' });
 
+    // Tracks whether we have already cancelled the old plan, so a failure
+    // afterwards can say so. The cancel has to happen first — the partial
+    // unique index permits only one active plan — but that leaves a window
+    // where a failed create drops the user to no active plan at all. There is
+    // no client-side transaction to close it; the least we owe them is an
+    // error that names what actually happened instead of "try again".
+    let cancelledPriorPlan = false;
+
     try {
       const budget = budgetStep.getValues();
       const { notificationSlots } = notificationStep.getValues();
@@ -105,10 +129,12 @@ export const useCreatePlan = (
       // budget_plan still backstops any race that bypasses this UX.
       if (replaceActivePlanId) {
         await cancelBudgetPlan(replaceActivePlanId);
+        cancelledPriorPlan = true;
       }
 
+      let created: Awaited<ReturnType<typeof createBudgetPlan>>;
       try {
-        await createBudgetPlan({
+        created = await createBudgetPlan({
           ...budget,
           mealsPerDay: budget.mealTypeIds.length,
           ...getPlanDateRange(budget.planType),
@@ -134,13 +160,28 @@ export const useCreatePlan = (
       }
 
       send({ type: 'SUBMIT_SUCCESS' });
-      showToast.success({ title: 'Budget plan created!' });
+      clearPlansDraft();
+      showToast.success({
+        title: 'Budget plan created',
+        description: 'Generate suggestions to fill the period.',
+      });
       onSuccess?.();
+
+      // Land on the plan, not back on the list. Committing a month of food
+      // money used to resolve into a 3-second toast and one more grey card,
+      // with nothing generated and no hint that generating was the next step —
+      // the emptiest possible ending to the highest-stakes action here.
+      // `useStartNextPlan` already navigated; the primary path now matches it.
+      if (created?.id) router.push(`/plans/${created.id}`);
     } catch (err) {
       send({ type: 'SUBMIT_FAILURE' });
+      queryClient.invalidateQueries({ queryKey: ['activeBudgetPlan'] });
+      queryClient.invalidateQueries({ queryKey: ['budgetPlans'] });
       showToast.error({
         title: 'Failed to create budget plan',
-        description: getErrorMessage(err, 'Something went wrong. Please try again.'),
+        description: cancelledPriorPlan
+          ? 'Your previous plan was already cancelled, so you have no active plan right now. Your details are still here — press Create plan to try again.'
+          : getErrorMessage(err, 'Something went wrong. Please try again.'),
       });
     }
   };
@@ -161,6 +202,32 @@ export const useCreatePlan = (
 
   const handleBack = () => send({ type: 'BACK' });
 
+  /**
+   * Return the whole flow to step one with empty forms. Called when the dialog
+   * opens, so "New plan" always means a new plan.
+   *
+   * Depends on the two `reset` functions rather than the step objects: those
+   * objects are rebuilt every render, and the dialog runs this from an effect —
+   * an unstable identity there would re-reset on every render forever.
+   */
+  const resetBudgetStep = budgetStep.reset;
+  const resetNotificationStep = notificationStep.reset;
+
+  const reset = useCallback(() => {
+    send({ type: 'RESET' });
+    resetBudgetStep();
+    resetNotificationStep();
+  }, [send, resetBudgetStep, resetNotificationStep]);
+
+  /** Explicit discard: throw the draft away too, then start clean. */
+  const discard = useCallback(() => {
+    clearPlansDraft();
+    reset();
+  }, [reset]);
+
+  /** True once the user has typed anything worth warning them about losing. */
+  const isDirty = budgetStep.isDirty || notificationStep.isDirty;
+
   // ─── Exposed API ──────────────────────────────────────────────────────────
 
   return {
@@ -170,6 +237,9 @@ export const useCreatePlan = (
     isLastStep,
     isSubmitting,
     canAdvance,
+    isDirty,
+    reset,
+    discard,
 
     mealTypes: {
       status: mealTypesStatus,

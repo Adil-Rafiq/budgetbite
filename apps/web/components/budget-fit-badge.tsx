@@ -7,10 +7,23 @@ import type { BudgetFit } from '@repo/shared';
  * meal decision. Pair with `classifyBudgetFit` from @repo/shared, which decides
  * the tone from the same numbers on client and server.
  */
-export const BUDGET_FIT_PILL: Record<BudgetFit, { pill: string; dot: string; label: string }> = {
-  green: { pill: 'bg-green/10 text-dark-green', dot: 'bg-green', label: 'Fits budget' },
-  amber: { pill: 'bg-[#fef6e6] text-[#8a5a12]', dot: 'bg-[#f5a623]', label: 'Tight' },
-  red: { pill: 'bg-tomato/10 text-tomato', dot: 'bg-tomato', label: 'Over budget' },
+export const BUDGET_FIT_PILL: Record<
+  BudgetFit,
+  { pill: string; dot: string; text: string; label: string }
+> = {
+  green: {
+    pill: 'bg-green/10 text-dark-green',
+    dot: 'bg-green',
+    text: 'text-dark-green',
+    label: 'Fits budget',
+  },
+  amber: {
+    pill: 'bg-amber-tint text-amber-ink',
+    dot: 'bg-amber',
+    text: 'text-amber-ink',
+    label: 'Tight',
+  },
+  red: { pill: 'bg-tomato/10 text-tomato', dot: 'bg-tomato', text: 'text-tomato', label: 'Over budget' },
 };
 
 export function BudgetFitBadge({

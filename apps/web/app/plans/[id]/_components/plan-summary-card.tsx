@@ -1,12 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { MapPin, RefreshCw, Sparkles } from 'lucide-react';
-import { motion } from 'motion/react';
+import { CircleCheck, MapPin, RefreshCw, Sparkles, TriangleAlert } from 'lucide-react';
 import { useGenerateMealPlan } from '@/hooks/use-meal-plan';
 import { useUser } from '@/hooks/use-user';
 import { cn } from '@/lib/utils';
 import { formatPKR } from '@/lib/currency';
+import { BudgetProgress } from '@/components/budget/budget-progress';
+import { RemainingAmount } from '@/components/budget/remaining-amount';
+import { BUDGET_FIT_PILL } from '@/components/budget-fit-badge';
+import {
+  getSpendingHealth,
+  isAlarming,
+  spendingHealthCaption,
+} from '@/lib/budget-plan/spending-health';
+import { FOCUS_RING } from '@/lib/focus-ring';
 import type { BudgetPlanDetail } from '@repo/shared';
 
 interface PlanSummaryCardProps {
@@ -32,8 +40,19 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
   const spent = ctx.amountSpent;
   const total = ctx.totalBudget;
   const remaining = ctx.amountRemaining;
-  const spentPercent =
-    total > 0 ? Math.min(100, Math.max(0, Math.round((spent / total) * 100))) : 0;
+  // Not clamped to 100: overspend is the state this surface most needs to show.
+  const spentPercent = total > 0 ? Math.max(0, Math.round((spent / total) * 100)) : 0;
+
+  const health = getSpendingHealth({ spent, total, remaining });
+  const alarm = isAlarming(health);
+  const statusPill =
+    health === 'over'
+      ? { cls: 'bg-tomato/10 text-tomato', Icon: TriangleAlert, label: 'Over budget' }
+      : health === 'danger'
+        ? { cls: 'bg-tomato/10 text-tomato', Icon: TriangleAlert, label: 'Watch spending' }
+        : health === 'warning'
+          ? { cls: BUDGET_FIT_PILL.amber.pill, Icon: TriangleAlert, label: 'Tight' }
+          : { cls: 'bg-green/10 text-dark-green', Icon: CircleCheck, label: 'On track' };
 
   const hasActiveGen = !!plan.activeGeneration;
   const isPending = plan.latestAttempt?.status === 'pending';
@@ -51,31 +70,48 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
       ? 'text-green'
       : ctx.cumulativeVariance < -total * 0.1
         ? 'text-tomato'
-        : 'text-[#b45309]';
-
-  const fillClass = spentPercent >= 90 ? 'bg-tomato' : 'bg-green';
+        : BUDGET_FIT_PILL.amber.text;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
       <div className="flex flex-col gap-5 p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex flex-col gap-1">
-            <div className="text-xs font-semibold uppercase tracking-widest text-slate/60">
-              Budget summary
+          <div className="flex min-w-0 flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <span
+                aria-hidden
+                className={`h-2 w-2 rounded-full ${alarm ? 'bg-tomato' : 'bg-green'}`}
+              />
+              <span className="text-xs font-semibold uppercase tracking-widest text-slate/60">
+                Budget summary
+              </span>
             </div>
-            <p className="font-display text-[32px] font-semibold leading-tight tracking-tight text-charcoal">
-              {formatPKR(remaining)}
-              <span className="ml-2 text-[13px] font-normal text-slate">
-                of {formatPKR(total)} left
+            {/* Was `{formatPKR(remaining)} of {total} left` — with a negative
+                remaining that rendered "₨ -5,000 of ₨ 45,000 left", a
+                hyphen-width minus on a 32px number followed by the word
+                "left". */}
+            <RemainingAmount remaining={remaining} size="lg" />
+            <p className="text-[12px] text-slate">
+              of {formatPKR(total)} ·{' '}
+              <span className="font-semibold tabular-nums text-tomato">
+                {formatPKR(spent)} spent
               </span>
             </p>
           </div>
+
+          <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+            <div
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${statusPill.cls}`}
+            >
+              <statusPill.Icon aria-hidden className="h-3.5 w-3.5" />
+              {statusPill.label}
+            </div>
 
           <button
             type="button"
             onClick={handleGenerate}
             disabled={disabled}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-green px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-green px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
           >
             {hasActiveGen ? (
               <>
@@ -89,11 +125,12 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
               </>
             )}
           </button>
+          </div>
         </div>
 
         {needsLocation && (
-          <div className="flex items-start gap-3 rounded-xl border border-[#f5a623]/30 bg-[#fef6e6] px-4 py-3 text-[#8a5a12]">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+          <div className="flex items-start gap-3 rounded-xl border border-amber/30 bg-amber-tint px-4 py-3 text-amber-ink">
+            <MapPin aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="text-[14px] font-medium">Set your location to generate a plan</p>
               <p className="mt-0.5 text-[12px] opacity-80">
@@ -103,7 +140,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
             </div>
             <Link
               href="/onboarding"
-              className="inline-flex shrink-0 items-center rounded-lg border border-[#f5a623]/40 bg-white px-3 py-1.5 text-[12px] font-medium text-[#8a5a12] transition-colors hover:bg-[#fef6e6]"
+              className={`inline-flex min-h-11 shrink-0 items-center rounded-lg border border-amber/40 bg-white px-3 text-[12px] font-medium text-amber-ink transition-colors hover:bg-amber-tint ${FOCUS_RING}`}
             >
               Complete setup
             </Link>
@@ -111,33 +148,34 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
         )}
 
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between text-[12px] text-slate">
-            <span>{formatPKR(spent)} spent</span>
-            <span className="font-semibold text-charcoal">{spentPercent}%</span>
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-sage/50">
-            <motion.div
-              className={`h-full rounded-full ${fillClass}`}
-              initial={{ width: '0%' }}
-              animate={{ width: `${spentPercent}%` }}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-            />
+          <BudgetProgress spentPercent={spentPercent} health={health} />
+          <div className="flex items-center justify-between gap-3 text-[12px]">
+            {/* Plain-language standing, not a colour the user has to interpret.
+                The bar used to flip red at exactly 90% and look identical at
+                150%. */}
+            <p className={alarm ? 'text-tomato' : 'text-slate'}>
+              {spendingHealthCaption(health, remaining)}
+            </p>
+            <span
+              className={`shrink-0 font-semibold tabular-nums ${alarm ? 'text-tomato' : 'text-slate'}`}
+            >
+              {spentPercent}% spent
+            </span>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <SummaryStat label="Consumed" value={`${ctx.mealsConsumed}/${ctx.totalMeals}`} />
           <SummaryStat label="Remaining" value={String(ctx.mealsRemaining)} />
-          <SummaryStat
-            label="Avg / meal"
-            value={formatPKR(Math.round(ctx.avgBudgetPerRemainingMeal))}
-          />
+          {/* `formatPKR` already rounds; the extra `Math.round` here was a
+              second opinion on the same number. */}
+          <SummaryStat label="Avg / meal" value={formatPKR(ctx.avgBudgetPerRemainingMeal)} />
           <SummaryStat
             label="Variance"
             value={
               ctx.cumulativeVariance >= 0
-                ? `+${formatPKR(Math.round(ctx.cumulativeVariance))}`
-                : `−${formatPKR(Math.round(Math.abs(ctx.cumulativeVariance)))}`
+                ? `+${formatPKR(ctx.cumulativeVariance)}`
+                : `−${formatPKR(Math.abs(ctx.cumulativeVariance))}`
             }
             toneClass={varianceTone}
           />
@@ -176,7 +214,7 @@ function SummaryStat({
     <div className="rounded-lg border border-sage bg-canvas p-3">
       <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate/60">{label}</p>
       <p
-        className={`mt-0.5 font-display text-[15px] font-semibold tracking-tight ${toneClass ?? 'text-charcoal'}`}
+        className={`mt-0.5 font-display text-[15px] font-semibold tabular-nums tracking-tight ${toneClass ?? 'text-charcoal'}`}
       >
         {value}
       </p>

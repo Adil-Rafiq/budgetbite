@@ -119,6 +119,16 @@
      CTA; the rest of the app still fills with --color-green and is a candidate
      for the same sweep. */
   --color-green-deep: #4f7c17;
+
+  /* Caution amber — the band between "on track" and "over budget".
+     These three values were already in the app as loose hexes: #f5a623 and
+     #fef6e6 in the budget-fit pill and the location notice, #8a5a12 as their
+     ink, plus a stray #b45309 on the plan summary's variance figure. Four
+     spellings of one idea meant caution drifted shade by shade across the
+     surfaces that raise it. `amber-ink` on `amber-tint` is ~7.1:1. */
+  --color-amber: #f5a623;
+  --color-amber-tint: #fef6e6;
+  --color-amber-ink: #8a5a12;
 }
 
 @layer base {
