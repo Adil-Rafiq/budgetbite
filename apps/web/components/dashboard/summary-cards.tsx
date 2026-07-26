@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { CircleCheck, TriangleAlert, ArrowRight } from 'lucide-react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { CountUp } from '@/components/motion';
+import { DataError } from '@/components/data-error';
 import { formatPKR } from '@/lib/currency';
 
 const getDaysLeft = (endDateStr: string): number => {
@@ -43,15 +44,6 @@ function BudgetSkeleton() {
   );
 }
 
-function SummaryCardsError() {
-  return (
-    <div className="flex items-center gap-3 rounded-2xl border border-tomato/30 bg-tomato/[0.06] p-4 text-[13px] text-tomato">
-      <TriangleAlert className="h-4 w-4 shrink-0" />
-      We couldn&apos;t load your budget just now. Please refresh to try again.
-    </div>
-  );
-}
-
 function NoPlanMessage() {
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-dashed border-sage bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
@@ -82,11 +74,17 @@ function NoPlanMessage() {
  * repetition), and the derived metrics carry a plain-language explanation.
  */
 export function SummaryCards() {
-  const { data: planData, isLoading: isPlanLoading, error: planError } = useActiveBudgetPlan();
+  const {
+    data: planData,
+    isLoading: isPlanLoading,
+    error: planError,
+    refetch,
+  } = useActiveBudgetPlan();
   const { plan: activePlan, budgetState: ctx } = planData ?? {};
 
   if (isPlanLoading) return <BudgetSkeleton />;
-  if (planError) return <SummaryCardsError />;
+  if (planError)
+    return <DataError message="We couldn't load your budget just now." onRetry={() => refetch()} />;
   if (!activePlan) return <NoPlanMessage />;
   if (!ctx) return <BudgetSkeleton />;
 

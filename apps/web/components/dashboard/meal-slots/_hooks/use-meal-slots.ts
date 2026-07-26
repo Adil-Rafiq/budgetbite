@@ -66,6 +66,7 @@ export function useMealSlots() {
     data: slotsData,
     isLoading: isSlotsLoading,
     error: slotsError,
+    refetch: refetchSlots,
   } = useMealPlanSuggestions({ date: today } satisfies GetSuggestionsQuery);
 
   const { data: choicesData } = useMealChoices(planId, { limit: 20 });
@@ -175,6 +176,7 @@ export function useMealSlots() {
     logModal,
     loggedByMealType,
     budget,
+    refetchSlots,
     actions: {
       setExpandedSlotId,
       openLogModal,

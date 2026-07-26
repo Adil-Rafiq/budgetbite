@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Check, Pin, RotateCw, TriangleAlert, ChefHat, PenLine } from 'lucide-react';
+import { ArrowRight, Check, Pin, RotateCw, ChefHat, PenLine } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,7 @@ import {
 import { LogMealModal } from '@/components/dashboard/meal-slots/_components/log-meal-modal';
 import { useMealSlots } from '@/components/dashboard/meal-slots/_hooks/use-meal-slots';
 import { BudgetFitBadge } from '@/components/budget-fit-badge';
+import { DataError } from '@/components/data-error';
 import { optionLabel } from '@/lib/suggestion';
 import { formatPKR } from '@/lib/currency';
 import { classifyBudgetFit } from '@repo/shared';
@@ -43,6 +44,7 @@ export function MealSlots() {
     logModal,
     loggedByMealType,
     budget,
+    refetchSlots,
     actions,
   } = useMealSlots();
 
@@ -72,10 +74,10 @@ export function MealSlots() {
 
   if (slotsError)
     return (
-      <div className="flex items-center gap-3 rounded-2xl border border-tomato/30 bg-tomato/[0.06] p-4 text-[13px] text-tomato">
-        <TriangleAlert className="h-4 w-4 shrink-0" />
-        We couldn&apos;t load today&apos;s meals just now. Please refresh to try again.
-      </div>
+      <DataError
+        message="We couldn't load today's meals just now."
+        onRetry={() => refetchSlots()}
+      />
     );
 
   if (!slotsData?.slots.length)

@@ -1,5 +1,6 @@
 'use client';
 
+import { RotateCw } from 'lucide-react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useMealChoices } from '@/hooks/use-meal-choice';
 import { useListActiveMealTypes } from '@/hooks/use-meal-type';
@@ -8,7 +9,7 @@ import { formatPKR } from '@/lib/currency';
 export function RecentActivity() {
   const { data: activePlan } = useActiveBudgetPlan();
   const planId = activePlan?.plan.id ?? '';
-  const { data, isLoading, error } = useMealChoices(planId, { limit: 5, offset: 0 });
+  const { data, isLoading, error, refetch } = useMealChoices(planId, { limit: 5, offset: 0 });
   const { data: mealTypes = [] } = useListActiveMealTypes();
 
   const mealTypesById = new Map(mealTypes.map((mt) => [mt.id, mt]));
@@ -35,7 +36,17 @@ export function RecentActivity() {
             ))}
           </div>
         ) : error ? (
-          <p className="p-5 text-[13px] text-tomato">Could not load recent activity.</p>
+          <div className="flex flex-col items-start gap-2 p-5">
+            <p className="text-[13px] text-tomato">Could not load recent activity.</p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-tomato/40 bg-white px-3 py-1.5 text-[12px] font-semibold text-tomato transition-colors hover:bg-tomato/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tomato/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            >
+              <RotateCw className="h-3.5 w-3.5" />
+              Try again
+            </button>
+          </div>
         ) : !planId ? (
           <p className="p-5 text-[13px] text-slate">No active plan yet.</p>
         ) : !data?.data.length ? (
