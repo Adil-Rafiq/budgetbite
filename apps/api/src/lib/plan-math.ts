@@ -7,20 +7,13 @@ import type { BudgetStateContext } from '@repo/shared';
 
 /**
  * Total meal slots in a plan: mealsPerDay × inclusive day count.
- * Dates are YYYY-MM-DD strings; the day count is clamped to at least 1 so a
- * same-day (or malformed) range never yields zero meals.
+ *
+ * Re-exported from `@repo/shared` rather than reimplemented here: the web app
+ * previews the same per-meal figure while the user is still choosing a budget,
+ * and a second copy of this arithmetic is exactly how those two screens drifted
+ * ~12% apart. One implementation, imported by both sides.
  */
-export function totalMealsForPlan(input: {
-  mealsPerDay: number;
-  startDate: string;
-  endDate: string;
-}): number {
-  const start = new Date(input.startDate);
-  const end = new Date(input.endDate);
-  const msPerDay = 1000 * 60 * 60 * 24;
-  const days = Math.max(1, Math.round((end.getTime() - start.getTime()) / msPerDay) + 1);
-  return input.mealsPerDay * days;
-}
+export { inclusiveDayCount, totalMealsForPlan } from '@repo/shared';
 
 /**
  * Subtract pinned-slot allocation from raw budget state. plan_context tracks

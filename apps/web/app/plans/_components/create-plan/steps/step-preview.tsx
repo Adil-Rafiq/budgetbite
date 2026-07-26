@@ -1,29 +1,11 @@
 import { Bell, BellOff, CalendarDays, Utensils } from 'lucide-react';
 import { format } from 'date-fns';
+import { planBudgetBreakdown } from '@repo/shared';
 import { useCreatePlanContext } from '@/app/plans/_context/create-plan-context';
 import { formatPKR } from '@/lib/currency';
+import { formatTimeOfDay } from '@/lib/time';
 
 const eyebrowClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60';
-
-const formatTime = (time: string) => {
-  if (!/^\d{2}:\d{2}$/.test(time)) return '—';
-  const [h, m] = time.split(':').map(Number);
-  const date = new Date();
-  date.setHours(h ?? 0, m ?? 0, 0, 0);
-  return format(date, 'h:mm a');
-};
-
-const getRange = (planType: 'weekly' | 'monthly') => {
-  const start = new Date();
-  const end = new Date(start);
-  if (planType === 'weekly') {
-    end.setDate(end.getDate() + 7);
-  } else {
-    end.setMonth(end.getMonth() + 1);
-  }
-  const days = Math.max(1, Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-  return { start, end, days };
-};
 
 export const StepPreview = () => {
   const { steps } = useCreatePlanContext();
@@ -31,10 +13,22 @@ export const StepPreview = () => {
   const { values: notificationValues } = steps.notifications;
 
   const { planType, totalBudget, selectedMealTypeIds, mealsPerDay } = budgetValues;
-  const { start, end, days } = getRange(planType);
-  const totalMeals = mealsPerDay * days;
-  const avgPerMeal = totalMeals > 0 ? totalBudget / totalMeals : 0;
-  const avgPerDay = days > 0 ? totalBudget / days : 0;
+
+  // Same shared arithmetic the API uses to create the plan. This preview used
+  // to divide by an exclusive day count while the server counted inclusively,
+  // so the per-meal figure here was ~12% higher than the one the dashboard
+  // showed moments later.
+  const {
+    startDate,
+    endDate,
+    days,
+    totalMeals,
+    perMeal: avgPerMeal,
+    perDay: avgPerDay,
+  } = planBudgetBreakdown({ planType, totalBudget, mealsPerDay });
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
 
   const selectedMealLabels = mealTypeOptions
     .filter((opt) => selectedMealTypeIds.includes(opt.id))
@@ -108,7 +102,7 @@ export const StepPreview = () => {
                 }`}
               >
                 <span className="capitalize">{slot.label}</span>
-                <span>{slot.enabled ? formatTime(slot.time) : 'off'}</span>
+                <span>{slot.enabled ? formatTimeOfDay(slot.time) : 'off'}</span>
               </div>
             ))}
           </div>

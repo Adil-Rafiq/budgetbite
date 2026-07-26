@@ -10,35 +10,20 @@ import { CREATE_PLAN_STEPS } from '@/app/plans/constants';
 import { createBudgetPlanMachine } from '@/app/plans/_machines/create-budget-plan.machine';
 import { useBudgetStep } from '@/app/plans/_hooks/use-budget-step';
 import { useNotificationStep } from '@/app/plans/_hooks/use-notification-step';
-import type { BudgetPlanPreferencesInput } from '@/app/plans/types';
+import { planDateRange } from '@repo/shared';
 import { getErrorMessage, isPlanAlreadyActive } from '@/lib/api/errors';
 
 export type MealTypesStatus = 'loading' | 'error' | 'empty' | 'ready';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export const getPlanDateRange = (planType: BudgetPlanPreferencesInput['planType']) => {
-  const startDate = new Date();
-  const endDate = new Date(startDate);
-
-  if (planType === 'weekly') {
-    endDate.setDate(endDate.getDate() + 7);
-  } else {
-    endDate.setMonth(endDate.getMonth() + 1);
-  }
-
-  const toLocalDateString = (d: Date): string => {
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  return {
-    startDate: toLocalDateString(startDate),
-    endDate: toLocalDateString(endDate),
-  };
-};
+/**
+ * Re-exported from `@repo/shared` so this flow, onboarding, and the API all
+ * derive plan dates from one implementation. Three local copies is how the
+ * preview screens ended up dividing by a different day count than the plan the
+ * server actually stored.
+ */
+export const getPlanDateRange = planDateRange;
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
