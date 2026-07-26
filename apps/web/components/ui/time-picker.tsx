@@ -5,9 +5,26 @@ import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { Clock } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { formatHourLabel, formatTimeOfDay } from '@/lib/time';
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
-const MINUTES = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
+
+/**
+ * Minutes in 5-minute steps rather than all 60. A reminder does not need
+ * minute precision, and flicking a 60-row column one-handed is exactly the
+ * interaction a distracted mobile user gives up on. An off-grid value that is
+ * already stored (from an earlier build, or an admin edit) is spliced back in
+ * so switching hours can never silently round someone's time.
+ */
+const MINUTE_STEP = 5;
+const BASE_MINUTES = Array.from({ length: 60 / MINUTE_STEP }, (_, i) =>
+  (i * MINUTE_STEP).toString().padStart(2, '0'),
+);
+
+const minuteOptions = (current: string): string[] =>
+  BASE_MINUTES.includes(current)
+    ? BASE_MINUTES
+    : [...BASE_MINUTES, current].sort((a, b) => Number(a) - Number(b));
 
 const TIME_PATTERN = /^(\d{2}):(\d{2})$/;
 
@@ -46,22 +63,22 @@ export function TimePicker({
         <button
           type="button"
           disabled={disabled}
-          aria-label={ariaLabel ?? `Time, ${hh}:${mm}`}
+          aria-label={ariaLabel ?? `Time, ${formatTimeOfDay(value)}`}
           className={cn(
             'inline-flex items-center justify-between gap-2 rounded-xl border bg-white outline-none transition',
-            'focus-visible:border-green/50 focus-visible:ring-2 focus-visible:ring-green/30',
-            'data-[state=open]:border-green/50 data-[state=open]:ring-2 data-[state=open]:ring-green/30',
+            'focus-visible:border-dark-green focus-visible:ring-2 focus-visible:ring-dark-green focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+            'data-[state=open]:border-dark-green data-[state=open]:ring-2 data-[state=open]:ring-dark-green/40',
             'disabled:cursor-not-allowed',
             disabled
               ? 'border-sage/60 text-slate/50 line-through'
-              : 'border-sage text-charcoal hover:border-green/40',
+              : 'border-sage text-charcoal hover:border-dark-green/50',
             size === 'sm'
-              ? 'w-[100px] px-2.5 py-1.5 text-[12px]'
-              : 'w-[124px] px-3.5 py-2.5 text-[14px]',
+              ? 'min-h-9 w-[112px] px-2.5 py-1.5 text-[12px]'
+              : 'min-h-11 w-[136px] px-3.5 py-2.5 text-[14px]',
             className,
           )}
         >
-          <span className="tabular-nums">{`${hh}:${mm}`}</span>
+          <span className="tabular-nums">{formatTimeOfDay(value)}</span>
           <Clock className={cn('shrink-0 opacity-60', size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5')} />
         </button>
       </PopoverPrimitive.Trigger>
@@ -83,14 +100,26 @@ export function TimePicker({
         )}
       >
         <div className="flex items-baseline justify-center gap-1 border-b border-sage bg-canvas px-5 py-3 text-[22px] tabular-nums text-charcoal">
-          <span>{hh}</span>
-          <span className="text-slate/50">:</span>
-          <span>{mm}</span>
+          {formatTimeOfDay(`${hh}:${mm}`)}
         </div>
         <div className="flex">
-          <TimeColumn label="Hour" items={HOURS} selected={hh} onSelect={setHour} open={open} />
+          <TimeColumn
+            label="Hour"
+            items={HOURS}
+            selected={hh}
+            onSelect={setHour}
+            open={open}
+            renderItem={formatHourLabel}
+            width="w-[86px]"
+          />
           <div className="w-px bg-sage" />
-          <TimeColumn label="Min" items={MINUTES} selected={mm} onSelect={setMinute} open={open} />
+          <TimeColumn
+            label="Min"
+            items={minuteOptions(mm)}
+            selected={mm}
+            onSelect={setMinute}
+            open={open}
+          />
         </div>
       </PopoverPrimitive.Content>
     </PopoverPrimitive.Root>
@@ -103,9 +132,20 @@ type TimeColumnProps = {
   selected: string;
   onSelect: (value: string) => void;
   open: boolean;
+  /** Display transform — the stored value stays 24-hour either way. */
+  renderItem?: (value: string) => string;
+  width?: string;
 };
 
-function TimeColumn({ label, items, selected, onSelect, open }: TimeColumnProps) {
+function TimeColumn({
+  label,
+  items,
+  selected,
+  onSelect,
+  open,
+  renderItem,
+  width = 'w-[68px]',
+}: TimeColumnProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<HTMLButtonElement>(null);
 
@@ -127,7 +167,7 @@ function TimeColumn({ label, items, selected, onSelect, open }: TimeColumnProps)
         ref={containerRef}
         role="listbox"
         aria-label={label}
-        className="scrollbar-thin h-44 w-[68px] overflow-y-auto py-1"
+        className={cn('scrollbar-thin h-44 overflow-y-auto py-1', width)}
       >
         {items.map((v) => {
           const isSelected = selected === v;
@@ -140,13 +180,14 @@ function TimeColumn({ label, items, selected, onSelect, open }: TimeColumnProps)
               aria-selected={isSelected}
               onClick={() => onSelect(v)}
               className={cn(
-                'flex h-8 w-full items-center justify-center text-[13px] tabular-nums transition-colors',
+                'flex h-9 w-full items-center justify-center text-[13px] tabular-nums transition-colors',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-dark-green',
                 isSelected
-                  ? 'bg-green text-white'
+                  ? 'bg-green-deep text-white'
                   : 'text-charcoal hover:bg-sage/40 focus:bg-sage/40',
               )}
             >
-              {v}
+              {renderItem ? renderItem(v) : v}
             </button>
           );
         })}

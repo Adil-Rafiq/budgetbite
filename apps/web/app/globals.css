@@ -111,6 +111,14 @@
   --color-tomato: #e84c3d;
   --color-charcoal: #1a1a1a;
   --color-slate: #4a4a4a;
+
+  /* Accessible fill for buttons that carry white label text.
+     White on --color-green is ~2.0:1 and on --color-dark-green ~4.1:1, both
+     under the 4.5:1 AA floor for the 14px semibold labels we actually ship.
+     This is the same hue family at ~5.0:1. Onboarding uses it for every filled
+     CTA; the rest of the app still fills with --color-green and is a candidate
+     for the same sweep. */
+  --color-green-deep: #4f7c17;
 }
 
 @layer base {
@@ -151,36 +159,6 @@
 .bb-progress {
   width: 100%;
   animation: bb-progress-fill 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* Onboarding budget slider — sage track, green thumb. */
-.bb-range {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  border-radius: 9999px;
-  background: var(--color-sage);
-  outline: none;
-}
-.bb-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--color-green);
-  border: 3px solid #fff;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(140, 198, 63, 0.4);
-}
-.bb-range::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--color-green);
-  border: 3px solid #fff;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(140, 198, 63, 0.4);
 }
 
 /* Onboarding step card fade-up on step change. */

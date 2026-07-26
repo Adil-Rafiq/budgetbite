@@ -1,20 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 import { ArrowLeft, ArrowRight, Rocket } from 'lucide-react';
 import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-context';
 import { ONBOARDING_STEPS } from '@/app/onboarding/constants';
 import type { OnboardingStepAccent } from '@/app/onboarding/types';
 import { LogoIcon } from '@/components/icons';
+import { FOCUS_RING_ON_CANVAS } from '@/lib/focus-ring';
 
 interface OnboardingShellProps {
   children: React.ReactNode;
 }
 
 const ACCENT_CHIP: Record<OnboardingStepAccent, string> = {
-  green: 'border-green/20 bg-green/10 text-dark-green',
-  'dark-green': 'border-green/20 bg-sage/60 text-dark-green',
-  tomato: 'border-tomato/20 bg-tomato/10 text-tomato',
+  green: 'border-green/30 bg-green/10 text-dark-green',
+  'dark-green': 'border-green/30 bg-sage/60 text-dark-green',
 };
 
 export const OnboardingShell = ({ children }: OnboardingShellProps) => {
@@ -25,7 +26,22 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
     isLastStep,
     isSubmitting,
     canAdvance,
+    blockedReason,
   } = useOnboardingContext();
+
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const isFirstRender = useRef(true);
+
+  // Move focus to the new step's heading. The step content remounts on change,
+  // so without this focus stays on the footer button and a screen-reader user
+  // is never told the screen changed.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    headingRef.current?.focus();
+  }, [currentStep]);
 
   if (!currentStepData) return null;
 
@@ -38,12 +54,16 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
       <header className="sticky top-0 z-50 border-b border-sage bg-canvas/95 backdrop-blur-sm">
         <div className="mx-auto max-w-2xl px-4 sm:px-6">
           <div className="flex h-14 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-green text-white">
+            <Link
+              href="/"
+              aria-label="BudgetBite home"
+              className={`flex items-center gap-2.5 rounded-lg ${FOCUS_RING_ON_CANVAS}`}
+            >
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-deep text-white">
                 <LogoIcon size={14} />
               </span>
               <span className="font-display text-base font-bold tracking-tight">
-                Budget<span className="text-green">Bite</span>
+                Budget<span className="text-dark-green">Bite</span>
               </span>
             </Link>
             <span className="text-xs font-semibold text-slate">
@@ -52,11 +72,18 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
           </div>
         </div>
         <div className="mx-auto max-w-2xl px-4 pb-3 sm:px-6">
-          <div className="flex gap-1.5">
+          <div
+            role="progressbar"
+            aria-valuemin={1}
+            aria-valuemax={totalSteps}
+            aria-valuenow={currentStep + 1}
+            aria-label={`Step ${currentStep + 1} of ${totalSteps}: ${currentStepData.label}`}
+            className="flex gap-1.5"
+          >
             {ONBOARDING_STEPS.map((step, i) => (
               <div key={step.id} className="h-1.5 flex-1 overflow-hidden rounded-full bg-sage/50">
                 <div
-                  className="h-full rounded-full bg-green transition-all duration-500 ease-out"
+                  className="h-full rounded-full bg-green-deep transition-all duration-500 ease-out"
                   style={{ width: i <= currentStep ? '100%' : '0%' }}
                 />
               </div>
@@ -65,19 +92,29 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
         </div>
       </header>
 
+      {/* Announces the step change to assistive tech, which a remount alone
+          does not do. */}
+      <div aria-live="polite" className="sr-only">
+        {`Step ${currentStep + 1} of ${totalSteps}: ${currentStepData.title}`}
+      </div>
+
       {/* ── Main content ── */}
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pb-40 pt-8 sm:px-6">
+      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pb-44 pt-8 sm:px-6">
         <div key={currentStep} className="bb-step-in">
           <div className="mb-6">
             <div
               className={`mb-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 ${ACCENT_CHIP[currentStepData.accent]}`}
             >
-              <StepIcon className="h-3 w-3" />
+              <StepIcon aria-hidden className="h-3 w-3" />
               <span className="text-xs font-semibold uppercase tracking-wide">
                 Step {currentStep + 1} — {currentStepData.label}
               </span>
             </div>
-            <h1 className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+            <h1
+              ref={headingRef}
+              tabIndex={-1}
+              className="font-display text-3xl font-bold leading-tight tracking-tight outline-none sm:text-4xl"
+            >
               {currentStepData.title}
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-slate">{currentStepData.description}</p>
@@ -95,9 +132,9 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
               type="button"
               onClick={handleBack}
               disabled={currentStep === 0 || isSubmitting}
-              className="inline-flex items-center gap-2 rounded-xl border border-sage px-5 py-3.5 text-sm font-semibold text-slate transition-colors hover:border-charcoal hover:text-charcoal disabled:pointer-events-none disabled:invisible"
+              className={`inline-flex min-h-11 items-center gap-2 rounded-xl border border-sage px-5 py-3.5 text-sm font-semibold text-slate transition-colors hover:border-charcoal hover:text-charcoal disabled:pointer-events-none disabled:invisible ${FOCUS_RING_ON_CANVAS}`}
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
+              <ArrowLeft aria-hidden className="h-3.5 w-3.5" />
               Back
             </button>
 
@@ -106,14 +143,15 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
                 type="button"
                 onClick={handleContinue}
                 disabled={isSubmitting || !canAdvance}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-tomato py-3.5 text-sm font-semibold text-white transition-all hover:bg-tomato/90 hover:shadow-lg hover:shadow-tomato/25 disabled:pointer-events-none disabled:opacity-50"
+                aria-describedby={blockedReason ? 'nav-blocked-reason' : undefined}
+                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-green-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-dark-green hover:shadow-lg hover:shadow-dark-green/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
               >
                 {isSubmitting ? (
                   'Saving…'
                 ) : (
                   <>
                     Continue
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight aria-hidden className="h-3.5 w-3.5" />
                   </>
                 )}
               </button>
@@ -122,44 +160,39 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
                 type="button"
                 onClick={handleFinish}
                 disabled={isSubmitting || !canAdvance}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-green py-3.5 text-sm font-semibold text-white transition-all hover:bg-dark-green hover:shadow-lg hover:shadow-green/25 disabled:pointer-events-none disabled:opacity-50"
+                aria-describedby={blockedReason ? 'nav-blocked-reason' : undefined}
+                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-green-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-dark-green hover:shadow-lg hover:shadow-dark-green/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
               >
                 {isSubmitting ? (
                   <>
                     <span
+                      aria-hidden
                       className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white"
                       style={{ borderTopColor: 'transparent' }}
                     />
-                    Generating your plan…
+                    {/* Not "Generating your plan…" — plan generation is
+                        env-gated and fire-and-forget on the API. What is
+                        actually happening here is the plan being created. */}
+                    Setting up your plan…
                   </>
                 ) : (
                   <>
                     Launch my BudgetBite
-                    <Rocket className="h-3.5 w-3.5" />
+                    <Rocket aria-hidden className="h-3.5 w-3.5" />
                   </>
                 )}
               </button>
             )}
           </div>
 
-          {/* Step dots */}
-          <div className="mt-3 flex justify-center gap-2">
-            {ONBOARDING_STEPS.map((step, i) => (
-              <div
-                key={step.id}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === currentStep
-                    ? 'w-6 bg-green'
-                    : i < currentStep
-                      ? 'w-1.5 bg-green'
-                      : 'w-1.5 bg-sage'
-                }`}
-              />
-            ))}
-          </div>
-
-          <p className="mt-3 text-center text-[11px] text-slate/70">
-            You can change all of this later in settings.
+          {/* One reason line, replacing a second row of step dots that
+              duplicated the header progress bar and looked clickable. */}
+          <p
+            id="nav-blocked-reason"
+            className="mt-3 text-center text-xs text-slate"
+            aria-live="polite"
+          >
+            {blockedReason ?? 'You can change all of this later in settings.'}
           </p>
         </div>
       </div>

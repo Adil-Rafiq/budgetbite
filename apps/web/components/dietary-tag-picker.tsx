@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 
+import { FOCUS_RING } from '@/lib/focus-ring';
+
 interface DietaryTagPickerProps {
   label: string;
   hint: string;
@@ -43,23 +45,26 @@ export const DietaryTagPicker = ({
         <p className="text-xs text-slate">{hint}</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div role="group" aria-label={label} className="flex flex-wrap gap-2">
         {[...quickOptions, ...customTags].map((tag) => {
           const checked = selected.includes(tag);
           return (
             <button
               key={tag}
               type="button"
+              role="checkbox"
+              aria-checked={checked}
               onClick={() => onToggle(tag)}
-              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] capitalize transition-colors ${
+              className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-[13px] capitalize transition-colors ${FOCUS_RING} ${
                 checked
-                  ? 'border-green bg-green/5 font-semibold text-charcoal'
-                  : 'border-sage bg-white font-normal text-slate hover:border-green/40'
+                  ? 'border-dark-green bg-green/10 font-semibold text-charcoal'
+                  : 'border-sage bg-white font-normal text-slate hover:border-dark-green/50'
               }`}
             >
               <span
+                aria-hidden
                 className={`flex h-4 w-4 items-center justify-center rounded-full border transition-colors ${
-                  checked ? 'border-green bg-green text-white' : 'border-sage bg-white'
+                  checked ? 'border-dark-green bg-dark-green text-white' : 'border-sage bg-white'
                 }`}
               >
                 {checked && <Check className="h-2.5 w-2.5" />}
@@ -76,6 +81,7 @@ export const DietaryTagPicker = ({
           value={draft}
           maxLength={60}
           placeholder="Add your own…"
+          aria-label={`Add a custom ${label.toLowerCase()} entry`}
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
@@ -83,19 +89,23 @@ export const DietaryTagPicker = ({
               handleAdd();
             }
           }}
-          className="w-full rounded-xl border border-sage bg-white px-3.5 py-2 text-[13px] text-charcoal outline-none transition-colors placeholder:text-slate/50 focus:border-green"
+          className={`min-h-11 w-full rounded-xl border border-sage bg-white px-3.5 py-2 text-[13px] text-charcoal transition-colors placeholder:text-slate/50 focus:border-dark-green ${FOCUS_RING}`}
         />
         <button
           type="button"
           onClick={handleAdd}
           disabled={draft.trim().length === 0}
-          className="rounded-xl border border-sage bg-canvas px-4 py-2 text-[13px] font-medium text-charcoal transition-colors hover:border-green disabled:opacity-40 disabled:hover:border-sage"
+          className={`min-h-11 rounded-xl border border-sage bg-canvas px-4 py-2 text-[13px] font-medium text-charcoal transition-colors hover:border-dark-green disabled:opacity-40 disabled:hover:border-sage ${FOCUS_RING}`}
         >
           Add
         </button>
       </div>
 
-      {error && <p className="text-xs text-tomato">{error}</p>}
+      {error && (
+        <p role="alert" className="text-xs font-medium text-tomato">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

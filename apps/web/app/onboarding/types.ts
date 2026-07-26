@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import type { LucideIcon } from 'lucide-react';
 
-export type OnboardingStepId = 'location' | 'dietary' | 'budget' | 'notifications';
+export type OnboardingStepId = 'location' | 'dietary' | 'budget' | 'notifications' | 'review';
 
-export type OnboardingStepAccent = 'green' | 'dark-green' | 'tomato';
+export type OnboardingStepAccent = 'green' | 'dark-green';
 
 export type OnboardingStep = {
   id: OnboardingStepId;
@@ -25,10 +25,20 @@ export interface BudgetPlanMealTypeOption {
   sortOrder: number;
 }
 
+export const MAX_TOTAL_BUDGET = 1_000_000;
+
 export const budgetPlanPreferencesSchema = z.object({
   planType: z.enum(['weekly', 'monthly']),
-  totalBudget: z.number().positive(),
-  mealTypeIds: z.array(z.string().uuid()).min(1, 'Select at least one meal type'),
+  totalBudget: z
+    .number({ message: 'Enter a budget amount' })
+    .positive('Enter an amount above zero')
+    .max(MAX_TOTAL_BUDGET, `Keep this under ${MAX_TOTAL_BUDGET.toLocaleString('en-US')}`),
+  // The API caps a plan at 5 meals/day; stop the user here rather than at the
+  // final Launch click, which would fail validation server-side.
+  mealTypeIds: z
+    .array(z.string().uuid())
+    .min(1, 'Select at least one meal type')
+    .max(5, 'Pick up to 5 meals a day'),
 });
 
 export type BudgetPlanPreferencesInput = z.infer<typeof budgetPlanPreferencesSchema>;
@@ -45,9 +55,14 @@ export const notificationPreferencesSchema = z.object({
   notificationSlots: z.array(notificationSlotSchema).min(1),
 });
 
+/**
+ * Both coordinates are required. They used to be optional, which let the map's
+ * default view double as a submitted value — a user who tapped straight through
+ * silently saved Karachi as their home and was never asked again.
+ */
 export const locationPreferencesSchema = z.object({
-  latitude: z.number().min(-90).max(90).optional(),
-  longitude: z.number().min(-180).max(180).optional(),
+  latitude: z.number({ message: 'Pick your location on the map' }).min(-90).max(90),
+  longitude: z.number({ message: 'Pick your location on the map' }).min(-180).max(180),
 });
 
 export const dietaryPreferencesSchema = z.object({

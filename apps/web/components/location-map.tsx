@@ -7,6 +7,8 @@ import { useEffect, useRef, useState } from 'react';
 import { MapPin, Search } from 'lucide-react';
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 
+import { FOCUS_RING } from '@/lib/focus-ring';
+
 const LEAFLET_ICON_BASE = 'https://unpkg.com/leaflet@1.9.4/dist/images/';
 
 L.Icon.Default.mergeOptions({
@@ -35,20 +37,41 @@ type NominatimResult = {
   lon: string;
 };
 
+const isCoordinate = (value: number | null | undefined): value is number =>
+  value != null && Number.isFinite(value);
+
 interface LocationMapProps {
-  latitude: number;
-  longitude: number;
+  /**
+   * The picked coordinates, or null/undefined when nothing has been picked yet.
+   * A null pair renders an empty map over `fallbackCenter` with no marker — the
+   * map's opening view must never read as a location the user chose.
+   */
+  latitude: number | null | undefined;
+  longitude: number | null | undefined;
   onCoordinatesChange: (latitude: number, longitude: number) => void;
+  /** Where to look when there is no pin yet. Defaults to central Karachi. */
+  fallbackCenter?: { latitude: number; longitude: number };
   height?: number;
 }
 
-function MapController({ latitude, longitude }: { latitude: number; longitude: number }) {
+function MapController({
+  latitude,
+  longitude,
+}: {
+  latitude: number | null | undefined;
+  longitude: number | null | undefined;
+}) {
   const map = useMap();
-  const lastApplied = useRef({ lat: latitude, lng: longitude });
+  const lastApplied = useRef<{ lat: number; lng: number } | null>(
+    isCoordinate(latitude) && isCoordinate(longitude) ? { lat: latitude, lng: longitude } : null,
+  );
 
   useEffect(() => {
+    if (!isCoordinate(latitude) || !isCoordinate(longitude)) return;
     const last = lastApplied.current;
-    if (Math.abs(last.lat - latitude) < 1e-6 && Math.abs(last.lng - longitude) < 1e-6) return;
+    if (last && Math.abs(last.lat - latitude) < 1e-6 && Math.abs(last.lng - longitude) < 1e-6) {
+      return;
+    }
     lastApplied.current = { lat: latitude, lng: longitude };
     map.flyTo([latitude, longitude], Math.max(map.getZoom(), 13), { duration: 0.6 });
   }, [latitude, longitude, map]);
@@ -75,8 +98,12 @@ export function LocationMap({
   latitude,
   longitude,
   onCoordinatesChange,
+  fallbackCenter = { latitude: 24.8607, longitude: 67.0011 },
   height = 280,
 }: LocationMapProps) {
+  const hasPin = isCoordinate(latitude) && isCoordinate(longitude);
+  const centerLat = hasPin ? latitude : fallbackCenter.latitude;
+  const centerLng = hasPin ? longitude : fallbackCenter.longitude;
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<NominatimResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -126,8 +153,16 @@ export function LocationMap({
     };
   }, [query]);
 
-  // Reverse geocode (debounced) — resolves the picked spot to an address
+  // Reverse geocode (debounced) — resolves the picked spot to an address.
+  // Skipped entirely until something is picked, so an unpicked map never shows
+  // a street name that could be mistaken for the user's own.
   useEffect(() => {
+    if (!isCoordinate(latitude) || !isCoordinate(longitude)) {
+      setAddress(null);
+      setIsResolvingAddress(false);
+      return;
+    }
+
     const controller = new AbortController();
     setIsResolvingAddress(true);
     const timer = setTimeout(async () => {
@@ -209,11 +244,13 @@ export function LocationMap({
     onCoordinatesChange(round(pos.lat), round(pos.lng));
   };
 
-  const addressRowLabel = isResolvingAddress
-    ? 'Resolving…'
-    : address
-      ? address
-      : 'No address found — try another spot';
+  const addressRowLabel = !hasPin
+    ? 'Nothing picked yet — search, tap the map, or use Detect'
+    : isResolvingAddress
+      ? 'Resolving…'
+      : address
+        ? address
+        : 'No address found — try another spot';
 
   return (
     <div ref={containerRef} className="flex flex-col gap-2">
@@ -230,7 +267,7 @@ export function LocationMap({
           aria-activedescendant={
             activeIndex >= 0 ? `loc-result-${results[activeIndex]?.place_id}` : undefined
           }
-          className="w-full rounded-xl border border-sage bg-white px-3.5 py-[11px] pr-9 text-[13px] text-charcoal outline-none transition-colors placeholder:text-slate/50 focus:border-green"
+          className={`w-full rounded-xl border border-sage bg-white px-3.5 py-[11px] pr-9 text-[13px] text-charcoal transition-colors placeholder:text-slate/50 focus:border-dark-green ${FOCUS_RING}`}
         />
         <span
           aria-hidden
@@ -260,7 +297,7 @@ export function LocationMap({
                   aria-selected={i === activeIndex}
                   onMouseEnter={() => setActiveIndex(i)}
                   onClick={() => handleSelectResult(r)}
-                  className={`block w-full px-3.5 py-2 text-left text-[12px] text-charcoal ${
+                  className={`block w-full px-3.5 py-2.5 text-left text-[12px] text-charcoal ${FOCUS_RING} ${
                     i === activeIndex ? 'bg-canvas' : ''
                   }`}
                 >
@@ -274,8 +311,8 @@ export function LocationMap({
 
       <div className="relative overflow-hidden rounded-2xl border border-sage">
         <MapContainer
-          center={[latitude, longitude]}
-          zoom={13}
+          center={[centerLat, centerLng]}
+          zoom={hasPin ? 13 : 11}
           scrollWheelZoom={true}
           zoomControl={false}
           style={{ height: `${height}px`, width: '100%', background: 'var(--color-canvas)' }}
@@ -286,12 +323,14 @@ export function LocationMap({
             subdomains="abcd"
             maxZoom={20}
           />
-          <Marker
-            position={[latitude, longitude]}
-            icon={wisprIcon}
-            draggable
-            eventHandlers={{ dragend: handleMarkerDragEnd }}
-          />
+          {hasPin && (
+            <Marker
+              position={[latitude, longitude]}
+              icon={wisprIcon}
+              draggable
+              eventHandlers={{ dragend: handleMarkerDragEnd }}
+            />
+          )}
           <MapController latitude={latitude} longitude={longitude} />
           <MapClickHandler onPick={onCoordinatesChange} />
           <MapReady onReady={setMapInstance} />
@@ -302,7 +341,7 @@ export function LocationMap({
             type="button"
             aria-label="Zoom in"
             onClick={() => mapInstance?.zoomIn()}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-sage bg-white text-[15px] text-charcoal shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-canvas"
+            className={`flex h-11 w-11 items-center justify-center rounded-full border border-sage bg-white text-[17px] text-charcoal shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-canvas ${FOCUS_RING}`}
           >
             +
           </button>
@@ -310,30 +349,39 @@ export function LocationMap({
             type="button"
             aria-label="Zoom out"
             onClick={() => mapInstance?.zoomOut()}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-sage bg-white text-[15px] text-charcoal shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-canvas"
+            className={`flex h-11 w-11 items-center justify-center rounded-full border border-sage bg-white text-[17px] text-charcoal shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-canvas ${FOCUS_RING}`}
           >
             −
           </button>
         </div>
 
         <div className="pointer-events-none absolute right-3 top-3 rounded-full border border-sage bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate backdrop-blur">
-          Tap or drag pin
+          {hasPin ? 'Tap or drag pin' : 'Tap to set your spot'}
         </div>
       </div>
 
-      <div className="flex items-start gap-3 rounded-xl border border-sage bg-white px-3.5 py-2.5">
+      <div
+        className={`flex items-start gap-3 rounded-xl border px-3.5 py-2.5 ${
+          hasPin ? 'border-green/40 bg-green/5' : 'border-dashed border-sage bg-white'
+        }`}
+      >
         <span
           aria-hidden
-          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-tomato text-white"
+          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+            hasPin ? 'bg-dark-green text-white' : 'bg-sage text-slate'
+          }`}
         >
           <MapPin className="h-3 w-3" />
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate">
-            {isResolvingAddress ? 'Resolving address' : 'Pinned location'}
+            {!hasPin ? 'No location yet' : isResolvingAddress ? 'Resolving address' : 'Your spot'}
           </span>
           <span
-            className={`text-[13px] leading-snug ${address ? 'text-charcoal' : 'italic text-slate'}`}
+            aria-live="polite"
+            className={`text-[13px] leading-snug ${
+              hasPin && address ? 'text-charcoal' : 'italic text-slate'
+            }`}
             title={address ?? undefined}
           >
             {addressRowLabel}

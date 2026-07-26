@@ -23,7 +23,7 @@ import { fileToMenuImagePayload, MenuImageError } from '@/lib/menu-image';
 import { showToast } from '@/lib/toast';
 import { useUser } from '@/hooks/use-user';
 import { useDetectLocation } from '@/hooks/use-detect-location';
-import { DEFAULT_COORDINATES } from '@/app/onboarding/constants';
+import { DEFAULT_MAP_VIEW } from '@/app/onboarding/constants';
 import {
   Dialog,
   DialogContent,
@@ -75,8 +75,8 @@ export function RecommendRestaurantButton({
 
   // Seed the pin at the user's saved location as a convenient starting point —
   // they then drag/search to the restaurant's actual spot (which may be far off).
-  const seedLat = currentUser?.profile?.latitude ?? DEFAULT_COORDINATES.latitude;
-  const seedLng = currentUser?.profile?.longitude ?? DEFAULT_COORDINATES.longitude;
+  const seedLat = currentUser?.profile?.latitude ?? DEFAULT_MAP_VIEW.latitude;
+  const seedLng = currentUser?.profile?.longitude ?? DEFAULT_MAP_VIEW.longitude;
 
   const {
     register,
@@ -98,8 +98,8 @@ export function RecommendRestaurantButton({
       phone: undefined,
       area: undefined,
       note: undefined,
-      latitude: DEFAULT_COORDINATES.latitude,
-      longitude: DEFAULT_COORDINATES.longitude,
+      latitude: DEFAULT_MAP_VIEW.latitude,
+      longitude: DEFAULT_MAP_VIEW.longitude,
       items: [{ ...EMPTY_ITEM }],
     },
   });
@@ -181,8 +181,8 @@ export function RecommendRestaurantButton({
     onSuccess: setCoordinates,
   });
 
-  const mapLatitude = watch('latitude') ?? DEFAULT_COORDINATES.latitude;
-  const mapLongitude = watch('longitude') ?? DEFAULT_COORDINATES.longitude;
+  const mapLatitude = watch('latitude') ?? DEFAULT_MAP_VIEW.latitude;
+  const mapLongitude = watch('longitude') ?? DEFAULT_MAP_VIEW.longitude;
 
   const onSubmit = (values: CreateRestaurantRecommendationInput) => {
     submit.mutate(values, {

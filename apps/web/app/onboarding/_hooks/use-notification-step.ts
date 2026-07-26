@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -8,6 +8,7 @@ import {
   type BudgetPlanMealTypeOption,
   type NotificationPreferencesInput,
 } from '@/app/onboarding/types';
+import { patchDraft, readDraft } from '@/app/onboarding/_lib/draft-storage';
 
 type NotificationSlot = NotificationPreferencesInput['notificationSlots'][number];
 
@@ -81,6 +82,20 @@ export const useNotificationStep = (
     },
   });
 
+  const restoredDraft = useRef(false);
+
+  // Restore reminder times from an interrupted session before the reconciliation
+  // effect below runs, so a restored slot is treated as "existing" and keeps its
+  // time instead of being reset to the per-meal default. In an effect rather
+  // than defaultValues because sessionStorage does not exist during SSR.
+  useEffect(() => {
+    if (restoredDraft.current) return;
+    restoredDraft.current = true;
+
+    const slots = readDraft().notificationSlots;
+    if (slots?.length) form.setValue('notificationSlots', slots);
+  }, [form]);
+
   // Sync notification slots when selected meal types change.
   // Preserves existing times, adds empty slots for new meal types,
   // removes slots for deselected meal types.
@@ -121,6 +136,13 @@ export const useNotificationStep = (
 
   const notificationSlots = form.watch('notificationSlots');
 
+  // Mirror to the session draft so an interruption restores the times the user
+  // set, not the defaults they had already replaced.
+  useEffect(() => {
+    if (notificationSlots.length === 0) return;
+    patchDraft({ notificationSlots });
+  }, [notificationSlots]);
+
   // Enrich slots with labels for display — decoupled from raw form data
   const slots = notificationSlots.map((slot) => ({
     mealTypeId: slot.mealTypeId,
@@ -139,7 +161,6 @@ export const useNotificationStep = (
 
     values: {
       slots,
-      reminderText: `Set one reminder per meal slot (${slots.length} total).`,
     },
 
     errors: {

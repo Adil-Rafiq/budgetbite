@@ -1,4 +1,4 @@
-import { MapPin, Wallet, Bell, Salad } from 'lucide-react';
+import { MapPin, Wallet, Bell, Salad, ClipboardCheck } from 'lucide-react';
 import type { OnboardingStep } from '@/app/onboarding/types';
 
 export const ONBOARDING_STEPS: readonly OnboardingStep[] = [
@@ -9,7 +9,7 @@ export const ONBOARDING_STEPS: readonly OnboardingStep[] = [
     accent: 'green',
     title: 'Where do you eat out?',
     description:
-      "We'll find restaurants near you with real menus and live prices to build your plan.",
+      "Pick the spot you order to. We'll only suggest restaurants that actually deliver near it.",
   },
   {
     id: 'dietary',
@@ -23,24 +23,54 @@ export const ONBOARDING_STEPS: readonly OnboardingStep[] = [
     id: 'budget',
     icon: Wallet,
     label: 'Budget setup',
-    accent: 'tomato',
+    accent: 'green',
     title: 'How much do you want to spend?',
-    description: 'Set a realistic food budget. The AI makes every rupee count across real menus.',
+    description: 'Set a realistic food budget. Every suggestion has to fit inside what is left.',
   },
   {
     id: 'notifications',
     icon: Bell,
     label: 'Meal reminders',
-    accent: 'green',
+    accent: 'dark-green',
     title: 'When should we nudge you?',
     description: 'A single reminder per meal, at the time you choose. Toggle off any you skip.',
   },
+  {
+    id: 'review',
+    icon: ClipboardCheck,
+    label: 'Review',
+    accent: 'green',
+    title: 'Here’s your plan',
+    description:
+      'Check it over before we start planning meals. Anything here can still be changed.',
+  },
 ] as const;
 
-export const DEFAULT_COORDINATES = {
+/**
+ * Where the map *looks* before the user has picked anything — a view hint, not
+ * a value. It is deliberately never written into the location form: a user in
+ * Lahore who taps straight through must not silently commit a Karachi address,
+ * because proximity is the whole mechanic and `getPostLoginPath` would then
+ * treat them as onboarded forever.
+ */
+export const DEFAULT_MAP_VIEW = {
   latitude: 24.8607,
   longitude: 67.0011,
 } as const;
+
+/**
+ * Radius used for the "restaurants near you" proof on the location step.
+ * Matches the default on the restaurants browse page so the count the user is
+ * shown here is the same one they will see there.
+ */
+export const ONBOARDING_NEARBY_RADIUS_KM = 10;
+
+/**
+ * The API caps a plan at 5 meals per day (`createBudgetPlanSchema`). Surfaced
+ * here so the budget step can stop the user at the limit instead of letting the
+ * final Launch click fail with a 400.
+ */
+export const MAX_MEALS_PER_DAY = 5;
 
 /** Common quick-pick dietary preferences; users can also add their own. */
 export const DIETARY_PREFERENCE_OPTIONS = [

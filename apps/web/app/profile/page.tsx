@@ -20,7 +20,7 @@ import { showToast } from '@/lib/toast';
 import { getErrorMessage } from '@/lib/api/errors';
 import {
   ALLERGEN_OPTIONS,
-  DEFAULT_COORDINATES,
+  DEFAULT_MAP_VIEW,
   DIETARY_PREFERENCE_OPTIONS,
 } from '@/app/onboarding/constants';
 import { useDietaryStep } from '@/app/onboarding/_hooks/use-dietary-step';
@@ -103,8 +103,8 @@ export default function ProfilePage() {
 
   const initialLocation = useMemo<LocationInput>(
     () => ({
-      latitude: user?.profile?.latitude ?? DEFAULT_COORDINATES.latitude,
-      longitude: user?.profile?.longitude ?? DEFAULT_COORDINATES.longitude,
+      latitude: user?.profile?.latitude ?? DEFAULT_MAP_VIEW.latitude,
+      longitude: user?.profile?.longitude ?? DEFAULT_MAP_VIEW.longitude,
     }),
     [user],
   );
@@ -141,8 +141,8 @@ export default function ProfilePage() {
     onSuccess: setLocationCoordinates,
   });
 
-  const mapLatitude = locationForm.watch('latitude') ?? DEFAULT_COORDINATES.latitude;
-  const mapLongitude = locationForm.watch('longitude') ?? DEFAULT_COORDINATES.longitude;
+  const mapLatitude = locationForm.watch('latitude') ?? DEFAULT_MAP_VIEW.latitude;
+  const mapLongitude = locationForm.watch('longitude') ?? DEFAULT_MAP_VIEW.longitude;
 
   const onSaveAccount = async (values: AccountInput) => {
     const fullName = `${values.firstName} ${values.lastName}`.trim();

@@ -3,6 +3,7 @@
 import { BellOff } from 'lucide-react';
 import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-context';
 import { TimePicker } from '@/components/ui/time-picker';
+import { FOCUS_RING } from '@/lib/focus-ring';
 
 export const NotificationsStep = () => {
   const { steps } = useOnboardingContext();
@@ -20,10 +21,13 @@ export const NotificationsStep = () => {
           >
             <div
               className={`flex items-center gap-3 transition-opacity ${
-                slot.enabled ? '' : 'opacity-40'
+                slot.enabled ? '' : 'opacity-50'
               }`}
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-green/10 text-sm font-bold uppercase text-dark-green">
+              <span
+                aria-hidden
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-green/15 text-sm font-bold uppercase text-dark-green"
+              >
                 {slot.label.slice(0, 1)}
               </span>
               <span className="text-sm font-semibold capitalize text-charcoal">{slot.label}</span>
@@ -36,6 +40,8 @@ export const NotificationsStep = () => {
                 size="md"
                 aria-label={`${slot.label} reminder time`}
               />
+              {/* 44px hit area around a 24px-tall track: the switch itself stays
+                  visually light, but the tap target clears the minimum. */}
               <button
                 type="button"
                 onClick={() => actions.toggleNotificationEnabled(slot.mealTypeId)}
@@ -44,15 +50,20 @@ export const NotificationsStep = () => {
                 aria-label={
                   slot.enabled ? `Disable ${slot.label} reminder` : `Enable ${slot.label} reminder`
                 }
-                className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-                  slot.enabled ? 'bg-green' : 'bg-sage'
-                }`}
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${FOCUS_RING}`}
               >
                 <span
-                  className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-all ${
-                    slot.enabled ? 'left-6' : 'left-1'
+                  aria-hidden
+                  className={`relative block h-6 w-11 rounded-full transition-colors ${
+                    slot.enabled ? 'bg-green-deep' : 'bg-sage'
                   }`}
-                />
+                >
+                  <span
+                    className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-all ${
+                      slot.enabled ? 'left-6' : 'left-1'
+                    }`}
+                  />
+                </span>
               </button>
             </div>
           </div>
@@ -60,19 +71,23 @@ export const NotificationsStep = () => {
       </div>
 
       {errors.notificationSlots && (
-        <p className="text-xs text-tomato">{errors.notificationSlots}</p>
+        <p role="alert" className="text-xs font-medium text-tomato">
+          {errors.notificationSlots}
+        </p>
       )}
 
       <div className="flex items-start gap-3 rounded-[20px] border border-sage bg-white p-5 shadow-sm">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/60">
+        <span
+          aria-hidden
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/60"
+        >
           <BellOff className="h-4 w-4 text-dark-green" />
         </span>
-        <div>
-          <p className="text-sm font-semibold text-charcoal">Quiet by default</p>
-          <p className="mt-0.5 text-xs leading-relaxed text-slate">
-            We only send the reminders you opt in to. Toggle any meal off any time from settings.
-          </p>
-        </div>
+        <p className="text-xs leading-relaxed text-slate">
+          These are already set to sensible times — you only need to touch the ones you want to
+          move. Reminders aren&apos;t sending yet; we save your times so they&apos;re ready when
+          they do.
+        </p>
       </div>
     </div>
   );

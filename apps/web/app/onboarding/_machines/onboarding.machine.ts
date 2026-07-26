@@ -8,6 +8,9 @@ interface OnboardingMachineContext {
 type OnboardingMachineEvent =
   | { type: 'CONTINUE' }
   | { type: 'BACK' }
+  /** Jump straight to a step — used to restore from the URL and to follow
+   *  browser Back/Forward, which now walk the wizard instead of leaving it. */
+  | { type: 'GOTO_STEP'; step: number }
   | { type: 'START_LOCATION_SUBMIT' }
   | { type: 'LOCATION_SUBMIT_SUCCESS' }
   | { type: 'LOCATION_SUBMIT_FAILURE' }
@@ -30,13 +33,19 @@ export const onboardingMachine = setup({
     previousStep: assign({
       step: ({ context }) => Math.max(context.step - 1, 0),
     }),
+    gotoStep: assign({
+      step: ({ context, event }) =>
+        event.type === 'GOTO_STEP'
+          ? Math.min(Math.max(event.step, 0), context.totalSteps - 1)
+          : context.step,
+    }),
   },
 }).createMachine({
   id: 'onboarding',
   initial: 'editing',
   context: {
     step: 0,
-    totalSteps: 4,
+    totalSteps: 5,
   },
   states: {
     editing: {
@@ -48,6 +57,9 @@ export const onboardingMachine = setup({
         CONTINUE: {
           guard: ({ context }) => context.step > 1 && context.step < context.totalSteps - 1,
           actions: 'nextStep',
+        },
+        GOTO_STEP: {
+          actions: 'gotoStep',
         },
         START_LOCATION_SUBMIT: {
           guard: ({ context }) => context.step === 0,
