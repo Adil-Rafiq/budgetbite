@@ -377,21 +377,119 @@ class FoodpandaParser:
                 price=current_price,
                 original_price=original_price,
                 image_url=image_url,
+                # Filled in by parse_menu_items, which reads the section the
+                # product sits under. A single product knows nothing about it.
+                category=None,
             )
 
         except Exception as e:
             print(f"[WARN] Failed to parse menu item {index}: {e}")
             return None
 
+    # Vendor pages group products under a section per menu category. The
+    # container's markup has changed more than once, so try the known shapes in
+    # order and take the first that actually holds products.
+    _CATEGORY_SECTION_SELECTORS = (
+        '[data-testid="menu-category"]',
+        'section[class*="dish-category"]',
+        'div[class*="dish-category-section"]',
+        'div[class*="menu-category"]',
+    )
+
+    # Where the section's own title lives inside that container.
+    _CATEGORY_TITLE_SELECTORS = (
+        '[data-testid="menu-category-name"]',
+        '[class*="dish-category-title"]',
+        "h2",
+        "h3",
+    )
+
+    @staticmethod
+    def _category_title(section: Locator) -> Optional[str]:
+        """Read a section's heading, trying each known title selector."""
+        for selector in FoodpandaParser._CATEGORY_TITLE_SELECTORS:
+            heading = section.locator(selector)
+            if heading.count() == 0:
+                continue
+            title = heading.first.inner_text().strip()
+            # Foodpanda appends a count to some headings ("Deals (12)"); the
+            # count is not part of the category's name and would fragment the
+            # grouping the moment the vendor adds an item.
+            title = re.sub(r"\s*\(\s*\d+\s*\)\s*$", "", title).strip()
+            if title:
+                return title[:120]
+        return None
+
+    @staticmethod
+    def _menu_categories_by_item_name(page: Page) -> dict[str, str]:
+        """Map each menu item's name to the section heading above it.
+
+        Keyed by name because that is the only identifier shared between the
+        section walk and the flat product parse — and the API dedupes menu items
+        by (restaurant, name) anyway, so a name is already unique per vendor.
+
+        Returns an empty map when the page has no recognisable sections, which
+        is a legitimate outcome: some vendors really do publish one flat list.
+        """
+        for selector in FoodpandaParser._CATEGORY_SECTION_SELECTORS:
+            try:
+                sections = page.locator(selector).all()
+            except Exception:
+                continue
+            if not sections:
+                continue
+
+            mapping: dict[str, str] = {}
+            for section in sections:
+                try:
+                    title = FoodpandaParser._category_title(section)
+                    if not title:
+                        continue
+                    for product in section.get_by_test_id("menu-product").all():
+                        name_locator = product.get_by_test_id("menu-product-name")
+                        if name_locator.count() == 0:
+                            continue
+                        name = name_locator.first.inner_text().strip()
+                        if name:
+                            mapping[name] = title
+                except Exception as e:
+                    print(f"[WARN] Failed to read a menu section: {e}")
+                    continue
+
+            if mapping:
+                return mapping
+
+        return {}
+
     @staticmethod
     def parse_menu_items(page: Page) -> List[MenuItem]:
-        """Parse all menu items from restaurant page."""
+        """Parse all menu items from restaurant page, grouped by section.
+
+        The flat product list stays the source of truth for *which* items exist;
+        the section walk only decorates them. Doing it the other way round would
+        mean a vendor whose section markup we no longer recognise loses their
+        entire menu rather than just its grouping.
+        """
         products = page.get_by_test_id("menu-product").all()
         items = []
-        
+
         for i, product in enumerate(products):
             item = FoodpandaParser.parse_menu_item(product, i)
             if item:
                 items.append(item)
-        
+
+        categories = FoodpandaParser._menu_categories_by_item_name(page)
+        if categories:
+            for item in items:
+                item["category"] = categories.get(item["name"])
+            grouped = sum(1 for item in items if item["category"])
+            print(
+                f"[INFO] Grouped {grouped}/{len(items)} menu items into "
+                f"{len(set(categories.values()))} categories"
+            )
+        elif items:
+            # Not an error — but if it starts happening to every vendor, the
+            # section selectors have drifted and the menu pages quietly flatten.
+            print(f"[INFO] No menu sections found; {len(items)} items left uncategorized")
+
         return items

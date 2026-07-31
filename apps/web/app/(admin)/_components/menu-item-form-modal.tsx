@@ -49,6 +49,7 @@ export function MenuItemFormModal({ open, onOpenChange, restaurantId, menuItem }
       price: menuItem?.price ?? undefined,
       description: menuItem?.description ?? undefined,
       imageUrl: menuItem?.imageUrl ?? undefined,
+      category: menuItem?.category ?? undefined,
     },
   });
 
@@ -107,6 +108,24 @@ export function MenuItemFormModal({ open, onOpenChange, restaurantId, menuItem }
               {...register('description', { setValueAs: optionalString })}
             />
             {errors.description && <p className={errorClass}>{errors.description.message}</p>}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="category" className={labelClass} style={labelStyle}>
+              Section
+            </Label>
+            <Input
+              id="category"
+              placeholder="optional — e.g. Starters"
+              {...register('category', { setValueAs: optionalString })}
+            />
+            {/* Grouping is by exact string, so a stray "starters" makes a
+                second section next to "Starters" on the public menu. */}
+            <p className="text-[11px] text-slate">
+              Groups the item on the restaurant page. Must match other items in the same section
+              exactly.
+            </p>
+            {errors.category && <p className={errorClass}>{errors.category.message}</p>}
           </div>
 
           <div className="flex flex-col gap-2">

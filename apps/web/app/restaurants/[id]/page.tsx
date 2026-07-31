@@ -4,11 +4,22 @@ import { useEffect, useMemo, useState, use } from 'react';
 import Link from 'next/link';
 import { ExternalLink, Phone, Search, Star, Utensils } from 'lucide-react';
 
-import { classifyBudgetFit, estimateMealCost, haversineKm } from '@repo/shared';
-import type { BudgetFit, MenuItem } from '@repo/shared';
+import {
+  classifyBudgetFit,
+  estimateMealCost,
+  haversineKm,
+  maxMenuPriceWithinBudget,
+  UNCATEGORIZED,
+} from '@repo/shared';
+import type { BudgetFit, MenuItem, MenuSort } from '@repo/shared';
 
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
-import { useRestaurant, useRestaurantMenu } from '@/hooks/use-restaurant';
+import {
+  MENU_PAGE_SIZE,
+  useRestaurant,
+  useRestaurantMenu,
+  useRestaurantMenuFacets,
+} from '@/hooks/use-restaurant';
 import { useUser } from '@/hooks/use-user';
 import { pricesUpdatedAgoLabel } from '@/lib/date';
 import { formatPKR } from '@/lib/currency';
@@ -36,8 +47,8 @@ import { RestaurantHeaderSkeleton } from '../_components/restaurant-header-skele
 import { BudgetFitBadge } from '@/components/budget-fit-badge';
 
 const MENU_CONTROLS_THRESHOLD = 6;
-/** Menus run to hundreds of items; render a screenful at a time. */
-const MENU_PAGE_SIZE = 24;
+/** Typing shouldn't fire a request per keystroke now that search hits the API. */
+const SEARCH_DEBOUNCE_MS = 300;
 
 /**
  * Menu thumbnail with a real fallback.
@@ -70,13 +81,103 @@ function MenuItemImage({ src, alt }: { src: string | null | undefined; alt: stri
   );
 }
 
-type MenuSort = 'default' | 'price-asc' | 'price-desc' | 'fit';
+/**
+ * Heading over the trailing block of items whose section the scrape never
+ * learned. Only ever drawn when some *other* item does have one — a menu with
+ * no sections at all gets no headings, not one called "More items".
+ */
+const UNCATEGORIZED_LABEL = 'More items';
 
-const FIT_RANK: Record<BudgetFit, number> = {
-  green: 0,
-  amber: 1,
-  red: 2,
-};
+function MenuItemCard({
+  item,
+  fit,
+  delivered,
+  onAddToPlan,
+}: {
+  item: MenuItem;
+  fit: BudgetFit | null;
+  delivered: number;
+  /** Null when there's no active plan to add to. */
+  onAddToPlan: (() => void) | null;
+}) {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
+      <MenuItemImage src={item.imageUrl} alt={item.name} />
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Menu names are long and compound ("Chicken Tikka Boneless Half
+                  + 2 Naan + Drink"); `truncate` on a third-width card amputated
+                  them with no title attribute and no way to read the rest. */}
+              <p className="min-w-0 text-[14px] font-medium text-charcoal [overflow-wrap:anywhere] line-clamp-2">
+                {item.name}
+              </p>
+              {fit && <BudgetFitBadge fit={fit} />}
+            </div>
+            {item.description && (
+              <p className="mt-1 line-clamp-3 text-[12px] text-slate">{item.description}</p>
+            )}
+          </div>
+          <div className="flex shrink-0 flex-col items-end">
+            <span className="whitespace-nowrap font-display text-base font-semibold tabular-nums text-charcoal">
+              {formatPKR(item.price)}
+            </span>
+            {delivered !== item.price && (
+              <span className="whitespace-nowrap text-[11px] tabular-nums text-slate">
+                {formatPKR(delivered)} delivered
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-auto flex items-center gap-2 pt-1">
+          <FoodPreferenceToggle targetType="menu_item" targetId={item.id} name={item.name} />
+          {onAddToPlan && (
+            <button
+              type="button"
+              onClick={onAddToPlan}
+              className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-sage bg-white px-3 text-[12px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+            >
+              Add to plan
+              <span aria-hidden className="opacity-70">
+                +
+              </span>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface MenuGroup {
+  key: string;
+  /** Null renders the grid with no heading above it. */
+  heading: string | null;
+  items: MenuItem[];
+}
+
+/**
+ * Split a page-accumulated item list into rendered sections.
+ *
+ * Works purely off "the category changed since the previous item", which is
+ * sound only because the server returns `default` order as (category, name).
+ * That is also why `withSections` is false for price sorts — there the same
+ * category recurs every few cards and a heading per card is worse than none.
+ */
+function groupMenuItems(items: MenuItem[], withSections: boolean): MenuGroup[] {
+  if (!withSections) return items.length ? [{ key: 'all', heading: null, items }] : [];
+
+  const groups: MenuGroup[] = [];
+  for (const item of items) {
+    const last = groups[groups.length - 1];
+    const heading = item.category ?? UNCATEGORIZED_LABEL;
+    if (last && last.heading === heading) last.items.push(item);
+    else groups.push({ key: heading, heading, items: [item] });
+  }
+  return groups;
+}
 
 function buildFoodpandaUrl(externalId: string, slug: string): string {
   // Scraped slugs sometimes carry the tracking query they were found with
@@ -92,19 +193,34 @@ const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-s
 const inputClass = 'bg-canvas border-sage-edge text-charcoal';
 const ctaBase = `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-4 text-[13px] font-semibold transition-colors ${FOCUS_RING}`;
 
+/** Section chip. 44px tall on touch, tightened once a pointer is available. */
+const chipClass = (active: boolean) =>
+  `inline-flex min-h-11 items-center rounded-full border px-3.5 text-[12px] font-medium transition-colors sm:min-h-9 ${FOCUS_RING} ${
+    active
+      ? 'border-green-deep bg-green/10 text-green-deep'
+      : 'border-sage bg-canvas text-charcoal hover:border-green'
+  }`;
+
 export default function RestaurantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const restaurantQuery = useRestaurant(id);
-  const menuQuery = useRestaurantMenu(id);
+  const facetsQuery = useRestaurantMenuFacets(id);
   const { data: activePlan } = useActiveBudgetPlan();
   const { data: user } = useUser();
 
   /** null = closed; `{ item: null }` = log a whole order rather than one dish. */
   const [logTarget, setLogTarget] = useState<{ item: MenuItem | null } | null>(null);
   const [menuSearch, setMenuSearch] = useState('');
+  /** The debounced copy of `menuSearch` — this is the one the server sees. */
+  const [searchTerm, setSearchTerm] = useState('');
   const [menuSort, setMenuSort] = useState<MenuSort>('default');
   const [hideOverBudget, setHideOverBudget] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(MENU_PAGE_SIZE);
+  const [category, setCategory] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setSearchTerm(menuSearch.trim()), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [menuSearch]);
 
   const r = restaurantQuery.data;
   const hasActivePlan = !!activePlan;
@@ -121,7 +237,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
       ? haversineKm(userLat, userLng, r.latitude, r.longitude)
       : null;
 
-  const canSortByFit = hasActivePlan && avgPerMeal > 0;
+  const canShowFit = hasActivePlan && avgPerMeal > 0;
 
   // What a dish here actually costs to receive, not what the menu prints.
   const deliveredCost = useMemo(
@@ -136,69 +252,82 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
 
   const fitOf = useMemo(
     () => (price: number) =>
-      canSortByFit
+      canShowFit
         ? classifyBudgetFit({
             itemPrice: deliveredCost(price),
             avgBudgetPerRemainingMeal: avgPerMeal,
             amountRemaining,
           })
         : null,
-    [canSortByFit, deliveredCost, avgPerMeal, amountRemaining],
+    [canShowFit, deliveredCost, avgPerMeal, amountRemaining],
   );
 
-  const menuStats = useMemo(() => {
-    const items = menuQuery.data ?? [];
-    if (items.length === 0) return null;
-    const prices = items.map((i) => i.price);
-    const sum = prices.reduce((a, b) => a + b, 0);
-    const newestUpdate = items.reduce<number>(
-      (max, i) => Math.max(max, new Date(i.updatedAt).getTime()),
-      0,
+  /**
+   * "Hide over-budget" as a price the server can filter on.
+   *
+   * `null` from the helper means no dish can qualify — the delivery fee and
+   * minimum order already break the ceiling on their own — and a ceiling of 0
+   * says exactly that to the API, since menu prices are positive. Collapsing it
+   * to "no filter" would show a full menu under a pressed "Hide over-budget"
+   * button, which is the opposite of what it claims.
+   */
+  const maxPrice = useMemo(() => {
+    if (!hideOverBudget || !canShowFit) return undefined;
+    return (
+      maxMenuPriceWithinBudget({
+        avgBudgetPerRemainingMeal: avgPerMeal,
+        amountRemaining,
+        deliveryFee: r?.deliveryFee,
+        minimumOrder: r?.minimumOrder,
+      }) ?? 0
     );
-    return {
-      count: items.length,
-      min: Math.min(...prices),
-      max: Math.max(...prices),
-      avg: sum / items.length,
-      freshness: newestUpdate > 0 ? pricesUpdatedAgoLabel(new Date(newestUpdate)) : null,
-    };
-  }, [menuQuery.data]);
+  }, [hideOverBudget, canShowFit, avgPerMeal, amountRemaining, r?.deliveryFee, r?.minimumOrder]);
 
-  const filteredMenu = useMemo(() => {
-    let items = menuQuery.data ?? [];
+  const menuFilters = useMemo(
+    () => ({
+      sort: menuSort,
+      q: searchTerm || undefined,
+      category: category ?? undefined,
+      maxPrice,
+    }),
+    [menuSort, searchTerm, category, maxPrice],
+  );
 
-    const q = menuSearch.trim().toLowerCase();
-    if (q) items = items.filter((i) => i.name.toLowerCase().includes(q));
+  const menuQuery = useRestaurantMenu(id, menuFilters);
 
-    if (hideOverBudget && canSortByFit) {
-      items = items.filter((i) => fitOf(i.price) !== 'red');
-    }
+  const facets = facetsQuery.data;
+  const menuItems = useMemo(
+    () => menuQuery.data?.pages.flatMap((page) => page.data) ?? [],
+    [menuQuery.data],
+  );
+  const matchCount = menuQuery.data?.pages[0]?.meta.total ?? 0;
+  const freshness = facets?.pricesUpdatedAt ? pricesUpdatedAgoLabel(facets.pricesUpdatedAt) : null;
 
-    if (menuSort === 'price-asc') {
-      items = [...items].sort((a, b) => a.price - b.price);
-    } else if (menuSort === 'price-desc') {
-      items = [...items].sort((a, b) => b.price - a.price);
-    } else if (menuSort === 'fit' && canSortByFit) {
-      items = [...items].sort((a, b) => {
-        const fa = fitOf(a.price);
-        const fb = fitOf(b.price);
-        if (!fa || !fb) return 0;
-        return FIT_RANK[fa] - FIT_RANK[fb];
-      });
-    }
+  /**
+   * Section headings are only meaningful when the server is returning the
+   * vendor's own order — a price sort interleaves categories, so a heading
+   * would appear every second card. They are also pointless once a single
+   * category is selected, and on a menu that has no sections at all.
+   */
+  const namedCategories = facets?.categories.filter((c) => c.category !== null) ?? [];
+  const showSections = menuSort === 'default' && !category && namedCategories.length > 0;
 
-    return items;
-  }, [menuQuery.data, menuSearch, menuSort, hideOverBudget, canSortByFit, fitOf]);
+  const menuGroups = useMemo(
+    () => groupMenuItems(menuItems, showSections),
+    [menuItems, showSections],
+  );
 
-  // A narrowed list should start from the top, not deep in a previous page.
-  useEffect(() => {
-    setVisibleCount(MENU_PAGE_SIZE);
-  }, [menuSearch, menuSort, hideOverBudget]);
+  const showMenuControls = (facets?.count ?? 0) > MENU_CONTROLS_THRESHOLD;
+  const filtersActive =
+    searchTerm.length > 0 || menuSort !== 'default' || hideOverBudget || !!category;
 
-  const showMenuControls = (menuStats?.count ?? 0) > MENU_CONTROLS_THRESHOLD;
-  const filtersActive = menuSearch.trim().length > 0 || menuSort !== 'default' || hideOverBudget;
-  const visibleMenu = filteredMenu.slice(0, visibleCount);
-  const hasMore = filteredMenu.length > visibleMenu.length;
+  const clearFilters = () => {
+    setMenuSearch('');
+    setSearchTerm('');
+    setMenuSort('default');
+    setHideOverBudget(false);
+    setCategory(null);
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
@@ -352,22 +481,31 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
           <h2 className="font-display text-[22px] font-semibold tracking-tight text-charcoal">
             Menu
           </h2>
-          {menuStats && (
+          {facets && facets.count > 0 && (
             // Filtering 365 items down to 3 changed this number silently; a
             // screen-reader user had to tab into the grid to learn anything
-            // had happened.
+            // had happened. The totals come from the facets endpoint, so the
+            // "of 365" stays put while the reader narrows the list.
             <span role="status" aria-live="polite" className="text-[12px] tabular-nums text-slate">
               {filtersActive
-                ? `${filteredMenu.length} of ${menuStats.count} items`
-                : `${menuStats.count} item${menuStats.count === 1 ? '' : 's'}`}{' '}
-              · {formatPKR(menuStats.min)} – {formatPKR(menuStats.max)} · avg{' '}
-              {formatPKR(menuStats.avg)}
-              {menuStats.freshness ? ` · ${menuStats.freshness}` : ''}
+                ? `${matchCount} of ${facets.count} items`
+                : `${facets.count} item${facets.count === 1 ? '' : 's'}`}
+              {facets.minPrice != null && facets.maxPrice != null && (
+                <>
+                  {' '}
+                  · {formatPKR(facets.minPrice)} – {formatPKR(facets.maxPrice)}
+                </>
+              )}
+              {facets.avgPrice != null && <> · avg {formatPKR(facets.avgPrice)}</>}
+              {freshness ? ` · ${freshness}` : ''}
+              {/* Filtering is a round trip now. Saying so beats a list that
+                  sits still for 300ms and then silently changes underneath. */}
+              {menuQuery.isFetching && !menuQuery.isFetchingNextPage && ' · updating…'}
             </span>
           )}
         </div>
 
-        {hasActivePlan && !canSortByFit && (
+        {hasActivePlan && !canShowFit && (
           <p className="text-[12px] text-slate">
             No meals left in this plan, so budget fit isn&apos;t shown. Prices below are menu prices
             {r?.deliveryFee ? ` and exclude the ${formatPKR(r.deliveryFee)} delivery fee` : ''}.
@@ -405,17 +543,21 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="default">Default</SelectItem>
+                    {/* "Best fit first" used to be a fourth option. It ranked by
+                        budget fit, which is a monotonic function of price — so
+                        it produced the same order as "Price: low → high", only
+                        coarser. One of the two had to go, and the one that
+                        still sorts within a fit band is the one that stayed. */}
+                    <SelectItem value="default">
+                      {showSections || namedCategories.length > 0 ? 'Menu order' : 'Default'}
+                    </SelectItem>
                     <SelectItem value="price-asc">Price: low → high</SelectItem>
                     <SelectItem value="price-desc">Price: high → low</SelectItem>
-                    <SelectItem value="fit" disabled={!canSortByFit}>
-                      Best fit first {canSortByFit ? '' : '— needs an active plan'}
-                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              {canSortByFit && (
+              {canShowFit && (
                 <button
                   type="button"
                   onClick={() => setHideOverBudget((v) => !v)}
@@ -430,6 +572,48 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                 </button>
               )}
             </div>
+
+            {/* Sections as filters. On a 365-item menu this is the difference
+                between fifteen taps of "Show more" and one tap to the eleven
+                things the vendor calls Desserts — and it costs one request for
+                eleven rows instead of paging through the other 354. */}
+            {facets && facets.categories.length > 1 && (
+              <div className="border-t border-sage px-4 py-3">
+                <div
+                  role="group"
+                  aria-label="Filter by menu section"
+                  className="flex flex-wrap gap-2"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setCategory(null)}
+                    aria-pressed={category === null}
+                    className={chipClass(category === null)}
+                  >
+                    All
+                    <span className="ml-1.5 tabular-nums opacity-70">{facets.count}</span>
+                  </button>
+                  {facets.categories.map((c) => {
+                    // A null category is a real group of items but not a real
+                    // name, so it travels as a sentinel and is labelled rather
+                    // than printed.
+                    const value = c.category ?? UNCATEGORIZED;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setCategory(category === value ? null : value)}
+                        aria-pressed={category === value}
+                        className={chipClass(category === value)}
+                      >
+                        {c.category ?? UNCATEGORIZED_LABEL}
+                        <span className="ml-1.5 tabular-nums opacity-70">{c.count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -441,21 +625,23 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
           </div>
         ) : menuQuery.error ? (
           <DataError message="Could not load menu." onRetry={() => menuQuery.refetch()} />
-        ) : !menuQuery.data?.length ? (
+        ) : facets && facets.count === 0 ? (
           <div className="rounded-2xl border border-dashed border-sage bg-white p-6 text-center text-[13px] text-slate">
             No menu items yet.
           </div>
-        ) : filteredMenu.length === 0 ? (
+        ) : matchCount === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sage bg-white p-6 text-center">
-            <p className="text-[13px] text-slate">No items match your filters.</p>
+            <p className="text-[13px] text-slate">
+              {hideOverBudget && maxPrice === 0
+                ? // The honest reason, rather than a shrug: with this vendor's
+                  // fee and minimum order, no dish can land inside the budget.
+                  'Nothing here comes in under budget once delivery and the minimum order are counted.'
+                : 'No items match your filters.'}
+            </p>
             {filtersActive && (
               <button
                 type="button"
-                onClick={() => {
-                  setMenuSearch('');
-                  setMenuSort('default');
-                  setHideOverBudget(false);
-                }}
+                onClick={clearFilters}
                 className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
               >
                 Clear filters
@@ -464,83 +650,44 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
           </div>
         ) : (
           <>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {visibleMenu.map((item) => {
-                const fit = fitOf(item.price);
-                const delivered = deliveredCost(item.price);
-                return (
-                  <div
-                    key={item.id}
-                    className="flex flex-col overflow-hidden rounded-2xl border border-sage bg-white shadow-sm"
-                  >
-                    <MenuItemImage src={item.imageUrl} alt={item.name} />
-                    <div className="flex flex-1 flex-col gap-3 p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            {/* Menu names are long and compound ("Chicken Tikka
-                                Boneless Half + 2 Naan + Drink"); `truncate` on
-                                a third-width card amputated them with no title
-                                attribute and no way to read the rest. */}
-                            <p className="min-w-0 text-[14px] font-medium text-charcoal [overflow-wrap:anywhere] line-clamp-2">
-                              {item.name}
-                            </p>
-                            {fit && <BudgetFitBadge fit={fit} />}
-                          </div>
-                          {item.description && (
-                            <p className="mt-1 line-clamp-3 text-[12px] text-slate">
-                              {item.description}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex shrink-0 flex-col items-end">
-                          <span className="whitespace-nowrap font-display text-base font-semibold tabular-nums text-charcoal">
-                            {formatPKR(item.price)}
-                          </span>
-                          {delivered !== item.price && (
-                            <span className="whitespace-nowrap text-[11px] tabular-nums text-slate">
-                              {formatPKR(delivered)} delivered
-                            </span>
-                          )}
-                        </div>
-                      </div>
+            {menuGroups.map((group) => (
+              <div key={group.key} className="flex flex-col gap-3">
+                {group.heading && (
+                  // Sections build up across pages rather than being computed
+                  // from a complete menu: the server returns items in category
+                  // order, so a heading is simply where the category changed.
+                  <h3 className="pt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate">
+                    {group.heading}
+                  </h3>
+                )}
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {group.items.map((item) => (
+                    <MenuItemCard
+                      key={item.id}
+                      item={item}
+                      fit={fitOf(item.price)}
+                      delivered={deliveredCost(item.price)}
+                      onAddToPlan={hasActivePlan ? () => setLogTarget({ item }) : null}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
 
-                      <div className="mt-auto flex items-center gap-2 pt-1">
-                        <FoodPreferenceToggle
-                          targetType="menu_item"
-                          targetId={item.id}
-                          name={item.name}
-                        />
-                        {hasActivePlan && (
-                          <button
-                            type="button"
-                            onClick={() => setLogTarget({ item })}
-                            className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-sage bg-white px-3 text-[12px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
-                          >
-                            Add to plan
-                            <span aria-hidden className="opacity-70">
-                              +
-                            </span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {hasMore && (
+            {menuQuery.hasNextPage && (
               <div className="flex flex-col items-center gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setVisibleCount((c) => c + MENU_PAGE_SIZE)}
-                  className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-5 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas ${FOCUS_RING}`}
+                  onClick={() => menuQuery.fetchNextPage()}
+                  disabled={menuQuery.isFetchingNextPage}
+                  className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-5 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:cursor-wait disabled:opacity-60 ${FOCUS_RING}`}
                 >
-                  Show {Math.min(MENU_PAGE_SIZE, filteredMenu.length - visibleMenu.length)} more
+                  {menuQuery.isFetchingNextPage
+                    ? 'Loading…'
+                    : `Show ${Math.min(MENU_PAGE_SIZE, matchCount - menuItems.length)} more`}
                 </button>
                 <p aria-live="polite" className="text-[11px] tabular-nums text-slate">
-                  Showing {visibleMenu.length} of {filteredMenu.length}
+                  Showing {menuItems.length} of {matchCount}
                 </p>
               </div>
             )}

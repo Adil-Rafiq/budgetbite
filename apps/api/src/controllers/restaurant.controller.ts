@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { ListRestaurantsQuery } from '@repo/shared';
+import type { ListMenuQuery, ListRestaurantsQuery } from '@repo/shared';
 
 import { restaurantService } from '../services/restaurant.service.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
@@ -22,6 +22,12 @@ export async function getRestaurant(req: Request, res: Response): Promise<void> 
 
 export async function getMenu(req: Request, res: Response): Promise<void> {
   const { id } = req.params as IdParams;
-  const menu = await restaurantService.getMenu(id);
+  const menu = await restaurantService.listMenu(id, req.query as unknown as ListMenuQuery);
   res.json(menu);
+}
+
+export async function getMenuFacets(req: Request, res: Response): Promise<void> {
+  const { id } = req.params as IdParams;
+  const facets = await restaurantService.getMenuFacets(id);
+  res.json(facets);
 }

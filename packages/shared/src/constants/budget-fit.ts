@@ -64,6 +64,44 @@ export function estimateMealCost({
 }
 
 /**
+ * The highest *menu* price that would still avoid a red badge — the inverse of
+ * `classifyBudgetFit` composed with `estimateMealCost`.
+ *
+ * "Hide over-budget" used to be a `.filter()` in the browser, which only worked
+ * because the browser held the whole menu. Now that the menu is paged, the
+ * filter has to travel to the database as a plain `price <= X`, and X is this.
+ * Deriving it here rather than re-implementing the thresholds in SQL is the
+ * point: `FIT_AMBER_RATIO` keeps exactly one definition, and the row the server
+ * excludes is the row the badge would have painted red.
+ *
+ * Returns null when *nothing* on the menu can qualify — a vendor whose delivery
+ * fee and minimum order already exceed the ceiling on their own. Null means
+ * "no price passes", which is not the same as "no limit", so callers must not
+ * collapse it to undefined.
+ */
+export function maxMenuPriceWithinBudget({
+  avgBudgetPerRemainingMeal,
+  amountRemaining,
+  deliveryFee,
+  minimumOrder,
+}: {
+  avgBudgetPerRemainingMeal: number;
+  amountRemaining: number;
+  deliveryFee?: number | null;
+  minimumOrder?: number | null;
+}): number | null {
+  const fee = deliveryFee ?? 0;
+  const floor = minimumOrder ?? 0;
+  const ceiling = Math.min(amountRemaining, avgBudgetPerRemainingMeal * FIT_AMBER_RATIO);
+
+  // Below the minimum order the delivered cost is pinned at `floor + fee`
+  // whatever the dish costs, so if that alone breaks the ceiling no item can
+  // pass — including the cheapest one.
+  if (floor + fee > ceiling) return null;
+  return ceiling - fee;
+}
+
+/**
  * The price a whole restaurant should be judged on in a list.
  *
  * `minItemPrice` is the cheapest thing on the menu — a naan, a raita, a soft

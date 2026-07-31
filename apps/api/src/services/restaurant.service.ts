@@ -3,8 +3,11 @@ import type {
   CreateRestaurantInput,
   UpdateRestaurantInput,
   CreateMenuItemInput,
+  ListMenuQuery,
+  MenuFacets,
   UpdateMenuItemInput,
 } from '@repo/shared';
+import { toNumberOrNull, UNCATEGORIZED } from '@repo/shared';
 import {
   budgetPlanRepository,
   mealPinRepository,
@@ -127,6 +130,10 @@ export const restaurantService = {
     return this.toRestaurantResponse(restaurant);
   },
 
+  /**
+   * The whole menu in one response. Kept for the admin editor, which edits rows
+   * in place and genuinely needs all of them. Public callers use `listMenu`.
+   */
   async getMenu(restaurantId: string) {
     const restaurant = await restaurantRepository.findById(restaurantId);
     if (!restaurant) throw new AppError(404, 'Restaurant not found', 'NOT_FOUND');
@@ -135,6 +142,47 @@ export const restaurantService = {
       ...item,
       price: Number(item.price),
     }));
+  },
+
+  /** One filtered, sorted page of a restaurant's menu. */
+  async listMenu(restaurantId: string, query: ListMenuQuery) {
+    const restaurant = await restaurantRepository.findById(restaurantId);
+    if (!restaurant) throw new AppError(404, 'Restaurant not found', 'NOT_FOUND');
+
+    // `uncategorized` is a sentinel, not a category name: it selects the rows
+    // whose category is NULL, which no `WHERE category = ...` can ever match.
+    const wantsUncategorized = query.category === UNCATEGORIZED;
+
+    const { rows, total } = await menuRepository.findPage(restaurantId, {
+      limit: query.limit,
+      offset: query.offset,
+      sort: query.sort,
+      q: query.q,
+      maxPrice: query.maxPrice,
+      category: wantsUncategorized ? undefined : query.category,
+      categoryIsNull: wantsUncategorized,
+    });
+
+    return {
+      data: rows.map((item) => ({ ...item, price: Number(item.price) })),
+      meta: { total, limit: query.limit, offset: query.offset },
+    };
+  },
+
+  /** Menu-wide totals and the section list, unaffected by page filters. */
+  async getMenuFacets(restaurantId: string): Promise<MenuFacets> {
+    const restaurant = await restaurantRepository.findById(restaurantId);
+    if (!restaurant) throw new AppError(404, 'Restaurant not found', 'NOT_FOUND');
+
+    const facets = await menuRepository.facets(restaurantId);
+    return {
+      count: facets.count,
+      minPrice: toNumberOrNull(facets.minPrice),
+      maxPrice: toNumberOrNull(facets.maxPrice),
+      avgPrice: toNumberOrNull(facets.avgPrice),
+      pricesUpdatedAt: facets.pricesUpdatedAt,
+      categories: facets.categories,
+    };
   },
 
   // Admin / scraper: create, update, delete restaurants and menu items
@@ -231,6 +279,7 @@ export const restaurantService = {
         description: item.description ?? null,
         price: String(item.price),
         imageUrl: item.imageUrl ?? null,
+        category: item.category ?? null,
       })),
     );
     await auditService.record({
@@ -258,6 +307,10 @@ export const restaurantService = {
       ...(input.description !== undefined && { description: input.description }),
       ...(input.price !== undefined && { price: String(input.price) }),
       ...(input.imageUrl !== undefined && { imageUrl: input.imageUrl }),
+      // An admin clearing the field means "this item has no section", which is
+      // the column's null — the create schema strips empty strings, so an
+      // explicit undefined is the only way to leave it untouched.
+      ...(input.category !== undefined && { category: input.category ?? null }),
     });
     await auditService.record({
       actor,

@@ -49,6 +49,12 @@ export interface SeedMenuItemFixture {
   description: string;
   /** PKR */
   price: number;
+  /**
+   * The vendor's menu section. Optional so a fixture can deliberately leave it
+   * off — the restaurant page has to stay legible for the scraped rows that
+   * have no category, and the seed is where that case gets looked at.
+   */
+  category?: string;
 }
 
 export interface SeedRestaurantFixture {
@@ -82,22 +88,40 @@ export const SEED_RESTAURANTS: SeedRestaurantFixture[] = [
     items: [
       {
         name: 'Halwa Puri Platter',
+        category: 'Breakfast Platters',
         description: '2 puris with halwa, chanay and achaar',
         price: 350,
       },
-      { name: 'Anda Paratha', description: 'Crispy paratha with two fried eggs', price: 220 },
+      {
+        name: 'Anda Paratha',
+        description: 'Crispy paratha with two fried eggs',
+        price: 220,
+        category: 'Parathas',
+      },
       {
         name: 'Chicken Cheese Omelette',
+        category: 'Breakfast Platters',
         description: 'Three-egg omelette with chicken chunks and cheddar',
         price: 320,
       },
-      { name: 'Doodh Patti Chai', description: 'Strong milk tea, full cup', price: 120 },
+      {
+        name: 'Doodh Patti Chai',
+        description: 'Strong milk tea, full cup',
+        price: 120,
+        category: 'Chai & Drinks',
+      },
       {
         name: 'Aloo Paratha with Dahi',
+        category: 'Parathas',
         description: 'Stuffed potato paratha served with yogurt',
         price: 260,
       },
-      { name: 'French Toast', description: 'Three slices with honey drizzle', price: 280 },
+      {
+        name: 'French Toast',
+        description: 'Three slices with honey drizzle',
+        price: 280,
+        category: 'Breakfast Platters',
+      },
     ],
   },
   {
@@ -114,30 +138,40 @@ export const SEED_RESTAURANTS: SeedRestaurantFixture[] = [
     items: [
       {
         name: 'Peanut Butter Banana Oats',
+        category: 'Breakfast',
         description: 'Overnight oats with banana, peanut butter and honey',
         price: 340,
       },
       {
         name: 'Chicken Caesar Salad',
+        category: 'Salads',
         description: 'Grilled chicken, romaine, parmesan, house dressing',
         price: 620,
       },
       {
         name: 'Fruit Yogurt Parfait',
+        category: 'Breakfast',
         description: 'Seasonal fruit with granola and yogurt',
         price: 380,
       },
       {
         name: 'Grilled Chicken Wrap',
+        category: 'Wraps',
         description: 'Whole-wheat wrap with grilled chicken and veggies',
         price: 540,
       },
       {
         name: 'Quinoa Power Bowl',
+        category: 'Bowls',
         description: 'Quinoa, chickpeas, roasted veg, tahini dressing',
         price: 690,
       },
-      { name: 'Fresh Orange Juice', description: 'Cold-pressed, no sugar added', price: 250 },
+      {
+        name: 'Fresh Orange Juice',
+        description: 'Cold-pressed, no sugar added',
+        price: 250,
+        category: 'Drinks',
+      },
     ],
   },
   {
@@ -154,35 +188,41 @@ export const SEED_RESTAURANTS: SeedRestaurantFixture[] = [
     items: [
       {
         name: 'Zinger Burger',
+        category: 'Burgers',
         description: 'Crispy fried chicken fillet with mayo and lettuce',
         price: 480,
       },
       {
         name: 'Beef Smash Burger',
+        category: 'Burgers',
         description: 'Double smashed patties with cheese and house sauce',
         price: 650,
       },
       {
         name: 'Crispy Chicken Wings (6 pcs)',
+        category: 'Sides',
         description: 'Fried wings tossed in buffalo sauce',
         price: 450,
       },
       {
         name: 'Loaded Fries',
+        category: 'Sides',
         description: 'Fries with cheese sauce, jalapeños and chicken bits',
         price: 350,
       },
       {
         name: 'Chicken Shawarma Roll',
+        category: 'Rolls',
         description: 'Grilled chicken strips with garlic sauce in pita',
         price: 300,
       },
       {
         name: 'Grilled Chicken Sandwich',
+        category: 'Burgers',
         description: 'Chargrilled fillet with honey mustard',
         price: 520,
       },
-      { name: 'Soft Drink (500ml)', description: 'Chilled bottle', price: 90 },
+      { name: 'Soft Drink (500ml)', description: 'Chilled bottle', price: 90, category: 'Drinks' },
     ],
   },
   {
@@ -199,14 +239,30 @@ export const SEED_RESTAURANTS: SeedRestaurantFixture[] = [
     items: [
       {
         name: 'Chicken Biryani',
+        category: 'Biryani & Rice',
         description: 'Karachi-style spicy biryani with aloo, single serving',
         price: 380,
       },
-      { name: 'Beef Pulao', description: 'Bannu-style beef pulao with raita', price: 450 },
-      { name: 'Mutton Biryani', description: 'Mutton biryani with raita and salad', price: 650 },
-      { name: 'Raita', description: 'Mint yogurt side', price: 60 },
-      { name: 'Shami Kebab (2 pcs)', description: 'Beef shami kebabs, shallow fried', price: 180 },
-      { name: 'Zarda', description: 'Sweet rice with dry fruit', price: 200 },
+      {
+        name: 'Beef Pulao',
+        description: 'Bannu-style beef pulao with raita',
+        price: 450,
+        category: 'Biryani & Rice',
+      },
+      {
+        name: 'Mutton Biryani',
+        description: 'Mutton biryani with raita and salad',
+        price: 650,
+        category: 'Biryani & Rice',
+      },
+      { name: 'Raita', description: 'Mint yogurt side', price: 60, category: 'Sides' },
+      {
+        name: 'Shami Kebab (2 pcs)',
+        description: 'Beef shami kebabs, shallow fried',
+        price: 180,
+        category: 'Sides',
+      },
+      { name: 'Zarda', description: 'Sweet rice with dry fruit', price: 200, category: 'Desserts' },
     ],
   },
   {
@@ -223,19 +279,46 @@ export const SEED_RESTAURANTS: SeedRestaurantFixture[] = [
     items: [
       {
         name: 'Chicken Karahi (Half)',
+        category: 'Karahi & Handi',
         description: 'Half-kg chicken karahi with fresh tomatoes',
         price: 850,
       },
-      { name: 'Daal Makhani', description: 'Slow-cooked black daal with butter', price: 380 },
+      {
+        name: 'Daal Makhani',
+        description: 'Slow-cooked black daal with butter',
+        price: 380,
+        category: 'Curries',
+      },
       {
         name: 'Seekh Kebab (4 pcs)',
+        category: 'BBQ',
         description: 'Charcoal-grilled beef seekh kebabs',
         price: 480,
       },
-      { name: 'Butter Naan', description: 'Tandoor naan brushed with butter', price: 70 },
-      { name: 'Palak Paneer', description: 'Spinach with cottage cheese cubes', price: 420 },
-      { name: 'Chicken Handi (Half)', description: 'Creamy boneless chicken handi', price: 780 },
-      { name: 'Roghni Naan', description: 'Sesame-topped soft naan', price: 90 },
+      {
+        name: 'Butter Naan',
+        description: 'Tandoor naan brushed with butter',
+        price: 70,
+        category: 'Breads',
+      },
+      {
+        name: 'Palak Paneer',
+        description: 'Spinach with cottage cheese cubes',
+        price: 420,
+        category: 'Curries',
+      },
+      {
+        name: 'Chicken Handi (Half)',
+        description: 'Creamy boneless chicken handi',
+        price: 780,
+        category: 'Karahi & Handi',
+      },
+      {
+        name: 'Roghni Naan',
+        description: 'Sesame-topped soft naan',
+        price: 90,
+        category: 'Breads',
+      },
     ],
   },
 ];

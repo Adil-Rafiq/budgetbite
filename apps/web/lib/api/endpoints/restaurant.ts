@@ -1,8 +1,10 @@
 import { apiClient } from '@/lib/api/client';
 import type {
+  ListMenuQuery,
+  ListMenuResponse,
   ListRestaurantsQuery,
   ListRestaurantsResponse,
-  MenuItem,
+  MenuFacets,
   Restaurant,
 } from '@repo/shared';
 
@@ -24,5 +26,12 @@ export const restaurantApi = {
 
   getById: (id: string) => apiClient.get(`api/restaurants/${id}`).json<Restaurant>(),
 
-  getMenu: (id: string) => apiClient.get(`api/restaurants/${id}/menu`).json<MenuItem[]>(),
+  /** One page of a menu. Search, sort, category and price ceiling run server-side. */
+  getMenu: (id: string, query: Partial<ListMenuQuery>) =>
+    apiClient
+      .get(`api/restaurants/${id}/menu`, { searchParams: stripUndefined(query) })
+      .json<ListMenuResponse>(),
+
+  getMenuFacets: (id: string) =>
+    apiClient.get(`api/restaurants/${id}/menu/facets`).json<MenuFacets>(),
 };

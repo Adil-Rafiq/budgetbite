@@ -1,5 +1,5 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import type { ListRestaurantsQuery } from '@repo/shared';
+import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import type { ListMenuQuery, ListRestaurantsQuery } from '@repo/shared';
 
 import { restaurantApi } from '@/lib/api/endpoints/restaurant';
 
@@ -27,9 +27,48 @@ export const useRestaurant = (id: string) =>
     enabled: !!id,
   });
 
-export const useRestaurantMenu = (id: string) =>
+/** How many menu items one "Show more" adds — and one page request costs. */
+export const MENU_PAGE_SIZE = 24;
+
+/**
+ * A menu, one page at a time.
+ *
+ * The whole menu used to arrive in a single response — 365 items with their
+ * descriptions and image URLs — so that the browser could filter and sort them.
+ * The server does that now, which means "Show 24 more" fetches 24 more instead
+ * of merely revealing rows already paid for.
+ *
+ * `filters` deliberately excludes `limit`/`offset`: they belong to the page
+ * cursor, not the query identity, and putting them in the key would give every
+ * page its own cache entry rather than extending one list.
+ */
+export const useRestaurantMenu = (id: string, filters: Omit<Partial<ListMenuQuery>, 'offset'>) =>
+  useInfiniteQuery({
+    queryKey: ['restaurantMenu', id, filters] as const,
+    queryFn: ({ pageParam }) =>
+      restaurantApi.getMenu(id, { ...filters, limit: MENU_PAGE_SIZE, offset: pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      const next = lastPage.meta.offset + lastPage.meta.limit;
+      return next < lastPage.meta.total ? next : undefined;
+    },
+    // Changing a filter re-keys the query; without this the list is replaced by
+    // skeletons on every keystroke, which is the strobing the grid already had.
+    placeholderData: keepPreviousData,
+    enabled: !!id,
+  });
+
+/**
+ * Menu-wide totals and the section list.
+ *
+ * Its own query because it must not change when the page filters do — it is
+ * what "12 of 365" compares against, and what the category chips are drawn
+ * from. One request per restaurant, reused across every filter change.
+ */
+export const useRestaurantMenuFacets = (id: string) =>
   useQuery({
-    queryKey: ['restaurantMenu', id] as const,
-    queryFn: () => restaurantApi.getMenu(id),
+    queryKey: ['restaurantMenuFacets', id] as const,
+    queryFn: () => restaurantApi.getMenuFacets(id),
+    staleTime: 5 * 60_000,
     enabled: !!id,
   });

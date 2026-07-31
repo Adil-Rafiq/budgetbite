@@ -6,7 +6,7 @@ export {
   type ListRestaurantsRow,
   type RestaurantSort,
 } from './restaurant.repo.js';
-export { menuRepository } from './menu.repo.js';
+export { menuRepository, type MenuPageParams, type MenuFacetsRow } from './menu.repo.js';
 export {
   budgetPlanRepository,
   type BudgetPlanWithRelations,

@@ -200,6 +200,7 @@ const seed = async (): Promise<void> => {
             name: item.name,
             description: item.description,
             price: money(item.price),
+            category: item.category ?? null,
           })),
         ),
       )

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   classifyBudgetFit,
   estimateMealCost,
+  maxMenuPriceWithinBudget,
   typicalMealCost,
   FIT_AMBER_RATIO,
 } from './budget-fit.js';
@@ -99,5 +100,64 @@ describe('classifyBudgetFit over a delivered cost', () => {
     const delivered = estimateMealCost({ itemPrice: 800, deliveryFee: 199, minimumOrder: null });
     expect(delivered).toBeGreaterThan(budget.amountRemaining);
     expect(classifyBudgetFit({ itemPrice: delivered, ...budget })).toBe('red');
+  });
+});
+
+describe('maxMenuPriceWithinBudget', () => {
+  const budget = { avgBudgetPerRemainingMeal: 150, amountRemaining: 900 };
+
+  it('subtracts the delivery fee from the amber ceiling', () => {
+    // Ceiling is 150 * 1.3 = 195 delivered; a ₨50 fee leaves ₨145 of menu price.
+    expect(maxMenuPriceWithinBudget({ ...budget, deliveryFee: 50, minimumOrder: null })).toBe(145);
+  });
+
+  it('uses what is actually left when that bites before the per-meal ceiling', () => {
+    // 40 remaining is below 195, so the wallet is the binding constraint.
+    expect(
+      maxMenuPriceWithinBudget({
+        avgBudgetPerRemainingMeal: 150,
+        amountRemaining: 40,
+        deliveryFee: 10,
+        minimumOrder: null,
+      }),
+    ).toBe(30);
+  });
+
+  it('returns null when the fee and floor alone break the ceiling', () => {
+    // ₨249 minimum + ₨199 fee = ₨448 delivered before choosing anything, against
+    // a ₨195 ceiling. No dish on this menu can come in under budget.
+    expect(maxMenuPriceWithinBudget({ ...budget, deliveryFee: 199, minimumOrder: 249 })).toBeNull();
+  });
+
+  it('agrees with classifyBudgetFit on both sides of the boundary', () => {
+    // The contract the server-side filter relies on: a price at or below the
+    // ceiling is never red, and the next rupee up always is.
+    const deliveryFee = 50;
+    const minimumOrder = 100;
+    const ceiling = maxMenuPriceWithinBudget({ ...budget, deliveryFee, minimumOrder });
+    if (ceiling === null) throw new Error('expected a ceiling for this fixture');
+
+    const fitAt = (price: number) =>
+      classifyBudgetFit({
+        itemPrice: estimateMealCost({ itemPrice: price, deliveryFee, minimumOrder }),
+        ...budget,
+      });
+
+    for (let price = 1; price <= ceiling; price += 1) {
+      expect(fitAt(price)).not.toBe('red');
+    }
+    expect(fitAt(ceiling + 1)).toBe('red');
+  });
+
+  it('holds the boundary when nothing is left to spend', () => {
+    const ceiling = maxMenuPriceWithinBudget({
+      avgBudgetPerRemainingMeal: 150,
+      amountRemaining: 0,
+      deliveryFee: 0,
+      minimumOrder: null,
+    });
+    // A zero ceiling is a real answer — menu prices are positive, so nothing
+    // passes — and it must not be confused with null ("no ceiling computed").
+    expect(ceiling).toBe(0);
   });
 });

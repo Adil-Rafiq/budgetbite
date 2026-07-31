@@ -113,6 +113,13 @@ def _menu_item_payload(item: dict) -> dict[str, Any]:
     }
     if item.get("description"):
         payload["description"] = (item["description"])[:2000]
+    # The vendor's menu section. Omitted rather than sent as null when unknown:
+    # the API's upsert coalesces a missing category onto whatever the row
+    # already has, so a scrape that failed to read the sections leaves an
+    # existing grouping intact instead of wiping it.
+    category = item.get("category")
+    if category:
+        payload["category"] = category.strip()[:120]
     # Only forward absolute http(s) URLs — the API validates imageUrl with
     # z.url(), so a relative/malformed src would 400 the whole batch.
     image_url = item.get("image_url")
