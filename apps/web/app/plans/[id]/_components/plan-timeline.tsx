@@ -39,7 +39,7 @@ function OptionPrice({ option, ctx }: { option: SuggestionOption; ctx: BudgetSta
     <div className="flex shrink-0 flex-col items-end gap-1">
       <span
         className={`whitespace-nowrap text-right font-display text-[13px] font-semibold tabular-nums ${
-          fit === 'red' ? 'text-tomato' : fit === 'amber' ? 'text-amber-ink' : 'text-dark-green'
+          fit === 'red' ? 'text-tomato-ink' : fit === 'amber' ? 'text-amber-ink' : 'text-green-deep'
         }`}
       >
         {formatPKR(option.estimatedPrice)}
@@ -64,8 +64,8 @@ function StatusBadge({ status }: { status: PlanTimelineSlot['status'] }) {
     PlanTimelineSlot['status'],
     { className: string; label: string; Icon: typeof Check } | null
   > = {
-    logged: { className: 'bg-green/10 text-dark-green', label: 'Logged', Icon: Check },
-    pinned: { className: 'bg-green/10 text-dark-green', label: 'Pinned', Icon: Pin },
+    logged: { className: 'bg-green/10 text-green-deep', label: 'Logged', Icon: Check },
+    pinned: { className: 'bg-green/10 text-green-deep', label: 'Pinned', Icon: Pin },
     suggested: { className: 'bg-slate/10 text-slate', label: 'Suggested', Icon: Sparkles },
     empty: null,
   };
@@ -190,7 +190,7 @@ function MealSection({
         <div className="flex min-w-0 items-center gap-2">
           <div
             aria-hidden
-            className="flex h-7 w-7 items-center justify-center rounded-md bg-green/10 text-green"
+            className="flex h-7 w-7 items-center justify-center rounded-md bg-green/10 text-green-deep"
           >
             <Icon className="h-3.5 w-3.5" />
           </div>
@@ -245,7 +245,7 @@ function DayCard({ day, ctx }: { day: PlanTimelineDay; ctx: BudgetStateContext }
             {formatDay(day.slotDate)}
           </h3>
           {isToday && (
-            <span className="rounded-full bg-green/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-dark-green">
+            <span className="rounded-full bg-green/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-green-deep">
               today
             </span>
           )}
@@ -254,13 +254,13 @@ function DayCard({ day, ctx }: { day: PlanTimelineDay; ctx: BudgetStateContext }
         {(counts.logged > 0 || counts.pinned > 0) && (
           <div className="flex shrink-0 items-center gap-3 text-[11px] text-slate">
             {counts.logged > 0 && (
-              <span className="flex items-center gap-1 text-dark-green">
+              <span className="flex items-center gap-1 text-green-deep">
                 <Check className="h-3 w-3" />
                 {counts.logged} logged
               </span>
             )}
             {counts.pinned > 0 && (
-              <span className="flex items-center gap-1 text-dark-green">
+              <span className="flex items-center gap-1 text-green-deep">
                 <Pin className="h-3 w-3" />
                 {counts.pinned} pinned
               </span>
@@ -328,7 +328,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
   const header = (
     <div className="flex items-end justify-between">
       <div className="flex flex-col gap-1">
-        <span className="text-xs font-semibold uppercase tracking-widest text-green">Timeline</span>
+        <span className="text-xs font-semibold uppercase tracking-widest text-green-deep">Timeline</span>
         <h2 className="font-display text-xl font-semibold tracking-tight text-charcoal">
           Day by day
         </h2>

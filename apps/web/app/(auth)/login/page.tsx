@@ -124,7 +124,7 @@ export default function LoginPage() {
 
       <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-6 py-6 sm:px-8">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-deep text-white">
             <LogoIcon size={16} />
           </span>
           <span className="font-display text-xl font-bold tracking-tight">
@@ -149,7 +149,7 @@ export default function LoginPage() {
             </span>
           </div>
           <h1 className="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tight">
-            Welcome <span className="text-green">back.</span>
+            Welcome <span className="text-green-deep">back.</span>
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-charcoal/60">
             Pick up where you left off.
@@ -170,7 +170,7 @@ export default function LoginPage() {
                 className={inputClass}
                 {...register('email')}
               />
-              {errors.email && <p className="text-xs text-tomato">{errors.email.message}</p>}
+              {errors.email && <p className="text-xs text-tomato-ink">{errors.email.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -180,7 +180,7 @@ export default function LoginPage() {
                 </label>
                 <button
                   type="button"
-                  className="text-xs font-medium text-green transition-colors hover:text-dark-green"
+                  className="text-xs font-medium text-green-deep transition-colors hover:text-green-deep"
                   onClick={() => router.push('/forgot-password')}
                 >
                   Forgot?
@@ -204,13 +204,13 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password && <p className="text-xs text-tomato">{errors.password.message}</p>}
+              {errors.password && <p className="text-xs text-tomato-ink">{errors.password.message}</p>}
             </div>
 
             <button
               type="submit"
               disabled={busy}
-              className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-green text-sm font-semibold text-white shadow-md transition-all hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+              className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-green-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
@@ -266,7 +266,7 @@ export default function LoginPage() {
           New to BudgetBite?{' '}
           <Link
             href="/register"
-            className="inline-flex items-center gap-1 font-semibold text-green transition-colors hover:text-dark-green"
+            className="inline-flex items-center gap-1 font-semibold text-green-deep transition-colors hover:text-green-deep"
           >
             Create an account
             <Mail className="h-3.5 w-3.5" />

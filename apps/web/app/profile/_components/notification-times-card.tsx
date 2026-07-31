@@ -85,7 +85,7 @@ export function NotificationTimesCard() {
                     aria-label={slot.enabled ? 'Disable reminder' : 'Enable reminder'}
                     className={`inline-flex min-w-[52px] items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] font-medium transition-colors ${
                       slot.enabled
-                        ? 'border-green bg-green/10 text-dark-green'
+                        ? 'border-green bg-green/10 text-green-deep'
                         : 'border-sage bg-canvas text-slate hover:border-green/40'
                     }`}
                   >
@@ -95,7 +95,7 @@ export function NotificationTimesCard() {
                     type="button"
                     onClick={() => remove(i)}
                     aria-label="Remove reminder"
-                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate transition-colors hover:bg-canvas hover:text-tomato"
+                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate transition-colors hover:bg-canvas hover:text-tomato-ink"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -116,7 +116,7 @@ export function NotificationTimesCard() {
                 type="button"
                 onClick={save}
                 disabled={!isDirty || !allValid || isPending}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-green px-4 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-green-deep px-4 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50"
               >
                 {isPending ? 'Saving…' : 'Save'}
               </button>

@@ -26,7 +26,7 @@ export const NotificationsStep = () => {
             >
               <span
                 aria-hidden
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-green/15 text-sm font-bold uppercase text-dark-green"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-green/15 text-sm font-bold uppercase text-green-deep"
               >
                 {slot.label.slice(0, 1)}
               </span>
@@ -71,7 +71,7 @@ export const NotificationsStep = () => {
       </div>
 
       {errors.notificationSlots && (
-        <p role="alert" className="text-xs font-medium text-tomato">
+        <p role="alert" className="text-xs font-medium text-tomato-ink">
           {errors.notificationSlots}
         </p>
       )}
@@ -81,7 +81,7 @@ export const NotificationsStep = () => {
           aria-hidden
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/60"
         >
-          <BellOff className="h-4 w-4 text-dark-green" />
+          <BellOff className="h-4 w-4 text-green-deep" />
         </span>
         <p className="text-xs leading-relaxed text-slate">
           These are already set to sensible times — you only need to touch the ones you want to

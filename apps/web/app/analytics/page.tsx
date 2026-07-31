@@ -144,7 +144,7 @@ function RangeButton({
       onClick={onClick}
       className={`inline-flex items-center rounded-full border px-3 py-1 text-[12px] font-medium transition-colors ${
         active
-          ? 'border-green bg-green/10 text-dark-green'
+          ? 'border-green bg-green/10 text-green-deep'
           : 'border-sage bg-canvas text-slate hover:border-green/40'
       }`}
     >
@@ -231,7 +231,7 @@ export default function AnalyticsPage() {
       <FadeUp>
         <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-2">
-            <div className="text-xs font-semibold uppercase tracking-widest text-green">
+            <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
               Spend · Analytics
             </div>
             <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
@@ -290,7 +290,7 @@ export default function AnalyticsPage() {
               {spendingQuery.isLoading ? (
                 <ChartSkeleton variant="line" />
               ) : spendingQuery.error ? (
-                <p className="text-[13px] text-tomato">Could not load spending.</p>
+                <p className="text-[13px] text-tomato-ink">Could not load spending.</p>
               ) : spendingChartData.length === 0 ? (
                 <p className="text-[13px] text-slate">No spending in this range.</p>
               ) : (

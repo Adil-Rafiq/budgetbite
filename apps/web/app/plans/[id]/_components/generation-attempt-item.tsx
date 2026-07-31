@@ -60,8 +60,8 @@ const TONE_DOT: Record<Tone, string> = {
 
 const TONE_ICON: Record<Tone, string> = {
   amber: 'text-amber',
-  green: 'text-green',
-  tomato: 'text-tomato',
+  green: 'text-green-deep',
+  tomato: 'text-tomato-ink',
   slate: 'text-slate',
 };
 
@@ -124,7 +124,7 @@ export function GenerationAttemptItem({
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-[14px] font-medium text-charcoal">{visual.label(generation)}</p>
                 {isActive && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-green/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-dark-green">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-green/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-green-deep">
                     <Sparkles className="h-3 w-3" />
                     Active
                   </span>
@@ -145,7 +145,7 @@ export function GenerationAttemptItem({
                 type="button"
                 onClick={() => generate.mutate(planId)}
                 disabled={generate.isPending}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-tomato/30 bg-white px-3 text-[12px] font-medium text-tomato transition-colors hover:bg-tomato/10 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-tomato/30 bg-white px-3 text-[12px] font-medium text-tomato-ink transition-colors hover:bg-tomato/10 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
               >
                 <RefreshCw className={cn('h-3.5 w-3.5', generate.isPending && 'animate-spin')} />
                 Retry
@@ -176,7 +176,7 @@ export function GenerationAttemptItem({
             disclosure for bug reports and the visible copy says what happened
             and what to do. */}
         {isFailed && (
-          <div className="rounded-lg border border-tomato/20 bg-tomato/[0.06] p-3 text-[12px] text-tomato">
+          <div className="rounded-lg border border-tomato/20 bg-tomato/[0.06] p-3 text-[12px] text-tomato-ink">
             <p className="font-medium">{failure.title}</p>
             <p className="mt-0.5 opacity-80">{failure.fix}</p>
             {generation.errorMessage && (

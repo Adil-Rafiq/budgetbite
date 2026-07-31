@@ -53,7 +53,7 @@ export const BudgetStep = () => {
               onClick={() => actions.setPlanType(type)}
               className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all ${FOCUS_RING} ${
                 active
-                  ? 'bg-green-deep text-white shadow-md shadow-dark-green/25'
+                  ? 'bg-green-deep text-white shadow-md shadow-green-deep/25'
                   : 'bg-transparent text-slate hover:text-charcoal'
               }`}
             >
@@ -73,7 +73,7 @@ export const BudgetStep = () => {
           Total food budget
         </label>
         <div className="mt-4 mb-5 flex items-end gap-3">
-          <span aria-hidden className="pb-1 font-display text-2xl font-bold text-dark-green">
+          <span aria-hidden className="pb-1 font-display text-2xl font-bold text-green-deep">
             ₨
           </span>
           <input
@@ -89,7 +89,7 @@ export const BudgetStep = () => {
             }}
             aria-describedby="budget-period"
             aria-invalid={errors.totalBudget ? true : undefined}
-            className={`min-w-0 flex-1 border-b-2 border-sage bg-transparent pb-1 font-display text-4xl font-bold text-charcoal transition-colors placeholder:text-slate/30 focus:border-dark-green sm:text-5xl ${FOCUS_RING}`}
+            className={`min-w-0 flex-1 border-b-2 border-sage bg-transparent pb-1 font-display text-4xl font-bold text-charcoal transition-colors placeholder:text-slate/30 focus:border-green-deep sm:text-5xl ${FOCUS_RING}`}
           />
           <span id="budget-period" className="pb-2 text-sm text-slate">
             / {values.planType === 'weekly' ? 'week' : 'month'}
@@ -108,8 +108,8 @@ export const BudgetStep = () => {
                 onClick={() => actions.setTotalBudget(preset)}
                 className={`min-h-11 rounded-full border px-4 py-2 text-xs font-medium transition-colors ${FOCUS_RING} ${
                   active
-                    ? 'border-dark-green bg-green/10 font-semibold text-dark-green'
-                    : 'border-sage text-slate hover:border-dark-green hover:text-dark-green'
+                    ? 'border-green-deep bg-green/10 font-semibold text-green-deep'
+                    : 'border-sage text-slate hover:border-green-deep hover:text-green-deep'
                 }`}
               >
                 {formatPKR(preset)}
@@ -120,7 +120,7 @@ export const BudgetStep = () => {
 
         {lastConversion && !errors.totalBudget && (
           <p className="mt-3 flex items-start gap-2 rounded-xl border border-sage bg-canvas px-3 py-2 text-xs text-slate">
-            <RefreshCw aria-hidden className="mt-0.5 h-3 w-3 shrink-0 text-dark-green" />
+            <RefreshCw aria-hidden className="mt-0.5 h-3 w-3 shrink-0 text-green-deep" />
             <span>
               Converted {formatPKR(lastConversion.from)} to{' '}
               <span className="font-semibold text-charcoal">{formatPKR(lastConversion.to)}</span> so
@@ -130,7 +130,7 @@ export const BudgetStep = () => {
         )}
 
         {errors.totalBudget && (
-          <p role="alert" className="mt-3 text-xs font-medium text-tomato">
+          <p role="alert" className="mt-3 text-xs font-medium text-tomato-ink">
             {errors.totalBudget}
           </p>
         )}
@@ -158,7 +158,7 @@ export const BudgetStep = () => {
             role="alert"
             className="flex flex-col items-start gap-2 rounded-xl border border-tomato/30 bg-tomato/5 p-4 text-sm"
           >
-            <div className="font-semibold text-tomato">Couldn&apos;t load meal types</div>
+            <div className="font-semibold text-tomato-ink">Couldn&apos;t load meal types</div>
             <div className="text-xs text-slate">
               This is usually a dropped connection. Your budget is saved on this device, so nothing
               is lost if you retry.
@@ -166,7 +166,7 @@ export const BudgetStep = () => {
             <button
               type="button"
               onClick={mealTypes.refetch}
-              className={`min-h-11 rounded-lg border border-sage bg-white px-3 py-2 text-xs font-semibold text-dark-green transition-colors hover:border-dark-green ${FOCUS_RING}`}
+              className={`min-h-11 rounded-lg border border-sage bg-white px-3 py-2 text-xs font-semibold text-green-deep transition-colors hover:border-green-deep ${FOCUS_RING}`}
             >
               Try again
             </button>
@@ -183,7 +183,7 @@ export const BudgetStep = () => {
             <button
               type="button"
               onClick={mealTypes.refetch}
-              className={`mt-3 min-h-11 rounded-lg border border-sage bg-white px-3 py-2 text-xs font-semibold text-dark-green transition-colors hover:border-dark-green ${FOCUS_RING}`}
+              className={`mt-3 min-h-11 rounded-lg border border-sage bg-white px-3 py-2 text-xs font-semibold text-green-deep transition-colors hover:border-green-deep ${FOCUS_RING}`}
             >
               Check again
             </button>
@@ -201,7 +201,7 @@ export const BudgetStep = () => {
               variant="grid"
             />
             {errors.mealTypeIds && (
-              <p role="alert" className="mt-3 text-xs font-medium text-tomato">
+              <p role="alert" className="mt-3 text-xs font-medium text-tomato-ink">
                 {errors.mealTypeIds}
               </p>
             )}

@@ -15,22 +15,19 @@ export function ApiWakeupBanner() {
 
   return (
     <div
-      className="sticky top-0 z-50 flex items-center justify-center gap-2.5 border-b px-4 py-2.5"
-      style={{ background: 'var(--color-lumen)', borderColor: 'var(--color-lumen-dk)' }}
+      role="status"
+      className="sticky top-0 z-50 flex items-center justify-center gap-2.5 border-b border-amber bg-amber-tint px-4 py-2.5"
     >
-      <span className="flex items-center gap-1">
+      <span aria-hidden className="flex items-center gap-1">
         {[0, 1, 2].map((i) => (
           <span
             key={i}
-            className="size-1.5 rounded-full"
-            style={{
-              background: 'var(--color-amber)',
-              animation: `wakeup-pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
-            }}
+            className="size-1.5 rounded-full bg-amber-ink"
+            style={{ animation: `wakeup-pulse 1.2s ease-in-out ${i * 0.2}s infinite` }}
           />
         ))}
       </span>
-      <p className="text-xs" style={{ color: 'var(--color-ink)' }}>
+      <p className="text-xs text-amber-ink">
         Waking up the server — hang tight, this only takes a moment
       </p>
       <style>{`

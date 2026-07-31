@@ -54,7 +54,7 @@ export function NewPlanLauncher({ children }: { children: ReactNode }) {
       <AlertDialog open={confirmReplaceOpen} onOpenChange={setConfirmReplaceOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="text-xs font-semibold uppercase tracking-widest text-tomato">
+            <div className="text-xs font-semibold uppercase tracking-widest text-tomato-ink">
               Confirm · Replace
             </div>
             <AlertDialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -76,7 +76,7 @@ export function NewPlanLauncher({ children }: { children: ReactNode }) {
                 setConfirmReplaceOpen(false);
                 setOpen(true);
               }}
-              className={`min-h-11 rounded-xl bg-green px-5 text-[13px] font-semibold text-white transition-colors hover:bg-dark-green active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl bg-green-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-green-deeper active:scale-[0.97] ${FOCUS_RING}`}
             >
               Replace plan
             </AlertDialogAction>

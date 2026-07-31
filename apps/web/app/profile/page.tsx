@@ -79,10 +79,10 @@ function initials(firstName: string, lastName: string): string {
   return `${a}${b}` || '•';
 }
 
-const inputClass = 'bg-canvas border-sage text-charcoal';
+const inputClass = 'bg-canvas border-sage-edge text-charcoal';
 const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60';
 const primaryBtn =
-  'inline-flex items-center justify-center gap-1.5 rounded-lg bg-green px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50';
+  'inline-flex items-center justify-center gap-1.5 rounded-lg bg-green-deep px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50';
 const ghostBtn =
   'inline-flex items-center justify-center gap-1.5 rounded-lg border border-sage bg-white px-4 py-2 text-[13px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50';
 
@@ -233,7 +233,7 @@ export default function ProfilePage() {
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
       {/* Page header — matches the rest of the app */}
       <header className="flex flex-col gap-2">
-        <div className="text-xs font-semibold uppercase tracking-widest text-green">
+        <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
           Account · Profile
         </div>
         <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
@@ -245,7 +245,7 @@ export default function ProfilePage() {
       {/* Identity card */}
       <section className="rounded-2xl border border-sage bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-green font-display text-[18px] font-semibold text-white">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-green-deep font-display text-[18px] font-semibold text-white">
             {initials(firstName, lastName)}
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -255,13 +255,13 @@ export default function ProfilePage() {
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-slate">
               <span className="truncate">{user.email}</span>
               {user.emailVerified && (
-                <span className="inline-flex items-center gap-1 text-dark-green">
+                <span className="inline-flex items-center gap-1 text-green-deep">
                   <BadgeCheck className="h-3.5 w-3.5" />
                   <span className="text-[11px] font-medium">Verified</span>
                 </span>
               )}
               {user.role === 'admin' && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-green/30 bg-green/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-dark-green">
+                <span className="inline-flex items-center gap-1 rounded-full border border-green/30 bg-green/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-green-deep">
                   <ShieldCheck className="h-3 w-3" />
                   Admin
                 </span>
@@ -304,7 +304,7 @@ export default function ProfilePage() {
                   className={inputClass}
                 />
                 {accountForm.formState.errors.firstName && (
-                  <p className="text-[11px] text-tomato">
+                  <p className="text-[11px] text-tomato-ink">
                     {accountForm.formState.errors.firstName.message}
                   </p>
                 )}
@@ -315,7 +315,7 @@ export default function ProfilePage() {
                 </Label>
                 <Input id="lastName" {...accountForm.register('lastName')} className={inputClass} />
                 {accountForm.formState.errors.lastName && (
-                  <p className="text-[11px] text-tomato">
+                  <p className="text-[11px] text-tomato-ink">
                     {accountForm.formState.errors.lastName.message}
                   </p>
                 )}
@@ -441,7 +441,7 @@ export default function ProfilePage() {
                 className={inputClass}
               />
               {passwordForm.formState.errors.currentPassword && (
-                <p className="text-[11px] text-tomato">
+                <p className="text-[11px] text-tomato-ink">
                   {passwordForm.formState.errors.currentPassword.message}
                 </p>
               )}
@@ -458,7 +458,7 @@ export default function ProfilePage() {
                 className={inputClass}
               />
               {passwordForm.formState.errors.newPassword && (
-                <p className="text-[11px] text-tomato">
+                <p className="text-[11px] text-tomato-ink">
                   {passwordForm.formState.errors.newPassword.message}
                 </p>
               )}
@@ -475,7 +475,7 @@ export default function ProfilePage() {
                 className={inputClass}
               />
               {passwordForm.formState.errors.confirmPassword && (
-                <p className="text-[11px] text-tomato">
+                <p className="text-[11px] text-tomato-ink">
                   {passwordForm.formState.errors.confirmPassword.message}
                 </p>
               )}

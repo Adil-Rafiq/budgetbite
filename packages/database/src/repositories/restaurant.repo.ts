@@ -100,6 +100,22 @@ export const restaurantRepository = {
       WHERE ${menuItem.restaurantId} = ${outerRestaurantId}
     )`;
 
+    // What a typical meal here actually costs to receive. Mirrors
+    // `typicalMealCost` in @repo/shared, which the client badge uses, so "Best
+    // for budget" and the "Fits budget" pill can never disagree about the same
+    // restaurant. Sorting on MIN(price) instead floated places to the top for
+    // selling a cheap naan; the average is what a person ends up paying, and
+    // delivery and the minimum-order floor are part of the bill.
+    // NULL average (no menu yet) stays NULL so those rows sort last rather
+    // than inheriting the minimum order as a fake price — GREATEST ignores
+    // NULLs in Postgres, so the guard has to be explicit.
+    const typicalCostExpr = sql<string | null>`(
+      CASE WHEN ${avgPriceExpr} IS NULL THEN NULL ELSE
+        GREATEST(${avgPriceExpr}::numeric, COALESCE(${restaurant.minimumOrder}::numeric, 0))
+          + COALESCE(${restaurant.deliveryFee}::numeric, 0)
+      END
+    )`;
+
     const conditions = [];
     if (minRating != null) conditions.push(gte(restaurant.rating, String(minRating)));
     if (maxDistanceKm != null && distanceExpr)
@@ -110,13 +126,13 @@ export const restaurantRepository = {
     if (sort === 'rating') {
       orderByExpr = sql`${restaurant.rating} DESC NULLS LAST, ${restaurant.name} ASC`;
     } else if (sort === 'budget-fit' && budgetFitTarget != null) {
-      // Two-tier sort: restaurants whose avg item price fits the per-meal
-      // target float to the top; within each tier, cheaper places win.
+      // Two-tier sort: restaurants whose typical delivered meal fits the
+      // per-meal target float to the top; within each tier, cheaper wins.
       orderByExpr = sql`(
-        CASE WHEN ${avgPriceExpr}::numeric <= ${budgetFitTarget} THEN 0 ELSE 1 END
-      ) ASC, ${minPriceExpr}::numeric ASC NULLS LAST`;
+        CASE WHEN ${typicalCostExpr} <= ${budgetFitTarget} THEN 0 ELSE 1 END
+      ) ASC, ${typicalCostExpr} ASC NULLS LAST`;
     } else if (sort === 'budget-fit') {
-      orderByExpr = sql`${minPriceExpr}::numeric ASC NULLS LAST`;
+      orderByExpr = sql`${typicalCostExpr} ASC NULLS LAST`;
     } else if (distanceExpr) {
       orderByExpr = sql`${distanceExpr}`;
     } else {

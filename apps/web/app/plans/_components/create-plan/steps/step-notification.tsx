@@ -31,7 +31,7 @@ export const StepNotifications = () => {
                 >
                   <span
                     aria-hidden
-                    className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-green/10 text-[11px] font-semibold text-green"
+                    className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-green/10 text-[11px] font-semibold text-green-deep"
                   >
                     {slot.label.slice(0, 1).toUpperCase()}
                   </span>
@@ -59,7 +59,7 @@ export const StepNotifications = () => {
                     }
                     className={`min-h-11 rounded-full px-3 text-[10px] font-semibold tracking-[0.1em] transition active:scale-[0.96] ${FOCUS_RING} ${
                       slot.enabled
-                        ? 'bg-green text-white hover:bg-dark-green'
+                        ? 'bg-green-deep text-white hover:bg-green-deeper'
                         : 'border border-sage bg-white text-slate/60 hover:border-green/40 hover:text-slate'
                     }`}
                   >
@@ -73,7 +73,7 @@ export const StepNotifications = () => {
                   sets for item failures — so an invalid time blocked "Next"
                   while displaying nothing at all. */}
               {slotError && (
-                <p role="alert" className="text-[11px] font-medium text-tomato">
+                <p role="alert" className="text-[11px] font-medium text-tomato-ink">
                   {slotError}
                 </p>
               )}
@@ -83,7 +83,7 @@ export const StepNotifications = () => {
       </div>
 
       {errors.notificationSlots && (
-        <p role="alert" className="text-[11px] font-medium text-tomato">
+        <p role="alert" className="text-[11px] font-medium text-tomato-ink">
           {errors.notificationSlots}
         </p>
       )}

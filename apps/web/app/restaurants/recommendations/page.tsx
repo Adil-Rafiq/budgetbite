@@ -13,6 +13,9 @@ import {
   useWithdrawRecommendation,
 } from '@/hooks/use-restaurant-recommendations';
 import { formatPKR } from '@/lib/currency';
+import { FOCUS_RING } from '@/lib/focus-ring';
+import { humanizeName } from '@/lib/humanize-name';
+import { DataError } from '@/components/data-error';
 import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
 import { RecommendRestaurantButton } from '@/components/recommend-restaurant-button';
 import { Button } from '@/components/ui/button';
@@ -31,9 +34,9 @@ const PAGE_SIZE = 12;
 const ITEM_PREVIEW_COUNT = 3;
 
 const STATUS_PILL: Record<string, { className: string; label: string }> = {
-  pending: { className: 'bg-[#fef6e6] text-[#8a5a12]', label: 'Pending review' },
-  approved: { className: 'bg-green/10 text-dark-green', label: 'Approved' },
-  rejected: { className: 'bg-tomato/10 text-tomato', label: 'Rejected' },
+  pending: { className: 'bg-amber-tint text-amber-ink', label: 'Pending review' },
+  approved: { className: 'bg-green/10 text-green-deep', label: 'Approved' },
+  rejected: { className: 'bg-tomato/10 text-tomato-ink', label: 'Rejected' },
 };
 
 function formatDate(value: Date | string): string {
@@ -58,8 +61,8 @@ function RecommendationCard({
   return (
     <div className="flex h-full flex-col gap-3 rounded-2xl border border-sage bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
-        <h3 className="min-w-0 truncate font-display text-lg font-semibold tracking-tight text-charcoal">
-          {rec.name}
+        <h3 className="min-w-0 font-display text-lg font-semibold tracking-tight text-charcoal [overflow-wrap:anywhere] line-clamp-2">
+          {humanizeName(rec.name)}
         </h3>
         {status && (
           <span
@@ -89,13 +92,13 @@ function RecommendationCard({
               <span className="shrink-0 text-slate">{formatPKR(item.price)}</span>
             </li>
           ))}
-          {extra > 0 && <li className="text-[11px] text-slate/60">+{extra} more</li>}
+          {extra > 0 && <li className="text-[11px] text-slate">+{extra} more</li>}
         </ul>
       )}
 
       {rec.status === 'rejected' && rec.adminNote && (
         <p className="rounded-xl border border-tomato/20 bg-tomato/[0.06] p-3 text-[12px] text-slate">
-          <span className="font-medium text-tomato">Admin note:</span> {rec.adminNote}
+          <span className="font-medium text-tomato-ink">Admin note:</span> {rec.adminNote}
         </p>
       )}
 
@@ -103,12 +106,12 @@ function RecommendationCard({
         {rec.status === 'approved' && rec.createdRestaurantId ? (
           <Link
             href={`/restaurants/${rec.createdRestaurantId}`}
-            className="text-[12px] font-medium text-green underline-offset-2 hover:underline"
+            className={`rounded text-[12px] font-medium text-green-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
           >
             View restaurant →
           </Link>
         ) : (
-          <span className="text-[11px] text-slate/60">
+          <span className="text-[11px] text-slate">
             {rec.status === 'pending'
               ? 'Awaiting admin review'
               : `Reviewed ${rec.reviewedAt ? formatDate(rec.reviewedAt) : ''}`}
@@ -119,7 +122,7 @@ function RecommendationCard({
             type="button"
             variant="outline"
             size="sm"
-            className="text-tomato hover:text-tomato"
+            className="text-tomato-ink hover:text-tomato-ink"
             onClick={() => onWithdraw(rec)}
           >
             <Trash2 className="h-3.5 w-3.5" />
@@ -133,7 +136,7 @@ function RecommendationCard({
 
 export default function MyRecommendationsPage() {
   const [page, setPage] = useState(0);
-  const { data, isLoading, error, isFetching } = useMyRecommendations({
+  const { data, isLoading, error, isFetching, refetch } = useMyRecommendations({
     limit: PAGE_SIZE,
     offset: page * PAGE_SIZE,
   });
@@ -157,9 +160,6 @@ export default function MyRecommendationsPage() {
       <FadeUp>
         <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-2">
-            <div className="text-xs font-semibold uppercase tracking-widest text-green">
-              Community · Recommendations
-            </div>
             <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
               Your recommendations
             </h1>
@@ -171,9 +171,9 @@ export default function MyRecommendationsPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/restaurants"
-              className="inline-flex items-center gap-1.5 text-[12px] text-slate underline-offset-2 transition-colors hover:text-green hover:underline"
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded px-1 text-[13px] text-slate underline-offset-2 transition-colors hover:text-green-deep hover:underline sm:min-h-9 ${FOCUS_RING}`}
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
+              <ArrowLeft aria-hidden className="h-3.5 w-3.5" />
               All restaurants
             </Link>
             <RecommendRestaurantButton />
@@ -191,9 +191,7 @@ export default function MyRecommendationsPage() {
           ))}
         </div>
       ) : error ? (
-        <p className="rounded-xl border border-tomato/20 bg-tomato/[0.06] p-4 text-[13px] text-tomato">
-          Could not load your recommendations.
-        </p>
+        <DataError message="Could not load your recommendations." onRetry={() => refetch()} />
       ) : recommendations.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sage bg-white p-10 text-center">
           <p className="font-display text-[14px] font-semibold text-charcoal">Nothing here yet.</p>
@@ -223,11 +221,11 @@ export default function MyRecommendationsPage() {
                 type="button"
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
                 disabled={page === 0 || isFetching}
-                className="inline-flex items-center rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40"
+                className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
               >
                 ← Prev
               </button>
-              <p className="text-[11px] text-slate">
+              <p aria-live="polite" className="text-[12px] tabular-nums text-slate">
                 Page {page + 1} of {totalPages} · {total} total
                 {isFetching ? ' · loading…' : ''}
               </p>
@@ -235,7 +233,7 @@ export default function MyRecommendationsPage() {
                 type="button"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={(page + 1) * PAGE_SIZE >= total || isFetching}
-                className="inline-flex items-center rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40"
+                className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
               >
                 Next →
               </button>
@@ -252,11 +250,11 @@ export default function MyRecommendationsPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="text-[10px] font-semibold uppercase tracking-widest text-tomato">
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-tomato-ink">
               Confirm withdrawal
             </div>
             <AlertDialogTitle className="font-display text-[22px] font-semibold tracking-tight text-charcoal">
-              Withdraw “{withdrawTarget?.name}”?
+              Withdraw “{withdrawTarget ? humanizeName(withdrawTarget.name) : ''}”?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate">
               This removes it from the review queue for good. If you change your mind, you’ll have
@@ -265,7 +263,7 @@ export default function MyRecommendationsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className="rounded-lg border border-sage bg-white px-4 py-2 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97]"
+              className={`min-h-11 rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
               disabled={withdraw.isPending}
             >
               Keep it
@@ -277,7 +275,7 @@ export default function MyRecommendationsPage() {
                 confirmWithdraw();
               }}
               disabled={withdraw.isPending}
-              className="rounded-lg bg-tomato px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-tomato/90 active:scale-[0.97]"
+              className={`min-h-11 rounded-lg bg-tomato-ink px-5 text-[13px] font-semibold text-white transition-colors hover:bg-tomato-ink/90 active:scale-[0.97] ${FOCUS_RING}`}
             >
               {withdraw.isPending ? 'Withdrawing…' : 'Withdraw'}
             </AlertDialogAction>

@@ -47,12 +47,12 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
   const alarm = isAlarming(health);
   const statusPill =
     health === 'over'
-      ? { cls: 'bg-tomato/10 text-tomato', Icon: TriangleAlert, label: 'Over budget' }
+      ? { cls: 'bg-tomato/10 text-tomato-ink', Icon: TriangleAlert, label: 'Over budget' }
       : health === 'danger'
-        ? { cls: 'bg-tomato/10 text-tomato', Icon: TriangleAlert, label: 'Watch spending' }
+        ? { cls: 'bg-tomato/10 text-tomato-ink', Icon: TriangleAlert, label: 'Watch spending' }
         : health === 'warning'
           ? { cls: BUDGET_FIT_PILL.amber.pill, Icon: TriangleAlert, label: 'Tight' }
-          : { cls: 'bg-green/10 text-dark-green', Icon: CircleCheck, label: 'On track' };
+          : { cls: 'bg-green/10 text-green-deep', Icon: CircleCheck, label: 'On track' };
 
   const hasActiveGen = !!plan.activeGeneration;
   const isPending = plan.latestAttempt?.status === 'pending';
@@ -67,9 +67,9 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
 
   const varianceTone =
     ctx.cumulativeVariance >= 0
-      ? 'text-green'
+      ? 'text-green-deep'
       : ctx.cumulativeVariance < -total * 0.1
-        ? 'text-tomato'
+        ? 'text-tomato-ink'
         : BUDGET_FIT_PILL.amber.text;
 
   return (
@@ -93,7 +93,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
             <RemainingAmount remaining={remaining} size="lg" />
             <p className="text-[12px] text-slate">
               of {formatPKR(total)} ·{' '}
-              <span className="font-semibold tabular-nums text-tomato">
+              <span className="font-semibold tabular-nums text-tomato-ink">
                 {formatPKR(spent)} spent
               </span>
             </p>
@@ -111,7 +111,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
             type="button"
             onClick={handleGenerate}
             disabled={disabled}
-            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-green px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
           >
             {hasActiveGen ? (
               <>
@@ -153,11 +153,11 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
             {/* Plain-language standing, not a colour the user has to interpret.
                 The bar used to flip red at exactly 90% and look identical at
                 150%. */}
-            <p className={alarm ? 'text-tomato' : 'text-slate'}>
+            <p className={alarm ? 'text-tomato-ink' : 'text-slate'}>
               {spendingHealthCaption(health, remaining)}
             </p>
             <span
-              className={`shrink-0 font-semibold tabular-nums ${alarm ? 'text-tomato' : 'text-slate'}`}
+              className={`shrink-0 font-semibold tabular-nums ${alarm ? 'text-tomato-ink' : 'text-slate'}`}
             >
               {spentPercent}% spent
             </span>

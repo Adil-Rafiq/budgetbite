@@ -14,8 +14,8 @@ interface OnboardingShellProps {
 }
 
 const ACCENT_CHIP: Record<OnboardingStepAccent, string> = {
-  green: 'border-green/30 bg-green/10 text-dark-green',
-  'dark-green': 'border-green/30 bg-sage/60 text-dark-green',
+  green: 'border-green/30 bg-green/10 text-green-deep',
+  deep: 'border-green/30 bg-sage/60 text-green-deep',
 };
 
 export const OnboardingShell = ({ children }: OnboardingShellProps) => {
@@ -63,7 +63,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
                 <LogoIcon size={14} />
               </span>
               <span className="font-display text-base font-bold tracking-tight">
-                Budget<span className="text-dark-green">Bite</span>
+                Budget<span className="text-green-deep">Bite</span>
               </span>
             </Link>
             <span className="text-xs font-semibold text-slate">
@@ -144,7 +144,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
                 onClick={handleContinue}
                 disabled={isSubmitting || !canAdvance}
                 aria-describedby={blockedReason ? 'nav-blocked-reason' : undefined}
-                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-green-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-dark-green hover:shadow-lg hover:shadow-dark-green/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
+                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-green-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-green-deeper hover:shadow-lg hover:shadow-green-deep/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
               >
                 {isSubmitting ? (
                   'Saving…'
@@ -161,7 +161,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
                 onClick={handleFinish}
                 disabled={isSubmitting || !canAdvance}
                 aria-describedby={blockedReason ? 'nav-blocked-reason' : undefined}
-                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-green-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-dark-green hover:shadow-lg hover:shadow-dark-green/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
+                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-green-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-green-deeper hover:shadow-lg hover:shadow-green-deep/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
               >
                 {isSubmitting ? (
                   <>

@@ -10,6 +10,7 @@ import { useUser } from '@/hooks/use-user';
 import { LogoIcon } from '@/components/icons';
 import { authClient } from '@/lib/auth-client';
 import { formatPKR } from '@/lib/currency';
+import { FOCUS_RING_ON_CANVAS } from '@/lib/focus-ring';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -70,6 +71,13 @@ export function AppHeader() {
   const remaining = bs ? bs.amountRemaining : totalBudget - spent;
   const spentPercent = totalBudget > 0 ? Math.round((spent / totalBudget) * 100) : 0;
   const isOver = remaining < 0;
+  // The number every budget-fit badge in the app is actually measured against.
+  // The pill carried only `remaining`, so on the restaurants and menu surfaces
+  // — the long scrolling ones — "Tight" and "Fits budget" became unanchored
+  // adjectives the moment the page header left the viewport, and the user had
+  // to scroll up, memorise a figure and scroll back to do the comparison the
+  // app exists to do for them. It travels with them now.
+  const perMeal = bs?.avgBudgetPerRemainingMeal ?? 0;
 
   const handleSignOut = async () => {
     setSigningOut(true);
@@ -89,7 +97,7 @@ export function AppHeader() {
       <div className="flex items-center justify-between px-4 py-3 lg:px-8 lg:py-4">
         {/* Mobile logo */}
         <Link href="/dashboard" className="flex items-center gap-2.5 lg:hidden">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-green text-white">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-deep text-white">
             <LogoIcon size={13} />
           </span>
           <span className="font-display text-base font-bold tracking-tight">
@@ -111,12 +119,18 @@ export function AppHeader() {
                 {isOver ? 'Over' : 'Left'}
               </span>
               <span
-                className={`font-display text-sm font-semibold ${
-                  isOver ? 'text-tomato' : 'text-charcoal'
+                className={`font-display text-sm font-semibold tabular-nums ${
+                  isOver ? 'text-tomato-ink' : 'text-charcoal'
                 }`}
               >
                 {formatPKR(Math.abs(remaining))}
               </span>
+              {perMeal > 0 && (
+                <span className="text-[11px] font-medium tabular-nums text-slate">
+                  · {formatPKR(perMeal)}
+                  <span className="text-[10px]">/meal</span>
+                </span>
+              )}
               <div className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-sage sm:block">
                 <motion.div
                   className={`h-full rounded-full ${
@@ -140,7 +154,7 @@ export function AppHeader() {
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-green text-xs font-semibold text-white transition-all hover:bg-dark-green active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+                className={`inline-flex size-11 items-center justify-center rounded-full bg-green-deep text-xs font-semibold text-white transition-all hover:bg-green-deeper active:scale-95 sm:size-9 ${FOCUS_RING_ON_CANVAS}`}
                 aria-label={user?.name ? `Account menu for ${user.name}` : 'Account menu'}
               >
                 {initials(user?.name)}

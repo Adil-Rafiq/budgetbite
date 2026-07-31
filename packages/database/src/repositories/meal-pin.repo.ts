@@ -4,7 +4,7 @@ import { db, type DbOrTx } from '../db.js';
 import { mealPin, menuItem, restaurant, type MealPin, type NewMealPin } from '../schema/index.js';
 
 export type MealPinWithRefs = MealPin & {
-  restaurant: { id: string; name: string };
+  restaurant: { id: string; name: string; deliveryFee: string | null; minimumOrder: string | null };
   menuItem: { id: string; name: string; description: string | null; imageUrl: string | null };
 };
 
@@ -84,7 +84,9 @@ export const mealPinRepository = {
     const rows = await db.query.mealPin.findMany({
       where: and(...conditions),
       with: {
-        restaurant: { columns: { id: true, name: true } },
+        restaurant: {
+          columns: { id: true, name: true, deliveryFee: true, minimumOrder: true },
+        },
         menuItem: {
           columns: { id: true, name: true, description: true, imageUrl: true },
         },
@@ -141,7 +143,9 @@ export const mealPinRepository = {
     const rows = await db.query.mealPin.findMany({
       where: and(eq(mealPin.budgetPlanId, budgetPlanId), eq(mealPin.slotDate, slotDate)),
       with: {
-        restaurant: { columns: { id: true, name: true } },
+        restaurant: {
+          columns: { id: true, name: true, deliveryFee: true, minimumOrder: true },
+        },
         menuItem: {
           columns: { id: true, name: true, description: true, imageUrl: true },
         },

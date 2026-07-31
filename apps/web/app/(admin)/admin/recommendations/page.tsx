@@ -41,8 +41,8 @@ const PAGE_SIZE = 20;
 
 const STATUS_PILL: Record<string, string> = {
   pending: 'bg-[#f5a623]/15 text-[#9a6400]',
-  approved: 'bg-green/15 text-dark-green',
-  rejected: 'bg-tomato/10 text-tomato',
+  approved: 'bg-green/15 text-green-deep',
+  rejected: 'bg-tomato/10 text-tomato-ink',
 };
 
 export default function AdminRecommendationsPage() {
@@ -165,7 +165,7 @@ export default function AdminRecommendationsPage() {
                           href={r.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[12px] text-dark-green underline-offset-2 hover:underline"
+                          className="text-[12px] text-green-deep underline-offset-2 hover:underline"
                         >
                           link
                         </a>
@@ -217,7 +217,7 @@ export default function AdminRecommendationsPage() {
                           href={`https://www.openstreetmap.org/?mlat=${r.latitude}&mlon=${r.longitude}#map=17/${r.latitude}/${r.longitude}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[12px] text-dark-green underline-offset-2 hover:underline"
+                          className="text-[12px] text-green-deep underline-offset-2 hover:underline"
                         >
                           view on map
                         </a>

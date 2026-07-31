@@ -20,7 +20,7 @@ import { Switch } from '@/components/ui/switch';
 
 const labelClass = 'text-[10px] uppercase text-slate/60';
 const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
-const errorClass = 'text-[11px] text-tomato';
+const errorClass = 'text-[11px] text-tomato-ink';
 
 const optionalNumber = (v: unknown) => (v === '' || v == null ? undefined : Number(v));
 

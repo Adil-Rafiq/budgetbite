@@ -69,7 +69,7 @@ export default function AdminOverviewPage() {
   return (
     <div className="mx-auto max-w-5xl">
       <header className="flex flex-col gap-2">
-        <div className="text-xs font-semibold uppercase tracking-widest text-green">
+        <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
           Admin · Overview
         </div>
         <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
@@ -104,7 +104,7 @@ export default function AdminOverviewPage() {
             className="group flex flex-col gap-3 rounded-2xl border border-sage bg-white p-5 shadow-sm transition-all hover:border-green/40 hover:shadow-md"
           >
             <div className="flex items-center justify-between">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-green/15 text-green">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-green/15 text-green-deep">
                 <Icon className="h-4.5 w-4.5" />
               </span>
               <ArrowUpRight className="h-4 w-4 text-slate transition-colors group-hover:text-charcoal" />

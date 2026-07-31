@@ -45,7 +45,7 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
       <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-4">
         <Link
           href="/plans"
-          className={`inline-flex w-fit items-center gap-1.5 rounded text-[12px] text-slate transition hover:text-green ${FOCUS_RING_ON_CANVAS}`}
+          className={`inline-flex w-fit items-center gap-1.5 rounded text-[12px] text-slate transition hover:text-green-deep ${FOCUS_RING_ON_CANVAS}`}
         >
           ← Back to plans
         </Link>
@@ -59,7 +59,7 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
       <div className="mx-auto flex w-full max-w-[1180px] flex-col items-start gap-4">
         <Link
           href="/plans"
-          className={`inline-flex items-center gap-1.5 rounded text-[12px] text-slate transition hover:text-green ${FOCUS_RING_ON_CANVAS}`}
+          className={`inline-flex items-center gap-1.5 rounded text-[12px] text-slate transition hover:text-green-deep ${FOCUS_RING_ON_CANVAS}`}
         >
           ← Back to plans
         </Link>
@@ -69,7 +69,7 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
           </p>
           <Link
             href="/plans"
-            className={`mt-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-green px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green ${FOCUS_RING}`}
+            className={`mt-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-green-deep px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper ${FOCUS_RING}`}
           >
             Back to plans
           </Link>

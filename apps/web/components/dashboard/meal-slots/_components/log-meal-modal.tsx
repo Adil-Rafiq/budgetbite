@@ -20,38 +20,13 @@ import type { LogSuggestionForm, LogCustomForm, LogHomeForm } from '../_schemas/
 import type { LogModalState, SavePayload } from '../_hooks/use-meal-slots';
 import { optionLabel } from '@/lib/suggestion';
 import { formatPKR } from '@/lib/currency';
+import { amountWarning, type LogBudget } from '@/lib/budget-plan/amount-warning';
 
 const labelClass = 'text-xs font-semibold uppercase tracking-wide text-slate';
-const inputClass = 'bg-canvas border-sage text-charcoal';
-const errorClass = 'text-[11px] text-tomato';
+const inputClass = 'bg-canvas border-sage-edge text-charcoal';
+const errorClass = 'text-[11px] text-tomato-ink';
 
-export interface LogBudget {
-  avgPerMeal: number;
-  amountRemaining: number;
-  hasBudget: boolean;
-}
-
-/**
- * Soft guardrail on the one number the whole product trusts. Names the overage
- * when a typed amount clearly blows the budget, so a fat-fingered value can't
- * silently re-plan the rest of the period. Non-blocking by design — the user
- * can still log an over-budget meal (eating out happens); they just can't do it
- * without seeing it.
- */
-function amountWarning(amount: number | undefined, budget: LogBudget | undefined): string | null {
-  if (!budget || !amount || amount <= 0) return null;
-  if (budget.amountRemaining > 0 && amount > budget.amountRemaining) {
-    return `That's ${formatPKR(amount - budget.amountRemaining)} more than the ${formatPKR(
-      budget.amountRemaining,
-    )} you have left. Double-check the amount.`;
-  }
-  if (budget.avgPerMeal > 0 && amount > budget.avgPerMeal * 1.3) {
-    return `That's well over your per-meal budget of about ${formatPKR(
-      budget.avgPerMeal,
-    )}. Double-check the amount.`;
-  }
-  return null;
-}
+export type { LogBudget };
 
 function AmountWarning({
   amount,
@@ -63,7 +38,7 @@ function AmountWarning({
   const msg = amountWarning(amount, budget);
   if (!msg) return null;
   return (
-    <p className="flex items-start gap-1.5 text-[11px] text-tomato" role="status">
+    <p className="flex items-start gap-1.5 text-[11px] text-tomato-ink" role="status">
       <TriangleAlert className="mt-px h-3 w-3 shrink-0" aria-hidden />
       {msg}
     </p>
@@ -124,7 +99,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                   aria-pressed={v === true}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition ${
                     v === true
-                      ? 'border-green bg-green/10 text-dark-green'
+                      ? 'border-green bg-green/10 text-green-deep'
                       : 'border-sage bg-transparent text-slate'
                   }`}
                 >
@@ -137,7 +112,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                   aria-pressed={v === false}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition ${
                     v === false
-                      ? 'border-tomato bg-tomato/10 text-tomato'
+                      ? 'border-tomato bg-tomato/10 text-tomato-ink'
                       : 'border-sage bg-transparent text-slate'
                   }`}
                 >
@@ -211,7 +186,7 @@ function PrimaryButton({
       type="submit"
       disabled={disabled}
       className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:pointer-events-none disabled:opacity-50 ${
-        armed ? 'bg-tomato hover:bg-tomato/90' : 'bg-green hover:bg-dark-green'
+        armed ? 'bg-tomato-ink hover:bg-tomato-ink/90' : 'bg-green-deep hover:bg-green-deeper'
       }`}
     >
       {children}
@@ -251,7 +226,7 @@ function AmountField({
 }) {
   if (showArmed) {
     return (
-      <p className="flex items-start gap-1.5 text-[11px] font-medium text-tomato">
+      <p className="flex items-start gap-1.5 text-[11px] font-medium text-tomato-ink">
         <TriangleAlert className="mt-px h-3 w-3 shrink-0" aria-hidden />
         That&apos;s more than double your per-meal budget — tap &ldquo;Log anyway&rdquo; to confirm.
       </p>
@@ -515,7 +490,7 @@ export function LogMealModal({ state, onClose, onSave, isSaving, budget }: Props
     <Dialog open={state.open} onOpenChange={onClose}>
       <DialogContent className="max-h-[90vh] max-w-sm overflow-y-auto">
         <DialogHeader>
-          <div className="text-xs font-semibold uppercase tracking-widest text-green">
+          <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
             {eyebrow}
           </div>
           <DialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">

@@ -267,7 +267,7 @@ export function LocationMap({
           aria-activedescendant={
             activeIndex >= 0 ? `loc-result-${results[activeIndex]?.place_id}` : undefined
           }
-          className={`w-full rounded-xl border border-sage bg-white px-3.5 py-[11px] pr-9 text-[13px] text-charcoal transition-colors placeholder:text-slate/50 focus:border-dark-green ${FOCUS_RING}`}
+          className={`w-full rounded-xl border border-sage bg-white px-3.5 py-[11px] pr-9 text-[13px] text-charcoal transition-colors placeholder:text-slate/50 focus:border-green-deep ${FOCUS_RING}`}
         />
         <span
           aria-hidden
@@ -368,7 +368,7 @@ export function LocationMap({
         <span
           aria-hidden
           className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-            hasPin ? 'bg-dark-green text-white' : 'bg-sage text-slate'
+            hasPin ? 'bg-green-deep text-white' : 'bg-sage text-slate'
           }`}
         >
           <MapPin className="h-3 w-3" />

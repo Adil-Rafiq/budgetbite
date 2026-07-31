@@ -73,7 +73,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <aside className="fixed inset-y-0 hidden border-r border-sage bg-white text-charcoal lg:flex lg:w-64 lg:flex-col">
         {/* Logo */}
         <Link href="/admin" className="flex items-center gap-2.5 border-b border-sage px-6 py-5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green text-white shadow-sm">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-deep text-white shadow-sm">
             <LogoIcon size={16} />
           </span>
           <span className="flex flex-col leading-none">
@@ -100,13 +100,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${
                   active
-                    ? 'bg-[#f0f9e0] text-dark-green'
+                    ? 'bg-[#f0f9e0] text-green-deep'
                     : 'text-slate hover:bg-canvas hover:text-charcoal'
                 }`}
               >
                 <span
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                    active ? 'bg-green/15 text-green' : 'border border-sage bg-canvas text-slate'
+                    active ? 'bg-green/15 text-green-deep' : 'border border-sage bg-canvas text-slate'
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -132,7 +132,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             Back to app
           </Link>
           <div className="flex items-center gap-3 rounded-2xl border border-sage bg-canvas px-3 py-2.5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green text-sm font-semibold text-white">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-deep text-sm font-semibold text-white">
               {initials(user?.name)}
             </span>
             <div className="flex min-w-0 flex-col">

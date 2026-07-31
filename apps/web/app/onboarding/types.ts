@@ -3,7 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 
 export type OnboardingStepId = 'location' | 'dietary' | 'budget' | 'notifications' | 'review';
 
-export type OnboardingStepAccent = 'green' | 'dark-green';
+export type OnboardingStepAccent = 'green' | 'deep';
 
 export type OnboardingStep = {
   id: OnboardingStepId;

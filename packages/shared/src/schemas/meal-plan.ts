@@ -40,8 +40,18 @@ export const suggestionOptionSchema = z.object({
   restaurantName: z.string().nullable(),
   /** The 1..N menu items composing this order, in AI-listed order. */
   items: z.array(suggestionOptionItemSchema).min(1),
-  /** Combined cost of every item in the order. */
+  /** Combined cost of every item in the order — a menu subtotal, not a bill. */
   estimatedPrice: z.number(),
+  /**
+   * The restaurant's fees, carried so the client can judge this option on what
+   * it costs to *receive*. Without them the dashboard scored a suggestion on
+   * `estimatedPrice` alone while the restaurants surface scored the same dish
+   * through `estimateMealCost`, so one ₨640 order could read "Fits budget" on
+   * one screen and "Tight" on the other. Optional because older cached
+   * responses predate them.
+   */
+  deliveryFee: z.number().nullable().optional(),
+  minimumOrder: z.number().nullable().optional(),
   notes: z.string().optional(),
   /**
    * Where this option came from. 'pin' rows are user-locked overrides served

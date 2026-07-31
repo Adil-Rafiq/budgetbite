@@ -29,8 +29,8 @@ const money = (n: number): string => formatPKR(n);
 
 const genStatusClass: Record<AdminPlanGeneration['status'], string> = {
   pending: 'bg-[#f5a623]/15 text-[#9a6400]',
-  succeeded: 'bg-green/15 text-dark-green',
-  failed: 'bg-tomato/10 text-tomato',
+  succeeded: 'bg-green/15 text-green-deep',
+  failed: 'bg-tomato/10 text-tomato-ink',
   superseded: 'bg-sage/50 text-slate/60',
 };
 
@@ -106,7 +106,7 @@ export default function AdminPlansPage() {
                   <TableCell>
                     <Link
                       href={`/admin/plans/${p.id}`}
-                      className="font-medium text-charcoal hover:text-dark-green"
+                      className="font-medium text-charcoal hover:text-green-deep"
                     >
                       {p.user.name}
                     </Link>

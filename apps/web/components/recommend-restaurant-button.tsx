@@ -21,6 +21,7 @@ import {
 } from '@/hooks/use-restaurant-recommendations';
 import { fileToMenuImagePayload, MenuImageError } from '@/lib/menu-image';
 import { showToast } from '@/lib/toast';
+import { FOCUS_RING } from '@/lib/focus-ring';
 import { useUser } from '@/hooks/use-user';
 import { useDetectLocation } from '@/hooks/use-detect-location';
 import { DEFAULT_MAP_VIEW } from '@/app/onboarding/constants';
@@ -46,7 +47,7 @@ const LocationMap = dynamic(() => import('@/components/location-map').then((m) =
 
 const labelClass = 'text-xs font-semibold uppercase tracking-wide text-slate';
 const labelStyle: React.CSSProperties = {};
-const errorClass = 'text-[11px] text-tomato';
+const errorClass = 'text-[11px] text-tomato-ink';
 
 // Empty string → undefined so optional fields are omitted, not sent as ''.
 const optionalString = (v: unknown) => (v === '' || v == null ? undefined : v);
@@ -228,7 +229,7 @@ export function RecommendRestaurantButton({
               awaiting review. Once an admin reviews one — or you{' '}
               <Link
                 href="/restaurants/recommendations"
-                className="text-green underline underline-offset-2"
+                className={`rounded text-green-deep underline underline-offset-2 ${FOCUS_RING}`}
                 onClick={() => setOpen(false)}
               >
                 withdraw one
@@ -285,16 +286,18 @@ export function RecommendRestaurantButton({
 
               {/* Location — the restaurant's own spot, not necessarily the user's. */}
               <div className="flex flex-col gap-2">
-                <Label className={labelClass} style={labelStyle}>
+                {/* A group heading, not a label — it names no control, and a
+                    <label> with nothing to label is announced as an orphan. */}
+                <p className={labelClass} style={labelStyle}>
                   Where is it?
-                </Label>
-                <p className="text-[12px] text-slate/60">
+                </p>
+                <p className="text-[12px] text-slate">
                   Drag the pin or search to mark the restaurant’s location — this is where it’ll
                   appear for people nearby.
                 </p>
                 <button
                   type="button"
-                  className="inline-flex min-h-10 items-center gap-2 self-start rounded-xl bg-green px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+                  className={`inline-flex min-h-10 items-center gap-2 self-start rounded-xl bg-green-deep px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
                   onClick={detectLocation}
                   disabled={isDetecting}
                 >
@@ -326,9 +329,9 @@ export function RecommendRestaurantButton({
 
               {/* Menu items — at least one required so the admin knows what's served. */}
               <div className="flex flex-col gap-2">
-                <Label className={labelClass} style={labelStyle}>
+                <p className={labelClass} style={labelStyle}>
                   Menu items
-                </Label>
+                </p>
                 {/* AI prefill from a photo — replaces the rows below; falls back to manual entry. */}
                 <div className="flex items-center gap-2">
                   <input
@@ -360,17 +363,30 @@ export function RecommendRestaurantButton({
                       </>
                     )}
                   </Button>
-                  <span className="text-[11px] text-slate/60">or type the items yourself</span>
+                  <span className="text-[11px] text-slate">or type the items yourself</span>
                 </div>
                 <div className="flex flex-col gap-2">
                   {fields.map((field, i) => (
                     <div key={field.id} className="flex flex-col gap-1">
+                      {/* Placeholders are not names: they vanish on first
+                          keystroke and a screen reader reaching row 4 of this
+                          repeating group otherwise announces "edit text" twice
+                          with no way to tell which field is which. The row
+                          number is in the label so the rows are distinguishable
+                          when tabbing; the visual design is unchanged. */}
                       <div className="flex items-start gap-2">
                         <div className="flex-1">
-                          <Input placeholder="Item name" {...register(`items.${i}.name`)} />
+                          <Input
+                            id={`item-name-${i}`}
+                            aria-label={`Item ${i + 1} name`}
+                            placeholder="Item name"
+                            {...register(`items.${i}.name`)}
+                          />
                         </div>
                         <div className="w-28">
                           <Input
+                            id={`item-price-${i}`}
+                            aria-label={`Item ${i + 1} price in rupees`}
                             type="number"
                             step="any"
                             placeholder="₨ price"
@@ -445,12 +461,12 @@ export function RecommendRestaurantButton({
 
           {mine.length > 0 && (
             <div className="mt-1 flex items-center justify-between gap-2 border-t border-sage pt-3">
-              <span className="text-[11px] text-slate/60">
+              <span className="text-[11px] text-slate">
                 {pendingCount} / {MAX_PENDING_RESTAURANT_RECOMMENDATIONS} pending review
               </span>
               <Link
                 href="/restaurants/recommendations"
-                className="text-[12px] text-green underline-offset-2 hover:underline"
+                className={`rounded text-[12px] text-green-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
                 onClick={() => setOpen(false)}
               >
                 view your recommendations →

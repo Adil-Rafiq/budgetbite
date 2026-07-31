@@ -10,6 +10,7 @@ import {
 } from '@/hooks/use-food-preference';
 import { showToast } from '@/lib/toast';
 import { getErrorMessage } from '@/lib/api/errors';
+import { FOCUS_RING } from '@/lib/focus-ring';
 
 interface FoodPreferenceToggleProps {
   targetType: FoodPreferenceTargetType;
@@ -21,9 +22,10 @@ interface FoodPreferenceToggleProps {
   className?: string;
 }
 
+/** Thumb-sized on phones, denser on desktop where the pointer is precise. */
 const BTN_SIZE: Record<'sm' | 'md', string> = {
-  sm: 'h-7 w-7',
-  md: 'h-8 w-8',
+  sm: 'size-11 sm:size-9',
+  md: 'size-11 sm:size-10',
 };
 
 const ICON_SIZE: Record<'sm' | 'md', string> = {
@@ -67,8 +69,7 @@ export function FoodPreferenceToggle({
     }
   };
 
-  const baseBtn =
-    'inline-flex items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-50';
+  const baseBtn = `inline-flex items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING}`;
 
   return (
     <div className={`flex items-center gap-1.5 ${className ?? ''}`}>
@@ -81,8 +82,8 @@ export function FoodPreferenceToggle({
         onClick={() => apply('favorite')}
         className={`${baseBtn} ${BTN_SIZE[size]} ${
           isFavorite
-            ? 'border-amber bg-amber/[0.12] text-amber'
-            : 'border-lumen-dk bg-white text-soft hover:border-amber/50 hover:text-amber'
+            ? 'border-amber bg-amber-tint text-amber-ink'
+            : 'border-sage bg-white text-slate hover:border-amber hover:text-amber-ink'
         }`}
       >
         <Heart
@@ -99,8 +100,8 @@ export function FoodPreferenceToggle({
         onClick={() => apply('blocked')}
         className={`${baseBtn} ${BTN_SIZE[size]} ${
           isBlocked
-            ? 'border-pulse bg-pulse/[0.10] text-pulse'
-            : 'border-lumen-dk bg-white text-soft hover:border-pulse/50 hover:text-pulse'
+            ? 'border-tomato bg-tomato/10 text-tomato-ink'
+            : 'border-sage bg-white text-slate hover:border-tomato hover:text-tomato-ink'
         }`}
       >
         <Ban className={ICON_SIZE[size]} />

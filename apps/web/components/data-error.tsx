@@ -1,5 +1,7 @@
 import { TriangleAlert, RotateCw } from 'lucide-react';
 
+import { FOCUS_RING } from '@/lib/focus-ring';
+
 /**
  * Recoverable data-load failure. The product's core scene is a phone on mobile
  * data, where a dropped request is routine — so failures offer an in-place
@@ -7,18 +9,24 @@ import { TriangleAlert, RotateCw } from 'lucide-react';
  */
 export function DataError({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-tomato/30 bg-tomato/[0.06] p-4 text-[13px] text-tomato sm:flex-row sm:items-center sm:justify-between">
+    <div
+      role="alert"
+      className="flex flex-col gap-3 rounded-2xl border border-tomato/30 bg-tomato/[0.06] p-4 text-[13px] text-tomato-ink sm:flex-row sm:items-center sm:justify-between"
+    >
       <span className="flex items-center gap-3">
-        <TriangleAlert className="h-4 w-4 shrink-0" />
+        <TriangleAlert aria-hidden className="h-4 w-4 shrink-0" />
         {message}
       </span>
       {onRetry && (
         <button
           type="button"
           onClick={onRetry}
-          className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-lg border border-tomato/40 bg-white px-3 py-1.5 text-[12px] font-semibold text-tomato transition-colors hover:bg-tomato/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tomato/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:self-auto"
+          // The house FOCUS_RING, not a bespoke tomato one. This is the single
+          // control a keyboard user reaches during a failure; it should not be
+          // the one control whose focus treatment they have never seen before.
+          className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-lg border border-tomato/40 bg-white px-3 text-[12px] font-semibold text-tomato-ink transition-colors hover:bg-tomato/10 sm:min-h-9 sm:self-auto ${FOCUS_RING}`}
         >
-          <RotateCw className="h-3.5 w-3.5" />
+          <RotateCw aria-hidden className="h-3.5 w-3.5" />
           Try again
         </button>
       )}

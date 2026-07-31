@@ -100,7 +100,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
           }}
         >
           <DialogHeader>
-            <div className="text-xs font-semibold uppercase tracking-widest text-green">
+            <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
               Step {stepNumber} · New plan
             </div>
             <DialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -149,7 +149,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
               type="button"
               onClick={advance}
               disabled={isSubmitting || !canAdvance}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-xl bg-green px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 items-center gap-2 rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
             >
               {isLastStep ? (isSubmitting ? 'Creating…' : 'Create plan') : 'Next'}
               <span aria-hidden className="opacity-70">
@@ -167,7 +167,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
       <AlertDialog open={confirmDiscardOpen} onOpenChange={setConfirmDiscardOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="text-xs font-semibold uppercase tracking-widest text-tomato">
+            <div className="text-xs font-semibold uppercase tracking-widest text-tomato-ink">
               Confirm · Discard
             </div>
             <AlertDialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -190,7 +190,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
                 discard();
                 onOpenChange(false);
               }}
-              className={`min-h-11 rounded-xl bg-tomato px-5 text-[13px] font-semibold text-white transition-colors hover:bg-tomato/90 active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl bg-tomato-ink px-5 text-[13px] font-semibold text-white transition-colors hover:bg-tomato/90 active:scale-[0.97] ${FOCUS_RING}`}
             >
               Discard
             </AlertDialogAction>

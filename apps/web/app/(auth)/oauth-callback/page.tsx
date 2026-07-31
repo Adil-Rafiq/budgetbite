@@ -34,7 +34,7 @@ export default function OAuthCallbackPage() {
           </span>
         </div>
         <p className="flex items-center gap-2 text-sm text-slate">
-          <Loader2 className="h-4 w-4 animate-spin text-green" />
+          <Loader2 className="h-4 w-4 animate-spin text-green-deep" />
           Completing handshake…
         </p>
       </div>

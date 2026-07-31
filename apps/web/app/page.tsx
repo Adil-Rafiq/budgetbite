@@ -55,7 +55,7 @@ export default function LandingPage() {
       <header className="fixed inset-x-0 top-0 z-50 border-b border-sage/60 bg-canvas/85 backdrop-blur-xl">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:h-[72px] lg:px-8">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green text-white">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-deep text-white">
               <LogoIcon size={16} />
             </span>
             <span className="font-display text-xl font-bold tracking-tight">
@@ -64,13 +64,13 @@ export default function LandingPage() {
           </Link>
 
           <div className="hidden items-center gap-8 text-sm font-normal text-charcoal/70 md:flex">
-            <a href="#how" className="transition-colors hover:text-green">
+            <a href="#how" className="transition-colors hover:text-green-deep">
               How it works
             </a>
-            <a href="#features" className="transition-colors hover:text-green">
+            <a href="#features" className="transition-colors hover:text-green-deep">
               Features
             </a>
-            <a href="#privacy" className="transition-colors hover:text-green">
+            <a href="#privacy" className="transition-colors hover:text-green-deep">
               Privacy
             </a>
           </div>
@@ -84,7 +84,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/register"
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-green px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-dark-green"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-green-deep px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-green-deeper"
             >
               <Leaf className="h-3.5 w-3.5" />
               Get started
@@ -119,7 +119,7 @@ export default function LandingPage() {
           <div className="mx-auto mb-6 max-w-4xl text-center">
             <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
               Eat well from{' '}
-              <span className="relative inline-block text-green">
+              <span className="relative inline-block text-green-deep">
                 local restaurants
                 <svg
                   className="absolute -bottom-1 left-0 w-full"
@@ -164,7 +164,7 @@ export default function LandingPage() {
               <div className="absolute left-4 top-4 rounded-2xl bg-white/95 px-4 py-3 shadow-lg backdrop-blur-sm">
                 <div className="flex items-center gap-2.5">
                   <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-green/15">
-                    <RefreshCw className="h-4 w-4 text-green" />
+                    <RefreshCw className="h-4 w-4 text-green-deep" />
                   </span>
                   <div>
                     <p className="font-display text-sm font-normal text-charcoal">AI re-planned</p>
@@ -174,7 +174,7 @@ export default function LandingPage() {
               </div>
 
               {/* top-right: under budget */}
-              <div className="absolute right-4 top-4 rounded-2xl bg-tomato px-3 py-2.5 text-white shadow-lg">
+              <div className="absolute right-4 top-4 rounded-2xl bg-tomato-ink px-3 py-2.5 text-white shadow-lg">
                 <div className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5" />
                   <p className="font-display text-sm font-normal">Under budget</p>
@@ -200,7 +200,7 @@ export default function LandingPage() {
                     <p className="text-[10px] font-normal uppercase tracking-wide text-charcoal/50">
                       Remaining
                     </p>
-                    <p className="font-display text-lg font-normal text-green">
+                    <p className="font-display text-lg font-normal text-green-deep">
                       ₨ {remaining.toLocaleString()}
                     </p>
                   </div>
@@ -216,9 +216,9 @@ export default function LandingPage() {
                   <span>₨ {total.toLocaleString()}</span>
                 </div>
                 <div className="mt-3 flex items-center gap-2 rounded-xl bg-canvas px-3 py-2">
-                  <Sparkles className="h-3.5 w-3.5 shrink-0 text-green" />
+                  <Sparkles className="h-3.5 w-3.5 shrink-0 text-green-deep" />
                   <p className="text-xs font-normal text-charcoal">
-                    AI suggests <span className="text-tomato">Sabri Nihari</span> — ₨650 nearby ·
+                    AI suggests <span className="text-tomato-ink">Sabri Nihari</span> — ₨650 nearby ·
                     fits your budget
                   </p>
                 </div>
@@ -261,7 +261,7 @@ export default function LandingPage() {
 
               <Link
                 href="/register"
-                className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-green text-sm font-semibold text-white shadow-md transition-all hover:bg-dark-green"
+                className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-green-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper"
               >
                 <Mail className="h-4 w-4" />
                 Sign up with email
@@ -280,8 +280,8 @@ export default function LandingPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-sage/50 px-4 py-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-green" />
-              <span className="text-xs font-normal uppercase tracking-widest text-green">
+              <Sparkles className="h-3.5 w-3.5 text-green-deep" />
+              <span className="text-xs font-normal uppercase tracking-widest text-green-deep">
                 How it works
               </span>
             </div>
@@ -305,10 +305,10 @@ export default function LandingPage() {
             {/* STEP 1 — Set your budget (active) */}
             <div className="relative z-10 rounded-3xl border-2 border-green bg-gradient-to-br from-canvas to-sage p-6 transition-transform hover:-translate-y-1">
               <div className="mb-5 flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green text-sm font-normal text-white shadow-md">
+                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green-deep text-sm font-normal text-white shadow-md">
                   01
                 </span>
-                <SlidersHorizontal className="ml-auto h-5 w-5 text-green" />
+                <SlidersHorizontal className="ml-auto h-5 w-5 text-green-deep" />
               </div>
               <h3 className="mb-2 font-display text-lg font-normal">Set your budget</h3>
               <p className="mb-5 text-sm leading-relaxed text-charcoal/60">
@@ -318,7 +318,7 @@ export default function LandingPage() {
               <div className="rounded-2xl border border-sage/60 bg-white p-4 shadow-sm">
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-xs font-normal text-charcoal/50">Weekly budget</span>
-                  <span className="font-display text-lg font-normal text-green">₨ 15,000</span>
+                  <span className="font-display text-lg font-normal text-green-deep">₨ 15,000</span>
                 </div>
                 <div className="relative h-2 rounded-full bg-sage/60">
                   <div className="absolute inset-y-0 left-0 w-[58%] rounded-full bg-gradient-to-r from-green to-green/70" />
@@ -370,10 +370,10 @@ export default function LandingPage() {
                 ].map((m, i) => {
                   const tint =
                     m.tint === 'tomato'
-                      ? 'bg-tomato/10 text-tomato'
+                      ? 'bg-tomato/10 text-tomato-ink'
                       : m.tint === 'green'
-                        ? 'bg-green/15 text-green'
-                        : 'bg-sage/50 text-dark-green';
+                        ? 'bg-green/15 text-green-deep'
+                        : 'bg-sage/50 text-green-deep';
                   return (
                     <div
                       key={m.name}
@@ -390,7 +390,7 @@ export default function LandingPage() {
                         <p className="truncate text-xs font-normal text-charcoal">{m.name}</p>
                         <p className="text-xs text-charcoal/40">{m.meta}</p>
                       </div>
-                      <span className="shrink-0 font-display text-sm font-normal text-green">
+                      <span className="shrink-0 font-display text-sm font-normal text-green-deep">
                         {m.price}
                       </span>
                     </div>
@@ -420,13 +420,13 @@ export default function LandingPage() {
                 <div className="flex items-center gap-2 rounded-xl border border-sage/30 bg-white px-3 py-2.5">
                   <PencilLine className="h-3.5 w-3.5 shrink-0 text-charcoal/30" />
                   <span className="flex-1 truncate text-xs text-charcoal">Sabri Nihari</span>
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-deep">
                     <Check className="h-3 w-3 text-white" />
                   </span>
                 </div>
                 <div className="mt-2 flex items-center gap-1.5">
-                  <Check className="h-3.5 w-3.5 text-green" />
-                  <span className="text-xs font-normal text-green">Logged · Budget updated</span>
+                  <Check className="h-3.5 w-3.5 text-green-deep" />
+                  <span className="text-xs font-normal text-green-deep">Logged · Budget updated</span>
                 </div>
               </div>
             </div>
@@ -434,10 +434,10 @@ export default function LandingPage() {
             {/* STEP 4 — It re-plans for you */}
             <div className="relative z-10 rounded-3xl border-2 border-sage/40 bg-white p-6 transition-all hover:-translate-y-1 hover:border-green/30">
               <div className="mb-5 flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-tomato text-sm font-normal text-white shadow-md">
+                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-tomato-ink text-sm font-normal text-white shadow-md">
                   04
                 </span>
-                <RefreshCw className="ml-auto h-5 w-5 text-tomato/40" />
+                <RefreshCw className="ml-auto h-5 w-5 text-tomato-ink/40" />
               </div>
               <h3 className="mb-2 font-display text-lg font-normal">It re-plans for you</h3>
               <p className="mb-5 text-sm leading-relaxed text-charcoal/60">
@@ -449,7 +449,7 @@ export default function LandingPage() {
                   <span className="text-xs font-normal uppercase tracking-wide text-charcoal/60">
                     New plan — rest of week
                   </span>
-                  <span className="font-display text-sm font-normal text-tomato">₨ 6,420 left</span>
+                  <span className="font-display text-sm font-normal text-tomato-ink">₨ 6,420 left</span>
                 </div>
                 <div className="space-y-1.5">
                   {[
@@ -463,15 +463,15 @@ export default function LandingPage() {
                     >
                       <span className="w-8 shrink-0 text-xs text-charcoal/40">{row.day}</span>
                       <span className="truncate text-xs font-normal text-charcoal">{row.name}</span>
-                      <span className="ml-auto shrink-0 font-display text-xs font-normal text-green">
+                      <span className="ml-auto shrink-0 font-display text-xs font-normal text-green-deep">
                         {row.price}
                       </span>
                     </div>
                   ))}
                 </div>
                 <div className="flex items-center gap-1.5 pt-1">
-                  <Sparkles className="h-3.5 w-3.5 text-tomato" />
-                  <span className="text-xs font-normal text-tomato">AI re-planned instantly</span>
+                  <Sparkles className="h-3.5 w-3.5 text-tomato-ink" />
+                  <span className="text-xs font-normal text-tomato-ink">AI re-planned instantly</span>
                 </div>
               </div>
             </div>
@@ -485,13 +485,13 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-2">
             <div>
               <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-green/20 px-4 py-1.5">
-                <Utensils className="h-3.5 w-3.5 text-green" />
-                <span className="text-xs font-normal uppercase tracking-widest text-green">
+                <Utensils className="h-3.5 w-3.5 text-green-deep" />
+                <span className="text-xs font-normal uppercase tracking-widest text-green-deep">
                   What you get
                 </span>
               </div>
               <h2 className="mb-6 font-display text-4xl font-normal leading-tight tracking-tight text-white lg:text-5xl">
-                Built for people who love food <span className="text-green">and</span> their budget.
+                Built for people who love food <span className="text-green-deep">and</span> their budget.
               </h2>
               <p className="mb-10 text-lg leading-relaxed text-white/50">
                 No spreadsheets, no guilt. Just a planner that knows what&apos;s near you, what fits
@@ -503,9 +503,9 @@ export default function LandingPage() {
                   const Icon = f.icon;
                   const tint =
                     f.tint === 'green'
-                      ? 'bg-green/15 text-green'
+                      ? 'bg-green/15 text-green-deep'
                       : f.tint === 'tomato'
-                        ? 'bg-tomato/15 text-tomato'
+                        ? 'bg-tomato/15 text-tomato-ink'
                         : 'bg-sage/20 text-sage';
                   return (
                     <div key={f.title} className="flex items-start gap-4">
@@ -533,7 +533,7 @@ export default function LandingPage() {
                   <p className="text-xs font-normal uppercase tracking-widest text-white/40">
                     Your month at a glance
                   </p>
-                  <span className="rounded-lg bg-green/15 px-2.5 py-1 text-xs font-normal text-green">
+                  <span className="rounded-lg bg-green/15 px-2.5 py-1 text-xs font-normal text-green-deep">
                     On track
                   </span>
                 </div>
@@ -544,7 +544,7 @@ export default function LandingPage() {
                     <p className="mt-1 text-xs text-white/40">left this week</p>
                   </div>
                   <div className="rounded-2xl bg-white/5 p-4">
-                    <p className="font-display text-3xl font-normal text-green">18</p>
+                    <p className="font-display text-3xl font-normal text-green-deep">18</p>
                     <p className="mt-1 text-xs text-white/40">meals planned</p>
                   </div>
                 </div>
@@ -567,7 +567,7 @@ export default function LandingPage() {
               </div>
 
               {/* floating card */}
-              <div className="absolute -bottom-5 -left-4 hidden rounded-2xl bg-green px-4 py-3 shadow-2xl lg:block">
+              <div className="absolute -bottom-5 -left-4 hidden rounded-2xl bg-green-deep px-4 py-3 shadow-2xl lg:block">
                 <div className="flex items-center gap-2">
                   <RefreshCw className="h-4 w-4 text-white" />
                   <span className="font-display text-sm font-normal text-white">
@@ -586,7 +586,7 @@ export default function LandingPage() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:px-8">
           <div className="lg:col-span-5">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-sage/60 px-4 py-1.5">
-              <span className="text-xs font-normal uppercase tracking-widest text-dark-green">
+              <span className="text-xs font-normal uppercase tracking-widest text-green-deep">
                 Privacy
               </span>
             </div>
@@ -602,7 +602,7 @@ export default function LandingPage() {
               'Export or delete your data at any time.',
             ].map((line) => (
               <li key={line} className="flex items-start gap-3 text-base text-charcoal">
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green text-white">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-deep text-white">
                   <Check className="h-3 w-3" />
                 </span>
                 <span>{line}</span>
@@ -613,7 +613,7 @@ export default function LandingPage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="relative overflow-hidden bg-green py-24 lg:py-32">
+      <section className="relative overflow-hidden bg-green-deep py-24 lg:py-32">
         <div
           aria-hidden
           className="absolute inset-0 opacity-20"
@@ -638,7 +638,7 @@ export default function LandingPage() {
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/register"
-              className="flex min-h-14 items-center justify-center gap-2.5 rounded-2xl bg-white px-8 py-4 text-base font-semibold text-dark-green shadow-xl transition-all hover:bg-canvas"
+              className="flex min-h-14 items-center justify-center gap-2.5 rounded-2xl bg-white px-8 py-4 text-base font-semibold text-green-deep shadow-xl transition-all hover:bg-canvas"
             >
               <Leaf className="h-4 w-4" />
               Get started — free
@@ -670,7 +670,7 @@ export default function LandingPage() {
           <div className="flex flex-col gap-10 border-b border-white/10 pb-12 md:flex-row md:items-start md:justify-between">
             <div className="md:max-w-sm">
               <div className="flex items-center gap-2.5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green text-white">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-deep text-white">
                   <LogoIcon size={16} />
                 </span>
                 <span className="font-display text-xl font-bold text-white">

@@ -253,7 +253,7 @@ export default function AdminRestaurantsPage() {
                       </TableCell>
                     )}
                     <TableCell className="font-medium text-charcoal">
-                      <Link href={`/admin/restaurants/${r.id}`} className="hover:text-dark-green">
+                      <Link href={`/admin/restaurants/${r.id}`} className="hover:text-green-deep">
                         {r.name}
                       </Link>
                     </TableCell>

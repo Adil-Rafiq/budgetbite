@@ -134,7 +134,7 @@ export default function AdminUsersPage() {
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[11px] ${
                           u.role === 'admin'
-                            ? 'bg-green/15 text-dark-green'
+                            ? 'bg-green/15 text-green-deep'
                             : 'bg-sage/50 text-slate/60'
                         }`}
                       >

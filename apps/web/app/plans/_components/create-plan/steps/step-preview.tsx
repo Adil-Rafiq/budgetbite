@@ -134,7 +134,7 @@ function PreviewRow({
 }) {
   return (
     <div className="flex gap-3 rounded-xl border border-sage bg-white p-3">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green/10 text-green">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green/10 text-green-deep">
         <Icon className="h-4 w-4" />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-1">

@@ -67,7 +67,7 @@ export function AppSidebar() {
         href="/dashboard"
         className="flex items-center gap-2.5 border-b border-sage px-6 py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green/40"
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green text-white shadow-sm">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-deep text-white shadow-sm">
           <LogoIcon size={16} />
         </span>
         <span className="font-display text-lg font-bold tracking-tight">
@@ -79,7 +79,7 @@ export function AppSidebar() {
       <div className="border-b border-sage/60 px-5 py-4">
         <div className="flex items-center gap-3">
           <span
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green text-sm font-semibold text-white"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-deep text-sm font-semibold text-white"
             style={{ boxShadow: '0 0 0 2px #8cc63f, 0 0 0 4px #f0f9e0' }}
           >
             {initials(user?.name)}
@@ -106,13 +106,13 @@ export function AppSidebar() {
               aria-current={isActive ? 'page' : undefined}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
                 isActive
-                  ? 'bg-[#f0f9e0] text-dark-green'
+                  ? 'bg-[#f0f9e0] text-green-deep'
                   : 'text-slate hover:bg-canvas hover:text-charcoal'
               }`}
             >
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                  isActive ? 'bg-green/15 text-green' : 'border border-sage bg-canvas text-slate'
+                  isActive ? 'bg-green/15 text-green-deep' : 'border border-sage bg-canvas text-slate'
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -131,13 +131,13 @@ export function AppSidebar() {
               <span className="text-xs font-semibold uppercase tracking-wide text-slate">
                 {active.plan.planType} budget
               </span>
-              <span className={`text-xs font-bold ${isOver ? 'text-tomato' : 'text-dark-green'}`}>
+              <span className={`text-xs font-bold ${isOver ? 'text-tomato-ink' : 'text-green-deep'}`}>
                 {spentPercent}%
               </span>
             </div>
             <div
               className={`mt-2.5 font-display text-2xl font-bold tracking-tight ${
-                isOver ? 'text-tomato' : 'text-charcoal'
+                isOver ? 'text-tomato-ink' : 'text-charcoal'
               }`}
             >
               {formatPKR(Math.abs(remaining))}

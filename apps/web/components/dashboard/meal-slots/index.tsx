@@ -15,12 +15,11 @@ import { BudgetFitBadge } from '@/components/budget-fit-badge';
 import { DataError } from '@/components/data-error';
 import { optionLabel } from '@/lib/suggestion';
 import { formatPKR } from '@/lib/currency';
-import { classifyBudgetFit } from '@repo/shared';
+import { classifyBudgetFit, estimateMealCost } from '@repo/shared';
 import type { SuggestionSlot, SuggestionOption, BudgetFit } from '@repo/shared';
+import { FOCUS_RING } from '@/lib/focus-ring';
 
-const focusRing =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
-const ghostBtn = `inline-flex w-full items-center justify-center gap-2 rounded-xl border border-sage bg-white px-4 py-2 text-sm font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${focusRing}`;
+const ghostBtn = `inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-sage bg-white px-4 py-2 text-sm font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`;
 
 function SkeletonCard() {
   return (
@@ -53,13 +52,27 @@ export function MealSlots() {
   // Which logged slot is showing its inline "remove this meal?" confirm.
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
 
-  // Fit cue for one option's price against the budget, or null when there's no
-  // usable per-meal target yet. Same helper the restaurants surface uses, so
-  // "Fits budget / Tight / Over budget" means the same thing everywhere.
-  const fitOf = (price: number): BudgetFit | null =>
+  // Fit cue for one option against the budget, or null when there's no usable
+  // per-meal target yet.
+  //
+  // This takes the whole option rather than a bare price on purpose. It used to
+  // take `option.estimatedPrice` — the AI's menu subtotal, with no delivery fee
+  // and no minimum-order floor — while the restaurants surface passed the same
+  // dish through `estimateMealCost`. The comment here claimed both screens
+  // agreed; they did not, and a ₨640 order could read "Fits budget" on the
+  // dashboard and "Tight" on the restaurant page. One badge, one meaning.
+  const fitOf = (option: {
+    estimatedPrice: number;
+    deliveryFee?: number | null;
+    minimumOrder?: number | null;
+  }): BudgetFit | null =>
     budget.hasBudget
       ? classifyBudgetFit({
-          itemPrice: price,
+          itemPrice: estimateMealCost({
+            itemPrice: option.estimatedPrice,
+            deliveryFee: option.deliveryFee,
+            minimumOrder: option.minimumOrder,
+          }),
           avgBudgetPerRemainingMeal: budget.avgPerMeal,
           amountRemaining: budget.amountRemaining,
         })
@@ -129,7 +142,7 @@ export function MealSlots() {
                   <div className="flex items-center gap-3">
                     <span
                       className={`inline-flex h-8 w-8 items-center justify-center rounded-xl text-sm font-semibold ${
-                        isLogged ? 'bg-green text-white' : 'bg-green/10 text-green'
+                        isLogged ? 'bg-green-deep text-white' : 'bg-green/10 text-green-deep'
                       }`}
                     >
                       {isLogged ? (
@@ -157,7 +170,7 @@ export function MealSlots() {
                   {isLogged && loggedMeal ? (
                     <>
                       <div className="rounded-xl bg-white/70 p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-dark-green">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-green-deep">
                           Logged
                         </div>
                         <div className="mt-1.5 flex items-start justify-between gap-3">
@@ -212,7 +225,7 @@ export function MealSlots() {
 
                       {confirmRemoveId === loggedMeal.id ? (
                         <div className="mt-auto flex items-center gap-2 rounded-xl border border-tomato/30 bg-tomato/[0.06] p-2">
-                          <span className="px-1 text-[12px] font-medium text-tomato">
+                          <span className="px-1 text-[12px] font-medium text-tomato-ink">
                             Remove this meal?
                           </span>
                           <div className="ml-auto flex gap-2">
@@ -220,7 +233,7 @@ export function MealSlots() {
                               type="button"
                               onClick={() => setConfirmRemoveId(null)}
                               disabled={isRemoving}
-                              className={`rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:opacity-50 ${focusRing}`}
+                              className={`rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:opacity-50 ${FOCUS_RING}`}
                             >
                               Cancel
                             </button>
@@ -231,7 +244,7 @@ export function MealSlots() {
                                 await actions.removeChoice(loggedMeal.id);
                                 setConfirmRemoveId(null);
                               }}
-                              className={`rounded-lg bg-tomato px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-tomato/90 disabled:opacity-50 ${focusRing}`}
+                              className={`rounded-lg bg-tomato-ink px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-tomato-ink/90 disabled:opacity-50 ${FOCUS_RING}`}
                             >
                               {isRemoving ? 'Removing…' : 'Remove'}
                             </button>
@@ -251,7 +264,7 @@ export function MealSlots() {
                             type="button"
                             onClick={() => setConfirmRemoveId(loggedMeal.id)}
                             aria-label="Remove this logged meal"
-                            className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-sage bg-white px-4 py-2 text-sm font-medium text-slate transition-colors hover:border-tomato/40 hover:text-tomato ${focusRing}`}
+                            className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-sage bg-white px-4 py-2 text-sm font-medium text-slate transition-colors hover:border-tomato/40 hover:text-tomato-ink ${FOCUS_RING}`}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                             Remove
@@ -262,7 +275,7 @@ export function MealSlots() {
                   ) : (
                     <>
                       {slot.options.slice(0, 3).map((option: SuggestionOption) => {
-                        const fit = fitOf(option.estimatedPrice);
+                        const fit = fitOf(option);
                         return (
                           <button
                             key={option.id}
@@ -270,7 +283,7 @@ export function MealSlots() {
                             onClick={() =>
                               actions.openLogModal(slot.mealTypeId, { type: 'suggestion', option })
                             }
-                            className={`rounded-xl border border-sage bg-canvas px-4 py-3 text-left transition-colors hover:border-green/60 hover:bg-[#f0f9e0]/50 ${focusRing}`}
+                            className={`rounded-xl border border-sage bg-canvas px-4 py-3 text-left transition-colors hover:border-green/60 hover:bg-[#f0f9e0]/50 ${FOCUS_RING}`}
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
@@ -282,7 +295,7 @@ export function MealSlots() {
                                 </p>
                               </div>
                               <div className="flex shrink-0 flex-col items-end gap-1">
-                                <span className="font-display text-[14px] font-bold text-green">
+                                <span className="font-display text-[14px] font-bold text-green-deep">
                                   {formatPKR(option.estimatedPrice)}
                                 </span>
                                 {fit && <BudgetFitBadge fit={fit} />}
@@ -321,7 +334,7 @@ export function MealSlots() {
             {budget.hasBudget && (
               <p className="text-[12px] text-slate">
                 Per meal left:{' '}
-                <span className="font-semibold text-green">{formatPKR(budget.avgPerMeal)}</span> ·{' '}
+                <span className="font-semibold text-green-deep">{formatPKR(budget.avgPerMeal)}</span> ·{' '}
                 {formatPKR(budget.amountRemaining)} remaining
               </p>
             )}
@@ -329,7 +342,7 @@ export function MealSlots() {
 
           <div className="flex flex-col gap-3 overflow-y-auto py-2 pr-1">
             {expandedSlot?.options.map((option: SuggestionOption) => {
-              const fit = fitOf(option.estimatedPrice);
+              const fit = fitOf(option);
               return (
                 <div
                   key={option.id}
@@ -379,7 +392,7 @@ export function MealSlots() {
                     onClick={() =>
                       actions.openLogModal(expandedSlotId!, { type: 'suggestion', option })
                     }
-                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-green px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-dark-green ${focusRing}`}
+                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-green-deep px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-green-deeper ${FOCUS_RING}`}
                   >
                     Choose
                   </button>
@@ -413,7 +426,7 @@ export function MealSlots() {
 
             <div className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-sage bg-canvas p-4">
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-green/10 text-green">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-green/10 text-green-deep">
                   <ChefHat className="h-4 w-4" />
                 </span>
                 <div>
@@ -426,7 +439,7 @@ export function MealSlots() {
               <button
                 type="button"
                 onClick={() => actions.openLogModal(expandedSlotId!, { type: 'home' })}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sage bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas ${focusRing}`}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sage bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas ${FOCUS_RING}`}
               >
                 Log
               </button>
@@ -434,7 +447,7 @@ export function MealSlots() {
 
             <div className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-sage bg-canvas p-4">
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-green/10 text-green">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-green/10 text-green-deep">
                   <PenLine className="h-4 w-4" />
                 </span>
                 <div>
@@ -447,7 +460,7 @@ export function MealSlots() {
               <button
                 type="button"
                 onClick={() => actions.openLogModal(expandedSlotId!, { type: 'custom' })}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sage bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas ${focusRing}`}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sage bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas ${FOCUS_RING}`}
               >
                 Enter
               </button>
@@ -474,7 +487,7 @@ interface StatusPillProps {
 }
 
 function StatusPill({ tone, label, icon }: StatusPillProps) {
-  const toneClass = tone === 'green' ? 'bg-green/15 text-dark-green' : 'bg-sage text-dark-green';
+  const toneClass = tone === 'green' ? 'bg-green/15 text-green-deep' : 'bg-sage text-green-deep';
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${toneClass}`}
@@ -504,7 +517,7 @@ function SectionHeader({
         {progress && progress.total > 0 && (
           <span
             className={`inline-flex items-center gap-1.5 text-[12px] font-semibold ${
-              done ? 'text-dark-green' : 'text-slate'
+              done ? 'text-green-deep' : 'text-slate'
             }`}
           >
             {done && <Check className="h-3.5 w-3.5" />}

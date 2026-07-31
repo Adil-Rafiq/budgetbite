@@ -6,9 +6,11 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search, Star, X } from 'lucide-react';
 
 import type { RestaurantSort } from '@repo/shared';
-import { classifyBudgetFit } from '@repo/shared';
+import { classifyBudgetFit, typicalMealCost } from '@repo/shared';
 
 import { BudgetFitBadge } from '@/components/budget-fit-badge';
+import { RemainingAmount } from '@/components/budget/remaining-amount';
+import { DataError } from '@/components/data-error';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,12 +25,15 @@ import { Slider } from '@/components/ui/slider';
 
 import { pricesUpdatedAgoLabel } from '@/lib/date';
 import { formatPKR } from '@/lib/currency';
+import { formatCount } from '@/lib/format-count';
+import { FOCUS_RING } from '@/lib/focus-ring';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { useRestaurants } from '@/hooks/use-restaurant';
 import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
 import { RecommendRestaurantButton } from '@/components/recommend-restaurant-button';
-import { motion } from 'motion/react';
+import { humanizeName } from '@/lib/humanize-name';
+import { motion, useReducedMotion } from 'motion/react';
 
 import { RestaurantCardSkeleton } from './_components/restaurant-card-skeleton';
 
@@ -49,14 +54,14 @@ const RATING_PRESETS = [
 
 type SortValue = RestaurantSort | 'auto';
 
-const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60';
-const inputClass = 'bg-canvas border-sage text-charcoal';
+/** The ordering in force, as the user is told about it. */
+type Ordering = 'budget' | 'distance' | 'rating' | 'name';
 
-function formatCount(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}m`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
-  return String(n);
-}
+const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate';
+const inputClass = 'bg-canvas border-sage-edge text-charcoal';
+
+/** Filter chips sit in a wrapping row: thumb-sized on phones, dense on desktop. */
+const presetClass = `inline-flex min-h-11 items-center rounded-full border px-3 text-[12px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-9 ${FOCUS_RING}`;
 
 function parseNumberParam(raw: string | null, fallback: number, min: number, max: number): number {
   if (raw == null) return fallback;
@@ -66,6 +71,7 @@ function parseNumberParam(raw: string | null, fallback: number, min: number, max
 }
 
 function RestaurantsPageInner() {
+  const reduceMotion = useReducedMotion();
   const { data: user } = useUser();
   const userLat = user?.profile?.latitude;
   const userLng = user?.profile?.longitude;
@@ -124,12 +130,43 @@ function RestaurantsPageInner() {
   }, [urlQ]);
 
   const hasLocation = userLat != null && userLng != null;
+  const canRankByBudget = hasActivePlan && avgPerMeal > 0;
+
+  /**
+   * What "Recommended" actually resolves to.
+   *
+   * This page used to promise "ranked for your budget" in the subtitle while
+   * `auto` fell through to the repository's distance ordering: the copy said
+   * money, the ORDER BY said proximity, and on first load the cheapest place a
+   * user could afford could sit on page 2. Budget adherence is the product, so
+   * when the per-meal target is known we sort by it and distance is the
+   * fallback. The subtitle and the select label are both derived from this one
+   * value, so the claim and the query cannot drift apart again.
+   */
+  const autoOrdering: Ordering = canRankByBudget
+    ? 'budget'
+    : hasLocation
+      ? 'distance'
+      : 'name';
 
   const resolvedSort: RestaurantSort | undefined = useMemo(() => {
-    if (sort === 'auto') return undefined;
-    if (sort === 'budget-fit' && !hasActivePlan) return undefined;
+    if (sort === 'auto') return canRankByBudget ? 'budget-fit' : undefined;
+    if (sort === 'budget-fit' && !canRankByBudget) return undefined;
+    if (sort === 'distance' && !hasLocation) return undefined;
     return sort;
-  }, [sort, hasActivePlan]);
+  }, [sort, canRankByBudget, hasLocation]);
+
+  /** The ordering actually in force, whatever the user picked. */
+  const ordering: Ordering =
+    sort === 'auto'
+      ? autoOrdering
+      : resolvedSort === 'budget-fit'
+        ? 'budget'
+        : resolvedSort === 'distance'
+          ? 'distance'
+          : resolvedSort === 'rating'
+            ? 'rating'
+            : 'name';
 
   const query = useMemo(
     () => ({
@@ -145,7 +182,7 @@ function RestaurantsPageInner() {
     [userLat, userLng, hasLocation, maxDistanceKm, minRating, urlQ, resolvedSort, page],
   );
 
-  const { data: result, isLoading, error, isFetching } = useRestaurants(query);
+  const { data: result, isLoading, error, isFetching, refetch } = useRestaurants(query);
   const data = result?.data ?? [];
   const total = result?.meta.total ?? 0;
   const totalPages = total > 0 ? Math.ceil(total / PAGE_SIZE) : 1;
@@ -153,12 +190,13 @@ function RestaurantsPageInner() {
   const hasNext = (page + 1) * PAGE_SIZE < total;
 
   // Active filter chips
-  type ActiveChip = { key: string; label: string; clear: () => void };
+  type ActiveChip = { key: string; label: string; a11yLabel: string; clear: () => void };
   const activeChips: ActiveChip[] = [];
   if (urlQ) {
     activeChips.push({
       key: 'q',
       label: `"${urlQ}"`,
+      a11yLabel: `Clear search for ${urlQ}`,
       clear: () => {
         setSearchInput('');
         updateParams({ q: null });
@@ -167,7 +205,7 @@ function RestaurantsPageInner() {
   }
   if (sort !== DEFAULT_SORT) {
     const sortLabels: Record<SortValue, string> = {
-      auto: 'Default',
+      auto: 'Recommended',
       distance: 'By distance',
       rating: 'By rating',
       'budget-fit': 'Best for budget',
@@ -175,6 +213,7 @@ function RestaurantsPageInner() {
     activeChips.push({
       key: 'sort',
       label: sortLabels[sort] ?? String(sort),
+      a11yLabel: 'Clear sort',
       clear: () => updateParams({ sort: null }),
     });
   }
@@ -182,6 +221,7 @@ function RestaurantsPageInner() {
     activeChips.push({
       key: 'distance',
       label: `≤ ${maxDistanceKm} km`,
+      a11yLabel: `Clear distance filter of ${maxDistanceKm} kilometres or less`,
       clear: () => updateParams({ maxDistanceKm: null }),
     });
   }
@@ -189,6 +229,7 @@ function RestaurantsPageInner() {
     activeChips.push({
       key: 'rating',
       label: `★ ${minRating}+`,
+      a11yLabel: `Clear minimum rating of ${minRating} and above`,
       clear: () => updateParams({ minRating: null }),
     });
   }
@@ -198,38 +239,62 @@ function RestaurantsPageInner() {
     router.replace(pathname, { scroll: false });
   };
 
+  const goToPage = (next: number) => {
+    updateParams({ page: next > 0 ? String(next) : null }, { resetPage: false });
+    // Paging without this leaves the reader parked at the bottom of the new
+    // page, facing the pagination controls with 24 unseen cards above them.
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const emptyMessage = page > 0
+    ? 'Nothing on this page.'
+    : urlQ
+      ? `No restaurants match “${urlQ}”.`
+      : activeChips.length > 0
+        ? 'No restaurants match your filters.'
+        : hasLocation
+          ? `No restaurants within ${maxDistanceKm} km of you.`
+          : 'No restaurants yet.';
+
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8">
       <FadeUp>
         <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-2">
-            <div className="text-xs font-semibold uppercase tracking-widest text-green">
-              Nearby · Restaurants
-            </div>
             <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
               Restaurants
             </h1>
             <p className="max-w-[540px] text-[14px] text-slate">
-              Places that deliver to you, ranked for your budget.
+              {ordering === 'budget'
+                ? `Places that deliver to you, the ones that fit ${formatPKR(avgPerMeal)} a meal first.`
+                : ordering === 'distance'
+                  ? hasActivePlan
+                    ? 'Places that deliver to you, nearest first.'
+                    : 'Places that deliver to you, nearest first. Start a plan to rank them by what you can afford.'
+                  : ordering === 'rating'
+                    ? 'Places that deliver to you, best rated first.'
+                    : 'Every restaurant we have, A–Z. Set your location to see what’s near you.'}
             </p>
           </div>
           <div className="flex items-center gap-4 sm:items-end">
-            {hasActivePlan && avgPerMeal > 0 && (
+            {hasActivePlan && (
               <div className="flex flex-col items-start gap-0.5 sm:items-end">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate/60">
-                  Avg target / meal
-                </p>
-                <p className="font-display text-[22px] font-semibold tracking-tight text-charcoal">
-                  {formatPKR(avgPerMeal)}
-                </p>
-                <p className="text-[11px] text-slate">{formatPKR(amountRemaining)} remaining</p>
+                {avgPerMeal > 0 && (
+                  <>
+                    <p className={labelClass}>Avg target / meal</p>
+                    <p className="font-display text-[22px] font-semibold tabular-nums tracking-tight text-charcoal">
+                      {formatPKR(avgPerMeal)}
+                    </p>
+                  </>
+                )}
+                <RemainingAmount remaining={amountRemaining} size={avgPerMeal > 0 ? 'sm' : 'md'} />
               </div>
             )}
             <div className="flex flex-col items-start gap-1.5 sm:items-end">
               <RecommendRestaurantButton />
               <Link
                 href="/restaurants/recommendations"
-                className="text-[12px] font-medium text-green underline-offset-2 hover:underline"
+                className={`rounded text-[12px] font-medium text-green-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
               >
                 Your recommendations →
               </Link>
@@ -237,6 +302,23 @@ function RestaurantsPageInner() {
           </div>
         </header>
       </FadeUp>
+
+      {!hasActivePlan && (
+        <FadeUp delay={0.04}>
+          <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-sage bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[13px] text-slate">
+              Start a budget plan to see which of these fit what you have left.
+            </p>
+            <Link
+              href="/plans"
+              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+            >
+              Create a plan
+              <span aria-hidden>→</span>
+            </Link>
+          </div>
+        </FadeUp>
+      )}
 
       <FadeUp delay={0.08}>
         <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
@@ -247,7 +329,10 @@ function RestaurantsPageInner() {
                   Search by name
                 </Label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate/60" />
+                  <Search
+                    aria-hidden
+                    className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate"
+                  />
                   <Input
                     id="search"
                     value={searchInput}
@@ -267,17 +352,24 @@ function RestaurantsPageInner() {
                   onValueChange={(v) => updateParams({ sort: v === DEFAULT_SORT ? null : v })}
                 >
                   <SelectTrigger id="sort" className={`w-full ${inputClass}`}>
-                    <SelectValue placeholder="Default" />
+                    <SelectValue placeholder="Recommended" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="auto">
-                      Default {hasLocation ? '(distance)' : '(name)'}
+                      Recommended{' '}
+                      {autoOrdering === 'budget'
+                        ? '(best for budget)'
+                        : autoOrdering === 'distance'
+                          ? '(nearest first)'
+                          : '(A–Z)'}
                     </SelectItem>
                     <SelectItem value="distance" disabled={!hasLocation}>
-                      Distance
+                      Distance {hasLocation ? '' : '— needs your location'}
                     </SelectItem>
                     <SelectItem value="rating">Rating</SelectItem>
-                    {hasActivePlan && <SelectItem value="budget-fit">Best for budget</SelectItem>}
+                    <SelectItem value="budget-fit" disabled={!canRankByBudget}>
+                      Best for budget {canRankByBudget ? '' : '— needs an active plan'}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -285,10 +377,12 @@ function RestaurantsPageInner() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
-                <Label className={labelClass}>
-                  Max distance: <span className="text-green">{maxDistanceKm} km</span>
+                <Label id="distance-label" className={labelClass}>
+                  Max distance: <span className="text-green-deep">{maxDistanceKm} km</span>
                 </Label>
                 <Slider
+                  aria-labelledby="distance-label"
+                  aria-describedby={hasLocation ? undefined : 'distance-hint'}
                   value={[maxDistanceKm]}
                   onValueChange={(vals) =>
                     updateParams({ maxDistanceKm: String(vals[0] ?? DEFAULT_MAX_DISTANCE) })
@@ -306,31 +400,41 @@ function RestaurantsPageInner() {
                         key={km}
                         type="button"
                         disabled={!hasLocation}
+                        aria-pressed={active}
                         onClick={() => updateParams({ maxDistanceKm: String(km) })}
-                        className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                        className={`${presetClass} ${
                           active
-                            ? 'border-green bg-green/10 text-dark-green'
-                            : 'border-sage bg-canvas text-slate hover:border-green/40'
+                            ? 'border-green-deep bg-green/10 text-green-deep'
+                            : 'border-sage bg-canvas text-slate hover:border-green'
                         }`}
                       >
-                        {km}km
+                        {km} km
                       </button>
                     );
                   })}
                 </div>
                 {!hasLocation && (
-                  <p className="text-[11px] text-slate/60">
-                    Set your location in profile to enable distance.
+                  <p id="distance-hint" className="text-[12px] text-slate">
+                    <Link
+                      href="/profile"
+                      className={`rounded font-medium text-green-deep underline underline-offset-2 ${FOCUS_RING}`}
+                    >
+                      Set your location
+                    </Link>{' '}
+                    to filter and sort by distance.
                   </p>
                 )}
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label className={labelClass}>
+                <Label id="rating-label" className={labelClass}>
                   Minimum rating:{' '}
-                  <span className="text-green">{minRating === 0 ? 'Any' : `${minRating}+`}</span>
+                  <span className="text-green-deep">
+                    {minRating === 0 ? 'Any' : `${minRating}+`}
+                  </span>
                 </Label>
                 <Slider
+                  aria-labelledby="rating-label"
                   value={[minRating]}
                   onValueChange={(vals) =>
                     updateParams({
@@ -351,13 +455,14 @@ function RestaurantsPageInner() {
                       <button
                         key={value}
                         type="button"
+                        aria-pressed={active}
                         onClick={() =>
                           updateParams({ minRating: value === 0 ? null : String(value) })
                         }
-                        className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
+                        className={`${presetClass} ${
                           active
-                            ? 'border-green bg-green/10 text-dark-green'
-                            : 'border-sage bg-canvas text-slate hover:border-green/40'
+                            ? 'border-green-deep bg-green/10 text-green-deep'
+                            : 'border-sage bg-canvas text-slate hover:border-green'
                         }`}
                       >
                         {label}
@@ -373,7 +478,7 @@ function RestaurantsPageInner() {
 
       {activeChips.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate/60">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate">
             Active ·
           </span>
           {activeChips.map((chip) => (
@@ -381,17 +486,17 @@ function RestaurantsPageInner() {
               key={chip.key}
               type="button"
               onClick={chip.clear}
-              className="inline-flex items-center gap-1 rounded-full border border-sage bg-white px-2.5 py-1 text-[11px] font-medium text-charcoal transition-colors hover:border-tomato/40 hover:text-tomato"
-              aria-label={`Remove ${chip.label}`}
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sage bg-white px-3 text-[12px] font-medium text-charcoal transition-colors hover:border-tomato hover:text-tomato-ink sm:min-h-9 ${FOCUS_RING}`}
+              aria-label={chip.a11yLabel}
             >
               {chip.label}
-              <X className="h-3 w-3" />
+              <X aria-hidden className="h-3.5 w-3.5" />
             </button>
           ))}
           <button
             type="button"
             onClick={clearAll}
-            className="ml-1 text-[11px] text-slate/60 underline-offset-2 hover:text-tomato hover:underline"
+            className={`ml-1 inline-flex min-h-11 items-center rounded px-1 text-[12px] text-slate underline-offset-2 hover:text-tomato-ink hover:underline sm:min-h-9 ${FOCUS_RING}`}
           >
             Clear all
           </button>
@@ -405,103 +510,160 @@ function RestaurantsPageInner() {
           ))}
         </div>
       ) : error ? (
-        <p className="rounded-xl border border-tomato/20 bg-tomato/[0.06] p-4 text-[13px] text-tomato">
-          Could not load restaurants.
-        </p>
+        <DataError message="Could not load restaurants." onRetry={() => refetch()} />
       ) : data.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-sage bg-white p-8 text-center text-[13px] text-slate">
-          {urlQ
-            ? 'No restaurants match your search.'
-            : activeChips.length > 0
-              ? 'No restaurants match your filters — try clearing one.'
-              : 'No restaurants found — try widening your radius.'}
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sage bg-white p-8 text-center">
+          <p className="text-[13px] text-slate">{emptyMessage}</p>
+          {page > 0 ? (
+            <button
+              type="button"
+              onClick={() => goToPage(0)}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+            >
+              Back to the first page
+            </button>
+          ) : activeChips.length > 0 ? (
+            <button
+              type="button"
+              onClick={clearAll}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+            >
+              Clear all filters
+            </button>
+          ) : hasLocation && maxDistanceKm < 30 ? (
+            <button
+              type="button"
+              onClick={() => updateParams({ maxDistanceKm: '30' })}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+            >
+              Widen to 30 km
+            </button>
+          ) : null}
         </div>
       ) : (
         <>
-          <Stagger className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" stagger={0.05}>
-            {data.map((r, idx) => {
+          {/* The count and the explanation of "Typical meal" both used to sit
+              below the grid — the tally inside the pagination block, so it only
+              existed past 24 results, and the footnote after every card it was
+              written to inform. Filtering 44 down to 3 showed no number and
+              announced nothing. Both belong above the results they describe. */}
+          <div className="flex flex-col gap-2">
+            <p role="status" aria-live="polite" className="text-[12px] tabular-nums text-slate">
+              {total} restaurant{total === 1 ? '' : 's'}
+              {activeChips.length > 0 ? ' match your filters' : ''}
+              {totalPages > 1 ? ` · page ${page + 1} of ${totalPages}` : ''}
+              {isFetching ? ' · updating…' : ''}
+            </p>
+            <p className="max-w-[640px] text-[12px] leading-relaxed text-slate">
+              &ldquo;Typical meal&rdquo; is the average dish here plus delivery, raised to the
+              minimum order where there is one. Prices are estimates from the last menu update, not
+              quotes — BudgetBite never orders for you, so what you log after ordering is what
+              counts.
+            </p>
+          </div>
+
+          <Stagger className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" stagger={0.02}>
+            {data.map((r) => {
+              // Judge the restaurant on what a meal here actually costs to
+              // receive — the average dish, floored by the minimum order, plus
+              // delivery — not on the cheapest thing on the menu.
+              const typicalCost = typicalMealCost({
+                avgItemPrice: r.avgItemPrice,
+                minItemPrice: r.minItemPrice,
+                deliveryFee: r.deliveryFee,
+                minimumOrder: r.minimumOrder,
+              });
               const fit =
-                hasActivePlan && r.minItemPrice != null && avgPerMeal > 0
+                hasActivePlan && typicalCost != null && avgPerMeal > 0
                   ? classifyBudgetFit({
-                      itemPrice: r.minItemPrice,
+                      itemPrice: typicalCost,
                       avgBudgetPerRemainingMeal: avgPerMeal,
                       amountRemaining,
                     })
                   : null;
-              const code = String(idx + 1 + page * PAGE_SIZE).padStart(2, '0');
-              const showAvg =
-                r.avgItemPrice != null &&
-                r.minItemPrice != null &&
-                Math.round(r.avgItemPrice) !== Math.round(r.minItemPrice);
               const priceFreshness =
-                r.minItemPrice != null ? pricesUpdatedAgoLabel(r.pricesUpdatedAt) : null;
+                typicalCost != null ? pricesUpdatedAgoLabel(r.pricesUpdatedAt) : null;
+              // Deliberately not "from ₨24": the cheapest item on the menu is
+              // the anchor `typicalMealCost` exists to remove, and printing it
+              // under the typical figure re-plants it two lines lower.
+              const basis = r.deliveryFee ? `incl. ${formatPKR(r.deliveryFee)} delivery` : null;
               return (
                 <StaggerItem key={r.id}>
-                  <Link href={`/restaurants/${r.id}`} className="group block h-full">
+                  <Link
+                    href={`/restaurants/${r.id}`}
+                    className={`group block h-full rounded-2xl ${FOCUS_RING}`}
+                  >
                     <motion.div
-                      whileHover={{ y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }}
+                      whileHover={
+                        reduceMotion ? undefined : { y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }
+                      }
                       transition={{ duration: 0.22, ease: 'easeOut' }}
                       className="flex h-full flex-col rounded-2xl border border-sage bg-white p-5 shadow-sm"
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60">
-                          {code}
-                        </span>
+                        <h3 className="min-w-0 flex-1 font-display text-lg font-semibold leading-snug tracking-tight text-charcoal [overflow-wrap:anywhere] line-clamp-2">
+                          {humanizeName(r.name)}
+                        </h3>
                         {r.rating != null && (
-                          <div className="flex shrink-0 items-baseline gap-1">
+                          <span
+                            className="flex shrink-0 items-baseline gap-1"
+                            title={`${r.rating.toFixed(1)} out of 5 on Foodpanda`}
+                          >
                             <Star
-                              className="h-3.5 w-3.5 self-center text-[#f5a623]"
-                              style={{ fill: '#f5a623' }}
+                              aria-hidden
+                              className="h-3.5 w-3.5 self-center fill-amber text-amber"
                             />
-                            <span className="text-[13px] font-semibold text-charcoal">
+                            <span className="text-[13px] font-semibold tabular-nums text-charcoal">
                               {r.rating.toFixed(1)}
                             </span>
                             {r.ratingCount > 0 && (
-                              <span className="text-[11px] text-slate/60">
+                              <span className="text-[11px] tabular-nums text-slate">
                                 · {formatCount(r.ratingCount)}
                               </span>
                             )}
-                          </div>
+                          </span>
                         )}
                       </div>
 
-                      <h3 className="mt-2 truncate font-display text-lg font-semibold tracking-tight text-charcoal">
-                        {r.name}
-                      </h3>
-
-                      <div className="mt-1 flex items-center gap-3 text-[12px] text-slate">
+                      <div className="mt-1.5 flex items-center gap-3 text-[12px] tabular-nums text-slate">
                         {r.distanceKm != null && <span>{r.distanceKm.toFixed(1)} km</span>}
-                        {r.deliveryFee != null && <span>{formatPKR(r.deliveryFee)} fee</span>}
+                        {r.deliveryFee != null && <span>{formatPKR(r.deliveryFee)} delivery</span>}
                       </div>
 
-                      <div className="mt-auto flex flex-col gap-2 pt-4">
-                        {fit && <BudgetFitBadge fit={fit} showDot />}
+                      {/* The verdict sits on the same line as the number it is
+                          a verdict about, both at the card's largest weight.
+                          It used to be a 10px pill stacked above a 16px figure,
+                          below the name, the rating, the distance and the fee —
+                          the smallest element on a card in a product whose
+                          entire job is answering "can I afford this?". */}
+                      <div className="mt-auto flex flex-col gap-1.5 pt-4">
                         <div className="flex items-end justify-between gap-2">
-                          {r.minItemPrice != null ? (
-                            <div className="flex flex-col gap-0.5">
-                              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate/60">
-                                From
+                          {typicalCost != null ? (
+                            <div className="flex min-w-0 flex-col gap-0.5">
+                              <span className={labelClass}>Typical meal</span>
+                              <span className="font-display text-xl font-semibold tabular-nums leading-none text-charcoal">
+                                {formatPKR(typicalCost)}
                               </span>
-                              <span className="font-display text-base font-semibold text-charcoal">
-                                {formatPKR(r.minItemPrice)}
-                              </span>
-                              {showAvg && (
-                                <span className="text-[11px] text-slate/60">
-                                  avg {formatPKR(r.avgItemPrice as number)}
-                                </span>
-                              )}
                             </div>
                           ) : (
-                            <span className="text-[11px] text-slate/60">no menu yet</span>
+                            <span className="text-[12px] text-slate">no menu yet</span>
                           )}
-                          {r.minimumOrder != null && (
-                            <span className="text-[11px] text-slate">
-                              min order {formatPKR(r.minimumOrder)}
+                          {fit && (
+                            <span className="shrink-0">
+                              <BudgetFitBadge fit={fit} showDot />
                             </span>
                           )}
                         </div>
+                        {(basis || r.minimumOrder != null) && (
+                          <div className="flex flex-wrap items-center gap-x-2 text-[11px] tabular-nums text-slate">
+                            {basis && <span>{basis}</span>}
+                            {r.minimumOrder != null && (
+                              <span>min order {formatPKR(r.minimumOrder)}</span>
+                            )}
+                          </div>
+                        )}
                         {priceFreshness && (
-                          <span className="text-[10px] text-slate/60">{priceFreshness}</span>
+                          <span className="text-[11px] text-slate">{priceFreshness}</span>
                         )}
                       </div>
                     </motion.div>
@@ -515,21 +677,20 @@ function RestaurantsPageInner() {
             <div className="flex items-center justify-between gap-3 pt-2">
               <button
                 type="button"
-                onClick={() => updateParams({ page: String(page - 1) }, { resetPage: false })}
+                onClick={() => goToPage(page - 1)}
                 disabled={!hasPrev || isFetching}
-                className="inline-flex items-center rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40"
+                className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
               >
                 ← Prev
               </button>
-              <p className="text-[11px] text-slate">
-                Page {page + 1} of {totalPages} · {total} total
-                {isFetching ? ' · loading…' : ''}
+              <p className="text-[12px] tabular-nums text-slate">
+                Page {page + 1} of {totalPages}
               </p>
               <button
                 type="button"
-                onClick={() => updateParams({ page: String(page + 1) }, { resetPage: false })}
+                onClick={() => goToPage(page + 1)}
                 disabled={!hasNext || isFetching}
-                className="inline-flex items-center rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40"
+                className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
               >
                 Next →
               </button>
@@ -543,7 +704,15 @@ function RestaurantsPageInner() {
 
 export default function RestaurantsPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={
+        <div className="mx-auto grid w-full max-w-[1180px] gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <RestaurantCardSkeleton key={i} />
+          ))}
+        </div>
+      }
+    >
       <RestaurantsPageInner />
     </Suspense>
   );

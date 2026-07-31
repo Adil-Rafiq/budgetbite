@@ -57,14 +57,14 @@ export const DietaryTagPicker = ({
               onClick={() => onToggle(tag)}
               className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-[13px] capitalize transition-colors ${FOCUS_RING} ${
                 checked
-                  ? 'border-dark-green bg-green/10 font-semibold text-charcoal'
-                  : 'border-sage bg-white font-normal text-slate hover:border-dark-green/50'
+                  ? 'border-green-deep bg-green/10 font-semibold text-charcoal'
+                  : 'border-sage bg-white font-normal text-slate hover:border-green-deep/50'
               }`}
             >
               <span
                 aria-hidden
                 className={`flex h-4 w-4 items-center justify-center rounded-full border transition-colors ${
-                  checked ? 'border-dark-green bg-dark-green text-white' : 'border-sage bg-white'
+                  checked ? 'border-green-deep bg-green-deep text-white' : 'border-sage bg-white'
                 }`}
               >
                 {checked && <Check className="h-2.5 w-2.5" />}
@@ -89,20 +89,20 @@ export const DietaryTagPicker = ({
               handleAdd();
             }
           }}
-          className={`min-h-11 w-full rounded-xl border border-sage bg-white px-3.5 py-2 text-[13px] text-charcoal transition-colors placeholder:text-slate/50 focus:border-dark-green ${FOCUS_RING}`}
+          className={`min-h-11 w-full rounded-xl border border-sage bg-white px-3.5 py-2 text-[13px] text-charcoal transition-colors placeholder:text-slate/50 focus:border-green-deep ${FOCUS_RING}`}
         />
         <button
           type="button"
           onClick={handleAdd}
           disabled={draft.trim().length === 0}
-          className={`min-h-11 rounded-xl border border-sage bg-canvas px-4 py-2 text-[13px] font-medium text-charcoal transition-colors hover:border-dark-green disabled:opacity-40 disabled:hover:border-sage ${FOCUS_RING}`}
+          className={`min-h-11 rounded-xl border border-sage bg-canvas px-4 py-2 text-[13px] font-medium text-charcoal transition-colors hover:border-green-deep disabled:opacity-40 disabled:hover:border-sage ${FOCUS_RING}`}
         >
           Add
         </button>
       </div>
 
       {error && (
-        <p role="alert" className="text-xs font-medium text-tomato">
+        <p role="alert" className="text-xs font-medium text-tomato-ink">
           {error}
         </p>
       )}

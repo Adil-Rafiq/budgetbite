@@ -25,9 +25,9 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 type PlanStatus = BudgetPlanResponse['status'];
 
 const STATUS_CLASS: Record<PlanStatus, { pill: string; dot: string }> = {
-  active: { pill: 'bg-green/10 text-dark-green', dot: 'bg-green' },
+  active: { pill: 'bg-green/10 text-green-deep', dot: 'bg-green' },
   completed: { pill: 'bg-slate/10 text-slate', dot: 'bg-slate' },
-  cancelled: { pill: 'bg-tomato/10 text-tomato', dot: 'bg-tomato' },
+  cancelled: { pill: 'bg-tomato/10 text-tomato-ink', dot: 'bg-tomato' },
 };
 
 /** Falls back visibly rather than painting an unrecognised status as "completed". */
@@ -81,7 +81,7 @@ function PlansListEmpty({ filtered, onClear }: { filtered: boolean; onClear: () 
         <button
           type="button"
           onClick={onClear}
-          className={`mt-3 min-h-11 rounded-xl border border-sage bg-white px-4 text-[13px] font-semibold text-dark-green transition-colors hover:border-dark-green ${FOCUS_RING_ON_CANVAS}`}
+          className={`mt-3 min-h-11 rounded-xl border border-sage bg-white px-4 text-[13px] font-semibold text-green-deep transition-colors hover:border-green-deep ${FOCUS_RING_ON_CANVAS}`}
         >
           Show all plans
         </button>
@@ -101,7 +101,7 @@ function PlansListEmpty({ filtered, onClear }: { filtered: boolean; onClear: () 
       <button
         type="button"
         onClick={requestNewPlan}
-        className={`mt-1 inline-flex min-h-11 items-center gap-2 rounded-xl bg-green px-5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-dark-green ${FOCUS_RING_ON_CANVAS}`}
+        className={`mt-1 inline-flex min-h-11 items-center gap-2 rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-green-deeper ${FOCUS_RING_ON_CANVAS}`}
       >
         New plan
         <Plus aria-hidden className="h-4 w-4" />
@@ -166,8 +166,8 @@ export default function PlansList() {
             }}
             className={`min-h-11 rounded-full border px-3.5 text-[12px] font-medium transition-colors ${FOCUS_RING_ON_CANVAS} ${
               active
-                ? 'border-dark-green bg-green/10 font-semibold text-dark-green'
-                : 'border-sage bg-white text-slate hover:border-dark-green/50'
+                ? 'border-green-deep bg-green/10 font-semibold text-green-deep'
+                : 'border-sage bg-white text-slate hover:border-green-deep/50'
             }`}
           >
             {filter.label}

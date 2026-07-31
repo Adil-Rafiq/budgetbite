@@ -46,7 +46,7 @@ function NoPlanMessage() {
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-dashed border-sage bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col gap-1.5">
-        <div className="text-xs font-semibold uppercase tracking-widest text-green">
+        <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
           No active plan
         </div>
         <p className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -56,7 +56,7 @@ function NoPlanMessage() {
       </div>
       <Link
         href="/plans"
-        className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-green px-5 text-sm font-semibold text-white shadow-md transition-all hover:bg-dark-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:self-auto"
+        className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:self-auto"
       >
         Create plan
         <ArrowRight className="h-4 w-4" />
@@ -100,10 +100,10 @@ export function SummaryCards() {
 
   const pill =
     health === 'over'
-      ? { cls: 'bg-tomato/10 text-tomato', Icon: TriangleAlert, label: 'Over budget' }
+      ? { cls: 'bg-tomato/10 text-tomato-ink', Icon: TriangleAlert, label: 'Over budget' }
       : health === 'danger'
-        ? { cls: 'bg-tomato/10 text-tomato', Icon: TriangleAlert, label: 'Watch spending' }
-        : { cls: 'bg-green/10 text-dark-green', Icon: CircleCheck, label: 'On track' };
+        ? { cls: 'bg-tomato/10 text-tomato-ink', Icon: TriangleAlert, label: 'Watch spending' }
+        : { cls: 'bg-green/10 text-green-deep', Icon: CircleCheck, label: 'On track' };
 
   // Plain-language standing, rendered as visible copy — not a `title` tooltip
   // that never fires on touch and is skipped by keyboard/screen-reader users.
@@ -123,7 +123,7 @@ export function SummaryCards() {
           <div className="flex items-end gap-2">
             <span
               className={`font-display text-4xl font-bold leading-none tracking-tight ${
-                isOver ? 'text-tomato' : 'text-charcoal'
+                isOver ? 'text-tomato-ink' : 'text-charcoal'
               }`}
             >
               <CountUp
@@ -131,13 +131,13 @@ export function SummaryCards() {
                 format={formatPKR}
               />
             </span>
-            <span className={`pb-0.5 text-sm font-medium ${isOver ? 'text-tomato' : 'text-slate'}`}>
+            <span className={`pb-0.5 text-sm font-medium ${isOver ? 'text-tomato-ink' : 'text-slate'}`}>
               {isOver ? 'over' : 'left'}
             </span>
           </div>
           <p className="mt-1.5 text-xs text-slate">
             of {formatPKR(ctx.totalBudget)} ·{' '}
-            <span className="font-semibold text-tomato">{formatPKR(ctx.amountSpent)} spent</span>
+            <span className="font-semibold text-tomato-ink">{formatPKR(ctx.amountSpent)} spent</span>
           </p>
         </div>
 
@@ -166,7 +166,7 @@ export function SummaryCards() {
         </div>
         <span
           className={`shrink-0 text-xs font-semibold tabular-nums ${
-            alarm ? 'text-tomato' : 'text-slate'
+            alarm ? 'text-tomato-ink' : 'text-slate'
           }`}
         >
           {spentPercent}% spent
@@ -174,7 +174,7 @@ export function SummaryCards() {
       </div>
 
       {/* Plain-language standing — visible to everyone, not hidden in a tooltip */}
-      <p className={`mt-2 text-[12px] ${alarm ? 'text-tomato' : 'text-slate'}`}>{statusCaption}</p>
+      <p className={`mt-2 text-[12px] ${alarm ? 'text-tomato-ink' : 'text-slate'}`}>{statusCaption}</p>
 
       {/* The few numbers that inform the next meal choice */}
       <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-sage/70 pt-4">
@@ -194,7 +194,7 @@ export function SummaryCards() {
           <dt className="text-[11px] text-slate sm:text-xs">Per meal left</dt>
           <dd
             className={`font-display text-base font-bold tabular-nums ${
-              isOver ? 'text-tomato' : 'text-green'
+              isOver ? 'text-tomato-ink' : 'text-green-deep'
             }`}
           >
             {formatPKR(Math.max(0, ctx.avgBudgetPerRemainingMeal))}
@@ -205,7 +205,7 @@ export function SummaryCards() {
       {isOver && (
         <Link
           href="/plans"
-          className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-tomato/30 bg-tomato/[0.06] px-4 py-3 text-[13px] font-medium text-tomato transition-colors hover:bg-tomato/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tomato/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+          className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-tomato/30 bg-tomato/[0.06] px-4 py-3 text-[13px] font-medium text-tomato-ink transition-colors hover:bg-tomato/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tomato/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         >
           Adjust your plan to recover the rest of the period
           <ArrowRight className="h-4 w-4 shrink-0" />

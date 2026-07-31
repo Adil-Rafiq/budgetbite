@@ -56,7 +56,7 @@ export const StepBudgetDetails = () => {
                 onClick={() => actions.setPlanType(type)}
                 className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl text-[13px] font-semibold transition-all ${FOCUS_RING} ${
                   active
-                    ? 'bg-green-deep text-white shadow-sm shadow-dark-green/20'
+                    ? 'bg-green-deep text-white shadow-sm shadow-green-deep/20'
                     : 'bg-transparent text-slate hover:text-charcoal'
                 }`}
               >
@@ -74,7 +74,7 @@ export const StepBudgetDetails = () => {
           Total budget (PKR)
         </label>
         <div className="flex items-end gap-2.5">
-          <span aria-hidden className="pb-1 font-display text-xl font-bold text-dark-green">
+          <span aria-hidden className="pb-1 font-display text-xl font-bold text-green-deep">
             ₨
           </span>
           <input
@@ -90,7 +90,7 @@ export const StepBudgetDetails = () => {
             }}
             aria-describedby="budget-period"
             aria-invalid={errors.totalBudget ? true : undefined}
-            className={`min-w-0 flex-1 border-b-2 border-sage bg-transparent pb-1 font-display text-3xl font-bold text-charcoal transition-colors placeholder:text-slate/30 focus:border-dark-green ${FOCUS_RING}`}
+            className={`min-w-0 flex-1 border-b-2 border-sage bg-transparent pb-1 font-display text-3xl font-bold text-charcoal transition-colors placeholder:text-slate/30 focus:border-green-deep ${FOCUS_RING}`}
           />
           <span id="budget-period" className="pb-1.5 text-[12px] text-slate">
             / {values.planType === 'weekly' ? 'week' : 'month'}
@@ -109,8 +109,8 @@ export const StepBudgetDetails = () => {
                 onClick={() => actions.setTotalBudget(preset)}
                 className={`min-h-11 rounded-full border px-3 text-[11px] font-medium transition-colors ${FOCUS_RING} ${
                   active
-                    ? 'border-dark-green bg-green/10 font-semibold text-dark-green'
-                    : 'border-sage text-slate hover:border-dark-green hover:text-dark-green'
+                    ? 'border-green-deep bg-green/10 font-semibold text-green-deep'
+                    : 'border-sage text-slate hover:border-green-deep hover:text-green-deep'
                 }`}
               >
                 {formatPKR(preset)}
@@ -121,7 +121,7 @@ export const StepBudgetDetails = () => {
 
         {lastConversion && !errors.totalBudget && (
           <p className="mt-1 flex items-start gap-2 rounded-xl border border-sage bg-canvas px-3 py-2 text-[11px] text-slate">
-            <RefreshCw aria-hidden className="mt-0.5 h-3 w-3 shrink-0 text-dark-green" />
+            <RefreshCw aria-hidden className="mt-0.5 h-3 w-3 shrink-0 text-green-deep" />
             <span>
               Converted {formatPKR(lastConversion.from)} to{' '}
               <span className="font-semibold text-charcoal">{formatPKR(lastConversion.to)}</span> so
@@ -131,7 +131,7 @@ export const StepBudgetDetails = () => {
         )}
 
         {errors.totalBudget && (
-          <p role="alert" className="text-[11px] font-medium text-tomato">
+          <p role="alert" className="text-[11px] font-medium text-tomato-ink">
             {errors.totalBudget}
           </p>
         )}
@@ -157,7 +157,7 @@ export const StepBudgetDetails = () => {
             role="alert"
             className="flex flex-col items-start gap-2 rounded-lg border border-tomato/30 bg-tomato/5 p-3 text-[12px]"
           >
-            <div className="font-medium text-tomato">Couldn&apos;t load meal types</div>
+            <div className="font-medium text-tomato-ink">Couldn&apos;t load meal types</div>
             <div className="text-[11px] text-slate">
               This is usually a dropped connection. Your budget is kept on this device, so nothing
               is lost if you retry.
@@ -165,7 +165,7 @@ export const StepBudgetDetails = () => {
             <button
               type="button"
               onClick={mealTypes.refetch}
-              className={`min-h-11 rounded-lg border border-sage bg-white px-3 text-[11px] font-semibold text-dark-green transition-colors hover:border-dark-green ${FOCUS_RING}`}
+              className={`min-h-11 rounded-lg border border-sage bg-white px-3 text-[11px] font-semibold text-green-deep transition-colors hover:border-green-deep ${FOCUS_RING}`}
             >
               Try again
             </button>
@@ -193,7 +193,7 @@ export const StepBudgetDetails = () => {
               variant="inline"
             />
             {errors.mealTypeIds && (
-              <p role="alert" className="text-[11px] font-medium text-tomato">
+              <p role="alert" className="text-[11px] font-medium text-tomato-ink">
                 {errors.mealTypeIds}
               </p>
             )}

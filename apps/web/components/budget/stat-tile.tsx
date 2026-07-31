@@ -24,7 +24,7 @@ export function StatTile({
       <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate/60">{label}</p>
       <div
         className={`font-display text-sm font-semibold tabular-nums ${
-          tone === 'alarm' ? 'text-tomato' : 'text-charcoal'
+          tone === 'alarm' ? 'text-tomato-ink' : 'text-charcoal'
         }`}
       >
         {value}

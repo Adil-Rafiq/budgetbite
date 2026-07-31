@@ -114,7 +114,7 @@ export default function AdminMealTypesPage() {
                     <TableCell>
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[11px] ${
-                          mt.active ? 'bg-green/15 text-dark-green' : 'bg-sage/50 text-slate/60'
+                          mt.active ? 'bg-green/15 text-green-deep' : 'bg-sage/50 text-slate/60'
                         }`}
                       >
                         {mt.active ? 'active' : 'inactive'}

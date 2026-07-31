@@ -116,7 +116,7 @@ export default function RegisterPage() {
 
       <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-6 py-6 sm:px-8">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-deep text-white">
             <LogoIcon size={16} />
           </span>
           <span className="font-display text-xl font-bold tracking-tight">
@@ -141,7 +141,7 @@ export default function RegisterPage() {
             </span>
           </div>
           <h1 className="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tight">
-            Welcome to <span className="text-green">BudgetBite.</span>
+            Welcome to <span className="text-green-deep">BudgetBite.</span>
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-charcoal/60">
             Plan meals from real menus, on a real budget.
@@ -163,7 +163,7 @@ export default function RegisterPage() {
                   {...register('firstName')}
                 />
                 {errors.firstName && (
-                  <p className="text-xs text-tomato">{errors.firstName.message}</p>
+                  <p className="text-xs text-tomato-ink">{errors.firstName.message}</p>
                 )}
               </div>
               <div className="flex flex-col gap-2">
@@ -178,7 +178,7 @@ export default function RegisterPage() {
                   {...register('lastName')}
                 />
                 {errors.lastName && (
-                  <p className="text-xs text-tomato">{errors.lastName.message}</p>
+                  <p className="text-xs text-tomato-ink">{errors.lastName.message}</p>
                 )}
               </div>
             </div>
@@ -195,7 +195,7 @@ export default function RegisterPage() {
                 className={inputClass}
                 {...register('email')}
               />
-              {errors.email && <p className="text-xs text-tomato">{errors.email.message}</p>}
+              {errors.email && <p className="text-xs text-tomato-ink">{errors.email.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -220,16 +220,16 @@ export default function RegisterPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password && <p className="text-xs text-tomato">{errors.password.message}</p>}
+              {errors.password && <p className="text-xs text-tomato-ink">{errors.password.message}</p>}
             </div>
 
             <p className="text-xs leading-relaxed text-charcoal/45">
               By creating an account you agree to our{' '}
-              <a href="#" className="font-medium text-green hover:text-dark-green">
+              <a href="#" className="font-medium text-green-deep hover:text-green-deep">
                 terms
               </a>{' '}
               and{' '}
-              <a href="#" className="font-medium text-green hover:text-dark-green">
+              <a href="#" className="font-medium text-green-deep hover:text-green-deep">
                 privacy policy
               </a>
               .
@@ -238,7 +238,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={busy}
-              className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-green text-sm font-semibold text-white shadow-md transition-all hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+              className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-green-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
@@ -294,7 +294,7 @@ export default function RegisterPage() {
           Already have an account?{' '}
           <Link
             href="/login"
-            className="inline-flex items-center gap-1 font-semibold text-green transition-colors hover:text-dark-green"
+            className="inline-flex items-center gap-1 font-semibold text-green-deep transition-colors hover:text-green-deep"
           >
             Sign in
             <ArrowRight className="h-3.5 w-3.5" />

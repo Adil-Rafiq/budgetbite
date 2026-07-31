@@ -69,7 +69,7 @@ const NearbyProof = ({ latitude, longitude }: { latitude: number; longitude: num
     <div className="flex items-start gap-3 rounded-xl border border-green/40 bg-green/5 px-4 py-3">
       <span
         aria-hidden
-        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-dark-green text-white"
+        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-green-deep text-white"
       >
         <Store className="h-3.5 w-3.5" />
       </span>
@@ -106,7 +106,7 @@ export const LocationStep = () => {
             type="button"
             onClick={actions.detectLocation}
             disabled={state.isDetectingLocation}
-            className={`inline-flex min-h-11 items-center gap-2 rounded-lg bg-green-deep px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-dark-green disabled:opacity-60 ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 items-center gap-2 rounded-lg bg-green-deep px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-green-deeper disabled:opacity-60 ${FOCUS_RING}`}
           >
             {state.isDetectingLocation ? (
               <>
@@ -148,7 +148,7 @@ export const LocationStep = () => {
       )}
 
       {(errors.latitude || errors.longitude) && (
-        <p role="alert" className="text-xs font-medium text-tomato">
+        <p role="alert" className="text-xs font-medium text-tomato-ink">
           {errors.latitude ?? errors.longitude}
         </p>
       )}

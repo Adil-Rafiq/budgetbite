@@ -51,7 +51,7 @@ function SlotCard({ slot, ctx }: { slot: SuggestionSlot; ctx: BudgetStateContext
       <div className="mb-2 flex items-center gap-2">
         <div
           aria-hidden
-          className="flex h-7 w-7 items-center justify-center rounded-md bg-green/10 text-green"
+          className="flex h-7 w-7 items-center justify-center rounded-md bg-green/10 text-green-deep"
         >
           <Icon className="h-3.5 w-3.5" />
         </div>
@@ -85,10 +85,10 @@ function SlotCard({ slot, ctx }: { slot: SuggestionSlot; ctx: BudgetStateContext
                   <span
                     className={`text-right font-display text-[13px] font-semibold tabular-nums ${
                       fit === 'red'
-                        ? 'text-tomato'
+                        ? 'text-tomato-ink'
                         : fit === 'amber'
                           ? 'text-amber-ink'
-                          : 'text-dark-green'
+                          : 'text-green-deep'
                     }`}
                   >
                     {formatPKR(option.estimatedPrice)}

@@ -19,7 +19,7 @@ import { Label } from '@/components/ui/label';
 
 const labelClass = 'text-[10px] uppercase text-slate/60';
 const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
-const errorClass = 'text-[11px] text-tomato';
+const errorClass = 'text-[11px] text-tomato-ink';
 
 // Empty string → undefined so optional fields are omitted instead of coerced to 0.
 const optionalNumber = (v: unknown) => (v === '' || v == null ? undefined : Number(v));

@@ -34,7 +34,15 @@ export interface SuggestionItemRow {
 }
 
 export type SuggestionWithRelations = MealSuggestion & {
-  restaurant: { id: string; name: string };
+  // deliveryFee/minimumOrder ride along so a suggestion can be judged on what
+  // it costs to receive rather than the menu subtotal — the same delivered-cost
+  // rule the restaurants surface applies. Numeric columns arrive as strings.
+  restaurant: {
+    id: string;
+    name: string;
+    deliveryFee: string | null;
+    minimumOrder: string | null;
+  };
   mealType: { key: string; label: string };
   items: SuggestionItemRow[];
 };
@@ -52,7 +60,7 @@ const suggestionColumns = {
 
 const suggestionWith = {
   restaurant: {
-    columns: { id: true, name: true },
+    columns: { id: true, name: true, deliveryFee: true, minimumOrder: true },
   },
   mealType: {
     columns: { key: true, label: true },

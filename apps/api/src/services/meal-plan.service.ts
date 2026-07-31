@@ -41,6 +41,8 @@ export function toOption(o: SuggestionRow): SuggestionOption {
       o.estimatedPrice != null
         ? toNumber(o.estimatedPrice)
         : items.reduce((sum, item) => sum + item.price, 0),
+    deliveryFee: toNumberOrNull(o.restaurant?.deliveryFee),
+    minimumOrder: toNumberOrNull(o.restaurant?.minimumOrder),
     notes: o.notes ?? undefined,
     source: 'suggestion',
   };
@@ -72,6 +74,8 @@ function pinToOption(
       },
     ],
     estimatedPrice: toNumber(pin.priceAtPin),
+    deliveryFee: toNumberOrNull(pin.restaurant.deliveryFee),
+    minimumOrder: toNumberOrNull(pin.restaurant.minimumOrder),
     notes: undefined,
     source: 'pin',
   };

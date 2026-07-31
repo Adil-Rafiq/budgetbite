@@ -30,7 +30,7 @@ function PreferenceRow({ pref }: { pref: FoodPreferenceResponse }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <Link
           href={href}
-          className="truncate text-[13px] font-medium text-charcoal underline-offset-2 hover:text-green hover:underline"
+          className="truncate text-[13px] font-medium text-charcoal underline-offset-2 hover:text-green-deep hover:underline"
         >
           {pref.name}
         </Link>
@@ -43,7 +43,7 @@ function PreferenceRow({ pref }: { pref: FoodPreferenceResponse }) {
         onClick={onRemove}
         disabled={remove.isPending}
         aria-label={`Remove ${pref.name}`}
-        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sage bg-white text-slate transition-colors hover:border-tomato/50 hover:text-tomato disabled:opacity-50"
+        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sage bg-white text-slate transition-colors hover:border-tomato/50 hover:text-tomato-ink disabled:opacity-50"
       >
         <X className="h-3.5 w-3.5" />
       </button>
@@ -64,7 +64,7 @@ function Group({
   items: FoodPreferenceResponse[];
   tone: 'positive' | 'danger';
 }) {
-  const toneClass = tone === 'positive' ? 'text-dark-green' : 'text-tomato';
+  const toneClass = tone === 'positive' ? 'text-green-deep' : 'text-tomato-ink';
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline gap-2">
@@ -105,12 +105,12 @@ export function FoodPreferencesCard() {
           <div className="h-10 w-full animate-pulse rounded-xl bg-sage" />
         </div>
       ) : error ? (
-        <p className="text-[13px] text-tomato">Could not load your preferences.</p>
+        <p className="text-[13px] text-tomato-ink">Could not load your preferences.</p>
       ) : favorites.length === 0 && blocked.length === 0 ? (
         <div className="rounded-xl border border-dashed border-sage bg-canvas p-4 text-[13px] text-slate">
-          Use the <Heart className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-dark-green" /> and{' '}
-          <Ban className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-tomato" /> buttons on a{' '}
-          <Link href="/restaurants" className="text-green underline-offset-2 hover:underline">
+          Use the <Heart className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-green-deep" /> and{' '}
+          <Ban className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-tomato-ink" /> buttons on a{' '}
+          <Link href="/restaurants" className="text-green-deep underline-offset-2 hover:underline">
             restaurant or dish
           </Link>{' '}
           to build these lists.

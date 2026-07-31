@@ -31,7 +31,7 @@ export function NoPlanState() {
     <section className="overflow-hidden rounded-3xl border border-sage bg-white shadow-sm">
       <div className="flex flex-col gap-6 p-7 sm:p-10">
         <div className="flex max-w-[560px] flex-col gap-3">
-          <span className="text-xs font-semibold uppercase tracking-widest text-dark-green">
+          <span className="text-xs font-semibold uppercase tracking-widest text-green-deep">
             Get started
           </span>
           <h1 className="font-display text-3xl font-semibold leading-[1.05] tracking-tight text-charcoal sm:text-4xl">
@@ -44,7 +44,7 @@ export function NoPlanState() {
           </p>
           <Link
             href="/plans"
-            className="mt-1 inline-flex min-h-11 w-fit items-center justify-center gap-2 rounded-xl bg-green px-6 text-sm font-semibold text-white shadow-md transition-all hover:bg-dark-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            className="mt-1 inline-flex min-h-11 w-fit items-center justify-center gap-2 rounded-xl bg-green-deep px-6 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
             Create your plan
             <ArrowRight className="h-4 w-4" />
@@ -56,7 +56,7 @@ export function NoPlanState() {
             const Icon = step.icon;
             return (
               <li key={step.title} className="flex gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green/10 text-green">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green/10 text-green-deep">
                   <Icon className="h-4 w-4" />
                 </span>
                 <div className="flex flex-col gap-0.5">

@@ -33,7 +33,7 @@ function TimelineEmpty({ planId }: { planId: string }) {
   const generate = useGenerateMealPlan();
   return (
     <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sage bg-white p-8 text-center">
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green/10 text-green">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green/10 text-green-deep">
         <Sparkles className="h-5 w-5" />
       </div>
       <div>
@@ -46,7 +46,7 @@ function TimelineEmpty({ planId }: { planId: string }) {
         type="button"
         onClick={() => generate.mutate(planId)}
         disabled={generate.isPending}
-        className={`inline-flex min-h-11 items-center gap-2 rounded-xl bg-green px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+        className={`inline-flex min-h-11 items-center gap-2 rounded-xl bg-green-deep px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
       >
         <Sparkles aria-hidden className="h-3.5 w-3.5" />
         Generate now
@@ -77,7 +77,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
     () => (
       <div className="flex items-end justify-between">
         <div className="flex flex-col gap-1">
-          <span className="text-xs font-semibold uppercase tracking-widest text-green">
+          <span className="text-xs font-semibold uppercase tracking-widest text-green-deep">
             History
           </span>
           <h2 className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -152,7 +152,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
             type="button"
             onClick={() => setLimit((n) => n + PAGE_SIZE)}
             disabled={isFetching}
-            className={`min-h-11 rounded-lg border border-sage bg-white px-4 text-[12px] font-semibold text-dark-green transition-colors hover:border-dark-green disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+            className={`min-h-11 rounded-lg border border-sage bg-white px-4 text-[12px] font-semibold text-green-deep transition-colors hover:border-green-deep disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
           >
             {isFetching ? 'Loading…' : 'Show older attempts'}
           </button>

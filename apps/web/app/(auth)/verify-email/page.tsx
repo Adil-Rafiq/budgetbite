@@ -173,7 +173,7 @@ function VerifyEmailForm() {
 
       <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-6 py-6 sm:px-8">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-deep text-white">
             <LogoIcon size={16} />
           </span>
           <span className="font-display text-xl font-bold tracking-tight">
@@ -191,7 +191,7 @@ function VerifyEmailForm() {
 
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[440px] flex-col justify-center px-6 pb-16">
         <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green/15 text-green">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green/15 text-green-deep">
             <MailCheck className="h-6 w-6" />
           </div>
           <h1 className="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tight">
@@ -232,7 +232,7 @@ function VerifyEmailForm() {
                       onFocus={(e) => e.target.select()}
                       className={`h-14 w-11 rounded-xl border-2 text-center text-2xl font-bold tabular-nums outline-none transition-all sm:h-16 sm:w-12 ${
                         error
-                          ? 'border-tomato/60 bg-tomato/5 text-tomato'
+                          ? 'border-tomato/60 bg-tomato/5 text-tomato-ink'
                           : digit
                             ? 'border-green/50 bg-white text-charcoal'
                             : 'border-sage bg-canvas text-charcoal'
@@ -244,7 +244,7 @@ function VerifyEmailForm() {
                 ))}
               </div>
               {error ? (
-                <p className="text-center text-xs font-medium text-tomato">{error}</p>
+                <p className="text-center text-xs font-medium text-tomato-ink">{error}</p>
               ) : (
                 <p className="text-center text-xs text-slate">The code expires in 10 minutes.</p>
               )}
@@ -253,7 +253,7 @@ function VerifyEmailForm() {
             <button
               type="submit"
               disabled={submitting || !isComplete}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-green text-sm font-semibold text-white shadow-md transition-all hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50"
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-green-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50"
             >
               {submitting ? (
                 <>
@@ -275,7 +275,7 @@ function VerifyEmailForm() {
               type="button"
               onClick={handleResend}
               disabled={resendCooldown > 0}
-              className="font-semibold text-green transition-colors hover:text-dark-green disabled:cursor-not-allowed disabled:font-medium disabled:text-slate/60"
+              className="font-semibold text-green-deep transition-colors hover:text-green-deep disabled:cursor-not-allowed disabled:font-medium disabled:text-slate/60"
             >
               {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
             </button>

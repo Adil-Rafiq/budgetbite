@@ -49,13 +49,13 @@ export const DietaryStep = () => {
         <button
           type="button"
           onClick={() => setShowAllergens(true)}
-          className={`flex min-h-11 items-center gap-3 rounded-[20px] border border-dashed border-sage bg-white p-5 text-left transition-colors hover:border-dark-green ${FOCUS_RING}`}
+          className={`flex min-h-11 items-center gap-3 rounded-[20px] border border-dashed border-sage bg-white p-5 text-left transition-colors hover:border-green-deep ${FOCUS_RING}`}
         >
           <span
             aria-hidden
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/60"
           >
-            <ShieldAlert className="h-4 w-4 text-dark-green" />
+            <ShieldAlert className="h-4 w-4 text-green-deep" />
           </span>
           <span className="min-w-0">
             <span className="flex items-center gap-1.5 text-sm font-semibold text-charcoal">

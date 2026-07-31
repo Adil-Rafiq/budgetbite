@@ -45,7 +45,7 @@ export function MobileNav() {
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
               className={`flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-1.5 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 ${
-                isActive ? 'text-green' : 'text-slate hover:text-green'
+                isActive ? 'text-green-deep' : 'text-slate hover:text-green-deep'
               }`}
             >
               <Icon className="h-5 w-5 shrink-0" />

@@ -20,7 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 const labelClass = 'text-[10px] uppercase text-slate/60';
 const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
-const errorClass = 'text-[11px] text-tomato';
+const errorClass = 'text-[11px] text-tomato-ink';
 
 // Empty string → undefined so optional fields are omitted, not sent as ''.
 const optionalString = (v: unknown) => (v === '' || v == null ? undefined : v);

@@ -22,7 +22,7 @@ function Section({
       <div className="flex items-baseline justify-between">
         <h2 className="text-[15px] font-medium text-charcoal">{title}</h2>
         <span
-          className={`font-mono text-[18px] font-semibold ${clean ? 'text-dark-green' : 'text-tomato'}`}
+          className={`font-mono text-[18px] font-semibold ${clean ? 'text-green-deep' : 'text-tomato-ink'}`}
         >
           {group.count}
         </span>
@@ -33,7 +33,7 @@ function Section({
           {group.sample.map((e) => (
             <li key={e.id} className="truncate text-[13px] text-slate">
               {linkRestaurants ? (
-                <Link href={`/admin/restaurants/${e.id}`} className="hover:text-dark-green">
+                <Link href={`/admin/restaurants/${e.id}`} className="hover:text-green-deep">
                   {e.name}
                 </Link>
               ) : (

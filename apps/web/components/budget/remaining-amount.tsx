@@ -37,8 +37,8 @@ export function RemainingAmount({
 
   return (
     <span className={`inline-flex items-baseline gap-1.5 ${className}`}>
-      <span className={`${amountClass} ${isOver ? 'text-tomato' : 'text-charcoal'}`}>{amount}</span>
-      <span className={`${wordClass} font-medium ${isOver ? 'text-tomato' : 'text-slate'}`}>
+      <span className={`${amountClass} ${isOver ? 'text-tomato-ink' : 'text-charcoal'}`}>{amount}</span>
+      <span className={`${wordClass} font-medium ${isOver ? 'text-tomato-ink' : 'text-slate'}`}>
         {word}
       </span>
     </span>

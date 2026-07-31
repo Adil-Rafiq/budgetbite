@@ -70,14 +70,14 @@ export function TimePicker({
           aria-invalid={ariaInvalid}
           className={cn(
             'inline-flex items-center justify-between gap-2 rounded-xl border bg-white outline-none transition',
-            'focus-visible:border-dark-green focus-visible:ring-2 focus-visible:ring-dark-green focus-visible:ring-offset-2 focus-visible:ring-offset-white',
-            'data-[state=open]:border-dark-green data-[state=open]:ring-2 data-[state=open]:ring-dark-green/40',
+            'focus-visible:border-green-deep focus-visible:ring-2 focus-visible:ring-green-deep focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+            'data-[state=open]:border-green-deep data-[state=open]:ring-2 data-[state=open]:ring-green-deep/40',
             'disabled:cursor-not-allowed',
             disabled
               ? 'border-sage/60 text-slate/50 line-through'
               : ariaInvalid
                 ? 'border-tomato text-charcoal hover:border-tomato'
-                : 'border-sage text-charcoal hover:border-dark-green/50',
+                : 'border-sage text-charcoal hover:border-green-deep/50',
             size === 'sm'
               ? 'min-h-9 w-[112px] px-2.5 py-1.5 text-[12px]'
               : 'min-h-11 w-[136px] px-3.5 py-2.5 text-[14px]',
@@ -187,7 +187,7 @@ function TimeColumn({
               onClick={() => onSelect(v)}
               className={cn(
                 'flex h-9 w-full items-center justify-center text-[13px] tabular-nums transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-dark-green',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-deep',
                 isSelected
                   ? 'bg-green-deep text-white'
                   : 'text-charcoal hover:bg-sage/40 focus:bg-sage/40',

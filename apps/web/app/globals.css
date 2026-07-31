@@ -7,9 +7,11 @@
    BudgetBite — "fresh greens" design system
    Brand palette (light-first):
      canvas    #f7fbf0   page background (cream-green)
-     sage      #d4e8b0   borders, secondary surfaces (mint)
-     green     #8cc63f   primary / brand
-     dark-green#5a8a1a   green text on light, primary hover
+     sage      #d4e8b0   decorative borders, secondary surfaces (mint)
+     sage-edge #7d8a6b   control boundaries that must clear 3:1
+     green     #8cc63f   brand fill — decorative only, never behind text
+     green-deep#4f7c17   green text on light, and any fill carrying white text
+     green-deeper #3f6212  hover state for green-deep fills
      tomato    #e84c3d   accent / destructive
      charcoal  #1a1a1a   foreground, dark sections
      slate     #4a4a4a   muted foreground
@@ -35,7 +37,8 @@
   --destructive: #e84c3d;
   --destructive-foreground: #ffffff;
   --border: #d4e8b0;
-  --input: #d4e8b0;
+  /* Form-control boundary, not a decorative one — see --color-sage-edge. */
+  --input: #7d8a6b;
   --ring: #8cc63f;
   --chart-1: #8cc63f;
   --chart-2: #5a8a1a;
@@ -107,28 +110,50 @@
   --color-canvas: #f7fbf0;
   --color-sage: #d4e8b0;
   --color-green: #8cc63f;
-  --color-dark-green: #5a8a1a;
   --color-tomato: #e84c3d;
   --color-charcoal: #1a1a1a;
   --color-slate: #4a4a4a;
 
-  /* Accessible fill for buttons that carry white label text.
-     White on --color-green is ~2.0:1 and on --color-dark-green ~4.1:1, both
-     under the 4.5:1 AA floor for the 14px semibold labels we actually ship.
-     This is the same hue family at ~5.0:1. Onboarding uses it for every filled
-     CTA; the rest of the app still fills with --color-green and is a candidate
-     for the same sweep. */
+  /* The green that text is allowed to be, and the only green a white label may
+     sit on. `--color-dark-green` (#5a8a1a) used to carry both jobs and failed
+     both: 4.13:1 as 12-13px text on white, 4.13:1 as a fill under white labels
+     — under the 4.5:1 AA floor either way. `--color-green` itself is far worse
+     at 2.05:1 and was still filling the primary CTA on the landing page, both
+     auth screens, and every plans surface.
+
+     The sweep that fixed this moved 86 text uses, 35 white-on-green fills, 31
+     borders and 5 focus rings, and deleted --color-dark-green outright so the
+     token guard (scripts/check-tokens.mjs) fails the build if it comes back.
+     green-deep is 4.97:1 on white / 4.73:1 on canvas; green-deeper is 7.08:1
+     and exists so a hover state gets darker rather than lighter — the old
+     `hover:bg-dark-green` on a green-deep button actually reduced contrast.
+     --color-green survives for decoration only: dots, bars, scrollbar hover. */
   --color-green-deep: #4f7c17;
+  --color-green-deeper: #3f6212;
+
+  /* Control boundaries. WCAG 1.4.11 wants 3:1 for the visual information that
+     identifies a form control, and `sage` as a border is 1.32:1 on white —
+     an input outlined in it is decoration, not an affordance. This is sage
+     walked toward the slate end of the same family: 3.67:1 on white, 3.50:1
+     on canvas, applied to inputs, textareas and select triggers only. Cards,
+     panels and dividers keep plain `sage`; a decorative edge has no floor. */
+  --color-sage-edge: #7d8a6b;
 
   /* Caution amber — the band between "on track" and "over budget".
      These three values were already in the app as loose hexes: #f5a623 and
      #fef6e6 in the budget-fit pill and the location notice, #8a5a12 as their
      ink, plus a stray #b45309 on the plan summary's variance figure. Four
      spellings of one idea meant caution drifted shade by shade across the
-     surfaces that raise it. `amber-ink` on `amber-tint` is ~7.1:1. */
+     surfaces that raise it. `amber-ink` on `amber-tint` is ~5.5:1. */
   --color-amber: #f5a623;
   --color-amber-tint: #fef6e6;
   --color-amber-ink: #8a5a12;
+
+  /* Readable ink for the alarm hue. `tomato` is a fill and a border colour: as
+     text it is ~3.8:1 on white and ~3.3:1 on its own 10% tint, so every "over
+     budget" pill and blocked-dish toggle that used it as a label sat under the
+     AA floor. Same family, ~5.6:1 on the tint and ~6.3:1 on white. */
+  --color-tomato-ink: #b32d1f;
 }
 
 @layer base {

@@ -26,7 +26,7 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
   }
 
   const saved = summary.variance >= 0;
-  const varianceTone = saved ? 'text-green' : 'text-tomato';
+  const varianceTone = saved ? 'text-green-deep' : 'text-tomato-ink';
   const statusLabel = plan.status === 'cancelled' ? 'cancelled' : 'wrapped up';
 
   return (
@@ -52,7 +52,7 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
             type="button"
             onClick={start}
             disabled={isPending}
-            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-green px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-dark-green disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
           >
             {isPending ? (
               <RefreshCw aria-hidden className="h-4 w-4 animate-spin" />
@@ -103,7 +103,7 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="text-xs font-semibold uppercase tracking-widest text-tomato">
+            <div className="text-xs font-semibold uppercase tracking-widest text-tomato-ink">
               Confirm · Replace
             </div>
             <AlertDialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -122,7 +122,7 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmReplace}
-              className={`min-h-11 rounded-xl bg-green px-5 text-[13px] font-semibold text-white transition-colors hover:bg-dark-green active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl bg-green-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-green-deeper active:scale-[0.97] ${FOCUS_RING}`}
             >
               Replace plan
             </AlertDialogAction>

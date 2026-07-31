@@ -13,8 +13,8 @@ const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letter
 
 const genStatusClass: Record<AdminPlanGeneration['status'], string> = {
   pending: 'bg-[#f5a623]/15 text-[#9a6400]',
-  succeeded: 'bg-green/15 text-dark-green',
-  failed: 'bg-tomato/10 text-tomato',
+  succeeded: 'bg-green/15 text-green-deep',
+  failed: 'bg-tomato/10 text-tomato-ink',
   superseded: 'bg-sage/50 text-slate/60',
 };
 
@@ -111,12 +111,12 @@ export default function AdminPlanDetailPage() {
                       {new Date(g.generatedAt).toLocaleString()}
                     </span>
                     {g.id === plan.activeGenerationId && (
-                      <span className="text-[11px] text-dark-green">active</span>
+                      <span className="text-[11px] text-green-deep">active</span>
                     )}
                   </div>
                   {g.errorCode && (
                     <span
-                      className="text-[12px] text-tomato"
+                      className="text-[12px] text-tomato-ink"
                       style={{ fontFamily: 'var(--font-mono)' }}
                     >
                       {g.errorCode}
