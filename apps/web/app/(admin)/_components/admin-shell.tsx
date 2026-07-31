@@ -106,7 +106,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               >
                 <span
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                    active ? 'bg-green/15 text-green-deep' : 'border border-sage bg-canvas text-slate'
+                    active
+                      ? 'bg-green/15 text-green-deep'
+                      : 'border border-sage bg-canvas text-slate'
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />

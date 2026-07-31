@@ -107,24 +107,24 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
               {statusPill.label}
             </div>
 
-          <button
-            type="button"
-            onClick={handleGenerate}
-            disabled={disabled}
-            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
-          >
-            {hasActiveGen ? (
-              <>
-                <RefreshCw className={cn('h-4 w-4', generate.isPending && 'animate-spin')} />
-                Regenerate
-              </>
-            ) : (
-              <>
-                <Sparkles className="h-4 w-4" />
-                Generate now
-              </>
-            )}
-          </button>
+            <button
+              type="button"
+              onClick={handleGenerate}
+              disabled={disabled}
+              className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+            >
+              {hasActiveGen ? (
+                <>
+                  <RefreshCw className={cn('h-4 w-4', generate.isPending && 'animate-spin')} />
+                  Regenerate
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  Generate now
+                </>
+              )}
+            </button>
           </div>
         </div>
 

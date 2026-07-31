@@ -220,7 +220,9 @@ export default function RegisterPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password && <p className="text-xs text-tomato-ink">{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-xs text-tomato-ink">{errors.password.message}</p>
+              )}
             </div>
 
             <p className="text-xs leading-relaxed text-charcoal/45">

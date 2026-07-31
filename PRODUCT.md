@@ -35,7 +35,7 @@ A recipe meal-planner has no orderable prices or budget ledger; a food-delivery 
 - **Data source:** Foodpanda Pakistan restaurants and menus, populated by a scraper (`apps/scraper`); the API only reads this data. Restaurant rows carry their own latitude/longitude.
 - **Proximity:** the user's residence lat/long is compared against each restaurant's lat/long via Haversine distance, in **kilometres**, within a configurable radius (e.g. 5 / 10 / 15 km). Only restaurants within radius are browsable and eligible for suggestions.
 - **Money:** currency is **PKR**; budgets are set per **weekly or monthly** period.
-- **Rhythm:** daily use is organized around meal slots and user-configured notification times. Notification *preferences* are persisted; actual push/email delivery is not yet wired up.
+- **Rhythm:** daily use is organized around meal slots and user-configured notification times. Notification _preferences_ are persisted; actual push/email delivery is not yet wired up.
 - **Cross-device:** desktop for setup, planning, and analytics; mobile for daily meal choices and logging spend. The product must work fully on both — neither is the "real" version.
 - **External step:** ordering happens outside the app on Foodpanda; the user then returns to record the actual amount spent.
 

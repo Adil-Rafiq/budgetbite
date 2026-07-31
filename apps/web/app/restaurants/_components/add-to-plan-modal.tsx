@@ -105,9 +105,7 @@ export function AddToPlanModal({
   // user's wallet — they can still correct it to the real total.
   const suggestedAmount = useMemo(
     () =>
-      menuItem
-        ? estimateMealCost({ itemPrice: menuItem.price, deliveryFee, minimumOrder })
-        : 0,
+      menuItem ? estimateMealCost({ itemPrice: menuItem.price, deliveryFee, minimumOrder }) : 0,
     [menuItem, deliveryFee, minimumOrder],
   );
 
@@ -326,10 +324,7 @@ export function AddToPlanModal({
                     where a user is most likely to be looking at something they
                     cannot afford. */}
                 {!guard.showArmed && warning && (
-                  <p
-                    role="status"
-                    className="flex items-start gap-1.5 text-[11px] text-tomato-ink"
-                  >
+                  <p role="status" className="flex items-start gap-1.5 text-[11px] text-tomato-ink">
                     <TriangleAlert aria-hidden className="mt-px h-3 w-3 shrink-0" />
                     {warning}
                   </p>
@@ -386,11 +381,11 @@ export function AddToPlanModal({
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={
-              !planId || !mealTypeId || isSaving || (isPastOrToday && actualAmount <= 0)
-            }
+            disabled={!planId || !mealTypeId || isSaving || (isPastOrToday && actualAmount <= 0)}
             className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-5 text-[13px] font-semibold text-white transition-colors disabled:pointer-events-none disabled:opacity-50 ${
-              guard.showArmed ? 'bg-tomato-ink hover:bg-tomato-ink/90' : 'bg-green-deep hover:bg-green-deeper'
+              guard.showArmed
+                ? 'bg-tomato-ink hover:bg-tomato-ink/90'
+                : 'bg-green-deep hover:bg-green-deeper'
             } ${FOCUS_RING}`}
           >
             {isSaving

@@ -190,8 +190,7 @@ export const useBudgetStep = (activeMealTypes: MealType[]) => {
     const draft = readDraftFrom(PLANS_DRAFT_KEY);
     form.reset({
       planType: draft.planType ?? DEFAULT_PLAN_TYPE,
-      totalBudget:
-        typeof draft.totalBudget === 'number' ? draft.totalBudget : DEFAULT_TOTAL_BUDGET,
+      totalBudget: typeof draft.totalBudget === 'number' ? draft.totalBudget : DEFAULT_TOTAL_BUDGET,
       mealTypeIds: draft.mealTypeIds ?? [],
     });
   }, [form]);

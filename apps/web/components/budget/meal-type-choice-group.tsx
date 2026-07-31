@@ -43,9 +43,7 @@ export function MealTypeChoiceGroup({
       <div
         role="group"
         aria-label={label}
-        className={
-          isInline ? 'flex flex-wrap gap-2' : 'grid grid-cols-2 gap-2 sm:grid-cols-3'
-        }
+        className={isInline ? 'flex flex-wrap gap-2' : 'grid grid-cols-2 gap-2 sm:grid-cols-3'}
       >
         {options.map((type) => {
           const checked = selectedIds.includes(type.id);

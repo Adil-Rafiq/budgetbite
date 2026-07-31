@@ -25,3 +25,7 @@ yarn.lock
 
 # Python virtualenvs (apps/scraper)
 **/.venv
+
+# Vendored skill docs and the report snapshots they emit — not ours to reformat
+.claude
+.impeccable

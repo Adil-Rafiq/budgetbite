@@ -112,7 +112,9 @@ export function AppSidebar() {
             >
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                  isActive ? 'bg-green/15 text-green-deep' : 'border border-sage bg-canvas text-slate'
+                  isActive
+                    ? 'bg-green/15 text-green-deep'
+                    : 'border border-sage bg-canvas text-slate'
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -131,7 +133,9 @@ export function AppSidebar() {
               <span className="text-xs font-semibold uppercase tracking-wide text-slate">
                 {active.plan.planType} budget
               </span>
-              <span className={`text-xs font-bold ${isOver ? 'text-tomato-ink' : 'text-green-deep'}`}>
+              <span
+                className={`text-xs font-bold ${isOver ? 'text-tomato-ink' : 'text-green-deep'}`}
+              >
                 {spentPercent}%
               </span>
             </div>

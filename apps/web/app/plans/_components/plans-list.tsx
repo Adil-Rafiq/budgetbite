@@ -230,7 +230,9 @@ export default function PlansList() {
               >
                 <motion.div
                   whileHover={
-                    prefersReducedMotion ? undefined : { y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }
+                    prefersReducedMotion
+                      ? undefined
+                      : { y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }
                   }
                   transition={{ duration: 0.22, ease: 'easeOut' }}
                   className="rounded-2xl border border-sage bg-white p-5 shadow-sm"
@@ -249,7 +251,10 @@ export default function PlansList() {
                     <span
                       className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${tone.pill}`}
                     >
-                      <span aria-hidden className={`inline-block h-1.5 w-1.5 rounded-full ${tone.dot}`} />
+                      <span
+                        aria-hidden
+                        className={`inline-block h-1.5 w-1.5 rounded-full ${tone.dot}`}
+                      />
                       {plan.status}
                     </span>
                   </div>

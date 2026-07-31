@@ -20,7 +20,8 @@ export function planPeriodLabel(startDate: string, endDate: string): string {
   const end = new Date(endDate);
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 'Budget plan';
 
-  const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear();
+  const sameMonth =
+    start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear();
   const spansWholeMonth =
     sameMonth &&
     start.getDate() === 1 &&

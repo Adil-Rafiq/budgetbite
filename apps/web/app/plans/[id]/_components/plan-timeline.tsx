@@ -122,13 +122,7 @@ function PinnedBody({ option, ctx }: { option: SuggestionOption; ctx: BudgetStat
   );
 }
 
-function SuggestedBody({
-  options,
-  ctx,
-}: {
-  options: SuggestionOption[];
-  ctx: BudgetStateContext;
-}) {
+function SuggestedBody({ options, ctx }: { options: SuggestionOption[]; ctx: BudgetStateContext }) {
   return (
     <div className="flex flex-col">
       {options.map((option, i) => (
@@ -139,7 +133,10 @@ function SuggestedBody({
           }`}
         >
           <div className="flex min-w-0 items-start gap-2.5">
-            <span aria-hidden className="mt-0.5 w-4 shrink-0 text-[11px] tabular-nums text-slate/60">
+            <span
+              aria-hidden
+              className="mt-0.5 w-4 shrink-0 text-[11px] tabular-nums text-slate/60"
+            >
               {String(i + 1).padStart(2, '0')}
             </span>
             <div className="min-w-0">
@@ -328,7 +325,9 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
   const header = (
     <div className="flex items-end justify-between">
       <div className="flex flex-col gap-1">
-        <span className="text-xs font-semibold uppercase tracking-widest text-green-deep">Timeline</span>
+        <span className="text-xs font-semibold uppercase tracking-widest text-green-deep">
+          Timeline
+        </span>
         <h2 className="font-display text-xl font-semibold tracking-tight text-charcoal">
           Day by day
         </h2>

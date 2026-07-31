@@ -143,11 +143,7 @@ function RestaurantsPageInner() {
    * fallback. The subtitle and the select label are both derived from this one
    * value, so the claim and the query cannot drift apart again.
    */
-  const autoOrdering: Ordering = canRankByBudget
-    ? 'budget'
-    : hasLocation
-      ? 'distance'
-      : 'name';
+  const autoOrdering: Ordering = canRankByBudget ? 'budget' : hasLocation ? 'distance' : 'name';
 
   const resolvedSort: RestaurantSort | undefined = useMemo(() => {
     if (sort === 'auto') return canRankByBudget ? 'budget-fit' : undefined;
@@ -246,15 +242,16 @@ function RestaurantsPageInner() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const emptyMessage = page > 0
-    ? 'Nothing on this page.'
-    : urlQ
-      ? `No restaurants match “${urlQ}”.`
-      : activeChips.length > 0
-        ? 'No restaurants match your filters.'
-        : hasLocation
-          ? `No restaurants within ${maxDistanceKm} km of you.`
-          : 'No restaurants yet.';
+  const emptyMessage =
+    page > 0
+      ? 'Nothing on this page.'
+      : urlQ
+        ? `No restaurants match “${urlQ}”.`
+        : activeChips.length > 0
+          ? 'No restaurants match your filters.'
+          : hasLocation
+            ? `No restaurants within ${maxDistanceKm} km of you.`
+            : 'No restaurants yet.';
 
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8">
@@ -595,7 +592,9 @@ function RestaurantsPageInner() {
                   >
                     <motion.div
                       whileHover={
-                        reduceMotion ? undefined : { y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }
+                        reduceMotion
+                          ? undefined
+                          : { y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }
                       }
                       transition={{ duration: 0.22, ease: 'easeOut' }}
                       className="flex h-full flex-col rounded-2xl border border-sage bg-white p-5 shadow-sm"

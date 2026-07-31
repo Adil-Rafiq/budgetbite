@@ -218,8 +218,8 @@ export default function LandingPage() {
                 <div className="mt-3 flex items-center gap-2 rounded-xl bg-canvas px-3 py-2">
                   <Sparkles className="h-3.5 w-3.5 shrink-0 text-green-deep" />
                   <p className="text-xs font-normal text-charcoal">
-                    AI suggests <span className="text-tomato-ink">Sabri Nihari</span> — ₨650 nearby ·
-                    fits your budget
+                    AI suggests <span className="text-tomato-ink">Sabri Nihari</span> — ₨650 nearby
+                    · fits your budget
                   </p>
                 </div>
               </div>
@@ -426,7 +426,9 @@ export default function LandingPage() {
                 </div>
                 <div className="mt-2 flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-green-deep" />
-                  <span className="text-xs font-normal text-green-deep">Logged · Budget updated</span>
+                  <span className="text-xs font-normal text-green-deep">
+                    Logged · Budget updated
+                  </span>
                 </div>
               </div>
             </div>
@@ -449,7 +451,9 @@ export default function LandingPage() {
                   <span className="text-xs font-normal uppercase tracking-wide text-charcoal/60">
                     New plan — rest of week
                   </span>
-                  <span className="font-display text-sm font-normal text-tomato-ink">₨ 6,420 left</span>
+                  <span className="font-display text-sm font-normal text-tomato-ink">
+                    ₨ 6,420 left
+                  </span>
                 </div>
                 <div className="space-y-1.5">
                   {[
@@ -471,7 +475,9 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center gap-1.5 pt-1">
                   <Sparkles className="h-3.5 w-3.5 text-tomato-ink" />
-                  <span className="text-xs font-normal text-tomato-ink">AI re-planned instantly</span>
+                  <span className="text-xs font-normal text-tomato-ink">
+                    AI re-planned instantly
+                  </span>
                 </div>
               </div>
             </div>
@@ -491,7 +497,8 @@ export default function LandingPage() {
                 </span>
               </div>
               <h2 className="mb-6 font-display text-4xl font-normal leading-tight tracking-tight text-white lg:text-5xl">
-                Built for people who love food <span className="text-green-deep">and</span> their budget.
+                Built for people who love food <span className="text-green-deep">and</span> their
+                budget.
               </h2>
               <p className="mb-10 text-lg leading-relaxed text-white/50">
                 No spreadsheets, no guilt. Just a planner that knows what&apos;s near you, what fits

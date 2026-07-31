@@ -101,7 +101,9 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
         <Tabs
           value={tab}
           onValueChange={(next) =>
-            router.replace(next === 'history' ? `/plans/${plan.id}?tab=history` : `/plans/${plan.id}`)
+            router.replace(
+              next === 'history' ? `/plans/${plan.id}?tab=history` : `/plans/${plan.id}`,
+            )
           }
           className="gap-4"
         >

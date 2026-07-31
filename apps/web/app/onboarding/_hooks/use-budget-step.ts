@@ -12,11 +12,7 @@ import {
 } from '@/app/onboarding/types';
 import { MAX_MEALS_PER_DAY } from '@/app/onboarding/constants';
 import { patchDraft, readDraft } from '@/app/onboarding/_lib/draft-storage';
-import {
-  BUDGET_PRESETS,
-  DEFAULT_PLAN_TYPE,
-  DEFAULT_TOTAL_BUDGET,
-} from '@/lib/budget-plan/schema';
+import { BUDGET_PRESETS, DEFAULT_PLAN_TYPE, DEFAULT_TOTAL_BUDGET } from '@/lib/budget-plan/schema';
 import type { MealType } from '@repo/shared';
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────

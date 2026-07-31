@@ -199,11 +199,7 @@ export function GenerationAttemptItem({
         <CollapsibleContent className="data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
           <div className="ml-2 mt-3 rounded-xl border border-dashed border-sage bg-canvas p-4">
             {open && (
-              <GenerationSuggestionsGrid
-                planId={planId}
-                generationId={generation.id}
-                ctx={ctx}
-              />
+              <GenerationSuggestionsGrid planId={planId} generationId={generation.id} ctx={ctx} />
             )}
           </div>
         </CollapsibleContent>

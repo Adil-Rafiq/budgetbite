@@ -32,18 +32,30 @@ describe('typicalMealCost', () => {
     // The real shape of the seeded data that made this necessary: a menu whose
     // floor is a side dish and whose average is a meal.
     expect(
-      typicalMealCost({ avgItemPrice: 1076, minItemPrice: 24, deliveryFee: 199, minimumOrder: 249 }),
+      typicalMealCost({
+        avgItemPrice: 1076,
+        minItemPrice: 24,
+        deliveryFee: 199,
+        minimumOrder: 249,
+      }),
     ).toBe(1275);
   });
 
   it('falls back to the cheapest item when there is no average', () => {
     expect(
-      typicalMealCost({ avgItemPrice: null, minItemPrice: 500, deliveryFee: 50, minimumOrder: null }),
+      typicalMealCost({
+        avgItemPrice: null,
+        minItemPrice: 500,
+        deliveryFee: 50,
+        minimumOrder: null,
+      }),
     ).toBe(550);
   });
 
   it('returns null when the restaurant has no menu', () => {
-    expect(typicalMealCost({ avgItemPrice: null, minItemPrice: null, deliveryFee: 199 })).toBeNull();
+    expect(
+      typicalMealCost({ avgItemPrice: null, minItemPrice: null, deliveryFee: 199 }),
+    ).toBeNull();
     expect(typicalMealCost({})).toBeNull();
   });
 

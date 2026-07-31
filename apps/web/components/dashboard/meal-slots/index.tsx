@@ -334,8 +334,10 @@ export function MealSlots() {
             {budget.hasBudget && (
               <p className="text-[12px] text-slate">
                 Per meal left:{' '}
-                <span className="font-semibold text-green-deep">{formatPKR(budget.avgPerMeal)}</span> ·{' '}
-                {formatPKR(budget.amountRemaining)} remaining
+                <span className="font-semibold text-green-deep">
+                  {formatPKR(budget.avgPerMeal)}
+                </span>{' '}
+                · {formatPKR(budget.amountRemaining)} remaining
               </p>
             )}
           </DialogHeader>

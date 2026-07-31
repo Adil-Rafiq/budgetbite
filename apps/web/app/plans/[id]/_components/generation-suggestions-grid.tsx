@@ -125,10 +125,7 @@ export function GenerationSuggestionsGrid({
 
   if (error) {
     return (
-      <DataError
-        message="We couldn't load this attempt's suggestions."
-        onRetry={() => refetch()}
-      />
+      <DataError message="We couldn't load this attempt's suggestions." onRetry={() => refetch()} />
     );
   }
 

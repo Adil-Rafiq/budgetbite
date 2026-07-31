@@ -131,13 +131,17 @@ export function SummaryCards() {
                 format={formatPKR}
               />
             </span>
-            <span className={`pb-0.5 text-sm font-medium ${isOver ? 'text-tomato-ink' : 'text-slate'}`}>
+            <span
+              className={`pb-0.5 text-sm font-medium ${isOver ? 'text-tomato-ink' : 'text-slate'}`}
+            >
               {isOver ? 'over' : 'left'}
             </span>
           </div>
           <p className="mt-1.5 text-xs text-slate">
             of {formatPKR(ctx.totalBudget)} ·{' '}
-            <span className="font-semibold text-tomato-ink">{formatPKR(ctx.amountSpent)} spent</span>
+            <span className="font-semibold text-tomato-ink">
+              {formatPKR(ctx.amountSpent)} spent
+            </span>
           </p>
         </div>
 
@@ -174,7 +178,9 @@ export function SummaryCards() {
       </div>
 
       {/* Plain-language standing — visible to everyone, not hidden in a tooltip */}
-      <p className={`mt-2 text-[12px] ${alarm ? 'text-tomato-ink' : 'text-slate'}`}>{statusCaption}</p>
+      <p className={`mt-2 text-[12px] ${alarm ? 'text-tomato-ink' : 'text-slate'}`}>
+        {statusCaption}
+      </p>
 
       {/* The few numbers that inform the next meal choice */}
       <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-sage/70 pt-4">
