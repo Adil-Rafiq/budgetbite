@@ -66,6 +66,13 @@ class FoodpandaScraper(BaseScraper):
         )
         return unique_links
 
+    def _await_vendor_content(self) -> bool:
+        """Wait for the vendor page to render its own content."""
+        return self.parser.wait_for_vendor_content(
+            self.browser.page,
+            self.config.vendor_content_timeout * 1000,
+        )
+
     def scrape_restaurant(self, url: str) -> Restaurant:
         """Scrape data from a single restaurant page."""
         page = self.browser.page
@@ -81,6 +88,19 @@ class FoodpandaScraper(BaseScraper):
         # Handle CAPTCHA (owns its own settle delay when one actually appears)
         self.handle_captcha()
 
+        # Don't parse a page that hasn't rendered. Scraping on nothing but the
+        # fixed delay produced restaurants with no name, no coordinates and no
+        # menu, which the uploader still wrote as real rows sitting on the
+        # scrape origin — a silent data-quality hole. A wall can also go up
+        # *after* the first CAPTCHA check, so a failed wait re-checks once.
+        if not self._await_vendor_content():
+            self.handle_captcha()
+            if not self._await_vendor_content():
+                raise RuntimeError(
+                    f"vendor page never rendered within "
+                    f"{self.config.vendor_content_timeout}s (blocked or dead URL)"
+                )
+
         # Scroll to load lazy-loaded content
         self.scroll_to_bottom()
 
@@ -89,6 +109,7 @@ class FoodpandaScraper(BaseScraper):
         latitude, longitude = self.parser.parse_restaurant_geo(page)
         rating = self.parser.parse_rating(page)
         rating_count = self.parser.parse_rating_count(page)
+        image_url = self.parser.parse_restaurant_image(page)
         delivery_fee = self.parser.parse_delivery_fee(page)
         minimum_order = self.parser.parse_minimum_order(page)
 
@@ -105,12 +126,24 @@ class FoodpandaScraper(BaseScraper):
                 ("coordinates", latitude if longitude is not None else None),
                 ("rating", rating),
                 ("rating_count", rating_count),
+                ("image_url", image_url),
                 ("menu", menu),
             )
             if not value
         ]
         if missing:
             print(f"[WARN] {vendor_id}: missing/empty fields -> {', '.join(missing)}")
+
+        # No menu *and* no coordinates of its own is the one combination that
+        # cannot be salvaged: the uploader would fall back to the scrape origin,
+        # planting a menu-less restaurant on the runner's doorstep and flattening
+        # the distance sort for every user nearby. Refuse it as a failed scrape
+        # instead. Either signal on its own is survivable and still uploaded.
+        if not menu and (latitude is None or longitude is None):
+            raise RuntimeError(
+                "page yielded neither a menu nor vendor coordinates; "
+                "refusing to upload a placeholder restaurant"
+            )
 
         print(f"[SUCCESS] Scraped {len(menu)} items from {name or vendor_id}")
 
@@ -123,6 +156,7 @@ class FoodpandaScraper(BaseScraper):
             longitude=longitude,
             rating=rating,
             rating_count=rating_count,
+            image_url=image_url,
             minimum_order=minimum_order,
             delivery_fee=delivery_fee,
             menu=menu,

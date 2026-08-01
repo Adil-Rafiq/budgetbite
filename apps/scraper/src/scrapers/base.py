@@ -13,7 +13,14 @@ class BaseScraper(ABC):
 
     def init(self, endpoint_url: str | None = None):
         """Initialize browser connection."""
-        self.browser.connect(endpoint_url)
+        page = self.browser.connect(endpoint_url)
+        # Every locator call that doesn't pass its own timeout inherits these.
+        # The parser bounds its text reads explicitly, but attribute reads and
+        # count()s do not, so without this a single detached node still stalls
+        # the run on Playwright's 30s default. Navigation keeps a long budget;
+        # element lookups get a short one.
+        page.set_default_navigation_timeout(self.config.navigation_timeout * 1000)
+        page.set_default_timeout(self.config.element_timeout * 1000)
 
     def scroll_to_bottom(
         self,

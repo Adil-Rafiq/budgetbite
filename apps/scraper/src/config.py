@@ -65,6 +65,19 @@ class ScraperConfig:
     scroll_stable_rounds: int = 3
     page_load_delay: float = 2.0
     captcha_wait_delay: float = 2.0
+    # How long a vendor page gets to render its own content before we call the
+    # page blocked or dead. A fixed post-navigation delay cannot do this job:
+    # it is simultaneously too long for a fast page and too short for a slow
+    # one, and it cannot tell "still loading" from "never going to load".
+    vendor_content_timeout: float = 15.0
+    # Playwright's own defaults, narrowed. Its single 30s timeout covers both
+    # navigation and element lookups, which are not the same wait: a vendor page
+    # legitimately takes seconds to load, while an element that isn't on an
+    # already-settled page is not going to appear. Splitting them means a stale
+    # handle costs seconds instead of half a minute, without cutting page loads
+    # short. Applied in BaseScraper.init().
+    navigation_timeout: float = 30.0
+    element_timeout: float = 5.0
 
     # Rate limiting
     request_delay: float = 2.0

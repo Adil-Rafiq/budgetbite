@@ -63,9 +63,71 @@ class FoodpandaParser:
     @staticmethod
     def parse_restaurant_links(page: Page) -> List[str]:
         """Extract all restaurant links from the page."""
-        links = page.locator("xpath=//a[contains(@href, '/restaurant/')]").all()
-        return [link.get_attribute("href") for link in links if link.get_attribute("href")]
-    
+        hrefs: List[str] = []
+        for link in page.locator("xpath=//a[contains(@href, '/restaurant/')]").all():
+            # One bounded read per link. These handles come from a snapshot of a
+            # homepage whose carousels keep re-rendering, so a node that detached
+            # in between would otherwise cost the full default timeout — and used
+            # to cost it twice, once to test the href and once to keep it.
+            try:
+                href = link.get_attribute("href", timeout=FoodpandaParser.ELEMENT_TIMEOUT_MS)
+            except Exception:
+                continue
+            if href:
+                hrefs.append(href)
+        return hrefs
+
+
+    # ========== Element reading ==========
+
+    # Every read below happens against a page we have already loaded, settled
+    # and scrolled, so an element that isn't there is one the page doesn't have
+    # — not one still on its way. Playwright's 30s default turns each such miss
+    # into half a minute of waiting: a vendor whose product markup has drifted
+    # burns 30s *per item*, which is what makes a run look hung rather than
+    # failed. Two and a half seconds is far past the point of new information.
+    ELEMENT_TIMEOUT_MS = 2500
+
+    @staticmethod
+    def _text(locator: Locator, timeout_ms: float | None = None) -> Optional[str]:
+        """Read an element's trimmed text, or None if it isn't there in time.
+
+        Wraps every text read in the file so that "this element is missing" is
+        a fast, ordinary answer instead of a timeout exception thrown 30s later.
+        """
+        try:
+            text = locator.inner_text(
+                timeout=timeout_ms if timeout_ms is not None else FoodpandaParser.ELEMENT_TIMEOUT_MS
+            )
+        except Exception:
+            return None
+        return text.strip() or None
+
+    # What proves a vendor page actually rendered: its own heading, or its
+    # products. Anything less (a bare <body>, a bot wall, an SPA shell that
+    # never hydrated) means there is nothing on the page worth parsing.
+    _VENDOR_CONTENT_SELECTOR = 'h1.main-info__title, h1, [data-testid="menu-product"]'
+
+    @staticmethod
+    def wait_for_vendor_content(page: Page, timeout_ms: float) -> bool:
+        """Block until the vendor page has rendered its own content.
+
+        Without this, parsing starts whenever the fixed post-navigation delay
+        happens to elapse. A page that was still loading — or was quietly
+        replaced by a block page — parses as a restaurant with no name, no
+        coordinates, no rating and no menu, which the uploader then writes as a
+        real row parked on the scrape origin. Better to know it never rendered.
+        """
+        try:
+            page.wait_for_selector(
+                FoodpandaParser._VENDOR_CONTENT_SELECTOR,
+                timeout=timeout_ms,
+                state="visible",
+            )
+            return True
+        except Exception:
+            return False
+
     # ========== Restaurant Details Parsing ==========
 
     @staticmethod
@@ -80,14 +142,14 @@ class FoodpandaParser:
             # 1) Confirmed vendor title heading on foodpanda.pk
             title = page.locator("h1.main-info__title")
             if title.count() > 0:
-                name = title.first.inner_text().strip()
+                name = FoodpandaParser._text(title.first)
                 if name:
                     return name
 
             # 2) Any main <h1> (guards against class-name changes)
             h1 = page.locator("h1")
             if h1.count() > 0:
-                name = h1.first.inner_text().strip()
+                name = FoodpandaParser._text(h1.first)
                 if name:
                     return name
 
@@ -102,7 +164,13 @@ class FoodpandaParser:
         """Collect Restaurant/FoodEstablishment entries from any ld+json blob."""
         found: List[dict] = []
         for script in page.locator('script[type="application/ld+json"]').all():
-            raw = script.text_content()
+            # Bounded like every other read: these handles come from a snapshot,
+            # and a node that detached under a re-render would otherwise cost 30s
+            # — now paid on every vendor, since the hero photo reads this too.
+            try:
+                raw = script.text_content(timeout=FoodpandaParser.ELEMENT_TIMEOUT_MS)
+            except Exception:
+                continue
             if not raw:
                 continue
             try:
@@ -168,6 +236,86 @@ class FoodpandaParser:
             print(f"[WARN] Failed to parse restaurant geo: {e}")
             return (None, None)
 
+    # Foodpanda serves its own branding when a vendor has no artwork of its own.
+    # Storing those would fill the app with identical panda logos, which is
+    # worse than the honest "no photo" placeholder the UI already draws.
+    _PLACEHOLDER_IMAGE_MARKERS = ("logo-simple-fp.svg", "micro-assets.foodora.com")
+
+    @staticmethod
+    def _is_placeholder_image(url: Optional[str]) -> bool:
+        """True for Foodpanda's own stand-in artwork rather than a real photo."""
+        return bool(url) and any(m in url for m in FoodpandaParser._PLACEHOLDER_IMAGE_MARKERS)
+
+    @staticmethod
+    def _background_image_url(style: Optional[str]) -> Optional[str]:
+        """Pull an absolute URL out of a `background-image: url("…")` style."""
+        if not style:
+            return None
+        match = re.search(r'url\s*\(\s*(?:"|\'|&quot;)(.+?)(?:"|\'|&quot;)\s*\)', style)
+        if not match:
+            return None
+        url = match.group(1).replace("&amp;", "&").replace("&quot;", '"').strip()
+        return url if url.startswith("http") else None
+
+    # Where the vendor's hero photo lives in the DOM, most specific first. The
+    # hero has moved between an <img>, a wrapper with a background-image, and a
+    # <picture>, so each candidate is probed for both shapes.
+    _HERO_IMAGE_SELECTORS = (
+        '[data-testid="vendor-hero-image"]',
+        '[data-testid="vendor-image"]',
+        ".vendor-hero-image",
+        ".hero-image",
+        ".vendor__hero",
+    )
+
+    @staticmethod
+    def parse_restaurant_image(page: Page) -> Optional[str]:
+        """Extract the vendor's own hero/banner photo URL.
+
+        Structured data first: JSON-LD and og:image are scoped to the vendor and
+        survive class-name churn, whereas the hero element has been re-skinned
+        repeatedly. Returns None when the page offers nothing but placeholder
+        artwork — the app renders its own fallback, so a wrong photo is worse
+        than no photo.
+        """
+        try:
+            # 1) JSON-LD `image`: a URL string, a list of them, or an ImageObject.
+            for entry in FoodpandaParser._json_ld_restaurants(page):
+                candidate = entry.get("image")
+                if isinstance(candidate, list):
+                    candidate = candidate[0] if candidate else None
+                if isinstance(candidate, dict):
+                    candidate = candidate.get("url")
+                if isinstance(candidate, str) and candidate.startswith("http"):
+                    if not FoodpandaParser._is_placeholder_image(candidate):
+                        return candidate.strip()
+
+            # 2) og:image — what Foodpanda itself uses to represent the vendor.
+            og = page.locator('meta[property="og:image"]')
+            if og.count() > 0:
+                url = (og.first.get_attribute("content") or "").strip()
+                if url.startswith("http") and not FoodpandaParser._is_placeholder_image(url):
+                    return url
+
+            # 3) The hero element, as <img src> or a background-image.
+            for selector in FoodpandaParser._HERO_IMAGE_SELECTORS:
+                hero = page.locator(selector)
+                if hero.count() == 0:
+                    continue
+                el = hero.first
+                url = el.get_attribute("src")
+                if not url and el.locator("img").count() > 0:
+                    url = el.locator("img").first.get_attribute("src")
+                if not url:
+                    url = FoodpandaParser._background_image_url(el.get_attribute("style"))
+                if url and url.startswith("http") and not FoodpandaParser._is_placeholder_image(url):
+                    return url
+
+            return None
+        except Exception as e:
+            print(f"[WARN] Failed to parse restaurant image: {e}")
+            return None
+
     @staticmethod
     def parse_rating(page: Page) -> Optional[float]:
         """Extract restaurant rating from page.
@@ -184,17 +332,17 @@ class FoodpandaParser:
                 # First span usually contains the rating number
                 spans = rating_container.locator("span").all()
                 if spans:
-                    rating_text = spans[0].inner_text().strip()
+                    rating_text = FoodpandaParser._text(spans[0])
                     # Extract number (e.g., "4.7" from "4.7★")
-                    match = re.search(r'(\d+\.?\d*)', rating_text)
+                    match = re.search(r'(\d+\.?\d*)', rating_text) if rating_text else None
                     if match:
                         return float(match.group(1))
-            
+
             # Fallback: try data-testid
             rating_locator = page.locator("[data-testid='vendor-rating']")
             if rating_locator.count() > 0:
-                rating_text = rating_locator.first.inner_text().strip()
-                match = re.search(r'(\d+\.?\d*)', rating_text)
+                rating_text = FoodpandaParser._text(rating_locator.first)
+                match = re.search(r'(\d+\.?\d*)', rating_text) if rating_text else None
                 if match:
                     return float(match.group(1))
             
@@ -218,14 +366,16 @@ class FoodpandaParser:
             if rating_container.count() > 0:
                 spans = rating_container.locator("span").all()
                 if len(spans) > 1:
-                    count_text = spans[1].inner_text().strip()
-                    return FoodpandaParser._parse_count_text(count_text)
-            
+                    count_text = FoodpandaParser._text(spans[1])
+                    if count_text:
+                        return FoodpandaParser._parse_count_text(count_text)
+
             # Fallback: look for text containing "rating" or "review"
             review_locator = page.locator("text=/\\d+.*(?:rating|review)/i")
             if review_locator.count() > 0:
-                count_text = review_locator.first.inner_text().strip()
-                return FoodpandaParser._parse_count_text(count_text)
+                count_text = FoodpandaParser._text(review_locator.first)
+                if count_text:
+                    return FoodpandaParser._parse_count_text(count_text)
             
             return None
         except Exception as e:
@@ -268,12 +418,12 @@ class FoodpandaParser:
             )
             
             if fee_locator.count() > 0:
-                fee_text = fee_locator.first.inner_text().strip()
-                
+                fee_text = FoodpandaParser._text(fee_locator.first) or ""
+
                 # Check for free delivery
                 if "free" in fee_text.lower():
                     return 0.0
-                
+
                 # Extract number from "Rs. 159" or "Rs.159"
                 match = re.search(r'Rs\.?\s*(\d+(?:,\d+)*)', fee_text, re.IGNORECASE)
                 if match:
@@ -303,8 +453,8 @@ class FoodpandaParser:
             )
             
             if min_order_locator.count() > 0:
-                min_text = min_order_locator.first.inner_text().strip()
-                
+                min_text = FoodpandaParser._text(min_order_locator.first) or ""
+
                 # Extract number from "Min. order Rs. 249"
                 match = re.search(r'Rs\.?\s*(\d+(?:,\d+)*)', min_text, re.IGNORECASE)
                 if match:
@@ -321,29 +471,32 @@ class FoodpandaParser:
 
     @staticmethod
     def _get_menu_product_image_url(product: Locator) -> str | None:
-        """Get image URL from data-testid='menu-product-image': <img src> or background-image."""
-        image_locator = product.get_by_test_id("menu-product-image")
-        if image_locator.count() == 0:
+        """Get image URL from data-testid='menu-product-image': <img src> or background-image.
+
+        Swallows its own failures. A photo is the least important thing on a
+        menu item, so a lazy-loading image that detaches mid-read must cost the
+        photo, not the item — letting it raise into parse_menu_item would drop a
+        priced, named dish over a picture.
+        """
+        try:
+            image_locator = product.get_by_test_id("menu-product-image")
+            if image_locator.count() == 0:
+                return None
+            el = image_locator.first
+
+            # 1) <img src="...">
+            image_url = el.get_attribute("src")
+            if not image_url and el.locator("img").count() > 0:
+                image_url = el.locator("img").first.get_attribute("src")
+
+            # 2) background-image: url("...") on div (e.g. lazy-loaded-dish-photo)
+            if not image_url:
+                image_url = FoodpandaParser._background_image_url(el.get_attribute("style"))
+        except Exception:
             return None
-        el = image_locator.first
-
-        # 1) <img src="...">
-        image_url = el.get_attribute("src")
-        if not image_url and el.locator("img").count() > 0:
-            image_url = el.locator("img").first.get_attribute("src")
-
-        # 2) background-image: url("...") on div (e.g. lazy-loaded-dish-photo)
-        if not image_url:
-            style = el.get_attribute("style")
-            if style:
-                match = re.search(r'url\s*\(\s*(?:"|\'|&quot;)(.+?)(?:"|\'|&quot;)\s*\)', style)
-                if match:
-                    url = match.group(1).replace("&amp;", "&").replace("&quot;", '"').strip()
-                    if url.startswith("http"):
-                        image_url = url
 
         # Reject known placeholder (Foodpanda logo)
-        if image_url and ("logo-simple-fp.svg" in image_url or "micro-assets.foodora.com" in image_url):
+        if FoodpandaParser._is_placeholder_image(image_url):
             return None
         return image_url
 
@@ -351,14 +504,31 @@ class FoodpandaParser:
     def parse_menu_item(product: Locator, index: int) -> MenuItem | None:
         """Parse a single menu item from the page."""
         try:
-            name = product.get_by_test_id("menu-product-name").inner_text().strip()
-            
+            # A product card with no name is a skeleton the page never filled
+            # in, or a card whose markup we no longer recognise. Either way it
+            # is not an item, and the answer has to come back in milliseconds:
+            # this runs once per product, and menus run to hundreds.
+            #
+            # `.first` throughout: a card that happens to carry two of the same
+            # test id is a strict-mode violation, which would fail the whole
+            # item rather than the one ambiguous field.
+            name = FoodpandaParser._text(product.get_by_test_id("menu-product-name").first)
+            if not name:
+                return None
+
             description = ""
             if product.get_by_test_id("menu-product-description").count() > 0:
-                description = product.get_by_test_id("menu-product-description").inner_text().strip()
+                description = (
+                    FoodpandaParser._text(
+                        product.get_by_test_id("menu-product-description").first
+                    )
+                    or ""
+                )
 
             # Parse price (handles "Rs. 1500 Rs. 1800" format for discounts)
-            full_price_text = product.get_by_test_id("menu-product-price").inner_text().strip()
+            full_price_text = (
+                FoodpandaParser._text(product.get_by_test_id("menu-product-price").first) or ""
+            )
             price_parts = [
                 p for p in full_price_text.replace("Rs.", "").split()
                 if p.replace(".", "").replace(",", "").isdigit()
@@ -411,7 +581,9 @@ class FoodpandaParser:
             heading = section.locator(selector)
             if heading.count() == 0:
                 continue
-            title = heading.first.inner_text().strip()
+            title = FoodpandaParser._text(heading.first)
+            if not title:
+                continue
             # Foodpanda appends a count to some headings ("Deals (12)"); the
             # count is not part of the category's name and would fragment the
             # grouping the moment the vendor adds an item.
@@ -449,7 +621,7 @@ class FoodpandaParser:
                         name_locator = product.get_by_test_id("menu-product-name")
                         if name_locator.count() == 0:
                             continue
-                        name = name_locator.first.inner_text().strip()
+                        name = FoodpandaParser._text(name_locator.first)
                         if name:
                             mapping[name] = title
                 except Exception as e:
@@ -460,6 +632,25 @@ class FoodpandaParser:
                 return mapping
 
         return {}
+
+    # The fields a real menu item is made of. A `menu-product` card carrying
+    # neither is not an orderable item — vendor pages reuse the test id for the
+    # popular-items swimlane and for skeletons the page never fills in. Dropping
+    # those is correct, so they must not be reported as parse failures: a
+    # warning that fires on all but two vendors is one nobody reads, and genuine
+    # selector drift hides inside it.
+    _PRODUCT_FIELD_TEST_IDS = ("menu-product-name", "menu-product-price")
+
+    @staticmethod
+    def _looks_like_product_card(product: Locator) -> bool:
+        """True when a card carries at least one field a menu item is made of."""
+        try:
+            return any(
+                product.get_by_test_id(test_id).count() > 0
+                for test_id in FoodpandaParser._PRODUCT_FIELD_TEST_IDS
+            )
+        except Exception:
+            return False
 
     @staticmethod
     def parse_menu_items(page: Page) -> List[MenuItem]:
@@ -472,11 +663,31 @@ class FoodpandaParser:
         """
         products = page.get_by_test_id("menu-product").all()
         items = []
+        skipped: List[Locator] = []
 
         for i, product in enumerate(products):
             item = FoodpandaParser.parse_menu_item(product, i)
             if item:
                 items.append(item)
+            else:
+                skipped.append(product)
+
+        # Split the skips: a card that has a name or price field we still failed
+        # to read is selector drift and has to stay loud; a card with neither was
+        # never a menu item, and saying so at INFO keeps the warning meaningful.
+        if skipped:
+            drifted = sum(1 for p in skipped if FoodpandaParser._looks_like_product_card(p))
+            if drifted:
+                print(
+                    f"[WARN] {drifted}/{len(products)} product cards carry a name or "
+                    f"price we could not read (markup drift?)"
+                )
+            not_items = len(skipped) - drifted
+            if not_items:
+                print(
+                    f"[INFO] Ignored {not_items} card(s) with neither name nor price "
+                    f"(swimlane/placeholder, not menu items)"
+                )
 
         categories = FoodpandaParser._menu_categories_by_item_name(page)
         if categories:
