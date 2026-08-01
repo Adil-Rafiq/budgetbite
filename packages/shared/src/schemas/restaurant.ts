@@ -25,6 +25,8 @@ export const createRestaurantSchema = z.object({
   slug: z.string().min(1).max(300).optional(),
   phone: z.string().trim().min(3).max(30).optional(),
   orderUrl: z.url().max(2000).optional(),
+  /** The vendor's hero/banner photo. Same validation as a menu item's image. */
+  imageUrl: z.url().max(2000).optional(),
   latitude: z.coerce.number().min(-90).max(90),
   longitude: z.coerce.number().min(-180).max(180),
   deliveryFee: z.coerce.number().min(0).optional(),
@@ -53,6 +55,12 @@ export const restaurantSchema = z.object({
   phone: z.string().nullable(),
   /** Generic order/website link — shown when there's no Foodpanda deep-link. */
   orderUrl: z.string().nullable(),
+  /**
+   * Hero/banner photo. Null for community rows and for anything scraped before
+   * this field existed, and the URL can rot on Foodpanda's CDN even when set —
+   * clients render it through a component that falls back on `onError`.
+   */
+  imageUrl: z.string().nullable(),
   latitude: z.number().min(-90).max(90).nullable(),
   longitude: z.number().min(-180).max(180).nullable(),
   deliveryFee: z.number().min(0).nullable(),

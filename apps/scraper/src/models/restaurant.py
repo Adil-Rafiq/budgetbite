@@ -28,6 +28,9 @@ class Restaurant(TypedDict):
     longitude: Optional[float]
     rating: Optional[float]
     rating_count: Optional[int]
+    # The vendor's hero/banner photo. None when the page exposes none, or when
+    # the only thing on offer was Foodpanda's own placeholder artwork.
+    image_url: Optional[str]
     minimum_order: float
     delivery_fee: float
     menu: List[MenuItem]

@@ -102,6 +102,13 @@ def _restaurant_payload(restaurant: Restaurant, lat: float, lng: float) -> dict[
     # was tracked stay valid; the API column is nullable.
     if slug:
         payload["slug"] = slug[:300]
+    # Hero photo. Only absolute http(s) URLs — the API validates imageUrl with
+    # z.url(). Omitted rather than sent as null when the scrape found nothing,
+    # so a run that missed the hero (or hit a placeholder) leaves the photo an
+    # earlier run stored intact instead of blanking it.
+    image_url = restaurant.get("image_url")
+    if image_url and image_url.startswith("http"):
+        payload["imageUrl"] = image_url[:2000]
     return payload
 
 

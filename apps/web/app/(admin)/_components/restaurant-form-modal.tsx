@@ -49,6 +49,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
       slug: restaurant?.slug ?? undefined,
       phone: restaurant?.phone ?? undefined,
       orderUrl: restaurant?.orderUrl ?? undefined,
+      imageUrl: restaurant?.imageUrl ?? undefined,
       latitude: restaurant?.latitude ?? undefined,
       longitude: restaurant?.longitude ?? undefined,
       deliveryFee: restaurant?.deliveryFee ?? undefined,
@@ -138,6 +139,22 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
               />
               {errors.orderUrl && <p className={errorClass}>{errors.orderUrl.message}</p>}
             </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="imageUrl" className={labelClass} style={labelStyle}>
+              Photo URL
+            </Label>
+            <Input
+              id="imageUrl"
+              placeholder="optional · https://…"
+              {...register('imageUrl', { setValueAs: optionalString })}
+            />
+            <p className="text-[11px] text-slate">
+              Shown on the restaurant card and above its page. Scraped rows fill this in
+              automatically; a dead link falls back to a placeholder rather than breaking.
+            </p>
+            {errors.imageUrl && <p className={errorClass}>{errors.imageUrl.message}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-3">

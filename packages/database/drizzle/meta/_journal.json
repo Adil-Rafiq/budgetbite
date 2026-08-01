@@ -141,6 +141,13 @@
       "when": 1785537301248,
       "tag": "0019_moaning_tyrannus",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1785613561716,
+      "tag": "0020_minor_shockwave",
+      "breakpoints": true
     }
   ]
 }

@@ -32,6 +32,7 @@ import { useUser } from '@/hooks/use-user';
 import { useRestaurants } from '@/hooks/use-restaurant';
 import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
 import { RecommendRestaurantButton } from '@/components/recommend-restaurant-button';
+import { RestaurantImage } from '@/components/restaurant-image';
 import { humanizeName } from '@/lib/humanize-name';
 import { motion, useReducedMotion } from 'motion/react';
 
@@ -600,6 +601,15 @@ function RestaurantsPageInner() {
                       className="flex h-full flex-col rounded-2xl border border-sage bg-white p-5 shadow-sm"
                     >
                       <div className="flex items-start justify-between gap-3">
+                        {/* A thumbnail rather than a full-bleed banner: the
+                            loudest thing on this card has to stay the price,
+                            since affording the meal is the question the page
+                            exists to answer. */}
+                        <RestaurantImage
+                          src={r.imageUrl}
+                          className="h-12 w-12 shrink-0 rounded-xl border border-sage-edge"
+                          iconClassName="h-5 w-5"
+                        />
                         <h3 className="min-w-0 flex-1 font-display text-lg font-semibold leading-snug tracking-tight text-charcoal [overflow-wrap:anywhere] line-clamp-2">
                           {humanizeName(r.name)}
                         </h3>

@@ -201,6 +201,7 @@ export const restaurantService = {
       slug: input.slug ?? null,
       phone: input.phone ?? null,
       orderUrl: input.orderUrl ?? null,
+      imageUrl: input.imageUrl ?? null,
       latitude: String(input.latitude),
       longitude: String(input.longitude),
       deliveryFee: input.deliveryFee != null ? String(input.deliveryFee) : null,
@@ -232,6 +233,7 @@ export const restaurantService = {
       ...(input.slug !== undefined && { slug: input.slug }),
       ...(input.phone !== undefined && { phone: input.phone }),
       ...(input.orderUrl !== undefined && { orderUrl: input.orderUrl }),
+      ...(input.imageUrl !== undefined && { imageUrl: input.imageUrl }),
       ...(input.latitude !== undefined && { latitude: String(input.latitude) }),
       ...(input.longitude !== undefined && { longitude: String(input.longitude) }),
       ...(input.deliveryFee !== undefined && { deliveryFee: String(input.deliveryFee) }),
@@ -345,6 +347,7 @@ export const restaurantService = {
     slug: string | null;
     phone: string | null;
     orderUrl: string | null;
+    imageUrl: string | null;
     latitude: string;
     longitude: string;
     deliveryFee: string | null;
@@ -362,6 +365,7 @@ export const restaurantService = {
       slug: restaurant.slug,
       phone: restaurant.phone,
       orderUrl: restaurant.orderUrl,
+      imageUrl: restaurant.imageUrl,
       latitude: Number(restaurant.latitude),
       longitude: Number(restaurant.longitude),
       deliveryFee: restaurant.deliveryFee != null ? Number(restaurant.deliveryFee) : null,

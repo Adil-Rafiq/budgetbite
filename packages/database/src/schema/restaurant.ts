@@ -18,6 +18,10 @@ export const restaurant = pgTable(
     // that have no Foodpanda deep-link.
     phone: text('phone'),
     orderUrl: text('order_url'),
+    // The vendor's own hero/banner photo. Points at Foodpanda's CDN for scraped
+    // rows, so it can 404 without warning — every consumer needs an onError
+    // fallback, not just a null check.
+    imageUrl: text('image_url'),
     latitude: decimal('latitude', { precision: 10, scale: 7 }).notNull(),
     longitude: decimal('longitude', { precision: 10, scale: 7 }).notNull(),
     deliveryFee: decimal('delivery_fee', { precision: 10, scale: 2 }),

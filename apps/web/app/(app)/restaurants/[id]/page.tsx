@@ -40,6 +40,7 @@ import {
 import { DataError } from '@/components/data-error';
 import { RemainingAmount } from '@/components/budget/remaining-amount';
 import { FoodPreferenceToggle } from '@/components/food-preference-toggle';
+import { RestaurantImage } from '@/components/restaurant-image';
 
 import { AddToPlanModal } from '../_components/add-to-plan-modal';
 import { MenuItemSkeleton } from '../_components/menu-item-skeleton';
@@ -348,6 +349,15 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         <p className="text-[13px] text-slate">Restaurant not found.</p>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
+          {/* The vendor's own photo, full-bleed above the header. It draws
+              nothing at all when there is none — a grey band the height of a
+              banner would cost the same space and tell the reader less than
+              the name it would be pushing down. */}
+          <RestaurantImage
+            src={r.imageUrl}
+            fallback="nothing"
+            className="h-36 w-full border-b border-sage sm:h-44"
+          />
           <div className="flex flex-col gap-5 p-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex min-w-0 flex-col gap-2">
