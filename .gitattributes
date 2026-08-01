@@ -1,1 +1,5 @@
 * text=auto eol=lf
+
+# Vendored third-party Claude Code skills (Apache 2.0). Not project code —
+# keep them out of the language stats and collapsed in diffs.
+.claude/skills/** linguist-vendored
