@@ -12,12 +12,13 @@ import { restaurantApi } from '@/lib/api/endpoints/restaurant';
  * were part-way through. Holding the last page means `isFetching` becomes the
  * signal instead, which is what the page's "· updating…" affordance is for.
  */
-export const useRestaurants = (query: Partial<ListRestaurantsQuery>) =>
+export const useRestaurants = (query: Partial<ListRestaurantsQuery>, enabled: boolean = true) =>
   useQuery({
     queryKey: ['restaurants', query] as const,
     queryFn: () => restaurantApi.list(query),
     placeholderData: keepPreviousData,
     staleTime: 60_000,
+    enabled,
   });
 
 export const useRestaurant = (id: string) =>

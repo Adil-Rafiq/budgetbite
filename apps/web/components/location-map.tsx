@@ -3,7 +3,7 @@
 import 'leaflet/dist/leaflet.css';
 
 import L from 'leaflet';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { MapPin, Search } from 'lucide-react';
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 
@@ -114,6 +114,7 @@ export function LocationMap({
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const resultsListRef = useRef<HTMLUListElement>(null);
+  const listboxId = useId();
 
   // Search (debounced)
   useEffect(() => {
@@ -244,6 +245,29 @@ export function LocationMap({
     onCoordinatesChange(round(pos.lat), round(pos.lng));
   };
 
+  /**
+   * Arrow keys nudge the focused pin. Click and drag were the only two ways to
+   * move it, which left keyboard users with no way to fine-tune a spot — the
+   * search box could jump to an address but not adjust one. Shift moves ten
+   * times further, so crossing a city doesn't take a hundred presses.
+   */
+  const handleMarkerKeyDown = (e: L.LeafletKeyboardEvent) => {
+    if (!isCoordinate(latitude) || !isCoordinate(longitude)) return;
+    const key = (e.originalEvent as KeyboardEvent).key;
+    const step = (e.originalEvent as KeyboardEvent).shiftKey ? 0.005 : 0.0005;
+    const move: Record<string, [number, number]> = {
+      ArrowUp: [step, 0],
+      ArrowDown: [-step, 0],
+      ArrowLeft: [0, -step],
+      ArrowRight: [0, step],
+    };
+    const delta = move[key];
+    if (!delta) return;
+    e.originalEvent.preventDefault();
+    e.originalEvent.stopPropagation();
+    onCoordinatesChange(round(latitude + delta[0]), round(longitude + delta[1]));
+  };
+
   const addressRowLabel = !hasPin
     ? 'Nothing picked yet — search, tap the map, or use Detect'
     : isResolvingAddress
@@ -262,6 +286,16 @@ export function LocationMap({
           onFocus={() => results.length > 0 && setShowResults(true)}
           onKeyDown={handleSearchKeyDown}
           placeholder="Search address or place…"
+          // `role="combobox"` is what ties this input to the listbox below it.
+          // Without it the aria-expanded/activedescendant attributes had nothing
+          // to attach to, so the relationship was never exposed and search — the
+          // only keyboard route to setting the pin — announced as a plain box.
+          role="combobox"
+          // Only reference the listbox while it is actually rendered. Pointing
+          // `aria-controls` at an id that is not in the document — which was the
+          // case whenever the dropdown was closed, i.e. most of the time — is an
+          // invalid reference, not a harmless one.
+          aria-controls={showResults && results.length > 0 ? listboxId : undefined}
           aria-autocomplete="list"
           aria-expanded={showResults && results.length > 0}
           aria-activedescendant={
@@ -285,7 +319,9 @@ export function LocationMap({
         {showResults && results.length > 0 && (
           <ul
             ref={resultsListRef}
+            id={listboxId}
             role="listbox"
+            aria-label="Address results"
             className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-56 overflow-y-auto rounded-xl border border-sage bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
           >
             {results.map((r, i) => (
@@ -323,12 +359,23 @@ export function LocationMap({
             subdomains="abcd"
             maxZoom={20}
           />
+          {/* `keyboard` makes Leaflet set `tabIndex=0` and `role="button"` on the
+              marker element. The `alt` option cannot name it: Leaflet applies
+              `alt` only when the icon is an image element, and this is a
+              `divIcon` — so the pin was a focusable button announcing nothing.
+              The ref names the element Leaflet actually rendered. */}
           {hasPin && (
             <Marker
+              ref={(marker) => {
+                marker
+                  ?.getElement()
+                  ?.setAttribute('aria-label', 'Your location pin. Use the arrow keys to move it.');
+              }}
               position={[latitude, longitude]}
               icon={wisprIcon}
               draggable
-              eventHandlers={{ dragend: handleMarkerDragEnd }}
+              keyboard
+              eventHandlers={{ dragend: handleMarkerDragEnd, keydown: handleMarkerKeyDown }}
             />
           )}
           <MapController latitude={latitude} longitude={longitude} />
@@ -356,7 +403,7 @@ export function LocationMap({
         </div>
 
         <div className="pointer-events-none absolute right-3 top-3 rounded-full border border-sage bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate backdrop-blur">
-          {hasPin ? 'Tap or drag pin' : 'Tap to set your spot'}
+          {hasPin ? 'Tap, drag, or arrow keys' : 'Tap to set your spot'}
         </div>
       </div>
 

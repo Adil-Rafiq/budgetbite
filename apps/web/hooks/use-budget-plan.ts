@@ -27,10 +27,15 @@ export const useBudgetPlanById = (id: string) =>
   });
 
 // get active budget plan
+//
+// `refetchOnWindowFocus` is off because the profile page's reminder editor is
+// seeded from this query: with the default, switching apps and coming back
+// discarded reminder edits that were still in progress.
 export const useActiveBudgetPlan = () =>
   useQuery({
     queryKey: ['activeBudgetPlan'],
     queryFn: () => orNull(() => budgetPlanApi.getActive()),
+    refetchOnWindowFocus: false,
   });
 
 // create a new budget plan

@@ -268,3 +268,14 @@ body::-webkit-scrollbar {
     scrollbar-color: color-mix(in srgb, var(--color-slate) 45%, transparent) transparent;
   }
 }
+
+/* The map pin is keyboard-operable (Leaflet's `keyboard` option gives it
+   tabIndex=0 and role="button", and arrow keys nudge it), so it needs a focus
+   indicator that matches the rest of the app rather than the UA default. Uses
+   green-deep — the same 4.97:1 token as FOCUS_RING — because the pin sits over
+   arbitrary map tiles. */
+.wispr-pin:focus-visible {
+  outline: 2px solid var(--color-green-deep);
+  outline-offset: 3px;
+  border-radius: 4px;
+}

@@ -60,10 +60,11 @@ export const DEFAULT_MAP_VIEW = {
 
 /**
  * Radius used for the "restaurants near you" proof on the location step.
- * Matches the default on the restaurants browse page so the count the user is
- * shown here is the same one they will see there.
+ * Defined in `@/lib/nearby` and re-exported here so the profile surface — where
+ * the same decision gets *changed* — proves it against the identical number;
+ * existing imports from this module keep working.
  */
-export const ONBOARDING_NEARBY_RADIUS_KM = 10;
+export { NEARBY_PROOF_RADIUS_KM as ONBOARDING_NEARBY_RADIUS_KM } from '@/lib/nearby';
 
 /**
  * The API caps a plan at 5 meals per day (`createBudgetPlanSchema`). Defined in

@@ -4,13 +4,26 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'motion/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { LogoIcon } from '@/components/icons';
 import { authClient } from '@/lib/auth-client';
 import { formatPKR } from '@/lib/currency';
-import { FOCUS_RING_ON_CANVAS } from '@/lib/focus-ring';
+import { FOCUS_RING, FOCUS_RING_ON_CANVAS } from '@/lib/focus-ring';
+import { initials } from '@/lib/name';
+import { useHasUnsavedChanges } from '@/hooks/use-unsaved-changes';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,20 +58,18 @@ function breadcrumbFor(pathname: string): string {
   return isDetail ? `Home · ${label} · Detail` : `Home · ${label}`;
 }
 
-function initials(name: string | undefined): string {
-  if (!name) return '•';
-  const parts = name.trim().split(/\s+/);
-  const a = parts[0]?.charAt(0).toUpperCase() ?? '';
-  const b = parts[1]?.charAt(0).toUpperCase() ?? '';
-  return `${a}${b}` || '•';
-}
-
 export function AppHeader() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const pathname = usePathname();
   const { data: active } = useActiveBudgetPlan();
   const { data: user } = useUser();
   const [signingOut, setSigningOut] = useState(false);
+  // This Sign out is a menu item, not an anchor, so the profile page's
+  // click-interceptor guard could never see it — one tap here discarded every
+  // unsaved edit on that page, forty pixels from a Sign out that confirmed.
+  const hasUnsavedChanges = useHasUnsavedChanges();
+  const [confirmSignOutOpen, setConfirmSignOutOpen] = useState(false);
 
   const prefersReducedMotion = useReducedMotion();
 
@@ -83,6 +94,9 @@ export function AppHeader() {
     setSigningOut(true);
     try {
       await authClient.signOut();
+      // Without this the query cache outlives the session, so the next account
+      // to sign in on this browser sees the previous one's data on first paint.
+      queryClient.clear();
       router.push('/login');
     } finally {
       setSigningOut(false);
@@ -182,7 +196,8 @@ export function AppHeader() {
               <DropdownMenuItem
                 variant="destructive"
                 onSelect={() => {
-                  handleSignOut();
+                  if (hasUnsavedChanges) setConfirmSignOutOpen(true);
+                  else handleSignOut();
                 }}
                 disabled={signingOut}
               >
@@ -193,6 +208,35 @@ export function AppHeader() {
           </DropdownMenu>
         </div>
       </div>
+
+      <AlertDialog open={confirmSignOutOpen} onOpenChange={setConfirmSignOutOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="text-xs font-semibold uppercase tracking-widest text-amber-ink">
+              Confirm · Sign out
+            </div>
+            <AlertDialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
+              Sign out with unsaved changes?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate">
+              You have edits on this page that haven&apos;t been saved. Signing out now loses them.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              className={`min-h-11 rounded-xl border border-sage bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+            >
+              Go back and save
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleSignOut}
+              className={`min-h-11 rounded-xl bg-tomato-ink px-5 text-[13px] font-semibold text-white transition-colors hover:bg-tomato-ink/90 active:scale-[0.97] ${FOCUS_RING}`}
+            >
+              Sign out anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </header>
   );
 }
