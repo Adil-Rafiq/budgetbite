@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { RecommendRestaurantButton } from '@/components/recommend-restaurant-button';
 import { useMyRecommendations } from '@/hooks/use-restaurant-recommendations';
+import { FOCUS_RING } from '@/lib/focus-ring';
 
 export function RecommendCard() {
   const { data } = useMyRecommendations({ limit: 20 });
@@ -19,7 +20,7 @@ export function RecommendCard() {
         {pendingCount > 0 && (
           <Link
             href="/restaurants/recommendations"
-            className="rounded text-[12px] font-medium text-green-deep underline-offset-2 hover:text-green-deep hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+            className={`rounded text-[12px] font-medium text-green-deep underline-offset-2 hover:text-green-deep hover:underline ${FOCUS_RING}`}
           >
             {pendingCount} pending review — view yours →
           </Link>

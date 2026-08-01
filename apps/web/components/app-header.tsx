@@ -3,16 +3,15 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { motion, useReducedMotion } from 'motion/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { LogOut, User as UserIcon } from 'lucide-react';
-import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
 import { LogoIcon } from '@/components/icons';
+import { BudgetReadout } from '@/components/budget-readout';
 import { authClient } from '@/lib/auth-client';
-import { formatPKR } from '@/lib/currency';
 import { FOCUS_RING, FOCUS_RING_ON_CANVAS } from '@/lib/focus-ring';
 import { initials } from '@/lib/name';
+import { ADMIN_NAV_ITEM, canSeeAdmin, sectionLabel } from '@/lib/nav';
 import { useHasUnsavedChanges } from '@/hooks/use-unsaved-changes';
 import {
   AlertDialog,
@@ -38,23 +37,19 @@ import {
  * every route, so `/plans/[id]` announced "Dashboard" directly above a page
  * headed "Budget plans". A breadcrumb that cannot be wrong is one derived from
  * where you actually are.
+ *
+ * The labels now come from `lib/nav`, which is also what the rail and the tab
+ * bar render. This header kept its own map and called `/plans` "Budget plans"
+ * while the rail called it "Plans" — one destination answering to two names
+ * depending on which half of the shell you read.
  */
-const SECTION_LABELS: Record<string, string> = {
-  dashboard: 'Dashboard',
-  plans: 'Budget plans',
-  restaurants: 'Restaurants',
-  analytics: 'Analytics',
-  profile: 'Profile',
-  onboarding: 'Setup',
-};
-
 function breadcrumbFor(pathname: string): string {
   const [section, second] = pathname.split('/').filter(Boolean);
   if (!section) return 'Home';
 
-  const label = SECTION_LABELS[section] ?? section.charAt(0).toUpperCase() + section.slice(1);
+  const label = sectionLabel(section) ?? section.charAt(0).toUpperCase() + section.slice(1);
   // A nested id segment means "inside" that section, not a new one.
-  const isDetail = !!second && !SECTION_LABELS[second];
+  const isDetail = !!second && !sectionLabel(second);
   return isDetail ? `Home · ${label} · Detail` : `Home · ${label}`;
 }
 
@@ -62,7 +57,6 @@ export function AppHeader() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const pathname = usePathname();
-  const { data: active } = useActiveBudgetPlan();
   const { data: user } = useUser();
   const [signingOut, setSigningOut] = useState(false);
   // This Sign out is a menu item, not an anchor, so the profile page's
@@ -70,25 +64,6 @@ export function AppHeader() {
   // unsaved edit on that page, forty pixels from a Sign out that confirmed.
   const hasUnsavedChanges = useHasUnsavedChanges();
   const [confirmSignOutOpen, setConfirmSignOutOpen] = useState(false);
-
-  const prefersReducedMotion = useReducedMotion();
-
-  // Prefer the pin-adjusted budgetState (the same source the dashboard budget
-  // card reads) so every budget figure in the shell agrees; fall back to plan
-  // totals. Remaining is honest — negative when over — and the pill labels it.
-  const bs = active?.budgetState;
-  const totalBudget = bs?.totalBudget ?? active?.plan.totalBudget ?? 0;
-  const spent = bs?.amountSpent ?? active?.plan.spentAmount ?? 0;
-  const remaining = bs ? bs.amountRemaining : totalBudget - spent;
-  const spentPercent = totalBudget > 0 ? Math.round((spent / totalBudget) * 100) : 0;
-  const isOver = remaining < 0;
-  // The number every budget-fit badge in the app is actually measured against.
-  // The pill carried only `remaining`, so on the restaurants and menu surfaces
-  // — the long scrolling ones — "Tight" and "Fits budget" became unanchored
-  // adjectives the moment the page header left the viewport, and the user had
-  // to scroll up, memorise a figure and scroll back to do the comparison the
-  // app exists to do for them. It travels with them now.
-  const perMeal = bs?.avgBudgetPerRemainingMeal ?? 0;
 
   const handleSignOut = async () => {
     setSigningOut(true);
@@ -110,12 +85,19 @@ export function AppHeader() {
     >
       <div className="flex items-center justify-between px-4 py-3 lg:px-8 lg:py-4">
         {/* Mobile logo */}
-        <Link href="/dashboard" className="flex items-center gap-2.5 lg:hidden">
+        <Link
+          href="/dashboard"
+          aria-label="BudgetBite — go to dashboard"
+          className={`flex shrink-0 items-center gap-2.5 rounded-lg lg:hidden ${FOCUS_RING_ON_CANVAS}`}
+        >
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-deep text-white">
             <LogoIcon size={13} />
           </span>
-          <span className="font-display text-base font-bold tracking-tight">
-            Budget<span className="text-green">Bite</span>
+          {/* The wordmark yields to the budget figure on a phone. The mark still
+              identifies the app and the tab bar names where you are; the money
+              is the thing this header exists to keep in front of the user. */}
+          <span className="hidden font-display text-base font-bold tracking-tight sm:inline">
+            Budget<span className="text-green-deep">Bite</span>
           </span>
         </Link>
 
@@ -124,51 +106,21 @@ export function AppHeader() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Budget pill: only where the sidebar's persistent budget card is not
-              visible (below lg). On desktop the sidebar already shows this, so
-              the pill would be a third copy of the same number. */}
-          {active && (
-            <div className="flex items-center gap-2.5 rounded-full border border-sage bg-white px-3.5 py-1.5 shadow-sm sm:gap-3 sm:px-4 lg:hidden">
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate">
-                {isOver ? 'Over' : 'Left'}
-              </span>
-              <span
-                className={`font-display text-sm font-semibold tabular-nums ${
-                  isOver ? 'text-tomato-ink' : 'text-charcoal'
-                }`}
-              >
-                {formatPKR(Math.abs(remaining))}
-              </span>
-              {perMeal > 0 && (
-                <span className="text-[11px] font-medium tabular-nums text-slate">
-                  · {formatPKR(perMeal)}
-                  <span className="text-[10px]">/meal</span>
-                </span>
-              )}
-              <div className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-sage sm:block">
-                <motion.div
-                  className={`h-full rounded-full ${
-                    isOver || spentPercent >= 90 ? 'bg-tomato' : 'bg-green'
-                  }`}
-                  initial={prefersReducedMotion ? false : { width: '0%' }}
-                  animate={{ width: `${Math.min(100, spentPercent)}%` }}
-                  transition={
-                    prefersReducedMotion
-                      ? { duration: 0 }
-                      : { duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }
-                  }
-                />
-              </div>
-              <span className="hidden text-[10px] font-medium text-slate sm:block">
-                {spentPercent}%
-              </span>
-            </div>
-          )}
+          {/* Budget pill: only where the rail's persistent readout is not
+              visible (below lg). On desktop the rail already shows this, so the
+              pill would be a third copy of the same number. Both render from
+              <BudgetReadout>, so they cannot drift apart again. */}
+          <div className="lg:hidden">
+            <BudgetReadout variant="pill" />
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className={`inline-flex size-11 items-center justify-center rounded-full bg-green-deep text-xs font-semibold text-white transition-all hover:bg-green-deeper active:scale-95 sm:size-9 ${FOCUS_RING_ON_CANVAS}`}
+                // Stays 44px at every width. It used to shrink to 36 above the
+                // `sm` breakpoint, which is under the 44px target floor — on
+                // the only path to sign out, Profile, and Admin.
+                className={`inline-flex size-11 items-center justify-center rounded-full bg-green-deep text-xs font-semibold text-white transition-all hover:bg-green-deeper active:scale-95 ${FOCUS_RING_ON_CANVAS}`}
                 aria-label={user?.name ? `Account menu for ${user.name}` : 'Account menu'}
               >
                 {initials(user?.name)}
@@ -192,6 +144,18 @@ export function AppHeader() {
                   Profile
                 </Link>
               </DropdownMenuItem>
+              {/* Admin lives here rather than in the rail: the rail's twin, the
+                  phone tab bar, has no room for a sixth slot, and an entry that
+                  exists on one device and not the other is exactly how admins
+                  ended up unable to reach /admin below lg. */}
+              {canSeeAdmin(user?.role) && (
+                <DropdownMenuItem asChild>
+                  <Link href={ADMIN_NAV_ITEM.href}>
+                    <ADMIN_NAV_ITEM.icon className="h-4 w-4" />
+                    {ADMIN_NAV_ITEM.label}
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 variant="destructive"

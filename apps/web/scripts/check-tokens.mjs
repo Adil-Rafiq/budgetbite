@@ -52,11 +52,36 @@ const cssVarPattern = new RegExp(
  * onto the analytics page as a chart fill. A banned value is banned in every
  * spelling, so the hex is checked too.
  */
-const BANNED_HEXES = new Map([['#5a8a1a', 'dark-green']]);
-const hexPattern = new RegExp(
-  String.raw`${[...BANNED_HEXES.keys()].join('|')}`,
-  'gi',
-);
+const BANNED_HEXES = new Map([
+  ['#5a8a1a', 'dark-green'],
+  // The active-nav wash. It was a bare arbitrary value in both shells and the
+  // meal-slot cards, plus a raw hex inside an inline boxShadow — one colour
+  // with no name, which is how it drifted into an inline style. Now `green-tint`.
+  ['#f0f9e0', 'green-tint'],
+  // Caution amber, which had four spellings across the app before it was
+  // tokenised. `#9a6400` was a fifth, invented for one admin badge.
+  ['#f5a623', 'amber'],
+  ['#fef6e6', 'amber-tint'],
+  ['#8a5a12', 'amber-ink'],
+  ['#9a6400', 'amber-ink'],
+]);
+const hexPattern = new RegExp(String.raw`${[...BANNED_HEXES.keys()].join('|')}`, 'gi');
+
+/**
+ * Focus rings that cannot be seen.
+ *
+ * `lib/focus-ring.ts` exists because the brand `green` is 2.05:1 on white and
+ * a ring drawn in it is decoration. That reasoning did not stop five surfaces
+ * from hardcoding `ring-green/40` anyway — 1.32:1 composited, weaker than the
+ * value the module was written to replace — including both navigation shells,
+ * where a keyboard user loses their place on every route. A rule nobody can
+ * see is a rule that comes back, so it is a build failure now.
+ *
+ * Matches `ring-green`, `ring-green/40`, `focus-visible:ring-green/40` and the
+ * `focus:` variants, but not `ring-green-deep` / `ring-green-deeper`.
+ */
+const weakRingPattern =
+  /\b(?:focus-visible:|focus:|group-focus-visible:)?ring-green(?!-deep)(?:\/\d+)?\b/g;
 
 /**
  * Blank out comments, preserving line numbering.
@@ -103,12 +128,24 @@ for (const dir of SCAN_DIRS) {
         }
       }
       hexPattern.lastIndex = 0;
-      for (const match of line.matchAll(hexPattern)) {
+      // A custom-property declaration is where these values are *supposed* to
+      // live — `--color-amber: #f5a623` is the token, not a bypass of it. Only
+      // the definition line is exempt; every use site must name the token.
+      const isTokenDeclaration = /^\s*--[\w-]+\s*:/.test(line);
+      for (const match of isTokenDeclaration ? [] : line.matchAll(hexPattern)) {
         const name = BANNED_HEXES.get(match[0].toLowerCase());
         findings.push({
           file: relative(WEB_ROOT, file).replace(/\\/g, '/'),
           line: i + 1,
-          token: `${match[0]} (the deleted \`${name}\` value)`,
+          token: `${match[0]} — use the \`${name}\` token`,
+        });
+      }
+      weakRingPattern.lastIndex = 0;
+      for (const match of line.matchAll(weakRingPattern)) {
+        findings.push({
+          file: relative(WEB_ROOT, file).replace(/\\/g, '/'),
+          line: i + 1,
+          token: `${match[0]} — a focus ring under 3:1; import FOCUS_RING from @/lib/focus-ring`,
         });
       }
     });
@@ -117,7 +154,7 @@ for (const dir of SCAN_DIRS) {
 
 if (findings.length > 0) {
   console.error(
-    `\nBanned colour${findings.length === 1 ? '' : 's'} referenced — an undefined utility renders as nothing, a deleted value fails AA:\n`,
+    `\n${findings.length} colour problem${findings.length === 1 ? '' : 's'} — an undefined utility renders as nothing, an untokenised value drifts, a weak ring cannot be seen:\n`,
   );
   for (const { file, line, token } of findings) {
     console.error(`  ${file}:${line}  ${token}`);
@@ -126,4 +163,4 @@ if (findings.length > 0) {
   exit(1);
 }
 
-console.log(`Design tokens OK — no ghost colour utilities in ${SCAN_DIRS.join(', ')}.`);
+console.log(`Design tokens OK — no ghost colours or weak focus rings in ${SCAN_DIRS.join(', ')}.`);

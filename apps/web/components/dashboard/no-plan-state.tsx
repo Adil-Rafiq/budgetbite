@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { ArrowRight, Wallet, Sparkles, PiggyBank } from 'lucide-react';
 
+import { FOCUS_RING } from '@/lib/focus-ring';
+
 const steps = [
   {
     icon: Wallet,
@@ -44,7 +46,7 @@ export function NoPlanState() {
           </p>
           <Link
             href="/plans"
-            className="mt-1 inline-flex min-h-11 w-fit items-center justify-center gap-2 rounded-xl bg-green-deep px-6 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            className={`mt-1 inline-flex min-h-11 w-fit items-center justify-center gap-2 rounded-xl bg-green-deep px-6 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper ${FOCUS_RING}`}
           >
             Create your plan
             <ArrowRight className="h-4 w-4" />

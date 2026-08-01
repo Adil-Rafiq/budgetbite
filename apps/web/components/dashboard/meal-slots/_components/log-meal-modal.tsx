@@ -71,10 +71,8 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                     aria-pressed={filled}
                   >
                     <Star
-                      className={`h-6 w-6 transition-colors ${
-                        filled ? 'text-[#f5a623]' : 'text-sage'
-                      }`}
-                      style={{ fill: filled ? '#f5a623' : 'transparent' }}
+                      className={`h-6 w-6 transition-colors ${filled ? 'text-amber' : 'text-sage'}`}
+                      style={{ fill: filled ? 'var(--color-amber)' : 'transparent' }}
                     />
                   </button>
                 );

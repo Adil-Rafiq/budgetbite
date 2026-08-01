@@ -28,7 +28,7 @@ const PAGE_SIZE = 20;
 const money = (n: number): string => formatPKR(n);
 
 const genStatusClass: Record<AdminPlanGeneration['status'], string> = {
-  pending: 'bg-[#f5a623]/15 text-[#9a6400]',
+  pending: 'bg-amber-tint text-amber-ink',
   succeeded: 'bg-green/15 text-green-deep',
   failed: 'bg-tomato/10 text-tomato-ink',
   superseded: 'bg-sage/50 text-slate/60',

@@ -1,0 +1,21 @@
+'use client';
+
+import { PlansPageHeader } from '@/app/(app)/plans/_components/plans-page-header';
+import PlansList from '@/app/(app)/plans/_components/plans-list';
+import { NewPlanLauncher } from '@/app/(app)/plans/_context/new-plan-launcher';
+import { FadeUp } from '@/components/motion';
+
+export default function PlansPage() {
+  return (
+    <NewPlanLauncher>
+      <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8">
+        <FadeUp>
+          <PlansPageHeader />
+        </FadeUp>
+        <FadeUp delay={0.1}>
+          <PlansList />
+        </FadeUp>
+      </div>
+    </NewPlanLauncher>
+  );
+}

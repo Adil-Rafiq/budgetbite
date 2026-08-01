@@ -128,7 +128,7 @@ export default function LoginPage() {
             <LogoIcon size={16} />
           </span>
           <span className="font-display text-xl font-bold tracking-tight">
-            Budget<span className="text-green">Bite</span>
+            Budget<span className="text-green-deep">Bite</span>
           </span>
         </Link>
         <Link

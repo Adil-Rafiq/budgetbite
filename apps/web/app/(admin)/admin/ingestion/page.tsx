@@ -17,7 +17,7 @@ import {
 const PAGE_SIZE = 25;
 
 const statusClass: Record<ScraperRun['status'], string> = {
-  running: 'bg-[#f5a623]/15 text-[#9a6400]',
+  running: 'bg-amber-tint text-amber-ink',
   succeeded: 'bg-green/15 text-green-deep',
   failed: 'bg-tomato/10 text-tomato-ink',
 };

@@ -135,7 +135,7 @@ export function MealSlots() {
               <article
                 key={slot.mealTypeId}
                 className={`flex flex-col overflow-hidden rounded-2xl border shadow-sm ${
-                  isLogged ? 'border-green/50 bg-[#f0f9e0]/50' : 'border-sage bg-white'
+                  isLogged ? 'border-green/50 bg-green-tint/50' : 'border-sage bg-white'
                 }`}
               >
                 <div className="flex items-center justify-between border-b border-sage/70 px-5 py-3">
@@ -283,7 +283,7 @@ export function MealSlots() {
                             onClick={() =>
                               actions.openLogModal(slot.mealTypeId, { type: 'suggestion', option })
                             }
-                            className={`rounded-xl border border-sage bg-canvas px-4 py-3 text-left transition-colors hover:border-green/60 hover:bg-[#f0f9e0]/50 ${FOCUS_RING}`}
+                            className={`rounded-xl border border-sage bg-canvas px-4 py-3 text-left transition-colors hover:border-green/60 hover:bg-green-tint/50 ${FOCUS_RING}`}
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">

@@ -49,15 +49,14 @@
   --chart-4: #f5a623;
   --chart-5: #3b82f6;
   --radius: 1rem;
-  --sidebar: #1a1a1a;
-  --sidebar-foreground: #f7fbf0;
-  --sidebar-primary: #8cc63f;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #262626;
-  --sidebar-accent-foreground: #f7fbf0;
-  --sidebar-border: #2b2b2b;
-  --sidebar-ring: #8cc63f;
 }
+
+/* The eight `--sidebar-*` tokens that used to sit here described a black rail
+   (#1a1a1a with #f7fbf0 text) and existed only for shadcn's `ui/sidebar`
+   primitive, which nothing in this app ever imported — the real rail is
+   hand-rolled and white. They were a trap: reaching for the primitive would
+   have produced a black sidebar in a light-only app with no warning. Removed
+   together with the primitive. */
 
 /* BudgetBite ships a single, deliberate light "fresh greens" theme. A dark
    token set used to live here but nothing ever applied a `.dark` class (no
@@ -99,14 +98,6 @@
   --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 8px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
 
   /* Brand tokens — used directly across the app (bg-canvas, text-green, …).
      These intentionally shadow a few Tailwind defaults (green, slate). */
@@ -133,6 +124,18 @@
      --color-green survives for decoration only: dots, bars, scrollbar hover. */
   --color-green-deep: #4f7c17;
   --color-green-deeper: #3f6212;
+
+  /* The palest green in the system: the "you are here" wash behind an active
+     nav item. It was a bare `bg-[#f0f9e0]` in four places (both shells, the
+     meal-slot cards) plus a raw hex inside an inline boxShadow — one idea with
+     no name, which is how it drifted into an inline style in the first place.
+
+     At 1.09:1 on white it is a wash, not a state indicator: on its own it
+     cannot carry "current page" for a low-vision user. Every active item that
+     uses it also carries a filled green-deep chip, semibold weight, and
+     aria-current, so the tint is the least of four signals rather than the
+     only one. Text on it must still be green-deep (4.57:1) or charcoal. */
+  --color-green-tint: #f0f9e0;
 
   /* Control boundaries. WCAG 1.4.11 wants 3:1 for the visual information that
      identifies a form control, and `sage` as a border is 1.32:1 on white —

@@ -177,7 +177,7 @@ function VerifyEmailForm() {
             <LogoIcon size={16} />
           </span>
           <span className="font-display text-xl font-bold tracking-tight">
-            Budget<span className="text-green">Bite</span>
+            Budget<span className="text-green-deep">Bite</span>
           </span>
         </Link>
         <Link
@@ -236,7 +236,7 @@ function VerifyEmailForm() {
                           : digit
                             ? 'border-green/50 bg-white text-charcoal'
                             : 'border-sage bg-canvas text-charcoal'
-                      } focus:border-green focus:bg-white focus:ring-4 focus:ring-green/15 disabled:opacity-60`}
+                      } focus:border-green-deep focus:bg-white focus:ring-4 focus:ring-green-deep/25 disabled:opacity-60`}
                     />
                     {/* subtle 3-3 grouping divider */}
                     {i === 2 && <span className="h-0.5 w-2 rounded-full bg-sage" />}

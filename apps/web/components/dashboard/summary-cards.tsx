@@ -6,22 +6,15 @@ import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { CountUp } from '@/components/motion';
 import { DataError } from '@/components/data-error';
 import { formatPKR } from '@/lib/currency';
+import { daysRemainingInPeriod } from '@/lib/date';
+import { FOCUS_RING } from '@/lib/focus-ring';
 import {
   getSpendingHealth,
   isAlarming,
   spendingHealthCaption,
 } from '@/lib/budget-plan/spending-health';
 
-const getDaysLeft = (endDateStr: string): number => {
-  const today = new Date();
-  const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const [year, month, day] = endDateStr.split('-').map(Number);
-  const endLocal = new Date(year!, month! - 1, day!);
-  return Math.max(
-    0,
-    Math.ceil((endLocal.getTime() - todayLocal.getTime()) / (1000 * 60 * 60 * 24)),
-  );
-};
+const getDaysLeft = (endDateStr: string): number => daysRemainingInPeriod(endDateStr) ?? 0;
 
 function BudgetSkeleton() {
   return (
@@ -56,7 +49,7 @@ function NoPlanMessage() {
       </div>
       <Link
         href="/plans"
-        className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:self-auto"
+        className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper ${FOCUS_RING} sm:self-auto`}
       >
         Create plan
         <ArrowRight className="h-4 w-4" />

@@ -40,7 +40,7 @@ import {
 const PAGE_SIZE = 20;
 
 const STATUS_PILL: Record<string, string> = {
-  pending: 'bg-[#f5a623]/15 text-[#9a6400]',
+  pending: 'bg-amber-tint text-amber-ink',
   approved: 'bg-green/15 text-green-deep',
   rejected: 'bg-tomato/10 text-tomato-ink',
 };
