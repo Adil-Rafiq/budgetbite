@@ -43,6 +43,22 @@ const cssVarPattern = new RegExp(
 );
 
 /**
+ * The literal values behind deleted tokens, banned by hex as well as by name.
+ *
+ * Matching only utility names and `--color-*` vars left one door open: code
+ * that needs a concrete colour rather than a class — Recharts props are the
+ * common case — declares `const DARK_GREEN = '#5a8a1a'` and walks straight
+ * past the guard. That is exactly how the swept-away `dark-green` came back
+ * onto the analytics page as a chart fill. A banned value is banned in every
+ * spelling, so the hex is checked too.
+ */
+const BANNED_HEXES = new Map([['#5a8a1a', 'dark-green']]);
+const hexPattern = new RegExp(
+  String.raw`${[...BANNED_HEXES.keys()].join('|')}`,
+  'gi',
+);
+
+/**
  * Blank out comments, preserving line numbering.
  *
  * The docblock explaining why a token is banned has to be able to name it —
@@ -86,13 +102,22 @@ for (const dir of SCAN_DIRS) {
           });
         }
       }
+      hexPattern.lastIndex = 0;
+      for (const match of line.matchAll(hexPattern)) {
+        const name = BANNED_HEXES.get(match[0].toLowerCase());
+        findings.push({
+          file: relative(WEB_ROOT, file).replace(/\\/g, '/'),
+          line: i + 1,
+          token: `${match[0]} (the deleted \`${name}\` value)`,
+        });
+      }
     });
   }
 }
 
 if (findings.length > 0) {
   console.error(
-    `\nUndefined colour token${findings.length === 1 ? '' : 's'} referenced — these render as nothing:\n`,
+    `\nBanned colour${findings.length === 1 ? '' : 's'} referenced — an undefined utility renders as nothing, a deleted value fails AA:\n`,
   );
   for (const { file, line, token } of findings) {
     console.error(`  ${file}:${line}  ${token}`);

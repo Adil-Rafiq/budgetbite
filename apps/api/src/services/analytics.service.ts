@@ -53,6 +53,7 @@ export const analyticsService = {
       actualAmountSpent: Number(c.actualAmountSpent),
       restaurantName: c.restaurantName,
       manualDescription: c.manualDescription,
+      isHomeCooked: c.isHomeCooked,
       createdAt: c.createdAt,
     }));
     const meta: PaginationMeta = { total: data.length, limit: data.length, offset: 0 };

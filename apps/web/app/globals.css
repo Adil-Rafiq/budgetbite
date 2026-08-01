@@ -41,7 +41,10 @@
   --input: #7d8a6b;
   --ring: #8cc63f;
   --chart-1: #8cc63f;
-  --chart-2: #5a8a1a;
+  /* Was #5a8a1a — the same value the `dark-green` sweep deleted for failing
+     AA, left behind here because nothing referenced it. Carried to green-deep
+     so the slot holds a colour that is actually allowed to be used. */
+  --chart-2: #4f7c17;
   --chart-3: #e84c3d;
   --chart-4: #f5a623;
   --chart-5: #3b82f6;
