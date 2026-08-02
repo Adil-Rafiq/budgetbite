@@ -20,7 +20,7 @@ L.Icon.Default.mergeOptions({
 const wisprIcon = L.divIcon({
   className: 'wispr-pin',
   html: `<svg width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M14 0C6.27 0 0 6.27 0 14c0 9.5 14 22 14 22s14-12.5 14-22C28 6.27 21.73 0 14 0z" fill="#e84c3d"/>
+    <path d="M14 0C6.27 0 0 6.27 0 14c0 9.5 14 22 14 22s14-12.5 14-22C28 6.27 21.73 0 14 0z" fill="#c8402f"/>
     <circle cx="14" cy="14" r="5" fill="#ffffff"/>
   </svg>`,
   iconSize: [28, 36],

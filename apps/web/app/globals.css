@@ -4,50 +4,70 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ==========================================================================
-   BudgetBite — "fresh greens" design system
+   BudgetBite — "terrace" design system
    Brand palette (light-first):
-     canvas    #f7fbf0   page background (cream-green)
-     sage      #d4e8b0   decorative borders, secondary surfaces (mint)
-     sage-edge #7d8a6b   control boundaries that must clear 3:1
-     green     #8cc63f   brand fill — decorative only, never behind text
-     green-deep#4f7c17   green text on light, and any fill carrying white text
-     green-deeper #3f6212  hover state for green-deep fills
-     tomato    #e84c3d   accent / destructive
-     charcoal  #1a1a1a   foreground, dark sections
-     slate     #4a4a4a   muted foreground
-   shadcn semantic tokens are mapped onto this pale tte so the ui/ primitives
+     canvas    #fbf7ee   page background (cream)
+     sage      #ebe0cd   decorative borders, secondary surfaces (sand)
+     sage-edge #8d8271   control boundaries that must clear 3:1
+     green     #178a8a   brand fill — decorative only, never behind text
+     green-deep#0d6363   brand text on light, and any fill carrying white text
+     green-deeper #094a4a  hover state for green-deep fills
+     tomato    #c8402f   accent / destructive
+     charcoal  #1f1a14   foreground, dark sections
+     slate     #5c5145   muted foreground
+
+   This replaced "fresh greens" — a cream-green canvas with mint chrome and a
+   #8cc63f lime brand. The lime was the whole problem: at 2.05:1 on white it
+   could never be text and never sit under a white label, so the palette a user
+   actually saw was olive-on-mint, with the brand hue relegated to dots and
+   bars. Sand and cream now carry the chrome, and the brand is a deep teal that
+   keeps its distance from both the amber caution band and the red alarm band.
+
+   The `green*` token names are deliberately unchanged: they are referenced in
+   roughly 2,200 utility classes, and a rename is a separate mechanical sweep
+   rather than part of the palette swap. They now name a teal.
+
+   shadcn semantic tokens are mapped onto this palette so the ui/ primitives
    (dialog, dropdown, select, popover, sheet, …) stay in sync.
    ========================================================================== */
 
 :root {
-  --background: #f7fbf0;
-  --foreground: #1a1a1a;
+  --background: #fbf7ee;
+  --foreground: #1f1a14;
   --card: #ffffff;
-  --card-foreground: #1a1a1a;
+  --card-foreground: #1f1a14;
   --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
-  --primary: #8cc63f;
+  --popover-foreground: #1f1a14;
+  /* `primary` is a fill token: shadcn primitives pair it with
+     `primary-foreground`, so it must be the value white is legible on. That is
+     green-deep (7.04:1), not the decorative brand teal (4.17:1). The old
+     palette had #8cc63f here at 2.05:1 — white-on-primary was unreadable in
+     any ui/ primitive that used the pair. */
+  --primary: #0d6363;
   --primary-foreground: #ffffff;
-  --secondary: #d4e8b0;
-  --secondary-foreground: #1a1a1a;
-  --muted: #eef6dd;
-  --muted-foreground: #4a4a4a;
-  --accent: #d4e8b0;
-  --accent-foreground: #1a1a1a;
-  --destructive: #e84c3d;
+  --secondary: #ebe0cd;
+  --secondary-foreground: #1f1a14;
+  --muted: #f6eee0;
+  --muted-foreground: #5c5145;
+  --accent: #ebe0cd;
+  --accent-foreground: #1f1a14;
+  --destructive: #c8402f;
   --destructive-foreground: #ffffff;
-  --border: #d4e8b0;
+  --border: #ebe0cd;
   /* Form-control boundary, not a decorative one — see --color-sage-edge. */
-  --input: #7d8a6b;
-  --ring: #8cc63f;
-  --chart-1: #8cc63f;
-  /* Was #5a8a1a — the same value the `dark-green` sweep deleted for failing
-     AA, left behind here because nothing referenced it. Carried to green-deep
-     so the slot holds a colour that is actually allowed to be used. */
-  --chart-2: #4f7c17;
-  --chart-3: #e84c3d;
-  --chart-4: #f5a623;
-  --chart-5: #3b82f6;
+  --input: #8d8271;
+  /* Drives `outline-ring/50` on every element via the base layer. The old
+     value was the brand lime at 2.05:1, which at 50% opacity was no indicator
+     at all; green-deep matches what lib/focus-ring.ts already concluded. */
+  --ring: #0d6363;
+  --chart-1: #178a8a;
+  --chart-2: #0d6363;
+  --chart-3: #c8402f;
+  --chart-4: #e9a020;
+  /* Was #3b82f6. A blue series sitting next to two teals is a hue most people
+     cannot separate at sparkline width, so the fifth series moved to violet —
+     the only direction left with clear separation from teal, amber and red. */
+  --chart-5: #7a4fa3;
   --radius: 1rem;
 }
 
@@ -58,7 +78,7 @@
    have produced a black sidebar in a light-only app with no warning. Removed
    together with the primitive. */
 
-/* BudgetBite ships a single, deliberate light "fresh greens" theme. A dark
+/* BudgetBite ships a single, deliberate light "terrace" theme. A dark
    token set used to live here but nothing ever applied a `.dark` class (no
    theme provider, and the shell hardcodes the light palette), so it was dead
    weight that read as a half-finished feature. If dark mode is wanted later,
@@ -100,66 +120,74 @@
   --radius-xl: calc(var(--radius) + 8px);
 
   /* Brand tokens — used directly across the app (bg-canvas, text-green, …).
-     These intentionally shadow a few Tailwind defaults (green, slate). */
-  --color-canvas: #f7fbf0;
-  --color-sage: #d4e8b0;
-  --color-green: #8cc63f;
-  --color-tomato: #e84c3d;
-  --color-charcoal: #1a1a1a;
-  --color-slate: #4a4a4a;
+     These intentionally shadow a few Tailwind defaults (green, slate).
+     `green` names a teal now; see the rename note in the header. */
+  --color-canvas: #fbf7ee;
+  --color-sage: #ebe0cd;
+  --color-green: #178a8a;
+  --color-tomato: #c8402f;
+  --color-charcoal: #1f1a14;
+  --color-slate: #5c5145;
 
-  /* The green that text is allowed to be, and the only green a white label may
-     sit on. `--color-dark-green` (#5a8a1a) used to carry both jobs and failed
-     both: 4.13:1 as 12-13px text on white, 4.13:1 as a fill under white labels
-     — under the 4.5:1 AA floor either way. `--color-green` itself is far worse
-     at 2.05:1 and was still filling the primary CTA on the landing page, both
-     auth screens, and every plans surface.
+  /* The brand colour that text is allowed to be, and the only one a white
+     label may sit on. The split exists because `--color-green` is a fill, not
+     an ink: the lime version was 2.05:1 on white, and the teal is 4.17:1 —
+     better, but still under the 4.5:1 AA floor, so the rule it was written to
+     enforce still holds. Decoration only: dots, bars, scrollbar hover.
 
-     The sweep that fixed this moved 86 text uses, 35 white-on-green fills, 31
-     borders and 5 focus rings, and deleted --color-dark-green outright so the
-     token guard (scripts/check-tokens.mjs) fails the build if it comes back.
-     green-deep is 4.97:1 on white / 4.73:1 on canvas; green-deeper is 7.08:1
-     and exists so a hover state gets darker rather than lighter — the old
-     `hover:bg-dark-green` on a green-deep button actually reduced contrast.
-     --color-green survives for decoration only: dots, bars, scrollbar hover. */
-  --color-green-deep: #4f7c17;
-  --color-green-deeper: #3f6212;
+     green-deep is 7.04:1 on white / 6.59:1 on canvas, and carries white labels
+     at the same 7.04:1. green-deeper is 10.05:1 and exists so a hover state
+     gets darker rather than lighter. The token guard
+     (scripts/check-tokens.mjs) still fails the build on `dark-green`, the
+     sub-AA value from two palettes ago. */
+  --color-green-deep: #0d6363;
+  --color-green-deeper: #094a4a;
 
-  /* The palest green in the system: the "you are here" wash behind an active
-     nav item. It was a bare `bg-[#f0f9e0]` in four places (both shells, the
-     meal-slot cards) plus a raw hex inside an inline boxShadow — one idea with
-     no name, which is how it drifted into an inline style in the first place.
+  /* The palest brand tint in the system: the "you are here" wash behind an
+     active nav item. It was a bare hex in four places (both shells, the
+     meal-slot cards) plus a raw value inside an inline boxShadow — one idea
+     with no name, which is how it drifted into an inline style in the first
+     place.
 
-     At 1.09:1 on white it is a wash, not a state indicator: on its own it
+     At 1.16:1 on white it is a wash, not a state indicator: on its own it
      cannot carry "current page" for a low-vision user. Every active item that
      uses it also carries a filled green-deep chip, semibold weight, and
      aria-current, so the tint is the least of four signals rather than the
-     only one. Text on it must still be green-deep (4.57:1) or charcoal. */
-  --color-green-tint: #f0f9e0;
+     only one. Text on it must still be green-deep (6.06:1) or charcoal. */
+  --color-green-tint: #e2f1f0;
 
   /* Control boundaries. WCAG 1.4.11 wants 3:1 for the visual information that
-     identifies a form control, and `sage` as a border is 1.32:1 on white —
+     identifies a form control, and `sage` as a border is 1.31:1 on white —
      an input outlined in it is decoration, not an affordance. This is sage
-     walked toward the slate end of the same family: 3.67:1 on white, 3.50:1
+     walked toward the slate end of the same family: 3.77:1 on white, 3.53:1
      on canvas, applied to inputs, textareas and select triggers only. Cards,
      panels and dividers keep plain `sage`; a decorative edge has no floor. */
-  --color-sage-edge: #7d8a6b;
+  --color-sage-edge: #8d8271;
 
   /* Caution amber — the band between "on track" and "over budget".
-     These three values were already in the app as loose hexes: #f5a623 and
-     #fef6e6 in the budget-fit pill and the location notice, #8a5a12 as their
-     ink, plus a stray #b45309 on the plan summary's variance figure. Four
-     spellings of one idea meant caution drifted shade by shade across the
-     surfaces that raise it. `amber-ink` on `amber-tint` is ~5.5:1. */
-  --color-amber: #f5a623;
-  --color-amber-tint: #fef6e6;
+     These three values were already in the app as loose hexes before they were
+     tokenised: the fill and its tint in the budget-fit pill and the location
+     notice, an ink for their label, plus a stray variant on the plan summary's
+     variance figure. Four spellings of one idea meant caution drifted shade by
+     shade across the surfaces that raise it.
+
+     Warmed slightly for this palette so caution reads as part of the cream
+     world rather than a leftover. The ink is unchanged and still the only one
+     of the three a label may use: `amber` itself is 1.99:1 on its own tint,
+     while `amber-ink` on `amber-tint` is 5.32:1. */
+  --color-amber: #e9a020;
+  --color-amber-tint: #fdf2dc;
   --color-amber-ink: #8a5a12;
 
   /* Readable ink for the alarm hue. `tomato` is a fill and a border colour: as
-     text it is ~3.8:1 on white and ~3.3:1 on its own 10% tint, so every "over
-     budget" pill and blocked-dish toggle that used it as a label sat under the
-     AA floor. Same family, ~5.6:1 on the tint and ~6.3:1 on white. */
-  --color-tomato-ink: #b32d1f;
+     text it is 4.96:1 on white but only 4.31:1 on its own 10% tint, which is
+     where every "over budget" pill and blocked-dish toggle actually puts it —
+     under the AA floor. Same family, 6.35:1 on the tint and 7.31:1 on white.
+
+     `tomato` itself was darkened from #e84c3d in the previous palette, where a
+     white label on the fill was 3.50:1. It is 4.96:1 now, so a destructive
+     button is finally legible. */
+  --color-tomato-ink: #a02c1d;
 }
 
 @layer base {
@@ -275,7 +303,7 @@ body::-webkit-scrollbar {
 /* The map pin is keyboard-operable (Leaflet's `keyboard` option gives it
    tabIndex=0 and role="button", and arrow keys nudge it), so it needs a focus
    indicator that matches the rest of the app rather than the UA default. Uses
-   green-deep — the same 4.97:1 token as FOCUS_RING — because the pin sits over
+   green-deep — the same 7.04:1 token as FOCUS_RING — because the pin sits over
    arbitrary map tiles. */
 .wispr-pin:focus-visible {
   outline: 2px solid var(--color-green-deep);

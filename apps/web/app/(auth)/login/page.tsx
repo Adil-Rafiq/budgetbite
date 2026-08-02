@@ -117,7 +117,7 @@ export default function LoginPage() {
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-40"
         style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, #d4e8b0 1px, transparent 0)',
+          backgroundImage: 'radial-gradient(circle at 1px 1px, #ebe0cd 1px, transparent 0)',
           backgroundSize: '32px 32px',
         }}
       />

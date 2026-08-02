@@ -40,9 +40,10 @@ function Slider({
         <SliderPrimitive.Range
           data-slot="slider-range"
           // green-deep, not the brand green: the filled range is the only thing
-          // that says where the value sits, and #8cc63f on the muted track is
-          // 1.84:1 — under the 3:1 WCAG 1.4.11 floor for control state. This is
-          // 4.46:1 on the same track.
+          // that says where the value sits, and the brand teal on the muted
+          // track is 3.62:1 — over the 3:1 WCAG 1.4.11 floor for control state,
+          // but only just, and it was 1.84:1 under the previous palette. This
+          // is 6.11:1 on the same track.
           className={
             'bg-green-deep absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full'
           }

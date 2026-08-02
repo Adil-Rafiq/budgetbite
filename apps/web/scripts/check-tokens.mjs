@@ -57,13 +57,32 @@ const BANNED_HEXES = new Map([
   // The active-nav wash. It was a bare arbitrary value in both shells and the
   // meal-slot cards, plus a raw hex inside an inline boxShadow — one colour
   // with no name, which is how it drifted into an inline style. Now `green-tint`.
-  ['#f0f9e0', 'green-tint'],
+  ['#e2f1f0', 'green-tint'],
   // Caution amber, which had four spellings across the app before it was
   // tokenised. `#9a6400` was a fifth, invented for one admin badge.
-  ['#f5a623', 'amber'],
-  ['#fef6e6', 'amber-tint'],
+  ['#e9a020', 'amber'],
+  ['#fdf2dc', 'amber-tint'],
   ['#8a5a12', 'amber-ink'],
   ['#9a6400', 'amber-ink'],
+  // Retired with the "fresh greens" palette. These are listed for the same
+  // reason `dark-green` is: the swap to "terrace" touched a dozen files that
+  // needed concrete values rather than classes (Recharts series, an SVG map
+  // pin, the dot-grid backgrounds, `themeColor`), and a stray survivor would
+  // not fail anything — it would just quietly render one mint element in a
+  // cream app. Deliberately excludes the old `charcoal`/`slate` neutrals:
+  // #1a1a1a and #4a4a4a are values generic enough to appear innocently.
+  ['#8cc63f', 'the retired lime brand — use `green`'],
+  ['#d4e8b0', 'the retired mint — use `sage`'],
+  ['#f7fbf0', 'the retired cream-green canvas — use `canvas`'],
+  ['#4f7c17', 'the retired olive — use `green-deep`'],
+  ['#3f6212', 'the retired olive hover — use `green-deeper`'],
+  ['#6b8f3a', 'the retired mid-olive chart ramp step'],
+  ['#7d8a6b', 'the retired control boundary — use `sage-edge`'],
+  ['#e84c3d', 'the retired tomato — use `tomato`'],
+  ['#b32d1f', 'the retired tomato ink — use `tomato-ink`'],
+  ['#f0f9e0', 'the retired nav wash — use `green-tint`'],
+  ['#f5a623', 'the retired amber — use `amber`'],
+  ['#fef6e6', 'the retired amber tint — use `amber-tint`'],
 ]);
 const hexPattern = new RegExp(String.raw`${[...BANNED_HEXES.keys()].join('|')}`, 'gi');
 

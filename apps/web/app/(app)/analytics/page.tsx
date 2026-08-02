@@ -71,13 +71,13 @@ import type { BudgetPlanResponse, BudgetStateContext } from '@repo/shared';
    meaning "lunch". Category colour is a single-hue ramp instead, and every
    category is directly labelled so colour is never the only encoding.
    ──────────────────────────────────────────────────────────────────────────── */
-const GREEN_DEEP = '#4f7c17';
-const GREEN_DEEPER = '#3f6212';
-const GREEN_MID = '#6b8f3a';
-const SAGE = '#d4e8b0';
-const SAGE_EDGE = '#7d8a6b';
-const SLATE = '#4a4a4a';
-const TOMATO_INK = '#b32d1f';
+const GREEN_DEEP = '#0d6363';
+const GREEN_DEEPER = '#094a4a';
+const GREEN_MID = '#2e9c9c';
+const SAGE = '#ebe0cd';
+const SAGE_EDGE = '#8d8271';
+const SLATE = '#5c5145';
+const TOMATO_INK = '#a02c1d';
 const WHITE = '#ffffff';
 
 /** Ordered light→dark is wrong for identity; ordered dark→light reads as rank. */
@@ -87,7 +87,7 @@ const chartTooltipStyle = {
   backgroundColor: WHITE,
   border: `1px solid ${SAGE_EDGE}`,
   borderRadius: 12,
-  color: '#1a1a1a',
+  color: '#1f1a14',
   fontFamily: 'var(--font-sans)',
   fontSize: 12,
 } as const;

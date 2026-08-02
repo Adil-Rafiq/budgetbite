@@ -99,7 +99,7 @@ export default function LandingPage() {
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-40"
           style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, #d4e8b0 1px, transparent 0)',
+            backgroundImage: 'radial-gradient(circle at 1px 1px, #ebe0cd 1px, transparent 0)',
             backgroundSize: '32px 32px',
           }}
         />
@@ -129,7 +129,7 @@ export default function LandingPage() {
                 >
                   <path
                     d="M2 5.5C60 2.5 140 1 300 5.5"
-                    stroke="#e84c3d"
+                    stroke="#c8402f"
                     strokeWidth="3"
                     strokeLinecap="round"
                   />

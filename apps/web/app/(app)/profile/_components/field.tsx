@@ -43,10 +43,12 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
         {label}
       </Label>
       {/* `FOCUS_RING` overrides the shadcn default. `Input` ships
-          `focus-visible:ring-ring/50`, and `--ring` is `#8cc63f` — the token
-          globals.css documents at 2.05:1 — so at half alpha the indicator sat
-          near 1.4:1. Every button and link on this page rings at 4.97:1; the
-          focus outline was disappearing precisely on the text fields. */}
+          `focus-visible:ring-ring/50`, and half alpha is the problem: even now
+          that `--ring` is green-deep rather than the old lime, the composited
+          indicator is 2.35:1 — still under the 3:1 WCAG 1.4.11 floor. Every
+          button and link on this page rings at a solid 7.04:1; without this
+          override the focus outline would fade out precisely on the text
+          fields. */}
       <Input
         id={id}
         ref={ref}

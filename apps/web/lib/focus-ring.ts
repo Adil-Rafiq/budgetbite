@@ -1,11 +1,12 @@
 /**
  * Keyboard focus treatment, defined once.
  *
- * `green-deep` rather than the brand `green`: at #8cc63f a focus ring is 2.05:1
- * against white and barely visible, which is the same reason the app's primary
- * fills moved to `green-deep`. The ring must be findable by someone tabbing
- * through a multi-step form, not merely present in the markup. At 4.97:1 it
- * clears the 3:1 floor WCAG 1.4.11 sets for focus indicators with room spare.
+ * `green-deep` rather than the brand `green`: the brand hue is a fill, not an
+ * ink — 4.17:1 against white, under the AA floor — which is the same reason the
+ * app's primary fills use `green-deep`. The ring must be findable by someone
+ * tabbing through a multi-step form, not merely present in the markup. At
+ * 7.04:1 it clears the 3:1 floor WCAG 1.4.11 sets for focus indicators with
+ * room spare.
  *
  * Pick the variant whose offset matches the surface the control sits on, so the
  * gap between element and ring reads as a clean halo instead of a seam.
