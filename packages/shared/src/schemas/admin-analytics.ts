@@ -7,6 +7,19 @@ import { uuidSchema } from './common.js';
 export const dataQualityEntitySchema = z.object({
   id: uuidSchema,
   name: z.string(),
+  /**
+   * The restaurant this entity belongs to, for groups whose entity is a menu
+   * item rather than a restaurant.
+   *
+   * Without it, an invalid-price item was a dead end: the report named a dish,
+   * the admin had no menu-item search to find it by, and restaurant search
+   * matches on restaurant name only — so the one defect class that actually
+   * corrupts a plan's arithmetic was the one with no route to a fix.
+   *
+   * Absent on restaurant-keyed groups, where `id` is already the restaurant.
+   */
+  restaurantId: uuidSchema.optional(),
+  restaurantName: z.string().optional(),
 });
 
 export const dataQualityGroupSchema = z.object({

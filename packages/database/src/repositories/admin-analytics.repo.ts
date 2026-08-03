@@ -6,7 +6,8 @@ import { budgetPlan, mealPlanGeneration, menuItem, restaurant, user } from '../s
 const SAMPLE_LIMIT = 50;
 const STALE_DAYS = 30;
 
-type Group = { count: number; sample: { id: string; name: string }[] };
+type Entity = { id: string; name: string; restaurantId?: string; restaurantName?: string };
+type Group = { count: number; sample: Entity[] };
 
 async function restaurantGroup(where: SQL): Promise<Group> {
   const [c] = await db
@@ -39,10 +40,20 @@ export const adminAnalyticsRepository = {
             .select({ count: sql<number>`count(*)::int` })
             .from(menuItem)
             .where(invalidPriceExpr);
+          // Joined to the parent restaurant so each sampled item carries a
+          // route to the screen that can actually fix it. A dish name alone
+          // was unactionable: there is no menu-item search in the admin.
           const sample = await db
-            .select({ id: menuItem.id, name: menuItem.name })
+            .select({
+              id: menuItem.id,
+              name: menuItem.name,
+              restaurantId: restaurant.id,
+              restaurantName: restaurant.name,
+            })
             .from(menuItem)
+            .innerJoin(restaurant, eq(menuItem.restaurantId, restaurant.id))
             .where(invalidPriceExpr)
+            .orderBy(restaurant.name, menuItem.name)
             .limit(SAMPLE_LIMIT);
           return { count: c?.count ?? 0, sample };
         })(),
