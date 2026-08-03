@@ -86,7 +86,7 @@ export const useCreatePlan = (
 
   /**
    * Both steps depend on meal types — and the current step must actually be
-   * satisfiable. Gating on data-load alone left a fully enabled green "Next"
+   * satisfiable. Gating on data-load alone left a fully enabled teal "Next"
    * that ran validation, failed, and returned without moving or saying
    * anything. A disabled button is honest about a blocked step; an enabled one
    * that does nothing reads as a broken app.

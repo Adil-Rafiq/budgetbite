@@ -34,7 +34,7 @@ export function SaveRow({
   return (
     <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
       {/* Disabled styling uses explicit tokens rather than `opacity-*`. At 50%,
-          white on `green-deep` composites to about 2.04:1 — and since every card
+          white on `teal-deep` composites to about 2.04:1 — and since every card
           arrives clean, twelve washed-out buttons were this page's resting
           state. `check-tokens.mjs` cannot see through an opacity modifier, so
           the one place the palette discipline lapsed was the most repeated
@@ -44,8 +44,8 @@ export function SaveRow({
         disabled={disabled || isSubmitting || !isDirty}
         className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-5 text-[13px] font-semibold transition-colors ${FOCUS_RING} ${
           disabled || isSubmitting || !isDirty
-            ? 'cursor-not-allowed bg-sage text-slate'
-            : 'bg-green-deep text-white hover:bg-green-deeper active:scale-[0.97]'
+            ? 'cursor-not-allowed bg-sand text-slate'
+            : 'bg-teal-deep text-white hover:bg-teal-deeper active:scale-[0.97]'
         }`}
       >
         {isSubmitting ? savingLabel : label}
@@ -57,8 +57,8 @@ export function SaveRow({
           disabled={!isDirty || isSubmitting}
           className={`inline-flex min-h-11 items-center justify-center rounded-xl border px-4 text-[13px] font-medium transition-colors ${FOCUS_RING} ${
             !isDirty || isSubmitting
-              ? 'cursor-not-allowed border-sage bg-canvas text-slate'
-              : 'border-sage bg-white text-slate hover:bg-canvas active:scale-[0.97]'
+              ? 'cursor-not-allowed border-sand bg-canvas text-slate'
+              : 'border-sand bg-white text-slate hover:bg-canvas active:scale-[0.97]'
           }`}
         >
           Revert

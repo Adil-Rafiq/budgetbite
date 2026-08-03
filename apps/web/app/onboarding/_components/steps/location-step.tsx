@@ -11,8 +11,8 @@ const LocationMap = dynamic(() => import('@/components/location-map').then((m) =
   ssr: false,
   loading: () => (
     <div className="flex flex-col gap-2">
-      <div className="h-[46px] w-full animate-pulse rounded-xl border border-sage bg-canvas" />
-      <div className="h-[280px] w-full animate-pulse rounded-2xl border border-sage bg-canvas" />
+      <div className="h-[46px] w-full animate-pulse rounded-xl border border-sand bg-canvas" />
+      <div className="h-[280px] w-full animate-pulse rounded-2xl border border-sand bg-canvas" />
     </div>
   ),
 });
@@ -23,7 +23,7 @@ export const LocationStep = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-[20px] border border-sage bg-white p-4 shadow-sm">
+      <div className="rounded-[20px] border border-sand bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between gap-3">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-slate">
             Search or drop a pin
@@ -32,7 +32,7 @@ export const LocationStep = () => {
             type="button"
             onClick={actions.detectLocation}
             disabled={state.isDetectingLocation}
-            className={`inline-flex min-h-11 items-center gap-2 rounded-lg bg-green-deep px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-green-deeper disabled:opacity-60 ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 items-center gap-2 rounded-lg bg-teal-deep px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-teal-deeper disabled:opacity-60 ${FOCUS_RING}`}
           >
             {state.isDetectingLocation ? (
               <>
@@ -64,7 +64,7 @@ export const LocationStep = () => {
       typeof values.longitude === 'number' ? (
         <NearbyProof latitude={values.latitude} longitude={values.longitude} />
       ) : (
-        <div className="rounded-xl border border-dashed border-sage bg-white px-4 py-3">
+        <div className="rounded-xl border border-dashed border-sand bg-white px-4 py-3">
           <p className="text-xs leading-relaxed text-slate">
             We compare this spot against every restaurant we have and only suggest ones within{' '}
             <span className="font-semibold text-charcoal">{ONBOARDING_NEARBY_RADIUS_KM} km</span>.

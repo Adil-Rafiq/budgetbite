@@ -38,7 +38,7 @@ export const StepPreview = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="rounded-2xl border border-sage bg-canvas p-4">
+      <div className="rounded-2xl border border-sand bg-canvas p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 flex-col gap-1">
             <span className={eyebrowClass}>Total budget</span>
@@ -46,7 +46,7 @@ export const StepPreview = () => {
               {formatPKR(totalBudget)}
             </p>
           </div>
-          <span className="shrink-0 rounded-full border border-sage bg-white px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal">
+          <span className="shrink-0 rounded-full border border-sand bg-white px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal">
             {planType}
           </span>
         </div>
@@ -74,7 +74,7 @@ export const StepPreview = () => {
             {selectedMealLabels.map((label) => (
               <span
                 key={label}
-                className="rounded-full border border-sage bg-canvas px-2 py-0.5 text-[11px] capitalize text-charcoal"
+                className="rounded-full border border-sand bg-canvas px-2 py-0.5 text-[11px] capitalize text-charcoal"
               >
                 {label}
               </span>
@@ -114,7 +114,7 @@ export const StepPreview = () => {
 
 function PreviewStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-sage bg-white p-2.5">
+    <div className="rounded-lg border border-sand bg-white p-2.5">
       <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate/60">{label}</p>
       <p className="mt-0.5 font-display text-sm font-semibold tracking-tight text-charcoal">
         {value}
@@ -133,8 +133,8 @@ function PreviewRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex gap-3 rounded-xl border border-sage bg-white p-3">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green/10 text-green-deep">
+    <div className="flex gap-3 rounded-xl border border-sand bg-white p-3">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal/10 text-teal-deep">
         <Icon className="h-4 w-4" />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-1">

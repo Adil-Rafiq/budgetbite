@@ -11,7 +11,7 @@ import type { LucideIcon } from 'lucide-react';
  * 1. **A tone.** Location, dietary rules and favourites are not preferences —
  *    they are the constraints the planner is bound by, and changing one changes
  *    what the app can ever suggest. Rendering them at the same weight as "last
- *    name" told the user they cost the same. `planner` cards get the green
+ *    name" told the user they cost the same. `planner` cards get the teal
  *    tile; `account` cards get a neutral one.
  * 2. **A dirty flag.** Six independent forms on one page is the right pattern
  *    for settings, but it obliges the page to say which one is unsaved. Without
@@ -47,14 +47,14 @@ export function Section({
       role="group"
       aria-labelledby={headingId}
       className={`flex h-full flex-col rounded-2xl border bg-white p-6 shadow-sm transition-colors ${
-        isDirty ? 'border-amber/60' : 'border-sage'
+        isDirty ? 'border-amber/60' : 'border-sand'
       }`}
     >
       <header className="mb-5 flex items-start gap-3">
         <span
           aria-hidden
           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-            isPlanner ? 'bg-green-deep text-white' : 'bg-canvas text-slate'
+            isPlanner ? 'bg-teal-deep text-white' : 'bg-canvas text-slate'
           }`}
         >
           <Icon className="h-4 w-4" />

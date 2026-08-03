@@ -30,8 +30,8 @@ const LocationMap = dynamic(() => import('@/components/location-map').then((m) =
   ssr: false,
   loading: () => (
     <div className="flex flex-col gap-2">
-      <div className="h-[46px] w-full animate-pulse rounded-xl border border-sage bg-canvas" />
-      <div className="h-[280px] w-full animate-pulse rounded-2xl border border-sage bg-canvas" />
+      <div className="h-[46px] w-full animate-pulse rounded-xl border border-sand bg-canvas" />
+      <div className="h-[280px] w-full animate-pulse rounded-2xl border border-sand bg-canvas" />
     </div>
   ),
 });
@@ -144,13 +144,13 @@ export function LocationCard({ onDirtyChange }: { onDirtyChange: (dirty: boolean
             type="button"
             onClick={detect}
             disabled={isDetecting}
-            className={`inline-flex min-h-11 items-center gap-2 rounded-xl border border-sage bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas disabled:opacity-60 ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 items-center gap-2 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas disabled:opacity-60 ${FOCUS_RING}`}
           >
             {isDetecting ? (
               <>
                 <span
                   aria-hidden
-                  className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-green-deep"
+                  className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-teal-deep"
                   style={{ borderTopColor: 'transparent' }}
                 />
                 Detecting…
@@ -174,7 +174,7 @@ export function LocationCard({ onDirtyChange }: { onDirtyChange: (dirty: boolean
         {pending ? (
           <NearbyProof latitude={pending.latitude} longitude={pending.longitude} />
         ) : (
-          <div className="rounded-xl border border-dashed border-sage bg-canvas px-4 py-3">
+          <div className="rounded-xl border border-dashed border-sand bg-canvas px-4 py-3">
             <p className="text-xs leading-relaxed text-slate">
               No location on file yet. Search, tap the map, or use Detect — we compare that spot
               against every restaurant we have and only suggest ones within{' '}
@@ -203,7 +203,7 @@ export function LocationCard({ onDirtyChange }: { onDirtyChange: (dirty: boolean
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
+            <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
               Confirm · Location
             </div>
             <AlertDialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -250,13 +250,13 @@ export function LocationCard({ onDirtyChange }: { onDirtyChange: (dirty: boolean
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-xl border border-sage bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
             >
               Keep the old spot
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={commit}
-              className={`min-h-11 rounded-xl bg-green-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-green-deeper active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl bg-teal-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-teal-deeper active:scale-[0.97] ${FOCUS_RING}`}
             >
               Save this location
             </AlertDialogAction>

@@ -30,7 +30,7 @@ export function getSpendingHealth({
   return 'danger';
 }
 
-/** True when the state warrants alarm styling (tomato rather than green). */
+/** True when the state warrants alarm styling (tomato rather than teal). */
 export const isAlarming = (health: SpendingHealth): boolean =>
   health === 'over' || health === 'danger';
 

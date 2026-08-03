@@ -52,7 +52,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
         ? { cls: 'bg-tomato/10 text-tomato-ink', Icon: TriangleAlert, label: 'Watch spending' }
         : health === 'warning'
           ? { cls: BUDGET_FIT_PILL.amber.pill, Icon: TriangleAlert, label: 'Tight' }
-          : { cls: 'bg-green/10 text-green-deep', Icon: CircleCheck, label: 'On track' };
+          : { cls: 'bg-teal/10 text-teal-deep', Icon: CircleCheck, label: 'On track' };
 
   const hasActiveGen = !!plan.activeGeneration;
   const isPending = plan.latestAttempt?.status === 'pending';
@@ -67,20 +67,20 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
 
   const varianceTone =
     ctx.cumulativeVariance >= 0
-      ? 'text-green-deep'
+      ? 'text-teal-deep'
       : ctx.cumulativeVariance < -total * 0.1
         ? 'text-tomato-ink'
         : BUDGET_FIT_PILL.amber.text;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-sand bg-white shadow-sm">
       <div className="flex flex-col gap-5 p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 flex-col gap-1">
             <div className="flex items-center gap-2">
               <span
                 aria-hidden
-                className={`h-2 w-2 rounded-full ${alarm ? 'bg-tomato' : 'bg-green'}`}
+                className={`h-2 w-2 rounded-full ${alarm ? 'bg-tomato' : 'bg-teal'}`}
               />
               <span className="text-xs font-semibold uppercase tracking-widest text-slate/60">
                 Budget summary
@@ -111,7 +111,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
               type="button"
               onClick={handleGenerate}
               disabled={disabled}
-              className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-teal-deep px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
             >
               {hasActiveGen ? (
                 <>
@@ -189,7 +189,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
             {plan.mealTypes.map((mt) => (
               <span
                 key={mt.id}
-                className="rounded-full border border-sage bg-canvas px-2.5 py-0.5 text-[10px] capitalize text-slate"
+                className="rounded-full border border-sand bg-canvas px-2.5 py-0.5 text-[10px] capitalize text-slate"
               >
                 {mt.label}
               </span>
@@ -211,7 +211,7 @@ function SummaryStat({
   toneClass?: string;
 }) {
   return (
-    <div className="rounded-lg border border-sage bg-canvas p-3">
+    <div className="rounded-lg border border-sand bg-canvas p-3">
       <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate/60">{label}</p>
       <p
         className={`mt-0.5 font-display text-[15px] font-semibold tabular-nums tracking-tight ${toneClass ?? 'text-charcoal'}`}

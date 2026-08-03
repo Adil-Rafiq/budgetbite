@@ -17,11 +17,11 @@ interface GenerationHistoryTimelineProps {
 function TimelineSkeleton() {
   return (
     <div className="relative">
-      <div className="absolute bottom-2 left-4 top-2 w-px bg-sage" aria-hidden />
+      <div className="absolute bottom-2 left-4 top-2 w-px bg-sand" aria-hidden />
       <div className="flex flex-col gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="pl-10">
-            <div className="h-20 w-full animate-pulse rounded-xl bg-sage" />
+            <div className="h-20 w-full animate-pulse rounded-xl bg-sand" />
           </div>
         ))}
       </div>
@@ -32,8 +32,8 @@ function TimelineSkeleton() {
 function TimelineEmpty({ planId }: { planId: string }) {
   const generate = useGenerateMealPlan();
   return (
-    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sage bg-white p-8 text-center">
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green/10 text-green-deep">
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-white p-8 text-center">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal/10 text-teal-deep">
         <Sparkles className="h-5 w-5" />
       </div>
       <div>
@@ -46,7 +46,7 @@ function TimelineEmpty({ planId }: { planId: string }) {
         type="button"
         onClick={() => generate.mutate(planId)}
         disabled={generate.isPending}
-        className={`inline-flex min-h-11 items-center gap-2 rounded-xl bg-green-deep px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+        className={`inline-flex min-h-11 items-center gap-2 rounded-xl bg-teal-deep px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
       >
         <Sparkles aria-hidden className="h-3.5 w-3.5" />
         Generate now
@@ -77,7 +77,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
     () => (
       <div className="flex items-end justify-between">
         <div className="flex flex-col gap-1">
-          <span className="text-xs font-semibold uppercase tracking-widest text-green-deep">
+          <span className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
             History
           </span>
           <h2 className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -126,7 +126,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
       {header}
 
       <div className="relative">
-        <div className="absolute bottom-2 left-[15px] top-2 w-px bg-sage" aria-hidden />
+        <div className="absolute bottom-2 left-[15px] top-2 w-px bg-sand" aria-hidden />
         <ol className="flex flex-col gap-3">
           {items.map((gen: BudgetGeneration) => (
             <li key={gen.id}>
@@ -152,7 +152,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
             type="button"
             onClick={() => setLimit((n) => n + PAGE_SIZE)}
             disabled={isFetching}
-            className={`min-h-11 rounded-lg border border-sage bg-white px-4 text-[12px] font-semibold text-green-deep transition-colors hover:border-green-deep disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+            className={`min-h-11 rounded-lg border border-sand bg-white px-4 text-[12px] font-semibold text-teal-deep transition-colors hover:border-teal-deep disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
           >
             {isFetching ? 'Loading…' : 'Show older attempts'}
           </button>

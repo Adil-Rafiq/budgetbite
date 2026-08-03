@@ -71,21 +71,21 @@ import type { BudgetPlanResponse, BudgetStateContext } from '@repo/shared';
    meaning "lunch". Category colour is a single-hue ramp instead, and every
    category is directly labelled so colour is never the only encoding.
    ──────────────────────────────────────────────────────────────────────────── */
-const GREEN_DEEP = '#0d6363';
-const GREEN_DEEPER = '#094a4a';
-const GREEN_MID = '#2e9c9c';
-const SAGE = '#ebe0cd';
-const SAGE_EDGE = '#8d8271';
+const TEAL_DEEP = '#0d6363';
+const TEAL_DEEPER = '#094a4a';
+const TEAL_MID = '#2e9c9c';
+const SAND = '#ebe0cd';
+const SAND_EDGE = '#8d8271';
 const SLATE = '#5c5145';
 const TOMATO_INK = '#a02c1d';
 const WHITE = '#ffffff';
 
 /** Ordered light→dark is wrong for identity; ordered dark→light reads as rank. */
-const CATEGORY_RAMP = [GREEN_DEEPER, GREEN_DEEP, GREEN_MID, SAGE_EDGE, SLATE];
+const CATEGORY_RAMP = [TEAL_DEEPER, TEAL_DEEP, TEAL_MID, SAND_EDGE, SLATE];
 
 const chartTooltipStyle = {
   backgroundColor: WHITE,
-  border: `1px solid ${SAGE_EDGE}`,
+  border: `1px solid ${SAND_EDGE}`,
   borderRadius: 12,
   color: '#1f1a14',
   fontFamily: 'var(--font-sans)',
@@ -181,9 +181,9 @@ function Panel({
   return (
     <section
       aria-label={title}
-      className={`flex flex-col rounded-2xl border border-sage bg-white shadow-sm ${className}`}
+      className={`flex flex-col rounded-2xl border border-sand bg-white shadow-sm ${className}`}
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b border-sage px-5 py-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b border-sand px-5 py-4">
         <div className="flex flex-col gap-1">
           <h2 className="font-display text-[15px] font-semibold tracking-tight text-charcoal">
             {title}
@@ -269,8 +269,8 @@ function ToggleButton({
       onClick={onClick}
       className={`min-h-11 rounded-full border px-3.5 text-[12px] font-medium transition-colors sm:min-h-9 ${FOCUS_RING} ${
         active
-          ? 'border-green-deep bg-green/10 font-semibold text-green-deep'
-          : 'border-sage bg-white text-slate hover:border-green-deep/50'
+          ? 'border-teal-deep bg-teal/10 font-semibold text-teal-deep'
+          : 'border-sand bg-white text-slate hover:border-teal-deep/50'
       }`}
     >
       {children}
@@ -442,7 +442,7 @@ export default function AnalyticsPage() {
       .filter((s) => s.value > 0)
       .sort((a, b) => b.value - a.value)
       .slice(0, 8)
-      .map((s, i) => ({ ...s, fill: CATEGORY_RAMP[i % CATEGORY_RAMP.length] ?? GREEN_DEEP }));
+      .map((s, i) => ({ ...s, fill: CATEGORY_RAMP[i % CATEGORY_RAMP.length] ?? TEAL_DEEP }));
   }, [history, breakdownBy, mealTypesById]);
 
   /* ── Panel 5: adherence across plans ──────────────────────────────────── */
@@ -492,7 +492,7 @@ export default function AnalyticsPage() {
     return (
       <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8">
         <header className="flex flex-col gap-2">
-          <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
+          <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
             Spend · Analytics
           </div>
           <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
@@ -502,7 +502,7 @@ export default function AnalyticsPage() {
             Loading your spending.
           </p>
         </header>
-        <div className="h-28 animate-pulse rounded-2xl border border-sage bg-white" />
+        <div className="h-28 animate-pulse rounded-2xl border border-sand bg-white" />
         <div className="grid gap-4 lg:grid-cols-2 lg:gap-5">
           <ChartSkeleton variant="bar" />
           <ChartSkeleton variant="line" />
@@ -518,7 +518,7 @@ export default function AnalyticsPage() {
       <FadeUp>
         <header className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
-            <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
+            <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
               Spend · Analytics
             </div>
             <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
@@ -565,8 +565,8 @@ export default function AnalyticsPage() {
                     }}
                     className={`min-h-11 rounded-full border bg-white px-3.5 text-[12px] font-medium text-slate transition-colors sm:min-h-9 ${FOCUS_RING_ON_CANVAS} ${
                       range.kind === 'plan'
-                        ? 'border-green-deep font-semibold text-green-deep'
-                        : 'border-sage hover:border-green-deep/50'
+                        ? 'border-teal-deep font-semibold text-teal-deep'
+                        : 'border-sand hover:border-teal-deep/50'
                     }`}
                   >
                     <option value="">By budget plan…</option>
@@ -582,7 +582,7 @@ export default function AnalyticsPage() {
             </div>
 
             {range.kind === 'custom' && (
-              <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-sage bg-white px-4 py-3">
+              <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-sand bg-white px-4 py-3">
                 <div className="flex items-center gap-2">
                   <label htmlFor="range-start" className="text-[12px] font-medium text-slate">
                     From
@@ -593,7 +593,7 @@ export default function AnalyticsPage() {
                     value={range.startDate}
                     max={range.endDate}
                     onChange={(e) => setCustom({ startDate: e.target.value })}
-                    className={`min-h-11 rounded-lg border border-sage-edge bg-white px-2.5 text-[13px] text-charcoal sm:min-h-9 ${FOCUS_RING}`}
+                    className={`min-h-11 rounded-lg border border-sand-edge bg-white px-2.5 text-[13px] text-charcoal sm:min-h-9 ${FOCUS_RING}`}
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -606,7 +606,7 @@ export default function AnalyticsPage() {
                     value={range.endDate}
                     min={range.startDate}
                     onChange={(e) => setCustom({ endDate: e.target.value })}
-                    className={`min-h-11 rounded-lg border border-sage-edge bg-white px-2.5 text-[13px] text-charcoal sm:min-h-9 ${FOCUS_RING}`}
+                    className={`min-h-11 rounded-lg border border-sand-edge bg-white px-2.5 text-[13px] text-charcoal sm:min-h-9 ${FOCUS_RING}`}
                   />
                 </div>
               </div>
@@ -683,7 +683,7 @@ export default function AnalyticsPage() {
                           bottom: 0,
                         }}
                       >
-                        <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={SAGE} />
+                        <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={SAND} />
                         <XAxis
                           dataKey="label"
                           axisLine={false}
@@ -706,7 +706,7 @@ export default function AnalyticsPage() {
                           }}
                         />
                         <Tooltip
-                          cursor={{ fill: SAGE, opacity: 0.25 }}
+                          cursor={{ fill: SAND, opacity: 0.25 }}
                           contentStyle={chartTooltipStyle}
                           formatter={(value: number) => [formatPKR(value), 'Spent']}
                         />
@@ -735,7 +735,7 @@ export default function AnalyticsPage() {
                               fill={
                                 dailyAllowance !== null && d.amount > dailyAllowance
                                   ? TOMATO_INK
-                                  : GREEN_DEEP
+                                  : TEAL_DEEP
                               }
                             />
                           ))}
@@ -787,7 +787,7 @@ export default function AnalyticsPage() {
                   >
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={burndown} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-                        <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={SAGE} />
+                        <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={SAND} />
                         <XAxis
                           dataKey="label"
                           axisLine={false}
@@ -810,7 +810,7 @@ export default function AnalyticsPage() {
                           }}
                         />
                         <Tooltip
-                          cursor={{ stroke: SAGE_EDGE, strokeDasharray: '3 3' }}
+                          cursor={{ stroke: SAND_EDGE, strokeDasharray: '3 3' }}
                           contentStyle={chartTooltipStyle}
                           formatter={(value: number, name: string) => [
                             formatPKR(value),
@@ -831,11 +831,11 @@ export default function AnalyticsPage() {
                         <Line
                           type="monotone"
                           dataKey="actual"
-                          stroke={GREEN_DEEP}
+                          stroke={TEAL_DEEP}
                           strokeWidth={2.5}
                           dot={false}
                           connectNulls={false}
-                          activeDot={{ r: 5, fill: GREEN_DEEP, strokeWidth: 0 }}
+                          activeDot={{ r: 5, fill: TEAL_DEEP, strokeWidth: 0 }}
                           name="actual"
                         />
                       </LineChart>
@@ -930,7 +930,7 @@ export default function AnalyticsPage() {
                         layout="vertical"
                         margin={{ top: 4, right: 56, left: 4, bottom: 4 }}
                       >
-                        <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke={SAGE} />
+                        <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke={SAND} />
                         <XAxis
                           type="number"
                           axisLine={false}
@@ -949,7 +949,7 @@ export default function AnalyticsPage() {
                           width={140}
                         />
                         <Tooltip
-                          cursor={{ fill: SAGE, opacity: 0.25 }}
+                          cursor={{ fill: SAND, opacity: 0.25 }}
                           contentStyle={chartTooltipStyle}
                           formatter={(value: number) => [formatPKR(value), 'Spent']}
                         />
@@ -1047,7 +1047,7 @@ export default function AnalyticsPage() {
                       barGap={4}
                       margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
                     >
-                      <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={SAGE} />
+                      <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={SAND} />
                       <XAxis
                         dataKey="label"
                         axisLine={false}
@@ -1070,26 +1070,26 @@ export default function AnalyticsPage() {
                         }}
                       />
                       <Tooltip
-                        cursor={{ fill: SAGE, opacity: 0.25 }}
+                        cursor={{ fill: SAND, opacity: 0.25 }}
                         contentStyle={chartTooltipStyle}
                         formatter={(value: number, name: string) => [
                           formatPKR(value),
                           name === 'budget' ? 'Budget' : 'Actually spent',
                         ]}
                       />
-                      {/* `sage-edge` rather than `sage`: the budget is the
+                      {/* `sand-edge` rather than `sand`: the budget is the
                           reference every other mark is judged against, and at
                           1.32:1 it was the least visible thing on the page. */}
                       <Bar
                         dataKey="budget"
-                        fill={SAGE_EDGE}
+                        fill={SAND_EDGE}
                         radius={[4, 4, 0, 0]}
                         maxBarSize={32}
                         name="budget"
                       />
                       <Bar dataKey="actual" radius={[4, 4, 0, 0]} maxBarSize={32} name="actual">
                         {adherence.map((p) => (
-                          <Cell key={p.label} fill={p.over ? TOMATO_INK : GREEN_DEEP} />
+                          <Cell key={p.label} fill={p.over ? TOMATO_INK : TEAL_DEEP} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -1110,7 +1110,7 @@ export default function AnalyticsPage() {
                     <span
                       aria-hidden
                       className="inline-block h-2.5 w-2.5 rounded-sm"
-                      style={{ background: SAGE_EDGE }}
+                      style={{ background: SAND_EDGE }}
                     />
                     Budget
                   </li>
@@ -1118,7 +1118,7 @@ export default function AnalyticsPage() {
                     <span
                       aria-hidden
                       className="inline-block h-2.5 w-2.5 rounded-sm"
-                      style={{ background: GREEN_DEEP }}
+                      style={{ background: TEAL_DEEP }}
                     />
                     Spent, within budget
                   </li>
@@ -1181,7 +1181,7 @@ function Verdict({
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-3 rounded-2xl border border-sage bg-white p-6">
+      <div className="flex flex-col gap-3 rounded-2xl border border-sand bg-white p-6">
         <div className="h-4 w-40 animate-pulse rounded bg-canvas" />
         <div className="h-8 w-3/4 animate-pulse rounded bg-canvas" />
         <div className="h-4 w-1/2 animate-pulse rounded bg-canvas" />
@@ -1205,7 +1205,7 @@ function Verdict({
   return (
     <div
       className={`flex flex-col gap-3 rounded-2xl border p-6 ${
-        alarming ? 'border-tomato/30 bg-tomato/[0.06]' : 'border-sage bg-white'
+        alarming ? 'border-tomato/30 bg-tomato/[0.06]' : 'border-sand bg-white'
       }`}
     >
       <p className="text-[12px] font-semibold uppercase tracking-widest text-slate">{label}</p>
@@ -1214,11 +1214,11 @@ function Verdict({
         <>
           <p className="font-display text-[clamp(20px,2.4vw,28px)] font-semibold leading-snug tracking-tight text-charcoal">
             You&rsquo;ve spent{' '}
-            <span className={alarming ? 'text-tomato-ink' : 'text-green-deep'}>
+            <span className={alarming ? 'text-tomato-ink' : 'text-teal-deep'}>
               {formatPKR(budget.spent)}
             </span>{' '}
             of {formatPKR(budget.total)} —{' '}
-            <span className={alarming ? 'text-tomato-ink' : 'text-green-deep'}>
+            <span className={alarming ? 'text-tomato-ink' : 'text-teal-deep'}>
               {formatPKR(Math.abs(budget.remaining))} {budget.remaining < 0 ? 'over' : 'left'}
             </span>
             .
@@ -1230,7 +1230,7 @@ function Verdict({
       ) : (
         <>
           <p className="font-display text-[clamp(20px,2.4vw,28px)] font-semibold leading-snug tracking-tight text-charcoal">
-            You&rsquo;ve spent <span className="text-green-deep">{formatPKR(totalSpent)}</span>{' '}
+            You&rsquo;ve spent <span className="text-teal-deep">{formatPKR(totalSpent)}</span>{' '}
             across {mealCount} {mealCount === 1 ? 'meal' : 'meals'}.
           </p>
           <p className="text-[14px] text-slate">
@@ -1240,7 +1240,7 @@ function Verdict({
               <button
                 type="button"
                 onClick={onPickActivePlan}
-                className={`rounded font-semibold text-green-deep underline underline-offset-2 hover:text-green-deeper ${FOCUS_RING}`}
+                className={`rounded font-semibold text-teal-deep underline underline-offset-2 hover:text-teal-deeper ${FOCUS_RING}`}
               >
                 Show my current plan instead
               </button>
@@ -1298,7 +1298,7 @@ function MealHistoryTable({
             <span className="sr-only">{caption}</span>
           </caption>
           <thead>
-            <tr className="border-b border-sage">
+            <tr className="border-b border-sand">
               <th
                 scope="col"
                 className="pb-2 pr-3 text-[11px] font-semibold uppercase tracking-wider text-slate"
@@ -1328,7 +1328,7 @@ function MealHistoryTable({
                   ? humanizeName(item.restaurantName)
                   : (item.manualDescription ?? 'Logged by hand');
               return (
-                <tr key={item.id} className="border-b border-sage/70 last:border-0">
+                <tr key={item.id} className="border-b border-sand/70 last:border-0">
                   <td className="whitespace-nowrap py-3 pr-3 align-top text-[12px] text-slate">
                     {format(new Date(`${item.slotDate}T00:00:00`), 'MMM d')}
                   </td>
@@ -1346,7 +1346,7 @@ function MealHistoryTable({
             })}
           </tbody>
           <tfoot>
-            <tr className="border-t-2 border-sage">
+            <tr className="border-t-2 border-sand">
               <th scope="row" colSpan={2} className="pt-3 text-[12px] font-semibold text-slate">
                 Total for this period
               </th>
@@ -1362,7 +1362,7 @@ function MealHistoryTable({
         <button
           type="button"
           onClick={onShowAll}
-          className={`min-h-11 self-start rounded-full border border-sage bg-white px-4 text-[12px] font-semibold text-green-deep transition-colors hover:border-green-deep/50 sm:min-h-9 ${FOCUS_RING}`}
+          className={`min-h-11 self-start rounded-full border border-sand bg-white px-4 text-[12px] font-semibold text-teal-deep transition-colors hover:border-teal-deep/50 sm:min-h-9 ${FOCUS_RING}`}
         >
           Show {hiddenCount} more {hiddenCount === 1 ? 'meal' : 'meals'}
         </button>

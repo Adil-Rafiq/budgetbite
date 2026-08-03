@@ -27,11 +27,20 @@ const EXTENSIONS = /\.(tsx?|css)$/;
  * `lumen`/`pulse`/`soft`/`vast`/`fathom` are leftovers from a previous palette.
  * `dark-green` is different: it was real, and it was the app's link colour and
  * button hover in 193 places — but at 4.13:1 it failed AA as 12-13px text and
- * again as a fill under white labels. It was swept to `green-deep` and deleted
+ * again as a fill under white labels. It was swept to `teal-deep` and deleted
  * from @theme, so it is listed here to make the sweep stick: reintroducing it
  * is now a build failure rather than a silent regression to sub-AA text.
+ *
+ * `green` and `sage` are here for the same reason, one palette later. The
+ * "terrace" swap renamed them to `teal` and `sand` across ~930 call sites, and
+ * a missed one is invisible: Tailwind emits nothing for `border-sage` and says
+ * nothing about it, so the element simply loses its border. Listing them turns
+ * every straggler into a build failure — which is also how the rename was
+ * verified complete. This does NOT cover `BudgetFit`'s `green | amber | red`
+ * rating in @repo/shared: that is a domain classification shared with the API,
+ * not a colour token, and it never appears as `*-green`.
  */
-const GHOST_TOKENS = ['lumen', 'pulse', 'soft', 'vast', 'fathom', 'dark-green'];
+const GHOST_TOKENS = ['lumen', 'pulse', 'soft', 'vast', 'fathom', 'dark-green', 'green', 'sage'];
 
 const utilityPattern = new RegExp(
   String.raw`\b(?:text|bg|border|ring|fill|stroke|from|to|via|shadow|outline|divide|accent|caret)-(?:${GHOST_TOKENS.join('|')})(?:-[a-z]+)?\b`,
@@ -56,8 +65,8 @@ const BANNED_HEXES = new Map([
   ['#5a8a1a', 'dark-green'],
   // The active-nav wash. It was a bare arbitrary value in both shells and the
   // meal-slot cards, plus a raw hex inside an inline boxShadow — one colour
-  // with no name, which is how it drifted into an inline style. Now `green-tint`.
-  ['#e2f1f0', 'green-tint'],
+  // with no name, which is how it drifted into an inline style. Now `teal-tint`.
+  ['#e2f1f0', 'teal-tint'],
   // Caution amber, which had four spellings across the app before it was
   // tokenised. `#9a6400` was a fifth, invented for one admin badge.
   ['#e9a020', 'amber'],
@@ -71,16 +80,16 @@ const BANNED_HEXES = new Map([
   // not fail anything — it would just quietly render one mint element in a
   // cream app. Deliberately excludes the old `charcoal`/`slate` neutrals:
   // #1a1a1a and #4a4a4a are values generic enough to appear innocently.
-  ['#8cc63f', 'the retired lime brand — use `green`'],
-  ['#d4e8b0', 'the retired mint — use `sage`'],
+  ['#8cc63f', 'the retired lime brand — use `teal`'],
+  ['#d4e8b0', 'the retired mint — use `sand`'],
   ['#f7fbf0', 'the retired cream-green canvas — use `canvas`'],
-  ['#4f7c17', 'the retired olive — use `green-deep`'],
-  ['#3f6212', 'the retired olive hover — use `green-deeper`'],
+  ['#4f7c17', 'the retired olive — use `teal-deep`'],
+  ['#3f6212', 'the retired olive hover — use `teal-deeper`'],
   ['#6b8f3a', 'the retired mid-olive chart ramp step'],
-  ['#7d8a6b', 'the retired control boundary — use `sage-edge`'],
+  ['#7d8a6b', 'the retired control boundary — use `sand-edge`'],
   ['#e84c3d', 'the retired tomato — use `tomato`'],
   ['#b32d1f', 'the retired tomato ink — use `tomato-ink`'],
-  ['#f0f9e0', 'the retired nav wash — use `green-tint`'],
+  ['#f0f9e0', 'the retired nav wash — use `teal-tint`'],
   ['#f5a623', 'the retired amber — use `amber`'],
   ['#fef6e6', 'the retired amber tint — use `amber-tint`'],
 ]);
@@ -89,18 +98,18 @@ const hexPattern = new RegExp(String.raw`${[...BANNED_HEXES.keys()].join('|')}`,
 /**
  * Focus rings that cannot be seen.
  *
- * `lib/focus-ring.ts` exists because the brand `green` is 2.05:1 on white and
- * a ring drawn in it is decoration. That reasoning did not stop five surfaces
- * from hardcoding `ring-green/40` anyway — 1.32:1 composited, weaker than the
- * value the module was written to replace — including both navigation shells,
+ * `lib/focus-ring.ts` exists because the brand `teal` is 4.17:1 on white and
+ * a ring drawn in it is under the AA floor. That reasoning did not stop five
+ * surfaces from hardcoding `ring-teal/40` anyway — 1.68:1 composited, well
+ * under the 3:1 focus floor — including both navigation shells,
  * where a keyboard user loses their place on every route. A rule nobody can
  * see is a rule that comes back, so it is a build failure now.
  *
- * Matches `ring-green`, `ring-green/40`, `focus-visible:ring-green/40` and the
- * `focus:` variants, but not `ring-green-deep` / `ring-green-deeper`.
+ * Matches `ring-teal`, `ring-teal/40`, `focus-visible:ring-teal/40` and the
+ * `focus:` variants, but not `ring-teal-deep` / `ring-teal-deeper`.
  */
 const weakRingPattern =
-  /\b(?:focus-visible:|focus:|group-focus-visible:)?ring-green(?!-deep)(?:\/\d+)?\b/g;
+  /\b(?:focus-visible:|focus:|group-focus-visible:)?ring-teal(?!-deep)(?:\/\d+)?\b/g;
 
 /**
  * Blank out comments, preserving line numbering.

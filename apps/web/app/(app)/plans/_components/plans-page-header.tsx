@@ -10,7 +10,7 @@ export function PlansPageHeader() {
   return (
     <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex flex-col gap-2">
-        <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
+        <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
           Budgets · Your plans
         </div>
         <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
@@ -25,7 +25,7 @@ export function PlansPageHeader() {
       <button
         type="button"
         onClick={requestNewPlan}
-        className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-green-deeper sm:self-auto ${FOCUS_RING_ON_CANVAS}`}
+        className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-teal-deep px-5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-teal-deeper sm:self-auto ${FOCUS_RING_ON_CANVAS}`}
       >
         New plan
         <Plus aria-hidden className="h-4 w-4" />

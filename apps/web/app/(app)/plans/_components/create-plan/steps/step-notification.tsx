@@ -13,14 +13,14 @@ export const StepNotifications = () => {
         you want to move, or toggle off any meal you don&apos;t want a reminder for.
       </p>
 
-      <div className="overflow-hidden rounded-xl border border-sage bg-white">
+      <div className="overflow-hidden rounded-xl border border-sand bg-white">
         {values.slots.map((slot, i) => {
           const slotError = errors.slots[i];
           return (
             <div
               key={slot.mealTypeId}
               className={`flex flex-col gap-1.5 px-3 py-2.5 ${
-                i === 0 ? '' : 'border-t border-sage'
+                i === 0 ? '' : 'border-t border-sand'
               } ${i % 2 === 0 ? 'bg-white' : 'bg-canvas'}`}
             >
               <div className="flex items-center justify-between gap-3">
@@ -31,7 +31,7 @@ export const StepNotifications = () => {
                 >
                   <span
                     aria-hidden
-                    className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-green/10 text-[11px] font-semibold text-green-deep"
+                    className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-teal/10 text-[11px] font-semibold text-teal-deep"
                   >
                     {slot.label.slice(0, 1).toUpperCase()}
                   </span>
@@ -59,8 +59,8 @@ export const StepNotifications = () => {
                     }
                     className={`min-h-11 rounded-full px-3 text-[10px] font-semibold tracking-[0.1em] transition active:scale-[0.96] ${FOCUS_RING} ${
                       slot.enabled
-                        ? 'bg-green-deep text-white hover:bg-green-deeper'
-                        : 'border border-sage bg-white text-slate/60 hover:border-green/40 hover:text-slate'
+                        ? 'bg-teal-deep text-white hover:bg-teal-deeper'
+                        : 'border border-sand bg-white text-slate/60 hover:border-teal/40 hover:text-slate'
                     }`}
                   >
                     {slot.enabled ? 'ON' : 'OFF'}

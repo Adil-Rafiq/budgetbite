@@ -14,7 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           (z-30) or it would land under them the moment it appears. */}
       <a
         href="#main-content"
-        className={`sr-only z-50 focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-xl focus:bg-green-deep focus:px-4 focus:text-sm focus:font-semibold focus:text-white ${FOCUS_RING}`}
+        className={`sr-only z-50 focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-xl focus:bg-teal-deep focus:px-4 focus:text-sm focus:font-semibold focus:text-white ${FOCUS_RING}`}
       >
         Skip to content
       </a>

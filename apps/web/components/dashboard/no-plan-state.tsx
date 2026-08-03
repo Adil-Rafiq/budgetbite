@@ -30,10 +30,10 @@ const steps = [
  */
 export function NoPlanState() {
   return (
-    <section className="overflow-hidden rounded-3xl border border-sage bg-white shadow-sm">
+    <section className="overflow-hidden rounded-3xl border border-sand bg-white shadow-sm">
       <div className="flex flex-col gap-6 p-7 sm:p-10">
         <div className="flex max-w-[560px] flex-col gap-3">
-          <span className="text-xs font-semibold uppercase tracking-widest text-green-deep">
+          <span className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
             Get started
           </span>
           <h1 className="font-display text-3xl font-semibold leading-[1.05] tracking-tight text-charcoal sm:text-4xl">
@@ -46,19 +46,19 @@ export function NoPlanState() {
           </p>
           <Link
             href="/plans"
-            className={`mt-1 inline-flex min-h-11 w-fit items-center justify-center gap-2 rounded-xl bg-green-deep px-6 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper ${FOCUS_RING}`}
+            className={`mt-1 inline-flex min-h-11 w-fit items-center justify-center gap-2 rounded-xl bg-teal-deep px-6 text-sm font-semibold text-white shadow-md transition-all hover:bg-teal-deeper ${FOCUS_RING}`}
           >
             Create your plan
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
-        <ol className="grid gap-x-6 gap-y-5 border-t border-sage/70 pt-6 sm:grid-cols-3">
+        <ol className="grid gap-x-6 gap-y-5 border-t border-sand/70 pt-6 sm:grid-cols-3">
           {steps.map((step, i) => {
             const Icon = step.icon;
             return (
               <li key={step.title} className="flex gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green/10 text-green-deep">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal/10 text-teal-deep">
                   <Icon className="h-4 w-4" />
                 </span>
                 <div className="flex flex-col gap-0.5">

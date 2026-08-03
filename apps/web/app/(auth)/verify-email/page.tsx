@@ -173,11 +173,11 @@ function VerifyEmailForm() {
 
       <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-6 py-6 sm:px-8">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-deep text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-deep text-white">
             <LogoIcon size={16} />
           </span>
           <span className="font-display text-xl font-bold tracking-tight">
-            Budget<span className="text-green-deep">Bite</span>
+            Budget<span className="text-teal-deep">Bite</span>
           </span>
         </Link>
         <Link
@@ -191,7 +191,7 @@ function VerifyEmailForm() {
 
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[440px] flex-col justify-center px-6 pb-16">
         <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green/15 text-green-deep">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal/15 text-teal-deep">
             <MailCheck className="h-6 w-6" />
           </div>
           <h1 className="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tight">
@@ -203,7 +203,7 @@ function VerifyEmailForm() {
           <p className="mt-0.5 text-[15px] font-semibold text-charcoal">{email}</p>
         </div>
 
-        <div className="mt-8 rounded-3xl border border-sage bg-white p-7 shadow-2xl">
+        <div className="mt-8 rounded-3xl border border-sand bg-white p-7 shadow-2xl">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -234,12 +234,12 @@ function VerifyEmailForm() {
                         error
                           ? 'border-tomato/60 bg-tomato/5 text-tomato-ink'
                           : digit
-                            ? 'border-green/50 bg-white text-charcoal'
-                            : 'border-sage bg-canvas text-charcoal'
-                      } focus:border-green-deep focus:bg-white focus:ring-4 focus:ring-green-deep/25 disabled:opacity-60`}
+                            ? 'border-teal/50 bg-white text-charcoal'
+                            : 'border-sand bg-canvas text-charcoal'
+                      } focus:border-teal-deep focus:bg-white focus:ring-4 focus:ring-teal-deep/25 disabled:opacity-60`}
                     />
                     {/* subtle 3-3 grouping divider */}
-                    {i === 2 && <span className="h-0.5 w-2 rounded-full bg-sage" />}
+                    {i === 2 && <span className="h-0.5 w-2 rounded-full bg-sand" />}
                   </div>
                 ))}
               </div>
@@ -253,7 +253,7 @@ function VerifyEmailForm() {
             <button
               type="submit"
               disabled={submitting || !isComplete}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-green-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50"
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-teal-deeper disabled:pointer-events-none disabled:opacity-50"
             >
               {submitting ? (
                 <>
@@ -269,13 +269,13 @@ function VerifyEmailForm() {
             </button>
           </form>
 
-          <div className="mt-5 border-t border-sage/70 pt-4 text-center text-[13px] text-charcoal/60">
+          <div className="mt-5 border-t border-sand/70 pt-4 text-center text-[13px] text-charcoal/60">
             <span>Didn&apos;t receive it? </span>
             <button
               type="button"
               onClick={handleResend}
               disabled={resendCooldown > 0}
-              className="font-semibold text-green-deep transition-colors hover:text-green-deep disabled:cursor-not-allowed disabled:font-medium disabled:text-slate/60"
+              className="font-semibold text-teal-deep transition-colors hover:text-teal-deep disabled:cursor-not-allowed disabled:font-medium disabled:text-slate/60"
             >
               {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
             </button>

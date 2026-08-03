@@ -33,17 +33,17 @@ export function AppSidebar() {
       // z-30 keeps the rail under the sticky header (z-40) and the API-wakeup
       // banner (z-50). Unlayered, this `fixed` element was painted over the
       // banner announcing the very outage that empties it.
-      className="fixed inset-y-0 left-0 z-30 hidden border-r border-sage bg-white text-charcoal lg:flex lg:w-64 lg:flex-col"
+      className="fixed inset-y-0 left-0 z-30 hidden border-r border-sand bg-white text-charcoal lg:flex lg:w-64 lg:flex-col"
     >
       <Link
         href="/dashboard"
-        className={`flex items-center gap-2.5 border-b border-sage px-6 py-5 ${FOCUS_RING}`}
+        className={`flex items-center gap-2.5 border-b border-sand px-6 py-5 ${FOCUS_RING}`}
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-deep text-white shadow-sm">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-deep text-white shadow-sm">
           <LogoIcon size={16} />
         </span>
         <span className="font-display text-lg font-bold tracking-tight">
-          Budget<span className="text-green-deep">Bite</span>
+          Budget<span className="text-teal-deep">Bite</span>
         </span>
       </Link>
 
@@ -65,13 +65,13 @@ export function AppSidebar() {
               aria-current={isActive ? 'page' : undefined}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${FOCUS_RING} ${
                 isActive
-                  ? 'bg-green-tint font-semibold text-green-deep'
+                  ? 'bg-teal-tint font-semibold text-teal-deep'
                   : 'text-slate hover:bg-canvas hover:text-charcoal'
               }`}
             >
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                  isActive ? 'bg-green-deep text-white' : 'border border-sage bg-canvas text-slate'
+                  isActive ? 'bg-teal-deep text-white' : 'border border-sand bg-canvas text-slate'
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />

@@ -92,7 +92,7 @@ export function PasswordCard({ onDirtyChange }: { onDirtyChange: (dirty: boolean
       <div
         role="status"
         aria-label="Loading your sign-in details"
-        className="h-[400px] w-full animate-pulse rounded-2xl border border-sage bg-white shadow-sm"
+        className="h-[400px] w-full animate-pulse rounded-2xl border border-sand bg-white shadow-sm"
       />
     );
   }
@@ -110,7 +110,7 @@ export function PasswordCard({ onDirtyChange }: { onDirtyChange: (dirty: boolean
     return (
       <Section icon={KeyRound} title="Sign-in method" hint="How you get into this account.">
         <div className="flex flex-1 flex-col gap-3">
-          <div className="rounded-xl border border-sage bg-canvas px-4 py-3">
+          <div className="rounded-xl border border-sand bg-canvas px-4 py-3">
             <p className="text-[13px] font-semibold text-charcoal">
               You sign in with {social.length ? social.join(' and ') : 'a linked account'}
             </p>
@@ -140,7 +140,7 @@ export function PasswordCard({ onDirtyChange }: { onDirtyChange: (dirty: boolean
             say so rather than letting a Google-only user discover it by being
             told their nonexistent password was wrong. */}
         {isError && (
-          <p className="rounded-xl border border-sage bg-canvas px-3 py-2 text-[12px] text-slate">
+          <p className="rounded-xl border border-sand bg-canvas px-3 py-2 text-[12px] text-slate">
             We couldn&apos;t check how you sign in. If you use Google or GitHub, there&apos;s no
             password on this account and this form won&apos;t apply.
           </p>

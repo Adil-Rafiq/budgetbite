@@ -45,7 +45,7 @@ export function DashboardBody() {
       <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8">
         <header className="flex flex-col gap-1.5">
           <div className="inline-flex items-center gap-2">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-green" />
+            <span className="h-2 w-2 animate-pulse rounded-full bg-teal" />
             <span className="text-xs font-semibold uppercase tracking-widest text-slate">
               Today · Your plan
             </span>

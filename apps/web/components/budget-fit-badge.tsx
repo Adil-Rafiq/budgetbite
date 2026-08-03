@@ -9,19 +9,22 @@ import type { BudgetFit } from '@repo/shared';
  * cost (`estimateMealCost` / `typicalMealCost`), not a bare menu price.
  *
  * Every state carries its label as text, so the cue never rests on hue alone.
- * The inks are the readable members of each family: the raw brand hues sat at
- * ~3.3:1 and ~3.9:1 as label colours on these tints, under the AA floor for
- * 10px type. Measured: amber-ink on amber-tint 5.50:1, tomato-ink on tomato/10
- * 5.58:1, green-deep on green/10 4.64:1.
+ * The inks are the readable members of each family: the raw hues are 3.68:1
+ * (teal on teal/10) and 1.99:1 (amber on amber-tint) as label colours, under
+ * the AA floor for 10px type. Measured: amber-ink on amber-tint 5.32:1,
+ * tomato-ink on tomato/10 6.35:1, teal-deep on teal/10 6.22:1.
  */
 export const BUDGET_FIT_PILL: Record<
   BudgetFit,
   { pill: string; dot: string; text: string; label: string }
 > = {
+  // `green` here is the shared `BudgetFit` rating, not the palette token — it
+  // is a traffic-light classification that @repo/shared and the API both use.
+  // It stays spelled `green` while rendering teal classes.
   green: {
-    pill: 'bg-green/10 text-green-deep',
-    dot: 'bg-green-deep',
-    text: 'text-green-deep',
+    pill: 'bg-teal/10 text-teal-deep',
+    dot: 'bg-teal-deep',
+    text: 'text-teal-deep',
     label: 'Fits budget',
   },
   amber: {

@@ -44,7 +44,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
       </Label>
       {/* `FOCUS_RING` overrides the shadcn default. `Input` ships
           `focus-visible:ring-ring/50`, and half alpha is the problem: even now
-          that `--ring` is green-deep rather than the old lime, the composited
+          that `--ring` is teal-deep rather than the old lime, the composited
           indicator is 2.35:1 — still under the 3:1 WCAG 1.4.11 floor. Every
           button and link on this page rings at a solid 7.04:1; without this
           override the focus outline would fade out precisely on the text
@@ -54,7 +54,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
         ref={ref}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy || undefined}
-        className={`bg-canvas border-sage-edge text-charcoal placeholder:text-slate ${FOCUS_RING} ${className ?? ''}`}
+        className={`bg-canvas border-sand-edge text-charcoal placeholder:text-slate ${FOCUS_RING} ${className ?? ''}`}
         {...inputProps}
       />
       {note && (

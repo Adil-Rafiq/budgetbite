@@ -6,7 +6,7 @@ export const ONBOARDING_STEPS: readonly OnboardingStep[] = [
     id: 'location',
     icon: MapPin,
     label: 'Your location',
-    accent: 'green',
+    accent: 'teal',
     title: 'Where do you eat out?',
     description:
       "Pick the spot you order to. We'll only suggest restaurants that actually deliver near it.",
@@ -23,7 +23,7 @@ export const ONBOARDING_STEPS: readonly OnboardingStep[] = [
     id: 'budget',
     icon: Wallet,
     label: 'Budget setup',
-    accent: 'green',
+    accent: 'teal',
     title: 'How much do you want to spend?',
     description: 'Set a realistic food budget. Every suggestion has to fit inside what is left.',
   },
@@ -39,7 +39,7 @@ export const ONBOARDING_STEPS: readonly OnboardingStep[] = [
     id: 'review',
     icon: ClipboardCheck,
     label: 'Review',
-    accent: 'green',
+    accent: 'teal',
     title: 'Here’s your plan',
     description:
       'Check it over before we start planning meals. Anything here can still be changed.',

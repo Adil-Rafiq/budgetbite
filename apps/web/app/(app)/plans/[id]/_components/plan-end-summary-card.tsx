@@ -22,15 +22,15 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
   const { start, confirmOpen, setConfirmOpen, confirmReplace, isPending } = useStartNextPlan(plan);
 
   if (isLoading || !summary) {
-    return <div className="h-40 w-full animate-pulse rounded-2xl bg-sage" />;
+    return <div className="h-40 w-full animate-pulse rounded-2xl bg-sand" />;
   }
 
   const saved = summary.variance >= 0;
-  const varianceTone = saved ? 'text-green-deep' : 'text-tomato-ink';
+  const varianceTone = saved ? 'text-teal-deep' : 'text-tomato-ink';
   const statusLabel = plan.status === 'cancelled' ? 'cancelled' : 'wrapped up';
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-sand bg-white shadow-sm">
       <div className="flex flex-col gap-5 p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-1">
@@ -52,7 +52,7 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
             type="button"
             onClick={start}
             disabled={isPending}
-            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-teal-deep px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
           >
             {isPending ? (
               <RefreshCw aria-hidden className="h-4 w-4 animate-spin" />
@@ -87,7 +87,7 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
         </div>
 
         {summary.favoriteRestaurant && (
-          <div className="flex items-center gap-2 rounded-xl border border-sage bg-canvas px-4 py-3">
+          <div className="flex items-center gap-2 rounded-xl border border-sand bg-canvas px-4 py-3">
             <Store aria-hidden className="h-4 w-4 shrink-0 text-slate/60" />
             <p className="min-w-0 text-[13px] text-charcoal">
               Ordered most from{' '}
@@ -116,13 +116,13 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-xl border border-sage bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
             >
               Keep current plan
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmReplace}
-              className={`min-h-11 rounded-xl bg-green-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-green-deeper active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl bg-teal-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-teal-deeper active:scale-[0.97] ${FOCUS_RING}`}
             >
               Replace plan
             </AlertDialogAction>
@@ -135,7 +135,7 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
 
 function SummaryStat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-lg border border-sage bg-canvas p-3">
+    <div className="rounded-lg border border-sand bg-canvas p-3">
       <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate/60">{label}</p>
       <p className="mt-0.5 font-display text-[15px] font-semibold tabular-nums tracking-tight text-charcoal">
         {value}

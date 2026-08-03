@@ -41,7 +41,7 @@ const PAGE_SIZE = 20;
 
 const STATUS_PILL: Record<string, string> = {
   pending: 'bg-amber-tint text-amber-ink',
-  approved: 'bg-green/15 text-green-deep',
+  approved: 'bg-teal/15 text-teal-deep',
   rejected: 'bg-tomato/10 text-tomato-ink',
 };
 
@@ -129,7 +129,7 @@ export default function AdminRecommendationsPage() {
         )}
       </div>
 
-      <div className="mt-4 rounded-xl border border-sage bg-white">
+      <div className="mt-4 rounded-xl border border-sand bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate/60" />
@@ -165,7 +165,7 @@ export default function AdminRecommendationsPage() {
                           href={r.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[12px] text-green-deep underline-offset-2 hover:underline"
+                          className="text-[12px] text-teal-deep underline-offset-2 hover:underline"
                         >
                           link
                         </a>
@@ -183,7 +183,7 @@ export default function AdminRecommendationsPage() {
                           {r.items.slice(0, 6).map((it, idx) => (
                             <span
                               key={idx}
-                              className="rounded border border-sage bg-canvas px-1.5 py-0.5 font-mono text-[11px] text-slate"
+                              className="rounded border border-sand bg-canvas px-1.5 py-0.5 font-mono text-[11px] text-slate"
                             >
                               {it.name} {formatPKR(it.price)}
                             </span>
@@ -217,7 +217,7 @@ export default function AdminRecommendationsPage() {
                           href={`https://www.openstreetmap.org/?mlat=${r.latitude}&mlon=${r.longitude}#map=17/${r.latitude}/${r.longitude}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[12px] text-green-deep underline-offset-2 hover:underline"
+                          className="text-[12px] text-teal-deep underline-offset-2 hover:underline"
                         >
                           view on map
                         </a>

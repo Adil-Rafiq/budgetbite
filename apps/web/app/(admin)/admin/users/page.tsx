@@ -100,7 +100,7 @@ export default function AdminUsersPage() {
         {total > 0 && <span className="font-mono text-[12px] text-slate/60">{total} total</span>}
       </div>
 
-      <div className="mt-4 rounded-xl border border-sage bg-white">
+      <div className="mt-4 rounded-xl border border-sand bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate/60" />
@@ -134,8 +134,8 @@ export default function AdminUsersPage() {
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[11px] ${
                           u.role === 'admin'
-                            ? 'bg-green/15 text-green-deep'
-                            : 'bg-sage/50 text-slate/60'
+                            ? 'bg-teal/15 text-teal-deep'
+                            : 'bg-sand/50 text-slate/60'
                         }`}
                       >
                         {u.role}

@@ -14,8 +14,8 @@ interface OnboardingShellProps {
 }
 
 const ACCENT_CHIP: Record<OnboardingStepAccent, string> = {
-  green: 'border-green/30 bg-green/10 text-green-deep',
-  deep: 'border-green/30 bg-sage/60 text-green-deep',
+  teal: 'border-teal/30 bg-teal/10 text-teal-deep',
+  deep: 'border-teal/30 bg-sand/60 text-teal-deep',
 };
 
 export const OnboardingShell = ({ children }: OnboardingShellProps) => {
@@ -51,7 +51,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
   return (
     <div className="flex min-h-screen flex-col bg-canvas text-charcoal antialiased">
       {/* ── Top header: brand bar + segmented progress ── */}
-      <header className="sticky top-0 z-50 border-b border-sage bg-canvas/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 border-b border-sand bg-canvas/95 backdrop-blur-sm">
         <div className="mx-auto max-w-2xl px-4 sm:px-6">
           <div className="flex h-14 items-center justify-between">
             <Link
@@ -59,11 +59,11 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
               aria-label="BudgetBite home"
               className={`flex items-center gap-2.5 rounded-lg ${FOCUS_RING_ON_CANVAS}`}
             >
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-deep text-white">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-deep text-white">
                 <LogoIcon size={14} />
               </span>
               <span className="font-display text-base font-bold tracking-tight">
-                Budget<span className="text-green-deep">Bite</span>
+                Budget<span className="text-teal-deep">Bite</span>
               </span>
             </Link>
             <span className="text-xs font-semibold text-slate">
@@ -81,9 +81,9 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
             className="flex gap-1.5"
           >
             {ONBOARDING_STEPS.map((step, i) => (
-              <div key={step.id} className="h-1.5 flex-1 overflow-hidden rounded-full bg-sage/50">
+              <div key={step.id} className="h-1.5 flex-1 overflow-hidden rounded-full bg-sand/50">
                 <div
-                  className="h-full rounded-full bg-green-deep transition-all duration-500 ease-out"
+                  className="h-full rounded-full bg-teal-deep transition-all duration-500 ease-out"
                   style={{ width: i <= currentStep ? '100%' : '0%' }}
                 />
               </div>
@@ -125,14 +125,14 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
       </main>
 
       {/* ── Sticky bottom nav ── */}
-      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-sage bg-canvas/95 backdrop-blur-sm">
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-sand bg-canvas/95 backdrop-blur-sm">
         <div className="mx-auto max-w-2xl px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={handleBack}
               disabled={currentStep === 0 || isSubmitting}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-xl border border-sage px-5 py-3.5 text-sm font-semibold text-slate transition-colors hover:border-charcoal hover:text-charcoal disabled:pointer-events-none disabled:invisible ${FOCUS_RING_ON_CANVAS}`}
+              className={`inline-flex min-h-11 items-center gap-2 rounded-xl border border-sand px-5 py-3.5 text-sm font-semibold text-slate transition-colors hover:border-charcoal hover:text-charcoal disabled:pointer-events-none disabled:invisible ${FOCUS_RING_ON_CANVAS}`}
             >
               <ArrowLeft aria-hidden className="h-3.5 w-3.5" />
               Back
@@ -144,7 +144,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
                 onClick={handleContinue}
                 disabled={isSubmitting || !canAdvance}
                 aria-describedby={blockedReason ? 'nav-blocked-reason' : undefined}
-                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-green-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-green-deeper hover:shadow-lg hover:shadow-green-deep/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
+                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-teal-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-teal-deeper hover:shadow-lg hover:shadow-teal-deep/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
               >
                 {isSubmitting ? (
                   'Saving…'
@@ -161,7 +161,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
                 onClick={handleFinish}
                 disabled={isSubmitting || !canAdvance}
                 aria-describedby={blockedReason ? 'nav-blocked-reason' : undefined}
-                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-green-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-green-deeper hover:shadow-lg hover:shadow-green-deep/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
+                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-teal-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-teal-deeper hover:shadow-lg hover:shadow-teal-deep/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
               >
                 {isSubmitting ? (
                   <>

@@ -57,7 +57,7 @@ function Band({
       <div className="flex flex-col gap-0.5">
         <h2
           id={headingId}
-          className="text-[11px] font-semibold uppercase tracking-[0.18em] text-green-deep"
+          className="text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-deep"
         >
           {label}
         </h2>
@@ -126,16 +126,16 @@ export default function ProfilePage() {
           Loading your profile
         </span>
         <div className="flex flex-col gap-2">
-          <div className="h-3 w-32 animate-pulse rounded bg-sage" />
-          <div className="h-9 w-56 animate-pulse rounded bg-sage" />
-          <div className="h-4 w-72 animate-pulse rounded bg-sage" />
+          <div className="h-3 w-32 animate-pulse rounded bg-sand" />
+          <div className="h-9 w-56 animate-pulse rounded bg-sand" />
+          <div className="h-4 w-72 animate-pulse rounded bg-sand" />
         </div>
-        <div className="h-24 w-full animate-pulse rounded-2xl bg-sage" />
+        <div className="h-24 w-full animate-pulse rounded-2xl bg-sand" />
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <div className="h-64 w-full animate-pulse rounded-2xl bg-sage" />
-          <div className="h-64 w-full animate-pulse rounded-2xl bg-sage" />
-          <div className="h-64 w-full animate-pulse rounded-2xl bg-sage" />
-          <div className="h-64 w-full animate-pulse rounded-2xl bg-sage" />
+          <div className="h-64 w-full animate-pulse rounded-2xl bg-sand" />
+          <div className="h-64 w-full animate-pulse rounded-2xl bg-sand" />
+          <div className="h-64 w-full animate-pulse rounded-2xl bg-sand" />
+          <div className="h-64 w-full animate-pulse rounded-2xl bg-sand" />
         </div>
       </div>
     );
@@ -146,7 +146,7 @@ export default function ProfilePage() {
   return (
     <FadeUp className="mx-auto flex w-full max-w-[1180px] flex-col gap-8">
       <header className="flex flex-col gap-2">
-        <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
+        <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
           Account · Profile
         </div>
         <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
@@ -161,7 +161,7 @@ export default function ProfilePage() {
       {/* Identity */}
       <section
         aria-label="Account summary"
-        className="rounded-2xl border border-sage bg-white p-5 shadow-sm"
+        className="rounded-2xl border border-sand bg-white p-5 shadow-sm"
       >
         <div className="flex flex-wrap items-center gap-4">
           {showAvatar ? (
@@ -178,7 +178,7 @@ export default function ProfilePage() {
           ) : (
             <div
               aria-hidden
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-green-deep font-display text-[18px] font-semibold text-white"
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-teal-deep font-display text-[18px] font-semibold text-white"
             >
               {initials(user.name)}
             </div>
@@ -190,13 +190,13 @@ export default function ProfilePage() {
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-slate">
               <span className="truncate">{user.email}</span>
               {user.emailVerified && (
-                <span className="inline-flex items-center gap-1 text-green-deep">
+                <span className="inline-flex items-center gap-1 text-teal-deep">
                   <BadgeCheck aria-hidden className="h-3.5 w-3.5" />
                   <span className="text-[11px] font-medium">Verified</span>
                 </span>
               )}
               {user.role === 'admin' && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-green/30 bg-green/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-green-deep">
+                <span className="inline-flex items-center gap-1 rounded-full border border-teal/30 bg-teal/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-deep">
                   <ShieldCheck aria-hidden className="h-3 w-3" />
                   Admin
                 </span>
@@ -212,7 +212,7 @@ export default function ProfilePage() {
             type="button"
             onClick={() => runGuarded(signOut)}
             disabled={signingOut}
-            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-sage bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
           >
             <LogOut aria-hidden className="h-3.5 w-3.5" />
             {signingOut ? 'Signing out…' : 'Sign out'}
@@ -269,7 +269,7 @@ export default function ProfilePage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-xl border border-sage bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING_ON_CANVAS}`}
+              className={`min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING_ON_CANVAS}`}
             >
               Keep editing
             </AlertDialogCancel>

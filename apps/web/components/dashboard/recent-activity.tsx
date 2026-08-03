@@ -23,13 +23,13 @@ export function RecentActivity() {
         <span className="text-[12px] text-slate">Last 5 entries</span>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-sand bg-white shadow-sm">
         {isLoading ? (
           <div className="flex flex-col">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className={`h-14 animate-pulse ${i === 0 ? '' : 'border-t border-sage'} ${
+                className={`h-14 animate-pulse ${i === 0 ? '' : 'border-t border-sand'} ${
                   i % 2 === 0 ? 'bg-white' : 'bg-canvas'
                 }`}
               />
@@ -70,11 +70,11 @@ export function RecentActivity() {
                 <li
                   key={item.id}
                   className={`flex items-center justify-between gap-4 px-5 py-3.5 ${
-                    i === 0 ? '' : 'border-t border-sage'
+                    i === 0 ? '' : 'border-t border-sand'
                   } ${i % 2 === 0 ? 'bg-white' : 'bg-canvas'}`}
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-green/10 text-[12px] font-semibold text-green-deep">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-teal/10 text-[12px] font-semibold text-teal-deep">
                       {label.slice(0, 1).toUpperCase()}
                     </span>
                     <div className="flex min-w-0 flex-col">

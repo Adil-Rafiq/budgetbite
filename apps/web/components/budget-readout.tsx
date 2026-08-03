@@ -51,7 +51,7 @@ const PACE_LABEL: Record<Pace, string> = {
 const PACE_TEXT: Record<Pace, string> = {
   over: 'text-tomato-ink',
   hot: 'text-amber-ink',
-  'on-track': 'text-green-deep',
+  'on-track': 'text-teal-deep',
 };
 
 /**
@@ -114,9 +114,9 @@ function ProgressBar({
 }) {
   const prefersReducedMotion = useReducedMotion();
   return (
-    <div aria-hidden className={`overflow-hidden rounded-full bg-sage ${className}`}>
+    <div aria-hidden className={`overflow-hidden rounded-full bg-sand ${className}`}>
       <motion.div
-        className={`h-full rounded-full ${isOver || spentPercent >= 90 ? 'bg-tomato' : 'bg-green'}`}
+        className={`h-full rounded-full ${isOver || spentPercent >= 90 ? 'bg-tomato' : 'bg-teal'}`}
         initial={prefersReducedMotion ? false : { width: '0%' }}
         animate={{ width: `${Math.min(100, Math.max(0, spentPercent))}%` }}
         transition={
@@ -131,7 +131,7 @@ function ProgressBar({
 
 // ─── Rail variant (desktop sidebar) ─────────────────────────────────────────
 
-const RAIL_SHELL = 'block rounded-2xl border border-sage bg-canvas p-4 text-left';
+const RAIL_SHELL = 'block rounded-2xl border border-sand bg-canvas p-4 text-left';
 
 function RailFrame({ children }: { children: React.ReactNode }) {
   return <div className={RAIL_SHELL}>{children}</div>;
@@ -141,10 +141,10 @@ function RailSkeleton() {
   return (
     <RailFrame>
       <div className="animate-pulse space-y-2.5">
-        <div className="h-3 w-28 rounded bg-sage" />
-        <div className="h-7 w-32 rounded bg-sage" />
-        <div className="h-3 w-24 rounded bg-sage" />
-        <div className="h-1.5 w-full rounded-full bg-sage" />
+        <div className="h-3 w-28 rounded bg-sand" />
+        <div className="h-7 w-32 rounded bg-sand" />
+        <div className="h-3 w-24 rounded bg-sand" />
+        <div className="h-1.5 w-full rounded-full bg-sand" />
       </div>
       <span className="sr-only">Loading your remaining budget</span>
     </RailFrame>
@@ -183,13 +183,13 @@ function RailEmpty() {
       // is no `/plans/new` route and a rail that invented one would be a dead
       // end at the exact moment the app is asking for a first commitment.
       href="/plans"
-      className={`${RAIL_SHELL} border-dashed transition-colors hover:border-green-deep hover:bg-white ${FOCUS_RING}`}
+      className={`${RAIL_SHELL} border-dashed transition-colors hover:border-teal-deep hover:bg-white ${FOCUS_RING}`}
     >
       <p className="font-display text-sm font-semibold text-charcoal">No budget yet</p>
       <p className="mt-1 text-xs text-slate">
         Set a weekly or monthly amount and BudgetBite plans meals that fit it.
       </p>
-      <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-green-deep">
+      <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-teal-deep">
         Start a plan
         <span aria-hidden>→</span>
       </span>
@@ -202,7 +202,7 @@ function RailReadout({ r }: { r: Readout }) {
   return (
     <Link
       href={`/plans/${r.planId}`}
-      className={`${RAIL_SHELL} transition-colors hover:border-green-deep hover:bg-white ${FOCUS_RING}`}
+      className={`${RAIL_SHELL} transition-colors hover:border-teal-deep hover:bg-white ${FOCUS_RING}`}
     >
       <p className="text-xs font-semibold uppercase tracking-wide text-slate">
         {r.periodLabel}
@@ -232,7 +232,7 @@ function RailReadout({ r }: { r: Readout }) {
       <div className="mt-3 flex items-center gap-2">
         <ProgressBar spentPercent={r.spentPercent} isOver={r.isOver} className="h-1.5 flex-1" />
         <span
-          className={`text-xs font-bold tabular-nums ${r.isOver ? 'text-tomato-ink' : 'text-green-deep'}`}
+          className={`text-xs font-bold tabular-nums ${r.isOver ? 'text-tomato-ink' : 'text-teal-deep'}`}
         >
           {r.spentPercent}%
         </span>
@@ -252,10 +252,10 @@ function RailReadout({ r }: { r: Readout }) {
 
 function PillSkeleton() {
   return (
-    <div className="flex items-center gap-2.5 rounded-full border border-sage bg-white px-3.5 py-1.5 sm:px-4">
+    <div className="flex items-center gap-2.5 rounded-full border border-sand bg-white px-3.5 py-1.5 sm:px-4">
       <span className="sr-only">Loading your remaining budget</span>
-      <span aria-hidden className="h-3 w-8 animate-pulse rounded bg-sage" />
-      <span aria-hidden className="h-3.5 w-16 animate-pulse rounded bg-sage" />
+      <span aria-hidden className="h-3 w-8 animate-pulse rounded bg-sand" />
+      <span aria-hidden className="h-3.5 w-16 animate-pulse rounded bg-sand" />
     </div>
   );
 }
@@ -278,7 +278,7 @@ function PillEmpty() {
   return (
     <Link
       href="/plans"
-      className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-dashed border-sage-edge bg-white px-3.5 text-xs font-semibold text-green-deep transition-colors hover:bg-canvas sm:min-h-9 ${FOCUS_RING_ON_CANVAS}`}
+      className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-dashed border-sand-edge bg-white px-3.5 text-xs font-semibold text-teal-deep transition-colors hover:bg-canvas sm:min-h-9 ${FOCUS_RING_ON_CANVAS}`}
     >
       Start a plan
       <span aria-hidden>→</span>
@@ -294,7 +294,7 @@ function PillReadout({ r }: { r: Readout }) {
       // between its currency mark and its digits — "₨" on one line, "12,000" on
       // the next — which is the worst possible place for a money figure to
       // break, on the device where most spend-logging happens.
-      className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-sage bg-white px-3 shadow-sm transition-colors hover:border-green-deep sm:min-h-9 sm:gap-3 sm:px-4 ${FOCUS_RING_ON_CANVAS}`}
+      className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-sand bg-white px-3 shadow-sm transition-colors hover:border-teal-deep sm:min-h-9 sm:gap-3 sm:px-4 ${FOCUS_RING_ON_CANVAS}`}
     >
       <span className="text-xs font-semibold uppercase tracking-wide text-slate">
         {r.isOver ? 'Over' : 'Left'}

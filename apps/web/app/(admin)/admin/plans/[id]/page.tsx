@@ -13,14 +13,14 @@ const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letter
 
 const genStatusClass: Record<AdminPlanGeneration['status'], string> = {
   pending: 'bg-amber-tint text-amber-ink',
-  succeeded: 'bg-green/15 text-green-deep',
+  succeeded: 'bg-teal/15 text-teal-deep',
   failed: 'bg-tomato/10 text-tomato-ink',
-  superseded: 'bg-sage/50 text-slate/60',
+  superseded: 'bg-sand/50 text-slate/60',
 };
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-sage bg-white px-3 py-2.5">
+    <div className="rounded-lg border border-sand bg-white px-3 py-2.5">
       <div className="text-[10px] uppercase text-slate/60" style={labelStyle}>
         {label}
       </div>
@@ -80,7 +80,7 @@ export default function AdminPlanDetailPage() {
               {plan.mealTypes.map((mt) => (
                 <span
                   key={mt.id}
-                  className="inline-flex items-center rounded-full bg-sage/50 px-2.5 py-0.5 text-[12px] text-slate"
+                  className="inline-flex items-center rounded-full bg-sand/50 px-2.5 py-0.5 text-[12px] text-slate"
                 >
                   {mt.label}
                 </span>
@@ -98,7 +98,7 @@ export default function AdminPlanDetailPage() {
               plan.generations.map((g) => (
                 <div
                   key={g.id}
-                  className="flex items-center justify-between rounded-lg border border-sage bg-white px-3 py-2"
+                  className="flex items-center justify-between rounded-lg border border-sand bg-white px-3 py-2"
                 >
                   <div className="flex items-center gap-3">
                     <span
@@ -111,7 +111,7 @@ export default function AdminPlanDetailPage() {
                       {new Date(g.generatedAt).toLocaleString()}
                     </span>
                     {g.id === plan.activeGenerationId && (
-                      <span className="text-[11px] text-green-deep">active</span>
+                      <span className="text-[11px] text-teal-deep">active</span>
                     )}
                   </div>
                   {g.errorCode && (
@@ -141,7 +141,7 @@ export default function AdminPlanDetailPage() {
                     {items.map((s) => (
                       <div
                         key={s.id}
-                        className="flex items-center justify-between rounded-lg border border-sage bg-white px-3 py-2"
+                        className="flex items-center justify-between rounded-lg border border-sand bg-white px-3 py-2"
                       >
                         <div className="flex min-w-0 flex-col">
                           <span className="truncate text-[14px] text-charcoal">

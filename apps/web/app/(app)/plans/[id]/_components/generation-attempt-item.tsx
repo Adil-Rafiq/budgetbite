@@ -20,7 +20,7 @@ import { FOCUS_RING } from '@/lib/focus-ring';
 import { GenerationSuggestionsGrid } from './generation-suggestions-grid';
 import type { BudgetGeneration, BudgetStateContext } from '@repo/shared';
 
-type Tone = 'amber' | 'green' | 'tomato' | 'slate';
+type Tone = 'amber' | 'teal' | 'tomato' | 'slate';
 
 interface StatusVisual {
   Icon: LucideIcon;
@@ -36,7 +36,7 @@ const STATUS_VISUALS: Record<BudgetGeneration['status'], StatusVisual> = {
   },
   succeeded: {
     Icon: CheckCircle2,
-    tone: 'green',
+    tone: 'teal',
     label: (gen) => `Succeeded ${formatDistanceToNow(gen.generatedAt, { addSuffix: true })}`,
   },
   failed: {
@@ -53,14 +53,14 @@ const STATUS_VISUALS: Record<BudgetGeneration['status'], StatusVisual> = {
 
 const TONE_DOT: Record<Tone, string> = {
   amber: 'bg-amber/20 border-amber',
-  green: 'bg-green/20 border-green',
+  teal: 'bg-teal/20 border-teal',
   tomato: 'bg-tomato/20 border-tomato',
   slate: 'bg-slate/20 border-slate',
 };
 
 const TONE_ICON: Record<Tone, string> = {
   amber: 'text-amber',
-  green: 'text-green-deep',
+  teal: 'text-teal-deep',
   tomato: 'text-tomato-ink',
   slate: 'text-slate',
 };
@@ -108,7 +108,7 @@ export function GenerationAttemptItem({
 
       <div
         className={`flex flex-col gap-2 rounded-xl border bg-white p-4 transition ${
-          open ? 'border-green/40' : 'border-sage'
+          open ? 'border-teal/40' : 'border-sand'
         }`}
       >
         <div className="flex items-start justify-between gap-3">
@@ -124,7 +124,7 @@ export function GenerationAttemptItem({
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-[14px] font-medium text-charcoal">{visual.label(generation)}</p>
                 {isActive && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-green/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-green-deep">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-teal/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-deep">
                     <Sparkles className="h-3 w-3" />
                     Active
                   </span>
@@ -156,7 +156,7 @@ export function GenerationAttemptItem({
                 <button
                   type="button"
                   className={cn(
-                    'inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-sage bg-white px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas',
+                    'inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-sand bg-white px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas',
                     open && 'bg-canvas',
                     FOCUS_RING,
                   )}
@@ -197,7 +197,7 @@ export function GenerationAttemptItem({
 
       {isSucceeded && (
         <CollapsibleContent className="data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
-          <div className="ml-2 mt-3 rounded-xl border border-dashed border-sage bg-canvas p-4">
+          <div className="ml-2 mt-3 rounded-xl border border-dashed border-sand bg-canvas p-4">
             {open && (
               <GenerationSuggestionsGrid planId={planId} generationId={generation.id} ctx={ctx} />
             )}

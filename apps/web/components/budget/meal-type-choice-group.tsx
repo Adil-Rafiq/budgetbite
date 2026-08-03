@@ -61,17 +61,17 @@ export function MealTypeChoiceGroup({
                 isInline
                   ? `inline-flex min-h-11 items-center gap-2 rounded-full border-2 px-3.5 text-[13px] capitalize transition-all ${FOCUS_RING} ${
                       checked
-                        ? 'border-green-deep bg-green/10 font-semibold text-charcoal'
+                        ? 'border-teal-deep bg-teal/10 font-semibold text-charcoal'
                         : blocked
-                          ? 'cursor-not-allowed border-sage bg-white font-medium text-slate/40'
-                          : 'border-sage bg-white font-medium text-slate hover:border-green-deep/50'
+                          ? 'cursor-not-allowed border-sand bg-white font-medium text-slate/40'
+                          : 'border-sand bg-white font-medium text-slate hover:border-teal-deep/50'
                     }`
                   : `flex min-h-11 items-center gap-2.5 rounded-xl border-2 px-3.5 py-3 text-left text-sm capitalize transition-all ${FOCUS_RING} ${
                       checked
-                        ? 'border-green-deep bg-green/10 font-semibold text-charcoal'
+                        ? 'border-teal-deep bg-teal/10 font-semibold text-charcoal'
                         : blocked
-                          ? 'cursor-not-allowed border-sage bg-white font-medium text-slate/40'
-                          : 'border-sage bg-white font-medium text-slate hover:border-green-deep/50'
+                          ? 'cursor-not-allowed border-sand bg-white font-medium text-slate/40'
+                          : 'border-sand bg-white font-medium text-slate hover:border-teal-deep/50'
                     }`
               }
             >
@@ -79,7 +79,7 @@ export function MealTypeChoiceGroup({
                 aria-hidden
                 className={`flex shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
                   isInline ? 'h-4 w-4' : 'h-5 w-5'
-                } ${checked ? 'border-green-deep bg-green-deep text-white' : 'border-sage bg-white'}`}
+                } ${checked ? 'border-teal-deep bg-teal-deep text-white' : 'border-sand bg-white'}`}
               >
                 {checked && <Check className={isInline ? 'h-2.5 w-2.5' : 'h-3 w-3'} />}
               </span>

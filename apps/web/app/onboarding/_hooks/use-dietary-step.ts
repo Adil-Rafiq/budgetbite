@@ -25,7 +25,7 @@ export const useDietaryStep = (profile?: UserProfile | null) => {
   //
   // Never over unsaved work. `profile` is a fresh object on every refetch, so
   // this fired whenever *any* mutation invalidated the user query — saving the
-  // name card silently discarded a half-entered allergen, under a green
+  // name card silently discarded a half-entered allergen, under a teal
   // success toast. Allergens are a safety input; losing one quietly is the
   // worst failure this form has.
   const { isDirty } = form.formState;

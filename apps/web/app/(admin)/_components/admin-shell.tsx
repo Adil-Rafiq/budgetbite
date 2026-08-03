@@ -66,25 +66,25 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-canvas text-charcoal antialiased">
       <a
         href="#admin-content"
-        className={`sr-only z-50 focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-xl focus:bg-green-deep focus:px-4 focus:text-sm focus:font-semibold focus:text-white ${FOCUS_RING}`}
+        className={`sr-only z-50 focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-xl focus:bg-teal-deep focus:px-4 focus:text-sm focus:font-semibold focus:text-white ${FOCUS_RING}`}
       >
         Skip to content
       </a>
       <aside
         aria-label="Admin sidebar"
-        className="fixed inset-y-0 left-0 z-30 hidden border-r border-sage bg-white text-charcoal lg:flex lg:w-64 lg:flex-col"
+        className="fixed inset-y-0 left-0 z-30 hidden border-r border-sand bg-white text-charcoal lg:flex lg:w-64 lg:flex-col"
       >
         {/* Logo */}
         <Link
           href="/admin"
-          className={`flex items-center gap-2.5 border-b border-sage px-6 py-5 ${FOCUS_RING}`}
+          className={`flex items-center gap-2.5 border-b border-sand px-6 py-5 ${FOCUS_RING}`}
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-deep text-white shadow-sm">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-deep text-white shadow-sm">
             <LogoIcon size={16} />
           </span>
           <span className="flex flex-col leading-none">
             <span className="font-display text-lg font-bold tracking-tight text-charcoal">
-              Budget<span className="text-green-deep">Bite</span>
+              Budget<span className="text-teal-deep">Bite</span>
             </span>
             <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-slate">
               admin
@@ -107,13 +107,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 aria-current={active ? 'page' : undefined}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${FOCUS_RING} ${
                   active
-                    ? 'bg-green-tint font-semibold text-green-deep'
+                    ? 'bg-teal-tint font-semibold text-teal-deep'
                     : 'text-slate hover:bg-canvas hover:text-charcoal'
                 }`}
               >
                 <span
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                    active ? 'bg-green-deep text-white' : 'border border-sage bg-canvas text-slate'
+                    active ? 'bg-teal-deep text-white' : 'border border-sand bg-canvas text-slate'
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -134,13 +134,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="mt-auto flex flex-col gap-3 px-4 pb-4 pt-2">
           <Link
             href="/dashboard"
-            className={`flex min-h-11 items-center gap-2 rounded-xl border border-sage bg-white px-3 py-2 text-[13px] text-slate transition-colors hover:bg-canvas hover:text-charcoal ${FOCUS_RING}`}
+            className={`flex min-h-11 items-center gap-2 rounded-xl border border-sand bg-white px-3 py-2 text-[13px] text-slate transition-colors hover:bg-canvas hover:text-charcoal ${FOCUS_RING}`}
           >
             <ArrowLeft aria-hidden className="h-4 w-4" />
             Back to app
           </Link>
-          <div className="flex items-center gap-3 rounded-2xl border border-sage bg-canvas px-3 py-2.5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-deep text-sm font-semibold text-white">
+          <div className="flex items-center gap-3 rounded-2xl border border-sand bg-canvas px-3 py-2.5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-deep text-sm font-semibold text-white">
               {initials(user?.name)}
             </span>
             <div className="flex min-w-0 flex-col">
@@ -155,7 +155,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-h-screen flex-col lg:pl-64">
         <header
-          className="sticky top-0 z-40 border-b border-sage bg-canvas/85"
+          className="sticky top-0 z-40 border-b border-sand bg-canvas/85"
           style={{ backdropFilter: 'saturate(180%) blur(10px)' }}
         >
           <div className="flex items-center justify-between px-4 py-3 lg:px-8 lg:py-4">
@@ -174,7 +174,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 type="button"
                 onClick={handleSignOut}
                 disabled={signingOut}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sage bg-white px-3 text-[12px] text-slate transition-all hover:text-charcoal active:scale-95 disabled:opacity-60 ${FOCUS_RING_ON_CANVAS}`}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sand bg-white px-3 text-[12px] text-slate transition-all hover:text-charcoal active:scale-95 disabled:opacity-60 ${FOCUS_RING_ON_CANVAS}`}
               >
                 <LogOut aria-hidden className="h-3.5 w-3.5" />
                 {signingOut ? 'Signing out…' : 'Sign out'}

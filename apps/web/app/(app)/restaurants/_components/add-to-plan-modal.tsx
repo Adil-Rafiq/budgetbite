@@ -52,7 +52,7 @@ interface Props {
 }
 
 const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate';
-const inputClass = 'bg-canvas border-sage-edge text-charcoal';
+const inputClass = 'bg-canvas border-sand-edge text-charcoal';
 
 /**
  * Same guardrail the dashboard's log modal ships: an amount more than double
@@ -211,7 +211,7 @@ export function AddToPlanModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto">
         <DialogHeader>
-          <div className="text-[10px] font-semibold uppercase tracking-widest text-green-deep">
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-teal-deep">
             {isPastOrToday ? 'Log a meal' : 'Pin to plan'}
           </div>
           {/* Keyed on what the button will actually do, not on whether a dish
@@ -229,7 +229,7 @@ export function AddToPlanModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="rounded-xl border border-sage bg-canvas p-3">
+        <div className="rounded-xl border border-sand bg-canvas p-3">
           <p className="font-medium text-charcoal">
             {menuItem ? menuItem.name : humanizeName(restaurantName)}
           </p>
@@ -374,7 +374,7 @@ export function AddToPlanModal({
             type="button"
             onClick={() => onOpenChange(false)}
             disabled={isSaving}
-            className={`inline-flex min-h-11 items-center justify-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 items-center justify-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
           >
             Cancel
           </button>
@@ -385,7 +385,7 @@ export function AddToPlanModal({
             className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-5 text-[13px] font-semibold text-white transition-colors disabled:pointer-events-none disabled:opacity-50 ${
               guard.showArmed
                 ? 'bg-tomato-ink hover:bg-tomato-ink/90'
-                : 'bg-green-deep hover:bg-green-deeper'
+                : 'bg-teal-deep hover:bg-teal-deeper'
             } ${FOCUS_RING}`}
           >
             {isSaving

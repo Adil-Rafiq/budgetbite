@@ -36,7 +36,7 @@ function PreferenceRow({
   };
 
   return (
-    <li className="flex items-center gap-3 rounded-xl border border-sage bg-canvas py-1.5 pl-3 pr-1.5">
+    <li className="flex items-center gap-3 rounded-xl border border-sand bg-canvas py-1.5 pl-3 pr-1.5">
       <span
         aria-hidden
         className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white text-slate"
@@ -46,7 +46,7 @@ function PreferenceRow({
       <div className="flex min-w-0 flex-1 flex-col">
         <Link
           href={href}
-          className={`truncate rounded text-[13px] font-medium text-charcoal underline-offset-2 hover:text-green-deep hover:underline ${FOCUS_RING}`}
+          className={`truncate rounded text-[13px] font-medium text-charcoal underline-offset-2 hover:text-teal-deep hover:underline ${FOCUS_RING}`}
         >
           {pref.name}
         </Link>
@@ -83,7 +83,7 @@ function Group({
   items: FoodPreferenceResponse[];
   tone: 'positive' | 'danger';
 }) {
-  const toneClass = tone === 'positive' ? 'text-green-deep' : 'text-tomato-ink';
+  const toneClass = tone === 'positive' ? 'text-teal-deep' : 'text-tomato-ink';
   const listRef = useRef<HTMLUListElement>(null);
   const headingRef = useRef<HTMLSpanElement>(null);
 
@@ -139,20 +139,20 @@ export function FoodPreferencesCard() {
     >
       {isLoading ? (
         <div className="flex flex-col gap-2">
-          <div className="h-10 w-full animate-pulse rounded-xl bg-sage" />
-          <div className="h-10 w-full animate-pulse rounded-xl bg-sage" />
+          <div className="h-10 w-full animate-pulse rounded-xl bg-sand" />
+          <div className="h-10 w-full animate-pulse rounded-xl bg-sand" />
         </div>
       ) : error ? (
         <p className="text-[13px] text-tomato-ink">Could not load your preferences.</p>
       ) : favorites.length === 0 && blocked.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-sage bg-canvas p-4 text-[13px] text-slate">
+        <div className="rounded-xl border border-dashed border-sand bg-canvas p-4 text-[13px] text-slate">
           Use the{' '}
-          <Heart aria-hidden className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-green-deep" />{' '}
+          <Heart aria-hidden className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-teal-deep" />{' '}
           and <Ban aria-hidden className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-tomato-ink" />{' '}
           buttons on a{' '}
           <Link
             href="/restaurants"
-            className={`rounded text-green-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
+            className={`rounded text-teal-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
           >
             restaurant or dish
           </Link>{' '}

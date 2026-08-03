@@ -20,7 +20,7 @@ export function StatTile({
   tone?: 'default' | 'alarm';
 }) {
   return (
-    <div className="rounded-lg border border-sage bg-canvas px-2 py-1.5">
+    <div className="rounded-lg border border-sand bg-canvas px-2 py-1.5">
       <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate/60">{label}</p>
       <div
         className={`font-display text-sm font-semibold tabular-nums ${

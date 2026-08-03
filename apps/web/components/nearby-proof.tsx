@@ -65,7 +65,7 @@ export function NearbyProof({ latitude, longitude }: { latitude: number; longitu
       <div
         aria-busy="true"
         aria-label="Checking restaurants near you"
-        className="h-[68px] animate-pulse rounded-xl border border-sage bg-canvas"
+        className="h-[68px] animate-pulse rounded-xl border border-sand bg-canvas"
       />
     );
   }
@@ -74,7 +74,7 @@ export function NearbyProof({ latitude, longitude }: { latitude: number; longitu
   // as "no proof needed"; a zero read as "nothing delivers to this address".
   if (isError || total === null) {
     return (
-      <div className="rounded-xl border border-dashed border-sage bg-canvas px-4 py-3">
+      <div className="rounded-xl border border-dashed border-sand bg-canvas px-4 py-3">
         <p className="text-[13px] font-semibold text-charcoal">
           We couldn&apos;t check what delivers here
         </p>
@@ -88,7 +88,7 @@ export function NearbyProof({ latitude, longitude }: { latitude: number; longitu
 
   if (total === 0) {
     return (
-      <div className="rounded-xl border border-sage bg-canvas px-4 py-3">
+      <div className="rounded-xl border border-sand bg-canvas px-4 py-3">
         <p className="text-[13px] font-semibold text-charcoal">
           No restaurants here yet, within {NEARBY_PROOF_RADIUS_KM} km
         </p>
@@ -101,10 +101,10 @@ export function NearbyProof({ latitude, longitude }: { latitude: number; longitu
   }
 
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-green/40 bg-green/5 px-4 py-3">
+    <div className="flex items-start gap-3 rounded-xl border border-teal/40 bg-teal/5 px-4 py-3">
       <span
         aria-hidden
-        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-green-deep text-white"
+        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-teal-deep text-white"
       >
         <Store className="h-3.5 w-3.5" />
       </span>

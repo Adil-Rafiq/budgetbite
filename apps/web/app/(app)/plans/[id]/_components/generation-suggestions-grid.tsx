@@ -32,10 +32,10 @@ function GridSkeleton() {
     <div className="flex flex-col gap-5">
       {Array.from({ length: 2 }).map((_, dayIdx) => (
         <div key={dayIdx} className="flex flex-col gap-3">
-          <div className="h-5 w-32 animate-pulse rounded bg-sage" />
+          <div className="h-5 w-32 animate-pulse rounded bg-sand" />
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, slotIdx) => (
-              <div key={slotIdx} className="h-40 w-full animate-pulse rounded-xl bg-sage" />
+              <div key={slotIdx} className="h-40 w-full animate-pulse rounded-xl bg-sand" />
             ))}
           </div>
         </div>
@@ -47,11 +47,11 @@ function GridSkeleton() {
 function SlotCard({ slot, ctx }: { slot: SuggestionSlot; ctx: BudgetStateContext }) {
   const { Icon } = getMealTypeVisual(slot.mealTypeKey);
   return (
-    <div className="flex h-full flex-col rounded-xl border border-sage bg-white p-4">
+    <div className="flex h-full flex-col rounded-xl border border-sand bg-white p-4">
       <div className="mb-2 flex items-center gap-2">
         <div
           aria-hidden
-          className="flex h-7 w-7 items-center justify-center rounded-md bg-green/10 text-green-deep"
+          className="flex h-7 w-7 items-center justify-center rounded-md bg-teal/10 text-teal-deep"
         >
           <Icon className="h-3.5 w-3.5" />
         </div>
@@ -73,7 +73,7 @@ function SlotCard({ slot, ctx }: { slot: SuggestionSlot; ctx: BudgetStateContext
             return (
               <div
                 key={option.id}
-                className="flex items-start justify-between gap-3 rounded-lg border border-sage bg-canvas p-2.5 transition hover:-translate-y-px"
+                className="flex items-start justify-between gap-3 rounded-lg border border-sand bg-canvas p-2.5 transition hover:-translate-y-px"
               >
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[13px] font-medium text-charcoal">
@@ -88,7 +88,7 @@ function SlotCard({ slot, ctx }: { slot: SuggestionSlot; ctx: BudgetStateContext
                         ? 'text-tomato-ink'
                         : fit === 'amber'
                           ? 'text-amber-ink'
-                          : 'text-green-deep'
+                          : 'text-teal-deep'
                     }`}
                   >
                     {formatPKR(option.estimatedPrice)}
@@ -131,7 +131,7 @@ export function GenerationSuggestionsGrid({
 
   if (!data || data.days.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-sage bg-white p-4 text-center text-[13px] text-slate">
+      <div className="rounded-xl border border-dashed border-sand bg-white p-4 text-center text-[13px] text-slate">
         This generation didn&apos;t produce any suggestions.
       </div>
     );

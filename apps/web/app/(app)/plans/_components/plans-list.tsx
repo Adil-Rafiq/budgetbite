@@ -26,7 +26,7 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 type PlanStatus = BudgetPlanResponse['status'];
 
 const STATUS_CLASS: Record<PlanStatus, { pill: string; dot: string }> = {
-  active: { pill: 'bg-green/10 text-green-deep', dot: 'bg-green' },
+  active: { pill: 'bg-teal/10 text-teal-deep', dot: 'bg-teal' },
   completed: { pill: 'bg-slate/10 text-slate', dot: 'bg-slate' },
   cancelled: { pill: 'bg-tomato/10 text-tomato-ink', dot: 'bg-tomato' },
 };
@@ -46,17 +46,17 @@ function PlansListSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="rounded-2xl border border-sage bg-white p-5">
+        <div key={i} className="rounded-2xl border border-sand bg-white p-5">
           <div className="flex items-center justify-between">
-            <div className="h-3 w-20 animate-pulse rounded bg-sage" />
-            <div className="h-5 w-16 animate-pulse rounded-full bg-sage" />
+            <div className="h-3 w-20 animate-pulse rounded bg-sand" />
+            <div className="h-5 w-16 animate-pulse rounded-full bg-sand" />
           </div>
-          <div className="mt-4 h-7 w-32 animate-pulse rounded bg-sage" />
-          <div className="mt-3 h-2 w-full animate-pulse rounded-full bg-sage" />
+          <div className="mt-4 h-7 w-32 animate-pulse rounded bg-sand" />
+          <div className="mt-3 h-2 w-full animate-pulse rounded-full bg-sand" />
           <div className="mt-4 grid grid-cols-3 gap-2">
-            <div className="h-10 animate-pulse rounded-lg bg-sage" />
-            <div className="h-10 animate-pulse rounded-lg bg-sage" />
-            <div className="h-10 animate-pulse rounded-lg bg-sage" />
+            <div className="h-10 animate-pulse rounded-lg bg-sand" />
+            <div className="h-10 animate-pulse rounded-lg bg-sand" />
+            <div className="h-10 animate-pulse rounded-lg bg-sand" />
           </div>
         </div>
       ))}
@@ -75,14 +75,14 @@ function PlansListEmpty({ filtered, onClear }: { filtered: boolean; onClear: () 
 
   if (filtered) {
     return (
-      <div className="rounded-2xl border border-dashed border-sage bg-white p-8 text-center">
+      <div className="rounded-2xl border border-dashed border-sand bg-white p-8 text-center">
         <p className="font-display text-lg font-semibold tracking-tight text-charcoal">
           No plans with this status.
         </p>
         <button
           type="button"
           onClick={onClear}
-          className={`mt-3 min-h-11 rounded-xl border border-sage bg-white px-4 text-[13px] font-semibold text-green-deep transition-colors hover:border-green-deep ${FOCUS_RING_ON_CANVAS}`}
+          className={`mt-3 min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-semibold text-teal-deep transition-colors hover:border-teal-deep ${FOCUS_RING_ON_CANVAS}`}
         >
           Show all plans
         </button>
@@ -91,7 +91,7 @@ function PlansListEmpty({ filtered, onClear }: { filtered: boolean; onClear: () 
   }
 
   return (
-    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sage bg-white p-8 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-white p-8 text-center">
       <p className="font-display text-xl font-semibold tracking-tight text-charcoal">
         Set your first budget.
       </p>
@@ -102,7 +102,7 @@ function PlansListEmpty({ filtered, onClear }: { filtered: boolean; onClear: () 
       <button
         type="button"
         onClick={requestNewPlan}
-        className={`mt-1 inline-flex min-h-11 items-center gap-2 rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-green-deeper ${FOCUS_RING_ON_CANVAS}`}
+        className={`mt-1 inline-flex min-h-11 items-center gap-2 rounded-xl bg-teal-deep px-5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-teal-deeper ${FOCUS_RING_ON_CANVAS}`}
       >
         New plan
         <Plus aria-hidden className="h-4 w-4" />
@@ -167,8 +167,8 @@ export default function PlansList() {
             }}
             className={`min-h-11 rounded-full border px-3.5 text-[12px] font-medium transition-colors ${FOCUS_RING_ON_CANVAS} ${
               active
-                ? 'border-green-deep bg-green/10 font-semibold text-green-deep'
-                : 'border-sage bg-white text-slate hover:border-green-deep/50'
+                ? 'border-teal-deep bg-teal/10 font-semibold text-teal-deep'
+                : 'border-sand bg-white text-slate hover:border-teal-deep/50'
             }`}
           >
             {filter.label}
@@ -239,7 +239,7 @@ export default function PlansList() {
                       : { y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }
                   }
                   transition={{ duration: 0.22, ease: 'easeOut' }}
-                  className="rounded-2xl border border-sage bg-white p-5 shadow-sm"
+                  className="rounded-2xl border border-sand bg-white p-5 shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -304,7 +304,7 @@ export default function PlansList() {
                       {plan.mealTypes.map((mt) => (
                         <span
                           key={mt.id}
-                          className="rounded-full border border-sage bg-canvas px-2.5 py-0.5 text-[10px] capitalize text-slate"
+                          className="rounded-full border border-sand bg-canvas px-2.5 py-0.5 text-[10px] capitalize text-slate"
                         >
                           {mt.label}
                         </span>
@@ -328,7 +328,7 @@ export default function PlansList() {
               type="button"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={!hasPrev || isFetching}
-              className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING_ON_CANVAS}`}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING_ON_CANVAS}`}
             >
               ← Prev
             </button>
@@ -336,7 +336,7 @@ export default function PlansList() {
               type="button"
               onClick={() => setPage((p) => p + 1)}
               disabled={!hasNext || isFetching}
-              className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING_ON_CANVAS}`}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING_ON_CANVAS}`}
             >
               Next →
             </button>

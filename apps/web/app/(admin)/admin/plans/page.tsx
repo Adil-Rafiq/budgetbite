@@ -29,9 +29,9 @@ const money = (n: number): string => formatPKR(n);
 
 const genStatusClass: Record<AdminPlanGeneration['status'], string> = {
   pending: 'bg-amber-tint text-amber-ink',
-  succeeded: 'bg-green/15 text-green-deep',
+  succeeded: 'bg-teal/15 text-teal-deep',
   failed: 'bg-tomato/10 text-tomato-ink',
-  superseded: 'bg-sage/50 text-slate/60',
+  superseded: 'bg-sand/50 text-slate/60',
 };
 
 export default function AdminPlansPage() {
@@ -77,7 +77,7 @@ export default function AdminPlansPage() {
         {total > 0 && <span className="font-mono text-[12px] text-slate/60">{total} total</span>}
       </div>
 
-      <div className="mt-4 rounded-xl border border-sage bg-white">
+      <div className="mt-4 rounded-xl border border-sand bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate/60" />
@@ -106,7 +106,7 @@ export default function AdminPlansPage() {
                   <TableCell>
                     <Link
                       href={`/admin/plans/${p.id}`}
-                      className="font-medium text-charcoal hover:text-green-deep"
+                      className="font-medium text-charcoal hover:text-teal-deep"
                     >
                       {p.user.name}
                     </Link>

@@ -23,7 +23,7 @@ import { FOCUS_RING } from '@/lib/focus-ring';
  * Whether a suggested price fits what is left, using the same classifier the
  * dashboard meal decision and the restaurant menus use.
  *
- * This surface printed every price in the same brand green — ₨350 against a
+ * This surface printed every price in the same brand teal — ₨350 against a
  * ₨400 per-meal target looked exactly like ₨1,800 against it. The one screen
  * where a whole period of AI suggestions is reviewed was the only place in the
  * app that would not say whether a suggestion fit the budget.
@@ -39,7 +39,7 @@ function OptionPrice({ option, ctx }: { option: SuggestionOption; ctx: BudgetSta
     <div className="flex shrink-0 flex-col items-end gap-1">
       <span
         className={`whitespace-nowrap text-right font-display text-[13px] font-semibold tabular-nums ${
-          fit === 'red' ? 'text-tomato-ink' : fit === 'amber' ? 'text-amber-ink' : 'text-green-deep'
+          fit === 'red' ? 'text-tomato-ink' : fit === 'amber' ? 'text-amber-ink' : 'text-teal-deep'
         }`}
       >
         {formatPKR(option.estimatedPrice)}
@@ -64,8 +64,8 @@ function StatusBadge({ status }: { status: PlanTimelineSlot['status'] }) {
     PlanTimelineSlot['status'],
     { className: string; label: string; Icon: typeof Check } | null
   > = {
-    logged: { className: 'bg-green/10 text-green-deep', label: 'Logged', Icon: Check },
-    pinned: { className: 'bg-green/10 text-green-deep', label: 'Pinned', Icon: Pin },
+    logged: { className: 'bg-teal/10 text-teal-deep', label: 'Logged', Icon: Check },
+    pinned: { className: 'bg-teal/10 text-teal-deep', label: 'Pinned', Icon: Pin },
     suggested: { className: 'bg-slate/10 text-slate', label: 'Suggested', Icon: Sparkles },
     empty: null,
   };
@@ -90,7 +90,7 @@ function LoggedBody({ slot }: { slot: PlanTimelineSlot }) {
       : (c.menuItemName ?? c.manualDescription ?? '—');
 
   return (
-    <div className="flex items-start justify-between gap-3 rounded-lg border border-green/30 bg-green/[0.05] p-3">
+    <div className="flex items-start justify-between gap-3 rounded-lg border border-teal/30 bg-teal/[0.05] p-3">
       <div className="min-w-0">
         <p className="truncate text-[13px] font-medium text-charcoal">{title}</p>
         {c.isHomeCooked ? (
@@ -110,7 +110,7 @@ function LoggedBody({ slot }: { slot: PlanTimelineSlot }) {
 
 function PinnedBody({ option, ctx }: { option: SuggestionOption; ctx: BudgetStateContext }) {
   return (
-    <div className="flex items-start justify-between gap-3 rounded-lg border border-green/30 bg-green/[0.05] p-3">
+    <div className="flex items-start justify-between gap-3 rounded-lg border border-teal/30 bg-teal/[0.05] p-3">
       <div className="min-w-0">
         <p className="truncate text-[13px] font-medium text-charcoal">{optionLabel(option)}</p>
         {option.restaurantName && (
@@ -129,7 +129,7 @@ function SuggestedBody({ options, ctx }: { options: SuggestionOption[]; ctx: Bud
         <div
           key={option.id}
           className={`flex items-start justify-between gap-3 py-2.5 ${
-            i === 0 ? '' : 'border-t border-sage'
+            i === 0 ? '' : 'border-t border-sand'
           }`}
         >
           <div className="flex min-w-0 items-start gap-2.5">
@@ -163,7 +163,7 @@ function EmptyBody({ relative }: { relative: PlanTimelineDay['relative'] }) {
         ? 'Nothing planned yet'
         : 'No suggestion yet';
   return (
-    <div className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-sage p-3 text-[12px] text-slate/60">
+    <div className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-sand p-3 text-[12px] text-slate/60">
       <Utensils className="h-3.5 w-3.5" />
       <span>{message}</span>
     </div>
@@ -187,7 +187,7 @@ function MealSection({
         <div className="flex min-w-0 items-center gap-2">
           <div
             aria-hidden
-            className="flex h-7 w-7 items-center justify-center rounded-md bg-green/10 text-green-deep"
+            className="flex h-7 w-7 items-center justify-center rounded-md bg-teal/10 text-teal-deep"
           >
             <Icon className="h-3.5 w-3.5" />
           </div>
@@ -223,14 +223,14 @@ function DayCard({ day, ctx }: { day: PlanTimelineDay; ctx: BudgetStateContext }
   }, [day.slots]);
 
   const containerClass = isToday
-    ? 'overflow-hidden rounded-2xl border-[1.5px] border-green bg-white shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-green)_10%,transparent)]'
+    ? 'overflow-hidden rounded-2xl border-[1.5px] border-teal bg-white shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-teal)_10%,transparent)]'
     : isPast
-      ? 'overflow-hidden rounded-2xl border border-sage bg-canvas'
-      : 'overflow-hidden rounded-2xl border border-sage bg-white';
+      ? 'overflow-hidden rounded-2xl border border-sand bg-canvas'
+      : 'overflow-hidden rounded-2xl border border-sand bg-white';
 
   const headerClass = isToday
-    ? 'flex items-center justify-between gap-3 border-b border-sage bg-green/[0.06] px-5 py-3.5'
-    : 'flex items-center justify-between gap-3 border-b border-sage bg-canvas px-5 py-3.5';
+    ? 'flex items-center justify-between gap-3 border-b border-sand bg-teal/[0.06] px-5 py-3.5'
+    : 'flex items-center justify-between gap-3 border-b border-sand bg-canvas px-5 py-3.5';
 
   return (
     <div className={containerClass}>
@@ -242,7 +242,7 @@ function DayCard({ day, ctx }: { day: PlanTimelineDay; ctx: BudgetStateContext }
             {formatDay(day.slotDate)}
           </h3>
           {isToday && (
-            <span className="rounded-full bg-green/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-green-deep">
+            <span className="rounded-full bg-teal/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-teal-deep">
               today
             </span>
           )}
@@ -251,13 +251,13 @@ function DayCard({ day, ctx }: { day: PlanTimelineDay; ctx: BudgetStateContext }
         {(counts.logged > 0 || counts.pinned > 0) && (
           <div className="flex shrink-0 items-center gap-3 text-[11px] text-slate">
             {counts.logged > 0 && (
-              <span className="flex items-center gap-1 text-green-deep">
+              <span className="flex items-center gap-1 text-teal-deep">
                 <Check className="h-3 w-3" />
                 {counts.logged} logged
               </span>
             )}
             {counts.pinned > 0 && (
-              <span className="flex items-center gap-1 text-green-deep">
+              <span className="flex items-center gap-1 text-teal-deep">
                 <Pin className="h-3 w-3" />
                 {counts.pinned} pinned
               </span>
@@ -269,7 +269,7 @@ function DayCard({ day, ctx }: { day: PlanTimelineDay; ctx: BudgetStateContext }
       <div className="flex flex-col gap-5 p-5">
         {day.slots.map((slot, i) => (
           <div key={`${day.slotDate}-${slot.mealTypeId}`} className="flex flex-col gap-2.5">
-            {i > 0 && <div className="-mx-1 h-px bg-sage" />}
+            {i > 0 && <div className="-mx-1 h-px bg-sand" />}
             <MealSection slot={slot} day={day} ctx={ctx} />
           </div>
         ))}
@@ -287,7 +287,7 @@ function SectionBanner({ label, count }: { label: string; count: number }) {
       <span className="text-[11px] text-slate/60">
         {count} day{count === 1 ? '' : 's'}
       </span>
-      <div className="h-px flex-1 bg-sage" />
+      <div className="h-px flex-1 bg-sand" />
     </div>
   );
 }
@@ -325,7 +325,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
   const header = (
     <div className="flex items-end justify-between">
       <div className="flex flex-col gap-1">
-        <span className="text-xs font-semibold uppercase tracking-widest text-green-deep">
+        <span className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
           Timeline
         </span>
         <h2 className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -346,7 +346,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
         {header}
         <div className="flex flex-col gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-48 w-full animate-pulse rounded-2xl bg-sage" />
+            <div key={i} className="h-48 w-full animate-pulse rounded-2xl bg-sand" />
           ))}
         </div>
       </div>
@@ -366,7 +366,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
     return (
       <div className="flex flex-col gap-4">
         {header}
-        <div className="rounded-2xl border border-dashed border-sage bg-white p-6 text-center text-[13px] text-slate">
+        <div className="rounded-2xl border border-dashed border-sand bg-white p-6 text-center text-[13px] text-slate">
           No days in this plan yet.
         </div>
       </div>
@@ -405,7 +405,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
               aria-hidden
               className={`h-3.5 w-3.5 text-slate/60 transition-transform ${showPast ? 'rotate-180' : ''}`}
             />
-            <span className="h-px flex-1 bg-sage" />
+            <span className="h-px flex-1 bg-sand" />
           </button>
 
           {showPast && (

@@ -40,10 +40,10 @@ export function BudgetProgress({
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label={label}
-      className={`h-1.5 w-full overflow-hidden rounded-full bg-sage/50 ${className}`}
+      className={`h-1.5 w-full overflow-hidden rounded-full bg-sand/50 ${className}`}
     >
       <motion.div
-        className={`h-full rounded-full ${alarm ? 'bg-tomato' : 'bg-green'}`}
+        className={`h-full rounded-full ${alarm ? 'bg-tomato' : 'bg-teal'}`}
         style={
           isOver
             ? {

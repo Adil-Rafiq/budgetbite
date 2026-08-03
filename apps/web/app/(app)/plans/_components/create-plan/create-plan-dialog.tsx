@@ -100,7 +100,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
           }}
         >
           <DialogHeader>
-            <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
+            <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
               Step {stepNumber} · New plan
             </div>
             <DialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -112,7 +112,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
           </DialogHeader>
 
           <div
-            className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-sage/50"
+            className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-sand/50"
             role="progressbar"
             aria-valuenow={currentStep + 1}
             aria-valuemin={1}
@@ -120,7 +120,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
             aria-label={`Step ${currentStep + 1} of 3`}
           >
             <div
-              className="h-full rounded-full bg-green transition-all"
+              className="h-full rounded-full bg-teal transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -140,7 +140,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
                 type="button"
                 onClick={actions.handleBack}
                 disabled={isSubmitting}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-sage bg-white px-4 text-sm font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-sand bg-white px-4 text-sm font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
               >
                 ← Back
               </button>
@@ -149,7 +149,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
               type="button"
               onClick={advance}
               disabled={isSubmitting || !canAdvance}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-xl bg-green-deep px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 items-center gap-2 rounded-xl bg-teal-deep px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
             >
               {isLastStep ? (isSubmitting ? 'Creating…' : 'Create plan') : 'Next'}
               <span aria-hidden className="opacity-70">
@@ -180,7 +180,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-xl border border-sage bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
             >
               Keep editing
             </AlertDialogCancel>

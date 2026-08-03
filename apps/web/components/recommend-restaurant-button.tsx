@@ -41,7 +41,7 @@ import { Textarea } from '@/components/ui/textarea';
 const LocationMap = dynamic(() => import('@/components/location-map').then((m) => m.LocationMap), {
   ssr: false,
   loading: () => (
-    <div className="h-[220px] w-full animate-pulse rounded-[14px] border border-sage bg-canvas" />
+    <div className="h-[220px] w-full animate-pulse rounded-[14px] border border-sand bg-canvas" />
   ),
 });
 
@@ -229,7 +229,7 @@ export function RecommendRestaurantButton({
               awaiting review. Once an admin reviews one — or you{' '}
               <Link
                 href="/restaurants/recommendations"
-                className={`rounded text-green-deep underline underline-offset-2 ${FOCUS_RING}`}
+                className={`rounded text-teal-deep underline underline-offset-2 ${FOCUS_RING}`}
                 onClick={() => setOpen(false)}
               >
                 withdraw one
@@ -297,7 +297,7 @@ export function RecommendRestaurantButton({
                 </p>
                 <button
                   type="button"
-                  className={`inline-flex min-h-10 items-center gap-2 self-start rounded-xl bg-green-deep px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+                  className={`inline-flex min-h-10 items-center gap-2 self-start rounded-xl bg-teal-deep px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
                   onClick={detectLocation}
                   disabled={isDetecting}
                 >
@@ -460,13 +460,13 @@ export function RecommendRestaurantButton({
           )}
 
           {mine.length > 0 && (
-            <div className="mt-1 flex items-center justify-between gap-2 border-t border-sage pt-3">
+            <div className="mt-1 flex items-center justify-between gap-2 border-t border-sand pt-3">
               <span className="text-[11px] text-slate">
                 {pendingCount} / {MAX_PENDING_RESTAURANT_RECOMMENDATIONS} pending review
               </span>
               <Link
                 href="/restaurants/recommendations"
-                className={`rounded text-[12px] text-green-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
+                className={`rounded text-[12px] text-teal-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
                 onClick={() => setOpen(false)}
               >
                 view your recommendations →

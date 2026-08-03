@@ -19,12 +19,12 @@ import { classifyBudgetFit, estimateMealCost } from '@repo/shared';
 import type { SuggestionSlot, SuggestionOption, BudgetFit } from '@repo/shared';
 import { FOCUS_RING } from '@/lib/focus-ring';
 
-const ghostBtn = `inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-sage bg-white px-4 py-2 text-sm font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`;
+const ghostBtn = `inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-sand bg-white px-4 py-2 text-sm font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`;
 
 function SkeletonCard() {
   return (
-    <div className="rounded-2xl border border-sage bg-white p-5">
-      <div className="h-3 w-20 animate-pulse rounded bg-sage" />
+    <div className="rounded-2xl border border-sand bg-white p-5">
+      <div className="h-3 w-20 animate-pulse rounded bg-sand" />
       <div className="mt-4 h-14 w-full animate-pulse rounded-lg bg-canvas" />
       <div className="mt-3 h-14 w-full animate-pulse rounded-lg bg-canvas" />
       <div className="mt-3 h-9 w-full animate-pulse rounded-xl bg-canvas" />
@@ -100,7 +100,7 @@ export function MealSlots() {
 
   if (!slotsData?.slots.length)
     return (
-      <div className="rounded-2xl border border-dashed border-sage bg-white p-5 text-[13px] text-slate">
+      <div className="rounded-2xl border border-dashed border-sand bg-white p-5 text-[13px] text-slate">
         No meals suggested for today yet. Once your plan generates today&apos;s options,
         they&apos;ll show up here.
       </div>
@@ -135,14 +135,14 @@ export function MealSlots() {
               <article
                 key={slot.mealTypeId}
                 className={`flex flex-col overflow-hidden rounded-2xl border shadow-sm ${
-                  isLogged ? 'border-green/50 bg-green-tint/50' : 'border-sage bg-white'
+                  isLogged ? 'border-teal/50 bg-teal-tint/50' : 'border-sand bg-white'
                 }`}
               >
-                <div className="flex items-center justify-between border-b border-sage/70 px-5 py-3">
+                <div className="flex items-center justify-between border-b border-sand/70 px-5 py-3">
                   <div className="flex items-center gap-3">
                     <span
                       className={`inline-flex h-8 w-8 items-center justify-center rounded-xl text-sm font-semibold ${
-                        isLogged ? 'bg-green-deep text-white' : 'bg-green/10 text-green-deep'
+                        isLogged ? 'bg-teal-deep text-white' : 'bg-teal/10 text-teal-deep'
                       }`}
                     >
                       {isLogged ? (
@@ -156,9 +156,9 @@ export function MealSlots() {
                     </span>
                   </div>
                   {isLogged ? (
-                    <StatusPill tone="green" label="Logged" icon={<Check className="h-3 w-3" />} />
+                    <StatusPill tone="teal" label="Logged" icon={<Check className="h-3 w-3" />} />
                   ) : isPinned ? (
-                    <StatusPill tone="sage" label="Pinned" icon={<Pin className="h-3 w-3" />} />
+                    <StatusPill tone="sand" label="Pinned" icon={<Pin className="h-3 w-3" />} />
                   ) : (
                     <span className="text-xs font-semibold uppercase tracking-wide text-slate">
                       Undecided
@@ -170,7 +170,7 @@ export function MealSlots() {
                   {isLogged && loggedMeal ? (
                     <>
                       <div className="rounded-xl bg-white/70 p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-green-deep">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-teal-deep">
                           Logged
                         </div>
                         <div className="mt-1.5 flex items-start justify-between gap-3">
@@ -233,7 +233,7 @@ export function MealSlots() {
                               type="button"
                               onClick={() => setConfirmRemoveId(null)}
                               disabled={isRemoving}
-                              className={`rounded-lg border border-sage bg-white px-3 py-1.5 text-[12px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:opacity-50 ${FOCUS_RING}`}
+                              className={`rounded-lg border border-sand bg-white px-3 py-1.5 text-[12px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:opacity-50 ${FOCUS_RING}`}
                             >
                               Cancel
                             </button>
@@ -264,7 +264,7 @@ export function MealSlots() {
                             type="button"
                             onClick={() => setConfirmRemoveId(loggedMeal.id)}
                             aria-label="Remove this logged meal"
-                            className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-sage bg-white px-4 py-2 text-sm font-medium text-slate transition-colors hover:border-tomato/40 hover:text-tomato-ink ${FOCUS_RING}`}
+                            className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-sand bg-white px-4 py-2 text-sm font-medium text-slate transition-colors hover:border-tomato/40 hover:text-tomato-ink ${FOCUS_RING}`}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                             Remove
@@ -283,7 +283,7 @@ export function MealSlots() {
                             onClick={() =>
                               actions.openLogModal(slot.mealTypeId, { type: 'suggestion', option })
                             }
-                            className={`rounded-xl border border-sage bg-canvas px-4 py-3 text-left transition-colors hover:border-green/60 hover:bg-green-tint/50 ${FOCUS_RING}`}
+                            className={`rounded-xl border border-sand bg-canvas px-4 py-3 text-left transition-colors hover:border-teal/60 hover:bg-teal-tint/50 ${FOCUS_RING}`}
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
@@ -295,7 +295,7 @@ export function MealSlots() {
                                 </p>
                               </div>
                               <div className="flex shrink-0 flex-col items-end gap-1">
-                                <span className="font-display text-[14px] font-bold text-green-deep">
+                                <span className="font-display text-[14px] font-bold text-teal-deep">
                                   {formatPKR(option.estimatedPrice)}
                                 </span>
                                 {fit && <BudgetFitBadge fit={fit} />}
@@ -334,9 +334,7 @@ export function MealSlots() {
             {budget.hasBudget && (
               <p className="text-[12px] text-slate">
                 Per meal left:{' '}
-                <span className="font-semibold text-green-deep">
-                  {formatPKR(budget.avgPerMeal)}
-                </span>{' '}
+                <span className="font-semibold text-teal-deep">{formatPKR(budget.avgPerMeal)}</span>{' '}
                 · {formatPKR(budget.amountRemaining)} remaining
               </p>
             )}
@@ -348,7 +346,7 @@ export function MealSlots() {
               return (
                 <div
                   key={option.id}
-                  className="flex items-start justify-between gap-4 rounded-xl border border-sage bg-white p-4"
+                  className="flex items-start justify-between gap-4 rounded-xl border border-sand bg-white p-4"
                 >
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <p className="font-display text-[14px] font-semibold text-charcoal">
@@ -394,7 +392,7 @@ export function MealSlots() {
                     onClick={() =>
                       actions.openLogModal(expandedSlotId!, { type: 'suggestion', option })
                     }
-                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-green-deep px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-green-deeper ${FOCUS_RING}`}
+                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-teal-deep px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-teal-deeper ${FOCUS_RING}`}
                   >
                     Choose
                   </button>
@@ -424,11 +422,11 @@ export function MealSlots() {
                 </button>
               )}
 
-            <div className="my-1 h-px bg-sage" />
+            <div className="my-1 h-px bg-sand" />
 
-            <div className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-sage bg-canvas p-4">
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-sand bg-canvas p-4">
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-green/10 text-green-deep">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-teal/10 text-teal-deep">
                   <ChefHat className="h-4 w-4" />
                 </span>
                 <div>
@@ -441,15 +439,15 @@ export function MealSlots() {
               <button
                 type="button"
                 onClick={() => actions.openLogModal(expandedSlotId!, { type: 'home' })}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sage bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas ${FOCUS_RING}`}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sand bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas ${FOCUS_RING}`}
               >
                 Log
               </button>
             </div>
 
-            <div className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-sage bg-canvas p-4">
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-sand bg-canvas p-4">
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-green/10 text-green-deep">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-teal/10 text-teal-deep">
                   <PenLine className="h-4 w-4" />
                 </span>
                 <div>
@@ -462,7 +460,7 @@ export function MealSlots() {
               <button
                 type="button"
                 onClick={() => actions.openLogModal(expandedSlotId!, { type: 'custom' })}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sage bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas ${FOCUS_RING}`}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-sand bg-white px-3.5 py-2 text-xs font-medium text-charcoal transition-colors hover:bg-canvas ${FOCUS_RING}`}
               >
                 Enter
               </button>
@@ -483,13 +481,13 @@ export function MealSlots() {
 }
 
 interface StatusPillProps {
-  tone: 'green' | 'sage';
+  tone: 'teal' | 'sand';
   label: string;
   icon: React.ReactNode;
 }
 
 function StatusPill({ tone, label, icon }: StatusPillProps) {
-  const toneClass = tone === 'green' ? 'bg-green/15 text-green-deep' : 'bg-sage text-green-deep';
+  const toneClass = tone === 'teal' ? 'bg-teal/15 text-teal-deep' : 'bg-sand text-teal-deep';
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${toneClass}`}
@@ -519,7 +517,7 @@ function SectionHeader({
         {progress && progress.total > 0 && (
           <span
             className={`inline-flex items-center gap-1.5 text-[12px] font-semibold ${
-              done ? 'text-green-deep' : 'text-slate'
+              done ? 'text-teal-deep' : 'text-slate'
             }`}
           >
             {done && <Check className="h-3.5 w-3.5" />}

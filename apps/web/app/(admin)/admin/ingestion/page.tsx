@@ -18,7 +18,7 @@ const PAGE_SIZE = 25;
 
 const statusClass: Record<ScraperRun['status'], string> = {
   running: 'bg-amber-tint text-amber-ink',
-  succeeded: 'bg-green/15 text-green-deep',
+  succeeded: 'bg-teal/15 text-teal-deep',
   failed: 'bg-tomato/10 text-tomato-ink',
 };
 
@@ -50,7 +50,7 @@ export default function AdminIngestionPage() {
         Scraper runs and how much data each one brought in.
       </p>
 
-      <div className="mt-6 rounded-xl border border-sage bg-white">
+      <div className="mt-6 rounded-xl border border-sand bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate/60" />

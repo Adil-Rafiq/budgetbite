@@ -108,7 +108,7 @@ export function MealTypeFormModal({ open, onOpenChange, mealType }: Props) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border border-sage px-3 py-2.5">
+          <div className="flex items-center justify-between rounded-lg border border-sand px-3 py-2.5">
             <Label htmlFor="active" className={labelClass} style={labelStyle}>
               Active
             </Label>

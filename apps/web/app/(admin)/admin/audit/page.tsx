@@ -72,7 +72,7 @@ export default function AdminAuditPage() {
         {total > 0 && <span className="font-mono text-[12px] text-slate/60">{total} total</span>}
       </div>
 
-      <div className="mt-4 rounded-xl border border-sage bg-white">
+      <div className="mt-4 rounded-xl border border-sand bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate/60" />
@@ -109,7 +109,7 @@ export default function AdminAuditPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <span className="inline-flex items-center rounded-full bg-sage/50 px-2 py-0.5 font-mono text-[11px] text-slate">
+                    <span className="inline-flex items-center rounded-full bg-sand/50 px-2 py-0.5 font-mono text-[11px] text-slate">
                       {entry.action}
                     </span>
                   </TableCell>

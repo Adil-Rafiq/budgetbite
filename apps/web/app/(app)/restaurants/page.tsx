@@ -59,7 +59,7 @@ type SortValue = RestaurantSort | 'auto';
 type Ordering = 'budget' | 'distance' | 'rating' | 'name';
 
 const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate';
-const inputClass = 'bg-canvas border-sage-edge text-charcoal';
+const inputClass = 'bg-canvas border-sand-edge text-charcoal';
 
 /** Filter chips sit in a wrapping row: thumb-sized on phones, dense on desktop. */
 const presetClass = `inline-flex min-h-11 items-center rounded-full border px-3 text-[12px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-9 ${FOCUS_RING}`;
@@ -292,7 +292,7 @@ function RestaurantsPageInner() {
               <RecommendRestaurantButton />
               <Link
                 href="/restaurants/recommendations"
-                className={`rounded text-[12px] font-medium text-green-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
+                className={`rounded text-[12px] font-medium text-teal-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
               >
                 Your recommendations →
               </Link>
@@ -303,13 +303,13 @@ function RestaurantsPageInner() {
 
       {!hasActivePlan && (
         <FadeUp delay={0.04}>
-          <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-sage bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-sand bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-[13px] text-slate">
               Start a budget plan to see which of these fit what you have left.
             </p>
             <Link
               href="/plans"
-              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
             >
               Create a plan
               <span aria-hidden>→</span>
@@ -319,7 +319,7 @@ function RestaurantsPageInner() {
       )}
 
       <FadeUp delay={0.08}>
-        <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-sand bg-white shadow-sm">
           <div className="flex flex-col gap-4 p-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
@@ -376,7 +376,7 @@ function RestaurantsPageInner() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <Label id="distance-label" className={labelClass}>
-                  Max distance: <span className="text-green-deep">{maxDistanceKm} km</span>
+                  Max distance: <span className="text-teal-deep">{maxDistanceKm} km</span>
                 </Label>
                 <Slider
                   aria-labelledby="distance-label"
@@ -402,8 +402,8 @@ function RestaurantsPageInner() {
                         onClick={() => updateParams({ maxDistanceKm: String(km) })}
                         className={`${presetClass} ${
                           active
-                            ? 'border-green-deep bg-green/10 text-green-deep'
-                            : 'border-sage bg-canvas text-slate hover:border-green'
+                            ? 'border-teal-deep bg-teal/10 text-teal-deep'
+                            : 'border-sand bg-canvas text-slate hover:border-teal'
                         }`}
                       >
                         {km} km
@@ -415,7 +415,7 @@ function RestaurantsPageInner() {
                   <p id="distance-hint" className="text-[12px] text-slate">
                     <Link
                       href="/profile"
-                      className={`rounded font-medium text-green-deep underline underline-offset-2 ${FOCUS_RING}`}
+                      className={`rounded font-medium text-teal-deep underline underline-offset-2 ${FOCUS_RING}`}
                     >
                       Set your location
                     </Link>{' '}
@@ -427,7 +427,7 @@ function RestaurantsPageInner() {
               <div className="flex flex-col gap-2">
                 <Label id="rating-label" className={labelClass}>
                   Minimum rating:{' '}
-                  <span className="text-green-deep">
+                  <span className="text-teal-deep">
                     {minRating === 0 ? 'Any' : `${minRating}+`}
                   </span>
                 </Label>
@@ -459,8 +459,8 @@ function RestaurantsPageInner() {
                         }
                         className={`${presetClass} ${
                           active
-                            ? 'border-green-deep bg-green/10 text-green-deep'
-                            : 'border-sage bg-canvas text-slate hover:border-green'
+                            ? 'border-teal-deep bg-teal/10 text-teal-deep'
+                            : 'border-sand bg-canvas text-slate hover:border-teal'
                         }`}
                       >
                         {label}
@@ -484,7 +484,7 @@ function RestaurantsPageInner() {
               key={chip.key}
               type="button"
               onClick={chip.clear}
-              className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sage bg-white px-3 text-[12px] font-medium text-charcoal transition-colors hover:border-tomato hover:text-tomato-ink sm:min-h-9 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sand bg-white px-3 text-[12px] font-medium text-charcoal transition-colors hover:border-tomato hover:text-tomato-ink sm:min-h-9 ${FOCUS_RING}`}
               aria-label={chip.a11yLabel}
             >
               {chip.label}
@@ -510,13 +510,13 @@ function RestaurantsPageInner() {
       ) : error ? (
         <DataError message="Could not load restaurants." onRetry={() => refetch()} />
       ) : data.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sage bg-white p-8 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-white p-8 text-center">
           <p className="text-[13px] text-slate">{emptyMessage}</p>
           {page > 0 ? (
             <button
               type="button"
               onClick={() => goToPage(0)}
-              className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
             >
               Back to the first page
             </button>
@@ -524,7 +524,7 @@ function RestaurantsPageInner() {
             <button
               type="button"
               onClick={clearAll}
-              className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
             >
               Clear all filters
             </button>
@@ -532,7 +532,7 @@ function RestaurantsPageInner() {
             <button
               type="button"
               onClick={() => updateParams({ maxDistanceKm: '30' })}
-              className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
             >
               Widen to 30 km
             </button>
@@ -598,7 +598,7 @@ function RestaurantsPageInner() {
                           : { y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }
                       }
                       transition={{ duration: 0.22, ease: 'easeOut' }}
-                      className="flex h-full flex-col rounded-2xl border border-sage bg-white p-5 shadow-sm"
+                      className="flex h-full flex-col rounded-2xl border border-sand bg-white p-5 shadow-sm"
                     >
                       <div className="flex items-start justify-between gap-3">
                         {/* A thumbnail rather than a full-bleed banner: the
@@ -607,7 +607,7 @@ function RestaurantsPageInner() {
                             exists to answer. */}
                         <RestaurantImage
                           src={r.imageUrl}
-                          className="h-12 w-12 shrink-0 rounded-xl border border-sage-edge"
+                          className="h-12 w-12 shrink-0 rounded-xl border border-sand-edge"
                           iconClassName="h-5 w-5"
                         />
                         <h3 className="min-w-0 flex-1 font-display text-lg font-semibold leading-snug tracking-tight text-charcoal [overflow-wrap:anywhere] line-clamp-2">
@@ -688,7 +688,7 @@ function RestaurantsPageInner() {
                 type="button"
                 onClick={() => goToPage(page - 1)}
                 disabled={!hasPrev || isFetching}
-                className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
+                className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
               >
                 ← Prev
               </button>
@@ -699,7 +699,7 @@ function RestaurantsPageInner() {
                 type="button"
                 onClick={() => goToPage(page + 1)}
                 disabled={!hasNext || isFetching}
-                className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
+                className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
               >
                 Next →
               </button>

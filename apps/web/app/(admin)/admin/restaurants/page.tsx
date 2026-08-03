@@ -203,7 +203,7 @@ export default function AdminRestaurantsPage() {
         </div>
       </div>
 
-      <div className="mt-4 rounded-xl border border-sage bg-white">
+      <div className="mt-4 rounded-xl border border-sand bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate/60" />
@@ -253,7 +253,7 @@ export default function AdminRestaurantsPage() {
                       </TableCell>
                     )}
                     <TableCell className="font-medium text-charcoal">
-                      <Link href={`/admin/restaurants/${r.id}`} className="hover:text-green-deep">
+                      <Link href={`/admin/restaurants/${r.id}`} className="hover:text-teal-deep">
                         {r.name}
                       </Link>
                     </TableCell>

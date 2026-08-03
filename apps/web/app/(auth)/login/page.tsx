@@ -107,7 +107,7 @@ export default function LoginPage() {
   };
 
   const inputClass =
-    'w-full rounded-xl border border-sage bg-white px-3.5 py-3 text-[14px] text-charcoal outline-none transition-colors placeholder:text-slate/50 focus:border-green';
+    'w-full rounded-xl border border-sand bg-white px-3.5 py-3 text-[14px] text-charcoal outline-none transition-colors placeholder:text-slate/50 focus:border-teal';
   const labelClass = 'text-xs font-semibold uppercase tracking-wide text-slate';
   const busy = isSubmitting || oauthLoading !== null;
 
@@ -124,11 +124,11 @@ export default function LoginPage() {
 
       <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-6 py-6 sm:px-8">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-deep text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-deep text-white">
             <LogoIcon size={16} />
           </span>
           <span className="font-display text-xl font-bold tracking-tight">
-            Budget<span className="text-green-deep">Bite</span>
+            Budget<span className="text-teal-deep">Bite</span>
           </span>
         </Link>
         <Link
@@ -142,21 +142,21 @@ export default function LoginPage() {
 
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[440px] flex-col justify-center px-6 pb-16">
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-sage bg-white px-4 py-1.5 shadow-sm">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-green" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-4 py-1.5 shadow-sm">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-teal" />
             <span className="text-xs font-normal uppercase tracking-widest text-charcoal/70">
               Sign in to your account
             </span>
           </div>
           <h1 className="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tight">
-            Welcome <span className="text-green-deep">back.</span>
+            Welcome <span className="text-teal-deep">back.</span>
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-charcoal/60">
             Pick up where you left off.
           </p>
         </div>
 
-        <div className="mt-8 rounded-3xl border border-sage bg-white p-7 shadow-2xl">
+        <div className="mt-8 rounded-3xl border border-sand bg-white p-7 shadow-2xl">
           <form onSubmit={handleSubmit(onSubmit)} autoComplete="on" className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
               <label htmlFor="email" className={labelClass}>
@@ -180,7 +180,7 @@ export default function LoginPage() {
                 </label>
                 <button
                   type="button"
-                  className="text-xs font-medium text-green-deep transition-colors hover:text-green-deep"
+                  className="text-xs font-medium text-teal-deep transition-colors hover:text-teal-deep"
                   onClick={() => router.push('/forgot-password')}
                 >
                   Forgot?
@@ -212,7 +212,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={busy}
-              className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-green-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-green-deeper disabled:pointer-events-none disabled:opacity-50"
+              className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-teal-deeper disabled:pointer-events-none disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
@@ -229,9 +229,9 @@ export default function LoginPage() {
           </form>
 
           <div className="my-6 flex items-center gap-3">
-            <span className="h-px flex-1 bg-sage" />
+            <span className="h-px flex-1 bg-sand" />
             <span className="text-xs font-normal text-charcoal/40">or</span>
-            <span className="h-px flex-1 bg-sage" />
+            <span className="h-px flex-1 bg-sand" />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -239,7 +239,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => handleOAuthSignIn('google')}
               disabled={busy}
-              className="flex min-h-11 items-center justify-center gap-2.5 rounded-xl border border-sage bg-white text-sm font-medium text-charcoal shadow-sm transition-all hover:border-green/40 hover:bg-canvas disabled:pointer-events-none disabled:opacity-50"
+              className="flex min-h-11 items-center justify-center gap-2.5 rounded-xl border border-sand bg-white text-sm font-medium text-charcoal shadow-sm transition-all hover:border-teal/40 hover:bg-canvas disabled:pointer-events-none disabled:opacity-50"
             >
               {oauthLoading === 'google' ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -268,7 +268,7 @@ export default function LoginPage() {
           New to BudgetBite?{' '}
           <Link
             href="/register"
-            className="inline-flex items-center gap-1 font-semibold text-green-deep transition-colors hover:text-green-deep"
+            className="inline-flex items-center gap-1 font-semibold text-teal-deep transition-colors hover:text-teal-deep"
           >
             Create an account
             <Mail className="h-3.5 w-3.5" />

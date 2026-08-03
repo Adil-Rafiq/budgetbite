@@ -39,13 +39,13 @@ function Slider({
       >
         <SliderPrimitive.Range
           data-slot="slider-range"
-          // green-deep, not the brand green: the filled range is the only thing
+          // teal-deep, not the brand teal: the filled range is the only thing
           // that says where the value sits, and the brand teal on the muted
           // track is 3.62:1 — over the 3:1 WCAG 1.4.11 floor for control state,
           // but only just, and it was 1.84:1 under the previous palette. This
           // is 6.11:1 on the same track.
           className={
-            'bg-green-deep absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full'
+            'bg-teal-deep absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full'
           }
         />
       </SliderPrimitive.Track>
@@ -56,7 +56,7 @@ function Slider({
           // A 16px thumb is under the 24px WCAG 2.5.8 floor and far under a
           // fingertip. The `before` pseudo-element widens the hit area to 44px
           // without changing how large the control looks.
-          className="border-green-deep ring-ring/50 relative block size-5 shrink-0 rounded-full border-2 bg-white shadow-sm transition-[color,box-shadow] before:absolute before:top-1/2 before:left-1/2 before:size-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+          className="border-teal-deep ring-ring/50 relative block size-5 shrink-0 rounded-full border-2 bg-white shadow-sm transition-[color,box-shadow] before:absolute before:top-1/2 before:left-1/2 before:size-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
         />
       ))}
     </SliderPrimitive.Root>

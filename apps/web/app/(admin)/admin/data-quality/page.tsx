@@ -18,22 +18,22 @@ function Section({
 }) {
   const clean = group.count === 0;
   return (
-    <div className="rounded-xl border border-sage bg-white p-4">
+    <div className="rounded-xl border border-sand bg-white p-4">
       <div className="flex items-baseline justify-between">
         <h2 className="text-[15px] font-medium text-charcoal">{title}</h2>
         <span
-          className={`font-mono text-[18px] font-semibold ${clean ? 'text-green-deep' : 'text-tomato-ink'}`}
+          className={`font-mono text-[18px] font-semibold ${clean ? 'text-teal-deep' : 'text-tomato-ink'}`}
         >
           {group.count}
         </span>
       </div>
       <p className="mt-1 text-[13px] text-slate/60">{description}</p>
       {!clean && (
-        <ul className="mt-3 flex flex-col gap-1 border-t border-sage pt-3">
+        <ul className="mt-3 flex flex-col gap-1 border-t border-sand pt-3">
           {group.sample.map((e) => (
             <li key={e.id} className="truncate text-[13px] text-slate">
               {linkRestaurants ? (
-                <Link href={`/admin/restaurants/${e.id}`} className="hover:text-green-deep">
+                <Link href={`/admin/restaurants/${e.id}`} className="hover:text-teal-deep">
                   {e.name}
                 </Link>
               ) : (

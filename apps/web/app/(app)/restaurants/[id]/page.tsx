@@ -102,7 +102,7 @@ function MenuItemCard({
   onAddToPlan: (() => void) | null;
 }) {
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-sand bg-white shadow-sm">
       <MenuItemImage src={item.imageUrl} alt={item.name} />
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex items-start justify-between gap-3">
@@ -138,7 +138,7 @@ function MenuItemCard({
             <button
               type="button"
               onClick={onAddToPlan}
-              className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-sage bg-white px-3 text-[12px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-sand bg-white px-3 text-[12px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
             >
               Add to plan
               <span aria-hidden className="opacity-70">
@@ -191,15 +191,15 @@ function buildFoodpandaUrl(externalId: string, slug: string): string {
 }
 
 const labelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-slate';
-const inputClass = 'bg-canvas border-sage-edge text-charcoal';
+const inputClass = 'bg-canvas border-sand-edge text-charcoal';
 const ctaBase = `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-4 text-[13px] font-semibold transition-colors ${FOCUS_RING}`;
 
 /** Section chip. 44px tall on touch, tightened once a pointer is available. */
 const chipClass = (active: boolean) =>
   `inline-flex min-h-11 items-center rounded-full border px-3.5 text-[12px] font-medium transition-colors sm:min-h-9 ${FOCUS_RING} ${
     active
-      ? 'border-green-deep bg-green/10 text-green-deep'
-      : 'border-sage bg-canvas text-charcoal hover:border-green'
+      ? 'border-teal-deep bg-teal/10 text-teal-deep'
+      : 'border-sand bg-canvas text-charcoal hover:border-teal'
   }`;
 
 export default function RestaurantDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -336,7 +336,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         href="/restaurants"
         // The primary return path, sitting above a menu that can run to 365
         // items — it needs a thumb-sized target, not a 13px text baseline.
-        className={`inline-flex min-h-11 w-fit items-center gap-1.5 rounded text-[13px] text-slate transition-colors hover:text-green-deep sm:min-h-9 ${FOCUS_RING}`}
+        className={`inline-flex min-h-11 w-fit items-center gap-1.5 rounded text-[13px] text-slate transition-colors hover:text-teal-deep sm:min-h-9 ${FOCUS_RING}`}
       >
         ← Back to restaurants
       </Link>
@@ -348,7 +348,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
       ) : !r ? (
         <p className="text-[13px] text-slate">Restaurant not found.</p>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-sand bg-white shadow-sm">
           {/* The vendor's own photo, full-bleed above the header. It draws
               nothing at all when there is none — a grey band the height of a
               banner would cost the same space and tell the reader less than
@@ -356,7 +356,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
           <RestaurantImage
             src={r.imageUrl}
             fallback="nothing"
-            className="h-36 w-full border-b border-sage sm:h-44"
+            className="h-36 w-full border-b border-sand sm:h-44"
           />
           <div className="flex flex-col gap-5 p-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -391,7 +391,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                 {r.phone && (
                   <a
                     href={`tel:${r.phone}`}
-                    className={`${ctaBase} border border-sage bg-white text-charcoal hover:bg-canvas`}
+                    className={`${ctaBase} border border-sand bg-white text-charcoal hover:bg-canvas`}
                   >
                     Call
                     <Phone aria-hidden className="h-3.5 w-3.5" />
@@ -404,14 +404,14 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                 the user logs. Numbering is the information here — the second
                 step is the one that keeps the budget honest, and it was
                 previously stated on no pixel of this surface. */}
-            <div className="flex flex-col gap-2 border-t border-sage pt-4">
+            <div className="flex flex-col gap-2 border-t border-sand pt-4">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 {orderUrl && (
                   <a
                     href={orderUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${ctaBase} bg-green-deep text-white hover:bg-green-deeper`}
+                    className={`${ctaBase} bg-teal-deep text-white hover:bg-teal-deeper`}
                   >
                     1 · Order on {foodpandaUrl ? 'Foodpanda' : 'their site'}
                     <ExternalLink aria-hidden className="h-3.5 w-3.5" />
@@ -422,7 +422,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                   onClick={() => setLogTarget({ item: null })}
                   disabled={!hasActivePlan}
                   title={hasActivePlan ? undefined : 'Start a budget plan to log spending'}
-                  className={`${ctaBase} border border-sage bg-white text-charcoal hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-50`}
+                  className={`${ctaBase} border border-sand bg-white text-charcoal hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-50`}
                 >
                   2 · Log what you spent
                 </button>
@@ -446,7 +446,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         // the cells because a monthly plan's ₨ 120,000 overflows a 90px column
         // on a 320px phone otherwise.
         <div
-          className={`sticky top-[57px] z-30 grid gap-3 rounded-2xl border border-sage bg-canvas/95 p-4 backdrop-blur ${
+          className={`sticky top-[57px] z-30 grid gap-3 rounded-2xl border border-sand bg-canvas/95 p-4 backdrop-blur ${
             avgPerMeal > 0 ? 'grid-cols-3' : 'grid-cols-2'
           }`}
         >
@@ -471,13 +471,13 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         </div>
       ) : (
         !restaurantQuery.isLoading && (
-          <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-sage bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-sand bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-[13px] text-slate">
               Start a budget plan to see fit and log meals from here.
             </p>
             <Link
               href="/plans"
-              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
             >
               Create a plan
               <span aria-hidden>→</span>
@@ -523,7 +523,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         )}
 
         {showMenuControls && (
-          <div className="overflow-hidden rounded-2xl border border-sage bg-white shadow-sm">
+          <div className="overflow-hidden rounded-2xl border border-sand bg-white shadow-sm">
             <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-[1fr_180px_auto] sm:items-end">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="menu-search" className={labelClass}>
@@ -574,8 +574,8 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                   aria-pressed={hideOverBudget}
                   className={`min-h-11 rounded-full border px-4 text-[12px] font-medium transition-colors sm:min-h-10 ${FOCUS_RING} ${
                     hideOverBudget
-                      ? 'border-green-deep bg-green/10 text-green-deep'
-                      : 'border-sage bg-canvas text-slate hover:border-green'
+                      ? 'border-teal-deep bg-teal/10 text-teal-deep'
+                      : 'border-sand bg-canvas text-slate hover:border-teal'
                   }`}
                 >
                   {hideOverBudget ? '✓ ' : ''}Hide over-budget
@@ -588,7 +588,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                 things the vendor calls Desserts — and it costs one request for
                 eleven rows instead of paging through the other 354. */}
             {facets && facets.categories.length > 1 && (
-              <div className="border-t border-sage px-4 py-3">
+              <div className="border-t border-sand px-4 py-3">
                 <div
                   role="group"
                   aria-label="Filter by menu section"
@@ -636,11 +636,11 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         ) : menuQuery.error ? (
           <DataError message="Could not load menu." onRetry={() => menuQuery.refetch()} />
         ) : facets && facets.count === 0 ? (
-          <div className="rounded-2xl border border-dashed border-sage bg-white p-6 text-center text-[13px] text-slate">
+          <div className="rounded-2xl border border-dashed border-sand bg-white p-6 text-center text-[13px] text-slate">
             No menu items yet.
           </div>
         ) : matchCount === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sage bg-white p-6 text-center">
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-white p-6 text-center">
             <p className="text-[13px] text-slate">
               {hideOverBudget && maxPrice === 0
                 ? // The honest reason, rather than a shrug: with this vendor's
@@ -652,7 +652,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
               <button
                 type="button"
                 onClick={clearFilters}
-                className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+                className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
               >
                 Clear filters
               </button>
@@ -690,7 +690,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                   type="button"
                   onClick={() => menuQuery.fetchNextPage()}
                   disabled={menuQuery.isFetchingNextPage}
-                  className={`inline-flex min-h-11 items-center rounded-lg border border-sage bg-white px-5 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:cursor-wait disabled:opacity-60 ${FOCUS_RING}`}
+                  className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-5 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:cursor-wait disabled:opacity-60 ${FOCUS_RING}`}
                 >
                   {menuQuery.isFetchingNextPage
                     ? 'Loading…'

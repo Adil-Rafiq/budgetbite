@@ -23,7 +23,7 @@ import { formatPKR } from '@/lib/currency';
 import { amountWarning, type LogBudget } from '@/lib/budget-plan/amount-warning';
 
 const labelClass = 'text-xs font-semibold uppercase tracking-wide text-slate';
-const inputClass = 'bg-canvas border-sage-edge text-charcoal';
+const inputClass = 'bg-canvas border-sand-edge text-charcoal';
 const errorClass = 'text-[11px] text-tomato-ink';
 
 export type { LogBudget };
@@ -71,7 +71,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                     aria-pressed={filled}
                   >
                     <Star
-                      className={`h-6 w-6 transition-colors ${filled ? 'text-amber' : 'text-sage'}`}
+                      className={`h-6 w-6 transition-colors ${filled ? 'text-amber' : 'text-sand'}`}
                       style={{ fill: filled ? 'var(--color-amber)' : 'transparent' }}
                     />
                   </button>
@@ -97,8 +97,8 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                   aria-pressed={v === true}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition ${
                     v === true
-                      ? 'border-green bg-green/10 text-green-deep'
-                      : 'border-sage bg-transparent text-slate'
+                      ? 'border-teal bg-teal/10 text-teal-deep'
+                      : 'border-sand bg-transparent text-slate'
                   }`}
                 >
                   <ThumbsUp className="h-3.5 w-3.5" />
@@ -111,7 +111,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition ${
                     v === false
                       ? 'border-tomato bg-tomato/10 text-tomato-ink'
-                      : 'border-sage bg-transparent text-slate'
+                      : 'border-sand bg-transparent text-slate'
                   }`}
                 >
                   <ThumbsDown className="h-3.5 w-3.5" />
@@ -158,7 +158,7 @@ function FeedbackDisclosure<T extends LogSuggestionForm | LogCustomForm | LogHom
   control: Control<T>;
 }) {
   return (
-    <details className="rounded-xl border border-sage bg-canvas/60 px-4 py-3">
+    <details className="rounded-xl border border-sand bg-canvas/60 px-4 py-3">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-[13px] font-medium text-charcoal [&::-webkit-details-marker]:hidden">
         Add feedback
         <span className="text-[11px] font-normal text-slate">optional · helps future picks</span>
@@ -184,7 +184,7 @@ function PrimaryButton({
       type="submit"
       disabled={disabled}
       className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:pointer-events-none disabled:opacity-50 ${
-        armed ? 'bg-tomato-ink hover:bg-tomato-ink/90' : 'bg-green-deep hover:bg-green-deeper'
+        armed ? 'bg-tomato-ink hover:bg-tomato-ink/90' : 'bg-teal-deep hover:bg-teal-deeper'
       }`}
     >
       {children}
@@ -488,7 +488,7 @@ export function LogMealModal({ state, onClose, onSave, isSaving, budget }: Props
     <Dialog open={state.open} onOpenChange={onClose}>
       <DialogContent className="max-h-[90vh] max-w-sm overflow-y-auto">
         <DialogHeader>
-          <div className="text-xs font-semibold uppercase tracking-widest text-green-deep">
+          <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
             {eyebrow}
           </div>
           <DialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -498,11 +498,11 @@ export function LogMealModal({ state, onClose, onSave, isSaving, budget }: Props
         </DialogHeader>
 
         {option && (
-          <div className="rounded-xl border border-sage bg-canvas p-3">
+          <div className="rounded-xl border border-sand bg-canvas p-3">
             <p className="font-medium text-charcoal">{optionLabel(option)}</p>
             <p className="text-[12px] text-slate">{option.restaurantName ?? '—'}</p>
             {option.items.length > 1 && (
-              <div className="mt-2 flex flex-col gap-0.5 border-t border-sage pt-2">
+              <div className="mt-2 flex flex-col gap-0.5 border-t border-sand pt-2">
                 {option.items.map((item) => (
                   <div key={item.menuItemId} className="flex items-center justify-between gap-3">
                     <p className="truncate text-[12px] text-slate">{item.menuItemName ?? '—'}</p>

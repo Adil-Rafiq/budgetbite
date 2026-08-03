@@ -39,7 +39,7 @@ export const StepBudgetDetails = () => {
         <div
           role="group"
           aria-label="Budget period"
-          className="flex gap-1 rounded-2xl border border-sage bg-canvas p-1"
+          className="flex gap-1 rounded-2xl border border-sand bg-canvas p-1"
         >
           {(
             [
@@ -56,7 +56,7 @@ export const StepBudgetDetails = () => {
                 onClick={() => actions.setPlanType(type)}
                 className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl text-[13px] font-semibold transition-all ${FOCUS_RING} ${
                   active
-                    ? 'bg-green-deep text-white shadow-sm shadow-green-deep/20'
+                    ? 'bg-teal-deep text-white shadow-sm shadow-teal-deep/20'
                     : 'bg-transparent text-slate hover:text-charcoal'
                 }`}
               >
@@ -74,7 +74,7 @@ export const StepBudgetDetails = () => {
           Total budget (PKR)
         </label>
         <div className="flex items-end gap-2.5">
-          <span aria-hidden className="pb-1 font-display text-xl font-bold text-green-deep">
+          <span aria-hidden className="pb-1 font-display text-xl font-bold text-teal-deep">
             ₨
           </span>
           <input
@@ -90,7 +90,7 @@ export const StepBudgetDetails = () => {
             }}
             aria-describedby="budget-period"
             aria-invalid={errors.totalBudget ? true : undefined}
-            className={`min-w-0 flex-1 border-b-2 border-sage bg-transparent pb-1 font-display text-3xl font-bold text-charcoal transition-colors placeholder:text-slate/30 focus:border-green-deep ${FOCUS_RING}`}
+            className={`min-w-0 flex-1 border-b-2 border-sand bg-transparent pb-1 font-display text-3xl font-bold text-charcoal transition-colors placeholder:text-slate/30 focus:border-teal-deep ${FOCUS_RING}`}
           />
           <span id="budget-period" className="pb-1.5 text-[12px] text-slate">
             / {values.planType === 'weekly' ? 'week' : 'month'}
@@ -109,8 +109,8 @@ export const StepBudgetDetails = () => {
                 onClick={() => actions.setTotalBudget(preset)}
                 className={`min-h-11 rounded-full border px-3 text-[11px] font-medium transition-colors ${FOCUS_RING} ${
                   active
-                    ? 'border-green-deep bg-green/10 font-semibold text-green-deep'
-                    : 'border-sage text-slate hover:border-green-deep hover:text-green-deep'
+                    ? 'border-teal-deep bg-teal/10 font-semibold text-teal-deep'
+                    : 'border-sand text-slate hover:border-teal-deep hover:text-teal-deep'
                 }`}
               >
                 {formatPKR(preset)}
@@ -120,8 +120,8 @@ export const StepBudgetDetails = () => {
         </div>
 
         {lastConversion && !errors.totalBudget && (
-          <p className="mt-1 flex items-start gap-2 rounded-xl border border-sage bg-canvas px-3 py-2 text-[11px] text-slate">
-            <RefreshCw aria-hidden className="mt-0.5 h-3 w-3 shrink-0 text-green-deep" />
+          <p className="mt-1 flex items-start gap-2 rounded-xl border border-sand bg-canvas px-3 py-2 text-[11px] text-slate">
+            <RefreshCw aria-hidden className="mt-0.5 h-3 w-3 shrink-0 text-teal-deep" />
             <span>
               Converted {formatPKR(lastConversion.from)} to{' '}
               <span className="font-semibold text-charcoal">{formatPKR(lastConversion.to)}</span> so
@@ -146,7 +146,7 @@ export const StepBudgetDetails = () => {
             {[0, 1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-11 w-24 animate-pulse rounded-full border border-sage bg-canvas"
+                className="h-11 w-24 animate-pulse rounded-full border border-sand bg-canvas"
               />
             ))}
           </div>
@@ -165,7 +165,7 @@ export const StepBudgetDetails = () => {
             <button
               type="button"
               onClick={mealTypes.refetch}
-              className={`min-h-11 rounded-lg border border-sage bg-white px-3 text-[11px] font-semibold text-green-deep transition-colors hover:border-green-deep ${FOCUS_RING}`}
+              className={`min-h-11 rounded-lg border border-sand bg-white px-3 text-[11px] font-semibold text-teal-deep transition-colors hover:border-teal-deep ${FOCUS_RING}`}
             >
               Try again
             </button>
@@ -173,7 +173,7 @@ export const StepBudgetDetails = () => {
         )}
 
         {mealTypes.status === 'empty' && (
-          <div className="rounded-lg border border-sage bg-canvas p-3 text-[12px] text-charcoal">
+          <div className="rounded-lg border border-sand bg-canvas p-3 text-[12px] text-charcoal">
             <div className="font-medium">No meal types available yet</div>
             <div className="mt-0.5 text-[11px] text-slate">
               An admin still needs to configure these. Please reach out to support so we can get you
@@ -209,7 +209,7 @@ export const StepBudgetDetails = () => {
       {mealTypes.status === 'ready' &&
         values.mealsPerDay > 0 &&
         Number.isFinite(values.totalBudget) && (
-          <div className="rounded-xl border border-sage bg-canvas p-3">
+          <div className="rounded-xl border border-sand bg-canvas p-3">
             <div className="grid grid-cols-3 gap-2">
               <BreakdownFigure value={formatPKR(breakdown.perMeal)} label="per meal" />
               <BreakdownFigure value={formatPKR(breakdown.perDay)} label="per day" />

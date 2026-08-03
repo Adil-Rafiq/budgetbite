@@ -67,7 +67,7 @@ export function NewPlanLauncher({ children }: { children: ReactNode }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-xl border border-sage bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
             >
               Keep current plan
             </AlertDialogCancel>
@@ -76,7 +76,7 @@ export function NewPlanLauncher({ children }: { children: ReactNode }) {
                 setConfirmReplaceOpen(false);
                 setOpen(true);
               }}
-              className={`min-h-11 rounded-xl bg-green-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-green-deeper active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl bg-teal-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-teal-deeper active:scale-[0.97] ${FOCUS_RING}`}
             >
               Replace plan
             </AlertDialogAction>

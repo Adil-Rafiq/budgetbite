@@ -7,12 +7,14 @@
    BudgetBite — "terrace" design system
    Brand palette (light-first):
      canvas    #fbf7ee   page background (cream)
-     sage      #ebe0cd   decorative borders, secondary surfaces (sand)
-     sage-edge #8d8271   control boundaries that must clear 3:1
-     green     #178a8a   brand fill — decorative only, never behind text
-     green-deep#0d6363   brand text on light, and any fill carrying white text
-     green-deeper #094a4a  hover state for green-deep fills
+     sand      #ebe0cd   decorative borders, secondary surfaces
+     sand-edge #8d8271   control boundaries that must clear 3:1
+     teal      #178a8a   brand fill — decorative only, never behind text
+     teal-deep #0d6363   brand text on light, and any fill carrying white text
+     teal-deeper #094a4a  hover state for teal-deep fills
+     teal-tint #e2f1f0   the "you are here" wash
      tomato    #c8402f   accent / destructive
+     amber     #e9a020   caution, between "on track" and "over budget"
      charcoal  #1f1a14   foreground, dark sections
      slate     #5c5145   muted foreground
 
@@ -23,9 +25,12 @@
    bars. Sand and cream now carry the chrome, and the brand is a deep teal that
    keeps its distance from both the amber caution band and the red alarm band.
 
-   The `green*` token names are deliberately unchanged: they are referenced in
-   roughly 2,200 utility classes, and a rename is a separate mechanical sweep
-   rather than part of the palette swap. They now name a teal.
+   The palette swap and the `green*`/`sage*` -> `teal*`/`sand*` rename were
+   deliberately separate commits: the swap is thirteen values, the rename is
+   ~930 call sites, and reviewing them together would have hidden the first
+   inside the second. One name is exempt — `BudgetFit` in @repo/shared still
+   classifies an item as `green | amber | red`, which is a domain rating shared
+   with the API, not a reference to this palette.
 
    shadcn semantic tokens are mapped onto this palette so the ui/ primitives
    (dialog, dropdown, select, popover, sheet, …) stay in sync.
@@ -40,7 +45,7 @@
   --popover-foreground: #1f1a14;
   /* `primary` is a fill token: shadcn primitives pair it with
      `primary-foreground`, so it must be the value white is legible on. That is
-     green-deep (7.04:1), not the decorative brand teal (4.17:1). The old
+     teal-deep (7.04:1), not the decorative brand teal (4.17:1). The old
      palette had #8cc63f here at 2.05:1 — white-on-primary was unreadable in
      any ui/ primitive that used the pair. */
   --primary: #0d6363;
@@ -54,11 +59,11 @@
   --destructive: #c8402f;
   --destructive-foreground: #ffffff;
   --border: #ebe0cd;
-  /* Form-control boundary, not a decorative one — see --color-sage-edge. */
+  /* Form-control boundary, not a decorative one — see --color-sand-edge. */
   --input: #8d8271;
   /* Drives `outline-ring/50` on every element via the base layer. The old
      value was the brand lime at 2.05:1, which at 50% opacity was no indicator
-     at all; green-deep matches what lib/focus-ring.ts already concluded. */
+     at all; teal-deep matches what lib/focus-ring.ts already concluded. */
   --ring: #0d6363;
   --chart-1: #178a8a;
   --chart-2: #0d6363;
@@ -119,29 +124,29 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 8px);
 
-  /* Brand tokens — used directly across the app (bg-canvas, text-green, …).
-     These intentionally shadow a few Tailwind defaults (green, slate).
-     `green` names a teal now; see the rename note in the header. */
+  /* Brand tokens — used directly across the app (bg-canvas, text-teal, …).
+     These intentionally shadow a few Tailwind defaults (teal, slate), so
+     `text-teal` here is this palette's #178a8a, not Tailwind's teal-500. */
   --color-canvas: #fbf7ee;
-  --color-sage: #ebe0cd;
-  --color-green: #178a8a;
+  --color-sand: #ebe0cd;
+  --color-teal: #178a8a;
   --color-tomato: #c8402f;
   --color-charcoal: #1f1a14;
   --color-slate: #5c5145;
 
   /* The brand colour that text is allowed to be, and the only one a white
-     label may sit on. The split exists because `--color-green` is a fill, not
+     label may sit on. The split exists because `--color-teal` is a fill, not
      an ink: the lime version was 2.05:1 on white, and the teal is 4.17:1 —
      better, but still under the 4.5:1 AA floor, so the rule it was written to
      enforce still holds. Decoration only: dots, bars, scrollbar hover.
 
-     green-deep is 7.04:1 on white / 6.59:1 on canvas, and carries white labels
-     at the same 7.04:1. green-deeper is 10.05:1 and exists so a hover state
+     teal-deep is 7.04:1 on white / 6.59:1 on canvas, and carries white labels
+     at the same 7.04:1. teal-deeper is 10.05:1 and exists so a hover state
      gets darker rather than lighter. The token guard
      (scripts/check-tokens.mjs) still fails the build on `dark-green`, the
      sub-AA value from two palettes ago. */
-  --color-green-deep: #0d6363;
-  --color-green-deeper: #094a4a;
+  --color-teal-deep: #0d6363;
+  --color-teal-deeper: #094a4a;
 
   /* The palest brand tint in the system: the "you are here" wash behind an
      active nav item. It was a bare hex in four places (both shells, the
@@ -151,18 +156,18 @@
 
      At 1.16:1 on white it is a wash, not a state indicator: on its own it
      cannot carry "current page" for a low-vision user. Every active item that
-     uses it also carries a filled green-deep chip, semibold weight, and
+     uses it also carries a filled teal-deep chip, semibold weight, and
      aria-current, so the tint is the least of four signals rather than the
-     only one. Text on it must still be green-deep (6.06:1) or charcoal. */
-  --color-green-tint: #e2f1f0;
+     only one. Text on it must still be teal-deep (6.06:1) or charcoal. */
+  --color-teal-tint: #e2f1f0;
 
   /* Control boundaries. WCAG 1.4.11 wants 3:1 for the visual information that
-     identifies a form control, and `sage` as a border is 1.31:1 on white —
-     an input outlined in it is decoration, not an affordance. This is sage
+     identifies a form control, and `sand` as a border is 1.31:1 on white —
+     an input outlined in it is decoration, not an affordance. This is sand
      walked toward the slate end of the same family: 3.77:1 on white, 3.53:1
      on canvas, applied to inputs, textareas and select triggers only. Cards,
-     panels and dividers keep plain `sage`; a decorative edge has no floor. */
-  --color-sage-edge: #8d8271;
+     panels and dividers keep plain `sand`; a decorative edge has no floor. */
+  --color-sand-edge: #8d8271;
 
   /* Caution amber — the band between "on track" and "over budget".
      These three values were already in the app as loose hexes before they were
@@ -277,7 +282,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-green) !important;
+  background-color: var(--color-teal) !important;
 }
 
 ::-webkit-scrollbar-corner {
@@ -303,10 +308,10 @@ body::-webkit-scrollbar {
 /* The map pin is keyboard-operable (Leaflet's `keyboard` option gives it
    tabIndex=0 and role="button", and arrow keys nudge it), so it needs a focus
    indicator that matches the rest of the app rather than the UA default. Uses
-   green-deep — the same 7.04:1 token as FOCUS_RING — because the pin sits over
+   teal-deep — the same 7.04:1 token as FOCUS_RING — because the pin sits over
    arbitrary map tiles. */
 .wispr-pin:focus-visible {
-  outline: 2px solid var(--color-green-deep);
+  outline: 2px solid var(--color-teal-deep);
   outline-offset: 3px;
   border-radius: 4px;
 }

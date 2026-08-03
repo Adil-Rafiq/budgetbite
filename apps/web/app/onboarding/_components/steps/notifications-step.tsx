@@ -11,12 +11,12 @@ export const NotificationsStep = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-hidden rounded-[20px] border border-sage bg-white shadow-sm">
+      <div className="overflow-hidden rounded-[20px] border border-sand bg-white shadow-sm">
         {values.slots.map((slot, i) => (
           <div
             key={slot.mealTypeId}
             className={`flex items-center justify-between gap-4 px-5 py-4 ${
-              i === 0 ? '' : 'border-t border-sage/70'
+              i === 0 ? '' : 'border-t border-sand/70'
             }`}
           >
             <div
@@ -26,7 +26,7 @@ export const NotificationsStep = () => {
             >
               <span
                 aria-hidden
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-green/15 text-sm font-bold uppercase text-green-deep"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal/15 text-sm font-bold uppercase text-teal-deep"
               >
                 {slot.label.slice(0, 1)}
               </span>
@@ -55,7 +55,7 @@ export const NotificationsStep = () => {
                 <span
                   aria-hidden
                   className={`relative block h-6 w-11 rounded-full transition-colors ${
-                    slot.enabled ? 'bg-green-deep' : 'bg-sage'
+                    slot.enabled ? 'bg-teal-deep' : 'bg-sand'
                   }`}
                 >
                   <span
@@ -76,12 +76,12 @@ export const NotificationsStep = () => {
         </p>
       )}
 
-      <div className="flex items-start gap-3 rounded-[20px] border border-sage bg-white p-5 shadow-sm">
+      <div className="flex items-start gap-3 rounded-[20px] border border-sand bg-white p-5 shadow-sm">
         <span
           aria-hidden
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/60"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sand/60"
         >
-          <BellOff className="h-4 w-4 text-green-deep" />
+          <BellOff className="h-4 w-4 text-teal-deep" />
         </span>
         <p className="text-xs leading-relaxed text-slate">
           These are already set to sensible times — you only need to touch the ones you want to

@@ -80,7 +80,7 @@ export function AppHeader() {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b border-sage bg-canvas/85"
+      className="sticky top-0 z-40 border-b border-sand bg-canvas/85"
       style={{ backdropFilter: 'saturate(180%) blur(10px)' }}
     >
       <div className="flex items-center justify-between px-4 py-3 lg:px-8 lg:py-4">
@@ -90,14 +90,14 @@ export function AppHeader() {
           aria-label="BudgetBite — go to dashboard"
           className={`flex shrink-0 items-center gap-2.5 rounded-lg lg:hidden ${FOCUS_RING_ON_CANVAS}`}
         >
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-deep text-white">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-deep text-white">
             <LogoIcon size={13} />
           </span>
           {/* The wordmark yields to the budget figure on a phone. The mark still
               identifies the app and the tab bar names where you are; the money
               is the thing this header exists to keep in front of the user. */}
           <span className="hidden font-display text-base font-bold tracking-tight sm:inline">
-            Budget<span className="text-green-deep">Bite</span>
+            Budget<span className="text-teal-deep">Bite</span>
           </span>
         </Link>
 
@@ -120,7 +120,7 @@ export function AppHeader() {
                 // Stays 44px at every width. It used to shrink to 36 above the
                 // `sm` breakpoint, which is under the 44px target floor — on
                 // the only path to sign out, Profile, and Admin.
-                className={`inline-flex size-11 items-center justify-center rounded-full bg-green-deep text-xs font-semibold text-white transition-all hover:bg-green-deeper active:scale-95 ${FOCUS_RING_ON_CANVAS}`}
+                className={`inline-flex size-11 items-center justify-center rounded-full bg-teal-deep text-xs font-semibold text-white transition-all hover:bg-teal-deeper active:scale-95 ${FOCUS_RING_ON_CANVAS}`}
                 aria-label={user?.name ? `Account menu for ${user.name}` : 'Account menu'}
               >
                 {initials(user?.name)}
@@ -188,7 +188,7 @@ export function AppHeader() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-xl border border-sage bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
             >
               Go back and save
             </AlertDialogCancel>

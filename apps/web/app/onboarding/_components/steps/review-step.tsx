@@ -12,7 +12,7 @@ const STEP_INDEX = Object.fromEntries(
   ONBOARDING_STEPS.map((step, index) => [step.id, index]),
 ) as Record<string, number>;
 
-const cardClass = 'rounded-[20px] border border-sage bg-white shadow-sm';
+const cardClass = 'rounded-[20px] border border-sand bg-white shadow-sm';
 
 interface SectionProps {
   icon: typeof MapPin;
@@ -27,15 +27,15 @@ const Section = ({ icon: Icon, title, editStep, editLabel, children }: SectionPr
 
   return (
     <section className={cardClass}>
-      <div className="flex items-center justify-between gap-3 border-b border-sage/70 px-5 py-3">
+      <div className="flex items-center justify-between gap-3 border-b border-sand/70 px-5 py-3">
         <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate">
-          <Icon aria-hidden className="h-3.5 w-3.5 text-green-deep" />
+          <Icon aria-hidden className="h-3.5 w-3.5 text-teal-deep" />
           {title}
         </h2>
         <button
           type="button"
           onClick={() => actions.goToStep(editStep)}
-          className={`-mr-2 min-h-11 rounded-lg px-2 text-xs font-semibold text-green-deep underline underline-offset-2 transition-colors hover:text-charcoal ${FOCUS_RING}`}
+          className={`-mr-2 min-h-11 rounded-lg px-2 text-xs font-semibold text-teal-deep underline underline-offset-2 transition-colors hover:text-charcoal ${FOCUS_RING}`}
         >
           {editLabel}
         </button>
@@ -84,7 +84,7 @@ export const ReviewStep = () => {
   return (
     <div className="flex flex-col gap-4">
       {/* ── The number this whole product is about, stated once, plainly. ── */}
-      <div className="rounded-[20px] border border-green/40 bg-green/5 px-5 py-5 sm:px-6">
+      <div className="rounded-[20px] border border-teal/40 bg-teal/5 px-5 py-5 sm:px-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate">
           Your budget per meal
         </p>

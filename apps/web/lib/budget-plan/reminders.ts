@@ -7,7 +7,7 @@ import type { BudgetPlanMealTypeOption, NotificationSlotInput } from '@/lib/budg
  * slot schema requires HH:MM, that made the step invalid the moment it
  * rendered — and because its only error outlet read the *array's* `.message`
  * while react-hook-form files per-item failures under `notificationSlots[i]`,
- * the user got an enabled green "Next" that moved nowhere and said nothing.
+ * the user got an enabled teal "Next" that moved nowhere and said nothing.
  * Pre-filling is the fix: the step can be completed without opening a single
  * picker, and the user adjusts only the times they care about.
  */
