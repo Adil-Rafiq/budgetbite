@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/select';
 import {
   Table,
+  TableCaption,
   TableBody,
   TableCell,
   TableHead,
@@ -33,6 +34,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { DataError } from '@/components/data-error';
+import { AdminPagination } from '../../_components/admin-pagination';
 
 const PAGE_SIZE = 20;
 
@@ -53,7 +56,7 @@ export default function AdminUsersPage() {
     return () => clearTimeout(t);
   }, [search]);
 
-  const { data, isLoading, isError } = useAdminUsers({
+  const { data, isLoading, isError, refetch } = useAdminUsers({
     limit: PAGE_SIZE,
     offset,
     q: debouncedSearch || undefined,
@@ -77,6 +80,7 @@ export default function AdminUsersPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search users by name or email"
             placeholder="Search name or email…"
             className="max-w-xs bg-white"
           />
@@ -87,7 +91,7 @@ export default function AdminUsersPage() {
               setOffset(0);
             }}
           >
-            <SelectTrigger className="w-36 bg-white">
+            <SelectTrigger aria-label="Filter by role" className="w-36 bg-white">
               <SelectValue placeholder="All roles" />
             </SelectTrigger>
             <SelectContent>
@@ -97,22 +101,23 @@ export default function AdminUsersPage() {
             </SelectContent>
           </Select>
         </div>
-        {total > 0 && <span className="font-mono text-[12px] text-slate/60">{total} total</span>}
+        {total > 0 && <span className="font-mono text-[12px] text-slate-muted">{total} total</span>}
       </div>
 
-      <div className="mt-4 rounded-xl border border-sand bg-white">
+      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-white'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-slate/60" />
+            <Spinner className="size-5 text-slate-muted" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-slate/60">
-            Could not load users. Try again.
-          </div>
+          <DataError message="Could not load users." onRetry={() => refetch()} />
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-slate/60">No users match.</div>
+          <div className="py-16 text-center text-[14px] text-slate-muted">No users match.</div>
         ) : (
           <Table>
+            {/* Named for screen readers: the visible heading sits outside the
+                table, so without this the table announces only its column count. */}
+            <TableCaption className="sr-only">User accounts, with role and join date.</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
@@ -135,19 +140,19 @@ export default function AdminUsersPage() {
                         className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[11px] ${
                           u.role === 'admin'
                             ? 'bg-teal/15 text-teal-deep'
-                            : 'bg-sand/50 text-slate/60'
+                            : 'bg-sand/50 text-slate-muted'
                         }`}
                       >
                         {u.role}
                       </span>
                     </TableCell>
-                    <TableCell className="text-slate/60">
+                    <TableCell className="text-slate-muted">
                       {new Date(u.createdAt).toLocaleDateString()}
                     </TableCell>
                     {canWrite && (
                       <TableCell>
                         {isSelf ? (
-                          <span className="text-[12px] text-slate/60">You</span>
+                          <span className="text-[12px] text-slate-muted">You</span>
                         ) : (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -192,29 +197,13 @@ export default function AdminUsersPage() {
       </div>
 
       {total > PAGE_SIZE && (
-        <div className="mt-4 flex items-center justify-between">
-          <span className="font-mono text-[12px] text-slate/60">
-            Page {page} of {pageCount}
-          </span>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={offset === 0}
-              onClick={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= pageCount}
-              onClick={() => setOffset((o) => o + PAGE_SIZE)}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+        <AdminPagination
+          page={page}
+          pageCount={pageCount}
+          itemLabel="users"
+          onPrevious={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
+          onNext={() => setOffset((o) => o + PAGE_SIZE)}
+        />
       )}
     </div>
   );

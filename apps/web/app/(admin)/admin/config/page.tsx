@@ -3,6 +3,7 @@
 import type { AdminConfig } from '@repo/shared';
 import { useAdminConfig } from '@/hooks/use-admin-config';
 import { Spinner } from '@/components/ui/spinner';
+import { DataError } from '@/components/data-error';
 
 const rows: { key: keyof AdminConfig; label: string; description: string }[] = [
   {
@@ -30,7 +31,7 @@ const rows: { key: keyof AdminConfig; label: string; description: string }[] = [
 ];
 
 export default function AdminConfigPage() {
-  const { data, isLoading, isError } = useAdminConfig();
+  const { data, isLoading, isError, refetch } = useAdminConfig();
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -44,11 +45,11 @@ export default function AdminConfigPage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-16">
-          <Spinner className="size-5 text-slate/60" />
+          <Spinner className="size-5 text-slate-muted" />
         </div>
       ) : isError || !data ? (
-        <div className="py-16 text-center text-[14px] text-slate/60">
-          Could not load config. Try again.
+        <div className="mt-6">
+          <DataError message="Could not load config." onRetry={() => refetch()} />
         </div>
       ) : (
         <div className="mt-6 divide-y divide-sand rounded-xl border border-sand bg-white">
@@ -56,10 +57,10 @@ export default function AdminConfigPage() {
             <div key={key} className="flex items-center justify-between gap-4 px-4 py-3">
               <div className="min-w-0">
                 <div className="truncate font-mono text-[12px] text-slate">{label}</div>
-                <div className="mt-0.5 text-[12px] text-slate/60">{description}</div>
+                <div className="mt-0.5 text-[12px] text-slate-muted">{description}</div>
               </div>
               <div className="shrink-0 font-mono text-[13px] font-medium text-charcoal">
-                {data[key] ?? <span className="text-slate/60">unset</span>}
+                {data[key] ?? <span className="text-slate-muted">unset</span>}
               </div>
             </div>
           ))}

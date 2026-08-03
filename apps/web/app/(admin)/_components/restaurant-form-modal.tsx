@@ -17,8 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-const labelClass = 'text-[10px] uppercase text-slate/60';
-const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
+const labelClass = 'font-mono text-[10px] uppercase tracking-[0.18em] text-slate-muted';
 const errorClass = 'text-[11px] text-tomato-ink';
 
 // Empty string → undefined so optional fields are omitted instead of coerced to 0.
@@ -84,7 +83,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="name" className={labelClass} style={labelStyle}>
+            <Label htmlFor="name" className={labelClass}>
               Name
             </Label>
             <Input id="name" placeholder="e.g. Burns Road Nihari" {...register('name')} />
@@ -93,7 +92,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="externalId" className={labelClass} style={labelStyle}>
+              <Label htmlFor="externalId" className={labelClass}>
                 External ID
               </Label>
               <Input
@@ -104,7 +103,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
               {errors.externalId && <p className={errorClass}>{errors.externalId.message}</p>}
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="slug" className={labelClass} style={labelStyle}>
+              <Label htmlFor="slug" className={labelClass}>
                 Slug
               </Label>
               <Input
@@ -118,7 +117,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="phone" className={labelClass} style={labelStyle}>
+              <Label htmlFor="phone" className={labelClass}>
                 Phone
               </Label>
               <Input
@@ -129,7 +128,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
               {errors.phone && <p className={errorClass}>{errors.phone.message}</p>}
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="orderUrl" className={labelClass} style={labelStyle}>
+              <Label htmlFor="orderUrl" className={labelClass}>
                 Order link
               </Label>
               <Input
@@ -142,7 +141,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="imageUrl" className={labelClass} style={labelStyle}>
+            <Label htmlFor="imageUrl" className={labelClass}>
               Photo URL
             </Label>
             <Input
@@ -159,7 +158,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="latitude" className={labelClass} style={labelStyle}>
+              <Label htmlFor="latitude" className={labelClass}>
                 Latitude
               </Label>
               <Input
@@ -171,7 +170,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
               {errors.latitude && <p className={errorClass}>{errors.latitude.message}</p>}
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="longitude" className={labelClass} style={labelStyle}>
+              <Label htmlFor="longitude" className={labelClass}>
                 Longitude
               </Label>
               <Input
@@ -186,7 +185,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="deliveryFee" className={labelClass} style={labelStyle}>
+              <Label htmlFor="deliveryFee" className={labelClass}>
                 Delivery fee
               </Label>
               <Input
@@ -199,7 +198,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
               {errors.deliveryFee && <p className={errorClass}>{errors.deliveryFee.message}</p>}
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="minimumOrder" className={labelClass} style={labelStyle}>
+              <Label htmlFor="minimumOrder" className={labelClass}>
                 Minimum order
               </Label>
               <Input
@@ -215,7 +214,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="rating" className={labelClass} style={labelStyle}>
+              <Label htmlFor="rating" className={labelClass}>
                 Rating
               </Label>
               <Input
@@ -228,7 +227,7 @@ export function RestaurantFormModal({ open, onOpenChange, restaurant }: Props) {
               {errors.rating && <p className={errorClass}>{errors.rating.message}</p>}
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="ratingCount" className={labelClass} style={labelStyle}>
+              <Label htmlFor="ratingCount" className={labelClass}>
                 Rating count
               </Label>
               <Input

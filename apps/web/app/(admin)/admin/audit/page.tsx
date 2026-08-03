@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useAdminAuditLogs } from '@/hooks/use-admin-audit-logs';
-import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import {
   Select,
@@ -13,12 +12,15 @@ import {
 } from '@/components/ui/select';
 import {
   Table,
+  TableCaption,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { DataError } from '@/components/data-error';
+import { AdminPagination } from '../../_components/admin-pagination';
 
 const PAGE_SIZE = 25;
 
@@ -29,7 +31,7 @@ export default function AdminAuditPage() {
   const [entityType, setEntityType] = useState<string>('all');
   const [offset, setOffset] = useState(0);
 
-  const { data, isLoading, isError } = useAdminAuditLogs({
+  const { data, isLoading, isError, refetch } = useAdminAuditLogs({
     limit: PAGE_SIZE,
     offset,
     entityType: entityType === 'all' ? undefined : entityType,
@@ -57,7 +59,7 @@ export default function AdminAuditPage() {
             setOffset(0);
           }}
         >
-          <SelectTrigger className="w-44 bg-white">
+          <SelectTrigger aria-label="Filter by entity type" className="w-44 bg-white">
             <SelectValue placeholder="All entities" />
           </SelectTrigger>
           <SelectContent>
@@ -69,24 +71,27 @@ export default function AdminAuditPage() {
             ))}
           </SelectContent>
         </Select>
-        {total > 0 && <span className="font-mono text-[12px] text-slate/60">{total} total</span>}
+        {total > 0 && <span className="font-mono text-[12px] text-slate-muted">{total} total</span>}
       </div>
 
-      <div className="mt-4 rounded-xl border border-sand bg-white">
+      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-white'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-slate/60" />
+            <Spinner className="size-5 text-slate-muted" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-slate/60">
-            Could not load the audit log. Try again.
-          </div>
+          <DataError message="Could not load the audit log." onRetry={() => refetch()} />
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-slate/60">
+          <div className="py-16 text-center text-[14px] text-slate-muted">
             No activity recorded yet.
           </div>
         ) : (
           <Table>
+            {/* Named for screen readers: the visible heading sits outside the
+                table, so without this the table announces only its column count. */}
+            <TableCaption className="sr-only">
+              Admin and scraper mutations, newest first.
+            </TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-48">When</TableHead>
@@ -98,12 +103,12 @@ export default function AdminAuditPage() {
             <TableBody>
               {rows.map((entry) => (
                 <TableRow key={entry.id}>
-                  <TableCell className="text-slate/60">
+                  <TableCell className="text-slate-muted">
                     {new Date(entry.createdAt).toLocaleString()}
                   </TableCell>
                   <TableCell className="text-slate">
                     {entry.actorType === 'service' ? (
-                      <span style={{ fontFamily: 'var(--font-mono)' }}>scraper</span>
+                      <span className="font-mono">scraper</span>
                     ) : (
                       (entry.actorName ?? '—')
                     )}
@@ -113,11 +118,19 @@ export default function AdminAuditPage() {
                       {entry.action}
                     </span>
                   </TableCell>
-                  <TableCell className="text-slate/60">
-                    <span style={{ fontFamily: 'var(--font-mono)' }}>{entry.entityType}</span>
+                  <TableCell className="text-slate-muted">
+                    <span className="font-mono">{entry.entityType}</span>
+                    {/* Truncated to stay scannable, but the full id is on the
+                        element: the log's purpose is tracing one record, and
+                        eight characters with no way to see the rest made that
+                        impossible. `text-slate/50` was also 2.4:1. */}
                     {entry.entityId && (
-                      <span className="ml-2 font-mono text-[12px] text-slate/50">
+                      <span
+                        title={entry.entityId}
+                        className="ml-2 font-mono text-[12px] text-slate-muted"
+                      >
                         {entry.entityId.slice(0, 8)}
+                        <span className="sr-only">{entry.entityId.slice(8)}</span>
                       </span>
                     )}
                   </TableCell>
@@ -129,29 +142,13 @@ export default function AdminAuditPage() {
       </div>
 
       {total > PAGE_SIZE && (
-        <div className="mt-4 flex items-center justify-between">
-          <span className="font-mono text-[12px] text-slate/60">
-            Page {page} of {pageCount}
-          </span>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={offset === 0}
-              onClick={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= pageCount}
-              onClick={() => setOffset((o) => o + PAGE_SIZE)}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+        <AdminPagination
+          page={page}
+          pageCount={pageCount}
+          itemLabel="log entries"
+          onPrevious={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
+          onNext={() => setOffset((o) => o + PAGE_SIZE)}
+        />
       )}
     </div>
   );

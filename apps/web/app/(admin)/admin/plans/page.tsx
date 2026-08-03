@@ -5,7 +5,6 @@ import Link from 'next/link';
 import type { AdminPlanGeneration } from '@repo/shared';
 import { useAdminPlans } from '@/hooks/use-admin-plans';
 import { formatPKR } from '@/lib/currency';
-import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import {
   Select,
@@ -16,12 +15,15 @@ import {
 } from '@/components/ui/select';
 import {
   Table,
+  TableCaption,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { DataError } from '@/components/data-error';
+import { AdminPagination } from '../../_components/admin-pagination';
 
 const PAGE_SIZE = 20;
 
@@ -31,14 +33,14 @@ const genStatusClass: Record<AdminPlanGeneration['status'], string> = {
   pending: 'bg-amber-tint text-amber-ink',
   succeeded: 'bg-teal/15 text-teal-deep',
   failed: 'bg-tomato/10 text-tomato-ink',
-  superseded: 'bg-sand/50 text-slate/60',
+  superseded: 'bg-sand/50 text-slate-muted',
 };
 
 export default function AdminPlansPage() {
   const [status, setStatus] = useState<string>('all');
   const [offset, setOffset] = useState(0);
 
-  const { data, isLoading, isError } = useAdminPlans({
+  const { data, isLoading, isError, refetch } = useAdminPlans({
     limit: PAGE_SIZE,
     offset,
     status: status === 'all' ? undefined : (status as 'active' | 'completed' | 'cancelled'),
@@ -64,7 +66,7 @@ export default function AdminPlansPage() {
             setOffset(0);
           }}
         >
-          <SelectTrigger className="w-40 bg-white">
+          <SelectTrigger aria-label="Filter by plan status" className="w-40 bg-white">
             <SelectValue placeholder="All statuses" />
           </SelectTrigger>
           <SelectContent>
@@ -74,22 +76,25 @@ export default function AdminPlansPage() {
             <SelectItem value="cancelled">Cancelled</SelectItem>
           </SelectContent>
         </Select>
-        {total > 0 && <span className="font-mono text-[12px] text-slate/60">{total} total</span>}
+        {total > 0 && <span className="font-mono text-[12px] text-slate-muted">{total} total</span>}
       </div>
 
-      <div className="mt-4 rounded-xl border border-sand bg-white">
+      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-white'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-slate/60" />
+            <Spinner className="size-5 text-slate-muted" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-slate/60">
-            Could not load plans. Try again.
-          </div>
+          <DataError message="Could not load plans." onRetry={() => refetch()} />
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-slate/60">No plans match.</div>
+          <div className="py-16 text-center text-[14px] text-slate-muted">No plans match.</div>
         ) : (
           <Table>
+            {/* Named for screen readers: the visible heading sits outside the
+                table, so without this the table announces only its column count. */}
+            <TableCaption className="sr-only">
+              Budget plans, with owner, budget and status.
+            </TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>User</TableHead>
@@ -110,24 +115,23 @@ export default function AdminPlansPage() {
                     >
                       {p.user.name}
                     </Link>
-                    <span className="ml-2 text-[12px] text-slate/60">{p.user.email}</span>
+                    <span className="ml-2 text-[12px] text-slate-muted">{p.user.email}</span>
                   </TableCell>
                   <TableCell className="text-slate">{p.planType}</TableCell>
                   <TableCell className="text-right text-slate">{money(p.totalBudget)}</TableCell>
-                  <TableCell className="text-slate/60">{p.status}</TableCell>
+                  <TableCell className="text-slate-muted">{p.status}</TableCell>
                   <TableCell>
                     {p.latestAttempt ? (
                       <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] ${genStatusClass[p.latestAttempt.status]}`}
-                        style={{ fontFamily: 'var(--font-mono)' }}
+                        className={`font-mono inline-flex items-center rounded-full px-2 py-0.5 text-[11px] ${genStatusClass[p.latestAttempt.status]}`}
                       >
                         {p.latestAttempt.status}
                       </span>
                     ) : (
-                      <span className="text-slate/60">—</span>
+                      <span className="text-slate-muted">—</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-slate/60">
+                  <TableCell className="text-slate-muted">
                     {new Date(p.createdAt).toLocaleDateString()}
                   </TableCell>
                 </TableRow>
@@ -138,29 +142,13 @@ export default function AdminPlansPage() {
       </div>
 
       {total > PAGE_SIZE && (
-        <div className="mt-4 flex items-center justify-between">
-          <span className="font-mono text-[12px] text-slate/60">
-            Page {page} of {pageCount}
-          </span>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={offset === 0}
-              onClick={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= pageCount}
-              onClick={() => setOffset((o) => o + PAGE_SIZE)}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+        <AdminPagination
+          page={page}
+          pageCount={pageCount}
+          itemLabel="plans"
+          onPrevious={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
+          onNext={() => setOffset((o) => o + PAGE_SIZE)}
+        />
       )}
     </div>
   );

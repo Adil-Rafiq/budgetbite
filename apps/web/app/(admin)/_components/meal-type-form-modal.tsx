@@ -18,8 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 
-const labelClass = 'text-[10px] uppercase text-slate/60';
-const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
+const labelClass = 'font-mono text-[10px] uppercase tracking-[0.18em] text-slate-muted';
 const errorClass = 'text-[11px] text-tomato-ink';
 
 const optionalNumber = (v: unknown) => (v === '' || v == null ? undefined : Number(v));
@@ -74,7 +73,7 @@ export function MealTypeFormModal({ open, onOpenChange, mealType }: Props) {
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="label" className={labelClass} style={labelStyle}>
+            <Label htmlFor="label" className={labelClass}>
               Label
             </Label>
             <Input id="label" placeholder="e.g. Breakfast" {...register('label')} />
@@ -83,19 +82,14 @@ export function MealTypeFormModal({ open, onOpenChange, mealType }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="key" className={labelClass} style={labelStyle}>
+              <Label htmlFor="key" className={labelClass}>
                 Key
               </Label>
-              <Input
-                id="key"
-                placeholder="e.g. breakfast"
-                style={{ fontFamily: 'var(--font-mono)' }}
-                {...register('key')}
-              />
+              <Input id="key" placeholder="e.g. breakfast" {...register('key')} />
               {errors.key && <p className={errorClass}>{errors.key.message}</p>}
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="sortOrder" className={labelClass} style={labelStyle}>
+              <Label htmlFor="sortOrder" className={labelClass}>
                 Sort order
               </Label>
               <Input
@@ -109,7 +103,7 @@ export function MealTypeFormModal({ open, onOpenChange, mealType }: Props) {
           </div>
 
           <div className="flex items-center justify-between rounded-lg border border-sand px-3 py-2.5">
-            <Label htmlFor="active" className={labelClass} style={labelStyle}>
+            <Label htmlFor="active" className={labelClass}>
               Active
             </Label>
             <Controller

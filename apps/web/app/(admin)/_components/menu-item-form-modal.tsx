@@ -18,8 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
-const labelClass = 'text-[10px] uppercase text-slate/60';
-const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-mono)', letterSpacing: '0.18em' };
+const labelClass = 'font-mono text-[10px] uppercase tracking-[0.18em] text-slate-muted';
 const errorClass = 'text-[11px] text-tomato-ink';
 
 // Empty string → undefined so optional fields are omitted, not sent as ''.
@@ -77,14 +76,14 @@ export function MenuItemFormModal({ open, onOpenChange, restaurantId, menuItem }
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="grid grid-cols-[1fr_8rem] gap-3">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="name" className={labelClass} style={labelStyle}>
+              <Label htmlFor="name" className={labelClass}>
                 Name
               </Label>
               <Input id="name" placeholder="e.g. Chicken Karahi" {...register('name')} />
               {errors.name && <p className={errorClass}>{errors.name.message}</p>}
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="price" className={labelClass} style={labelStyle}>
+              <Label htmlFor="price" className={labelClass}>
                 Price (₨)
               </Label>
               <Input
@@ -98,7 +97,7 @@ export function MenuItemFormModal({ open, onOpenChange, restaurantId, menuItem }
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="description" className={labelClass} style={labelStyle}>
+            <Label htmlFor="description" className={labelClass}>
               Description
             </Label>
             <Textarea
@@ -111,7 +110,7 @@ export function MenuItemFormModal({ open, onOpenChange, restaurantId, menuItem }
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="category" className={labelClass} style={labelStyle}>
+            <Label htmlFor="category" className={labelClass}>
               Section
             </Label>
             <Input
@@ -129,7 +128,7 @@ export function MenuItemFormModal({ open, onOpenChange, restaurantId, menuItem }
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="imageUrl" className={labelClass} style={labelStyle}>
+            <Label htmlFor="imageUrl" className={labelClass}>
               Image URL
             </Label>
             <Input

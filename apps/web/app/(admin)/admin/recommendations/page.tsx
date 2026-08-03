@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import {
   Table,
+  TableCaption,
   TableBody,
   TableCell,
   TableHead,
@@ -36,6 +37,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { DataError } from '@/components/data-error';
+import { AdminPagination } from '../../_components/admin-pagination';
 
 const PAGE_SIZE = 20;
 
@@ -56,7 +59,7 @@ export default function AdminRecommendationsPage() {
   const [rejecting, setRejecting] = useState<AdminRestaurantRecommendation | null>(null);
   const [rejectNote, setRejectNote] = useState('');
 
-  const { data, isLoading, isError } = useAdminRecommendations({
+  const { data, isLoading, isError, refetch } = useAdminRecommendations({
     limit: PAGE_SIZE,
     offset,
     status:
@@ -112,7 +115,7 @@ export default function AdminRecommendationsPage() {
             setOffset(0);
           }}
         >
-          <SelectTrigger className="w-40 bg-white">
+          <SelectTrigger aria-label="Filter by recommendation status" className="w-40 bg-white">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -122,28 +125,27 @@ export default function AdminRecommendationsPage() {
             <SelectItem value="rejected">Rejected</SelectItem>
           </SelectContent>
         </Select>
-        {total > 0 && (
-          <span className="text-[12px] text-slate/60" style={{ fontFamily: 'var(--font-mono)' }}>
-            {total} total
-          </span>
-        )}
+        {total > 0 && <span className="font-mono text-[12px] text-slate-muted">{total} total</span>}
       </div>
 
-      <div className="mt-4 rounded-xl border border-sand bg-white">
+      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-white'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-slate/60" />
+            <Spinner className="size-5 text-slate-muted" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-slate/60">
-            Could not load recommendations. Try again.
-          </div>
+          <DataError message="Could not load recommendations." onRetry={() => refetch()} />
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-slate/60">
+          <div className="py-16 text-center text-[14px] text-slate-muted">
             No recommendations{statusFilter !== 'all' ? ` are ${statusFilter}` : ''}.
           </div>
         ) : (
           <Table>
+            {/* Named for screen readers: the visible heading sits outside the
+                table, so without this the table announces only its column count. */}
+            <TableCaption className="sr-only">
+              User-submitted restaurants awaiting review.
+            </TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Restaurant &amp; items</TableHead>
@@ -171,45 +173,35 @@ export default function AdminRecommendationsPage() {
                         </a>
                       )}
                       {r.phone && (
-                        <span
-                          className="text-[12px] text-slate/60"
-                          style={{ fontFamily: 'var(--font-mono)' }}
-                        >
-                          {r.phone}
-                        </span>
+                        <span className="font-mono text-[12px] text-slate-muted">{r.phone}</span>
                       )}
                       {r.items.length > 0 && (
                         <div className="flex flex-wrap gap-1">
-                          {r.items.slice(0, 6).map((it, idx) => (
+                          {r.items.slice(0, 6).map((it) => (
                             <span
-                              key={idx}
+                              key={it.name}
                               className="rounded border border-sand bg-canvas px-1.5 py-0.5 font-mono text-[11px] text-slate"
                             >
                               {it.name} {formatPKR(it.price)}
                             </span>
                           ))}
                           {r.items.length > 6 && (
-                            <span className="text-[11px] text-slate/60">
+                            <span className="text-[11px] text-slate-muted">
                               +{r.items.length - 6} more
                             </span>
                           )}
                         </div>
                       )}
-                      {r.note && <span className="text-[12px] text-slate/60">{r.note}</span>}
+                      {r.note && <span className="text-[12px] text-slate-muted">{r.note}</span>}
                     </div>
                   </TableCell>
                   <TableCell className="text-slate">
                     <div className="flex flex-col">
                       <span>{r.user.name}</span>
-                      <span
-                        className="text-[11px] text-slate/60"
-                        style={{ fontFamily: 'var(--font-mono)' }}
-                      >
-                        {r.user.email}
-                      </span>
+                      <span className="font-mono text-[11px] text-slate-muted">{r.user.email}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-slate/60">
+                  <TableCell className="text-slate-muted">
                     <div className="flex flex-col gap-1">
                       <span>{r.area ?? '—'}</span>
                       {r.latitude != null && r.longitude != null && (
@@ -226,16 +218,15 @@ export default function AdminRecommendationsPage() {
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] ${STATUS_PILL[r.status]}`}
-                      style={{ fontFamily: 'var(--font-mono)' }}
+                      className={`font-mono inline-flex items-center rounded-full px-2 py-0.5 text-[11px] ${STATUS_PILL[r.status]}`}
                     >
                       {r.status}
                     </span>
                     {r.adminNote && (
-                      <span className="mt-1 block text-[11px] text-slate/60">{r.adminNote}</span>
+                      <span className="mt-1 block text-[11px] text-slate-muted">{r.adminNote}</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-slate/60">
+                  <TableCell className="text-slate-muted">
                     {new Date(r.createdAt).toLocaleDateString()}
                   </TableCell>
                   {canWrite && (
@@ -262,7 +253,7 @@ export default function AdminRecommendationsPage() {
                           </Button>
                         </div>
                       ) : (
-                        <span className="text-[12px] text-slate/60">
+                        <span className="text-[12px] text-slate-muted">
                           {r.reviewedAt ? new Date(r.reviewedAt).toLocaleDateString() : 'reviewed'}
                         </span>
                       )}
@@ -276,29 +267,13 @@ export default function AdminRecommendationsPage() {
       </div>
 
       {total > PAGE_SIZE && (
-        <div className="mt-4 flex items-center justify-between">
-          <span className="text-[12px] text-slate/60" style={{ fontFamily: 'var(--font-mono)' }}>
-            Page {page} of {pageCount}
-          </span>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={offset === 0}
-              onClick={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= pageCount}
-              onClick={() => setOffset((o) => o + PAGE_SIZE)}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+        <AdminPagination
+          page={page}
+          pageCount={pageCount}
+          itemLabel="recommendations"
+          onPrevious={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
+          onNext={() => setOffset((o) => o + PAGE_SIZE)}
+        />
       )}
 
       {/* Approve — one click creates the restaurant + its menu items. */}
@@ -347,11 +322,19 @@ export default function AdminRecommendationsPage() {
             rows={3}
             value={rejectNote}
             onChange={(e) => setRejectNote(e.target.value)}
+            aria-label="Rejection note"
             placeholder="Reason (optional)"
           />
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmReject} disabled={review.isPending}>
+            {/* Reject inherited the default affirmative styling, so the two
+                opposite outcomes — approve and reject — rendered as the same
+                brand-teal button. */}
+            <AlertDialogAction
+              onClick={confirmReject}
+              disabled={review.isPending}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
               Reject
             </AlertDialogAction>
           </AlertDialogFooter>
