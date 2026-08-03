@@ -7,13 +7,14 @@ import { useUser } from '@/hooks/use-user';
 import {
   useAdminMealTypes,
   useDeleteAdminMealType,
-  useUpdateAdminMealType,
+  useSwapAdminMealTypeOrder,
 } from '@/hooks/use-admin-meal-types';
 import { MealTypeFormModal } from '../../_components/meal-type-form-modal';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import {
   Table,
+  TableCaption,
   TableBody,
   TableCell,
   TableHead,
@@ -31,6 +32,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { DataError } from '@/components/data-error';
 
 export default function AdminMealTypesPage() {
   const { data: user } = useUser();
@@ -39,20 +41,19 @@ export default function AdminMealTypesPage() {
 
   const [form, setForm] = useState<{ open: boolean; mealType?: MealType }>({ open: false });
 
-  const { data, isLoading, isError } = useAdminMealTypes();
+  const { data, isLoading, isError, refetch } = useAdminMealTypes();
   const deleteMealType = useDeleteAdminMealType();
-  const updateMealType = useUpdateAdminMealType();
+  const swapOrder = useSwapAdminMealTypeOrder();
 
   const rows = [...(data ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
 
-  // Reorder by swapping sortOrder with the adjacent row. Two writes; the list
-  // re-sorts on invalidation. No-op at the ends.
+  // Reorder by swapping sortOrder with the adjacent row. One atomic swap; the
+  // list re-sorts on invalidation. No-op at the ends.
   const move = (index: number, dir: -1 | 1) => {
     const a = rows[index];
     const b = rows[index + dir];
     if (!a || !b) return;
-    updateMealType.mutate({ id: a.id, input: { sortOrder: b.sortOrder } });
-    updateMealType.mutate({ id: b.id, input: { sortOrder: a.sortOrder } });
+    swapOrder.mutate({ a, b });
   };
 
   return (
@@ -74,19 +75,22 @@ export default function AdminMealTypesPage() {
         )}
       </div>
 
-      <div className="mt-6 rounded-xl border border-sand bg-white">
+      <div className={isError ? 'mt-6' : 'mt-6 rounded-xl border border-sand bg-white'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Spinner className="size-5 text-slate/60" />
+            <Spinner className="size-5 text-slate-muted" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center text-[14px] text-slate/60">
-            Could not load meal types. Try again.
-          </div>
+          <DataError message="Could not load meal types." onRetry={() => refetch()} />
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-[14px] text-slate/60">No meal types yet.</div>
+          <div className="py-16 text-center text-[14px] text-slate-muted">No meal types yet.</div>
         ) : (
           <Table>
+            {/* Named for screen readers: the visible heading sits outside the
+                table, so without this the table announces only its column count. */}
+            <TableCaption className="sr-only">
+              Meal types, in the order users see them.
+            </TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-16 text-right">Order</TableHead>
@@ -101,20 +105,15 @@ export default function AdminMealTypesPage() {
                 const isDeleting = deleteMealType.isPending && deleteMealType.variables === mt.id;
                 return (
                   <TableRow key={mt.id}>
-                    <TableCell className="text-right text-slate/60">{mt.sortOrder}</TableCell>
+                    <TableCell className="text-right text-slate-muted">{mt.sortOrder}</TableCell>
                     <TableCell>
-                      <span
-                        className="text-[13px] text-slate"
-                        style={{ fontFamily: 'var(--font-mono)' }}
-                      >
-                        {mt.key}
-                      </span>
+                      <span className="font-mono text-[13px] text-slate">{mt.key}</span>
                     </TableCell>
                     <TableCell className="font-medium text-charcoal">{mt.label}</TableCell>
                     <TableCell>
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[11px] ${
-                          mt.active ? 'bg-teal/15 text-teal-deep' : 'bg-sand/50 text-slate/60'
+                          mt.active ? 'bg-teal/15 text-teal-deep' : 'bg-sand/50 text-slate-muted'
                         }`}
                       >
                         {mt.active ? 'active' : 'inactive'}
@@ -129,7 +128,7 @@ export default function AdminMealTypesPage() {
                                 variant="ghost"
                                 size="icon-sm"
                                 aria-label={`Move ${mt.label} up`}
-                                disabled={index === 0 || updateMealType.isPending}
+                                disabled={index === 0 || swapOrder.isPending}
                                 onClick={() => move(index, -1)}
                               >
                                 <ChevronUp className="size-4 text-slate" />
@@ -138,7 +137,7 @@ export default function AdminMealTypesPage() {
                                 variant="ghost"
                                 size="icon-sm"
                                 aria-label={`Move ${mt.label} down`}
-                                disabled={index === rows.length - 1 || updateMealType.isPending}
+                                disabled={index === rows.length - 1 || swapOrder.isPending}
                                 onClick={() => move(index, 1)}
                               >
                                 <ChevronDown className="size-4 text-slate" />
