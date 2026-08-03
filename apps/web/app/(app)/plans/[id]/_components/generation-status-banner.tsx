@@ -54,7 +54,7 @@ export function GenerationStatusBanner({ plan }: GenerationStatusBannerProps) {
           type="button"
           onClick={() => generate.mutate(plan.id)}
           disabled={generate.isPending}
-          className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-tomato/30 bg-white px-3 text-[12px] font-medium text-tomato-ink transition-colors hover:bg-tomato/10 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+          className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-tomato/30 bg-surface px-3 text-[12px] font-medium text-tomato-ink transition-colors hover:bg-tomato/10 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
         >
           <RefreshCw className={cn('h-3.5 w-3.5', generate.isPending && 'animate-spin')} />
           Retry

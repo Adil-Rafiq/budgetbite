@@ -144,13 +144,13 @@ export function LocationCard({ onDirtyChange }: { onDirtyChange: (dirty: boolean
             type="button"
             onClick={detect}
             disabled={isDetecting}
-            className={`inline-flex min-h-11 items-center gap-2 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas disabled:opacity-60 ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 items-center gap-2 rounded-xl border border-sand bg-surface px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas disabled:opacity-60 ${FOCUS_RING}`}
           >
             {isDetecting ? (
               <>
                 <span
                   aria-hidden
-                  className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-teal-deep"
+                  className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-teal-ink"
                   style={{ borderTopColor: 'transparent' }}
                 />
                 Detecting…
@@ -203,7 +203,7 @@ export function LocationCard({ onDirtyChange }: { onDirtyChange: (dirty: boolean
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
+            <div className="text-xs font-semibold uppercase tracking-widest text-teal-ink">
               Confirm · Location
             </div>
             <AlertDialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -250,7 +250,7 @@ export function LocationCard({ onDirtyChange }: { onDirtyChange: (dirty: boolean
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl border border-sand bg-surface px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
             >
               Keep the old spot
             </AlertDialogCancel>

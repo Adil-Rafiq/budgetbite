@@ -107,7 +107,7 @@ export default function LoginPage() {
   };
 
   const inputClass =
-    'w-full rounded-xl border border-sand bg-white px-3.5 py-3 text-[14px] text-charcoal outline-none transition-colors placeholder:text-slate/50 focus:border-teal';
+    'w-full rounded-xl border border-sand bg-surface px-3.5 py-3 text-[14px] text-charcoal outline-none transition-colors placeholder:text-slate/50 focus:border-teal';
   const labelClass = 'text-xs font-semibold uppercase tracking-wide text-slate';
   const busy = isSubmitting || oauthLoading !== null;
 
@@ -117,7 +117,8 @@ export default function LoginPage() {
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-40"
         style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, #ebe0cd 1px, transparent 0)',
+          backgroundImage:
+            'radial-gradient(circle at 1px 1px, var(--color-sand) 1px, transparent 0)',
           backgroundSize: '32px 32px',
         }}
       />
@@ -128,7 +129,7 @@ export default function LoginPage() {
             <LogoIcon size={16} />
           </span>
           <span className="font-display text-xl font-bold tracking-tight">
-            Budget<span className="text-teal-deep">Bite</span>
+            Budget<span className="text-teal-ink">Bite</span>
           </span>
         </Link>
         <Link
@@ -142,21 +143,21 @@ export default function LoginPage() {
 
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[440px] flex-col justify-center px-6 pb-16">
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-4 py-1.5 shadow-sm">
+          <div className="inline-flex items-center gap-2 rounded-full border border-sand bg-surface px-4 py-1.5 shadow-sm">
             <span className="h-2 w-2 animate-pulse rounded-full bg-teal" />
             <span className="text-xs font-normal uppercase tracking-widest text-charcoal/70">
               Sign in to your account
             </span>
           </div>
           <h1 className="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tight">
-            Welcome <span className="text-teal-deep">back.</span>
+            Welcome <span className="text-teal-ink">back.</span>
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-charcoal/60">
             Pick up where you left off.
           </p>
         </div>
 
-        <div className="mt-8 rounded-3xl border border-sand bg-white p-7 shadow-2xl">
+        <div className="mt-8 rounded-3xl border border-sand bg-surface p-7 shadow-2xl">
           <form onSubmit={handleSubmit(onSubmit)} autoComplete="on" className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
               <label htmlFor="email" className={labelClass}>
@@ -180,7 +181,7 @@ export default function LoginPage() {
                 </label>
                 <button
                   type="button"
-                  className="text-xs font-medium text-teal-deep transition-colors hover:text-teal-deep"
+                  className="text-xs font-medium text-teal-ink transition-colors hover:text-teal-ink"
                   onClick={() => router.push('/forgot-password')}
                 >
                   Forgot?
@@ -239,7 +240,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => handleOAuthSignIn('google')}
               disabled={busy}
-              className="flex min-h-11 items-center justify-center gap-2.5 rounded-xl border border-sand bg-white text-sm font-medium text-charcoal shadow-sm transition-all hover:border-teal/40 hover:bg-canvas disabled:pointer-events-none disabled:opacity-50"
+              className="flex min-h-11 items-center justify-center gap-2.5 rounded-xl border border-sand bg-surface text-sm font-medium text-charcoal shadow-sm transition-all hover:border-teal/40 hover:bg-canvas disabled:pointer-events-none disabled:opacity-50"
             >
               {oauthLoading === 'google' ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -252,7 +253,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => handleOAuthSignIn('github')}
               disabled={busy}
-              className="flex min-h-11 items-center justify-center gap-2.5 rounded-xl bg-charcoal text-sm font-medium text-white transition-all hover:bg-charcoal/90 disabled:pointer-events-none disabled:opacity-50"
+              className="flex min-h-11 items-center justify-center gap-2.5 rounded-xl bg-onyx text-sm font-medium text-white transition-all hover:bg-onyx/90 disabled:pointer-events-none disabled:opacity-50"
             >
               {oauthLoading === 'github' ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -268,7 +269,7 @@ export default function LoginPage() {
           New to BudgetBite?{' '}
           <Link
             href="/register"
-            className="inline-flex items-center gap-1 font-semibold text-teal-deep transition-colors hover:text-teal-deep"
+            className="inline-flex items-center gap-1 font-semibold text-teal-ink transition-colors hover:text-teal-ink"
           >
             Create an account
             <Mail className="h-3.5 w-3.5" />

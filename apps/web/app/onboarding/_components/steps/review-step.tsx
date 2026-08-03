@@ -12,7 +12,7 @@ const STEP_INDEX = Object.fromEntries(
   ONBOARDING_STEPS.map((step, index) => [step.id, index]),
 ) as Record<string, number>;
 
-const cardClass = 'rounded-[20px] border border-sand bg-white shadow-sm';
+const cardClass = 'rounded-[20px] border border-sand bg-surface shadow-sm';
 
 interface SectionProps {
   icon: typeof MapPin;
@@ -29,13 +29,13 @@ const Section = ({ icon: Icon, title, editStep, editLabel, children }: SectionPr
     <section className={cardClass}>
       <div className="flex items-center justify-between gap-3 border-b border-sand/70 px-5 py-3">
         <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate">
-          <Icon aria-hidden className="h-3.5 w-3.5 text-teal-deep" />
+          <Icon aria-hidden className="h-3.5 w-3.5 text-teal-ink" />
           {title}
         </h2>
         <button
           type="button"
           onClick={() => actions.goToStep(editStep)}
-          className={`-mr-2 min-h-11 rounded-lg px-2 text-xs font-semibold text-teal-deep underline underline-offset-2 transition-colors hover:text-charcoal ${FOCUS_RING}`}
+          className={`-mr-2 min-h-11 rounded-lg px-2 text-xs font-semibold text-teal-ink underline underline-offset-2 transition-colors hover:text-charcoal ${FOCUS_RING}`}
         >
           {editLabel}
         </button>

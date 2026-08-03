@@ -9,6 +9,7 @@ import { useAdminRecommendations } from '@/hooks/use-admin-recommendations';
 import { useAdminIngestionHealth } from '@/hooks/use-admin-ingestion-health';
 import { authClient } from '@/lib/auth-client';
 import { LogoIcon } from '@/components/icons';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
   ADMIN_NAV_GROUPS,
@@ -58,7 +59,7 @@ function NavLink({
       aria-current={active ? 'page' : undefined}
       className={`flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${FOCUS_RING} ${
         active
-          ? 'bg-teal-tint font-semibold text-teal-deep'
+          ? 'bg-teal-tint font-semibold text-teal-ink'
           : 'text-slate hover:bg-canvas hover:text-charcoal'
       }`}
     >
@@ -129,7 +130,7 @@ function Wordmark({ onNavigate }: { onNavigate?: () => void }) {
       </span>
       <span className="flex flex-col leading-none">
         <span className="font-display text-lg font-bold tracking-tight text-charcoal">
-          Budget<span className="text-teal-deep">Bite</span>
+          Budget<span className="text-teal-ink">Bite</span>
         </span>
         <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-slate-muted">
           admin
@@ -196,7 +197,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const backToApp = (
     <Link
       href="/dashboard"
-      className={`flex min-h-11 items-center gap-2 rounded-xl border border-sand bg-white px-3 py-2 text-[13px] text-slate transition-colors hover:bg-canvas hover:text-charcoal ${FOCUS_RING}`}
+      className={`flex min-h-11 items-center gap-2 rounded-xl border border-sand bg-surface px-3 py-2 text-[13px] text-slate transition-colors hover:bg-canvas hover:text-charcoal ${FOCUS_RING}`}
     >
       <ArrowLeft aria-hidden className="h-4 w-4" />
       Back to app
@@ -215,7 +216,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Desktop rail */}
       <aside
         aria-label="Admin sidebar"
-        className="fixed inset-y-0 left-0 z-30 hidden border-r border-sand bg-white text-charcoal lg:flex lg:w-64 lg:flex-col"
+        className="fixed inset-y-0 left-0 z-30 hidden border-r border-sand bg-surface text-charcoal lg:flex lg:w-64 lg:flex-col"
       >
         <div className="border-b border-sand px-6 py-5">
           <Wordmark />
@@ -244,7 +245,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   <button
                     type="button"
                     aria-label="Open admin menu"
-                    className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-sand bg-white text-slate transition-colors hover:text-charcoal lg:hidden ${FOCUS_RING_ON_CANVAS}`}
+                    className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-sand bg-surface text-slate transition-colors hover:text-charcoal lg:hidden ${FOCUS_RING_ON_CANVAS}`}
                   >
                     <Menu aria-hidden className="h-4 w-4" />
                   </button>
@@ -252,7 +253,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 {/* gap-0 because SheetContent's default gap-4 would space the
                     header, nav and footer apart from the borders that already
                     separate them. */}
-                <SheetContent side="left" className="w-[17rem] gap-0 bg-white p-0">
+                <SheetContent side="left" className="w-[17rem] gap-0 bg-surface p-0">
                   <SheetTitle className="sr-only">Admin navigation</SheetTitle>
                   <div className="border-b border-sand px-5 py-4">
                     <Wordmark onNavigate={() => setMenuOpen(false)} />
@@ -280,6 +281,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="flex shrink-0 items-center gap-3">
+              <ThemeToggle />
               <Link
                 href="/dashboard"
                 className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-[12px] text-slate transition-colors hover:text-charcoal lg:hidden ${FOCUS_RING_ON_CANVAS}`}
@@ -291,7 +293,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 type="button"
                 onClick={handleSignOut}
                 disabled={signingOut}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sand bg-white px-3 text-[12px] text-slate transition-all hover:text-charcoal active:scale-95 disabled:opacity-60 ${FOCUS_RING_ON_CANVAS}`}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sand bg-surface px-3 text-[12px] text-slate transition-all hover:text-charcoal active:scale-95 disabled:opacity-60 ${FOCUS_RING_ON_CANVAS}`}
               >
                 <LogOut aria-hidden className="h-3.5 w-3.5" />
                 {signingOut ? 'Signing out…' : 'Sign out'}

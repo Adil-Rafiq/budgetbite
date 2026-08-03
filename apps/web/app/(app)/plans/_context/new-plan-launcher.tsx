@@ -67,7 +67,7 @@ export function NewPlanLauncher({ children }: { children: ReactNode }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl border border-sand bg-surface px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
             >
               Keep current plan
             </AlertDialogCancel>

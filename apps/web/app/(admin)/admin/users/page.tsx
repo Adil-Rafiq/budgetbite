@@ -82,7 +82,7 @@ export default function AdminUsersPage() {
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Search users by name or email"
             placeholder="Search name or email…"
-            className="max-w-xs bg-white"
+            className="max-w-xs bg-surface"
           />
           <Select
             value={roleFilter}
@@ -91,7 +91,7 @@ export default function AdminUsersPage() {
               setOffset(0);
             }}
           >
-            <SelectTrigger aria-label="Filter by role" className="w-36 bg-white">
+            <SelectTrigger aria-label="Filter by role" className="w-36 bg-surface">
               <SelectValue placeholder="All roles" />
             </SelectTrigger>
             <SelectContent>
@@ -104,7 +104,7 @@ export default function AdminUsersPage() {
         {total > 0 && <span className="font-mono text-[12px] text-slate-muted">{total} total</span>}
       </div>
 
-      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-white'}>
+      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-surface'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate-muted" />
@@ -139,7 +139,7 @@ export default function AdminUsersPage() {
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[11px] ${
                           u.role === 'admin'
-                            ? 'bg-teal/15 text-teal-deep'
+                            ? 'bg-teal/15 text-teal-ink'
                             : 'bg-sand/50 text-slate-muted'
                         }`}
                       >

@@ -32,7 +32,7 @@ export function ChartSkeleton({ variant, className }: ChartSkeletonProps) {
       >
         <div className="relative">
           <div className="size-36 animate-pulse rounded-full bg-sand" />
-          <div className="absolute inset-0 m-auto size-16 rounded-full bg-white" />
+          <div className="absolute inset-0 m-auto size-16 rounded-full bg-surface" />
         </div>
         <div className="flex flex-wrap justify-center gap-2">
           <div className={cn(shimmerCls, 'h-3 w-14 bg-sand')} />

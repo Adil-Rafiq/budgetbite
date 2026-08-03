@@ -58,7 +58,7 @@ export function SaveRow({
           className={`inline-flex min-h-11 items-center justify-center rounded-xl border px-4 text-[13px] font-medium transition-colors ${FOCUS_RING} ${
             !isDirty || isSubmitting
               ? 'cursor-not-allowed border-sand bg-canvas text-slate'
-              : 'border-sand bg-white text-slate hover:bg-canvas active:scale-[0.97]'
+              : 'border-sand bg-surface text-slate hover:bg-canvas active:scale-[0.97]'
           }`}
         >
           Revert

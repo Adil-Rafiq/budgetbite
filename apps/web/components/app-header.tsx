@@ -8,6 +8,7 @@ import { LogOut, User as UserIcon } from 'lucide-react';
 import { useUser } from '@/hooks/use-user';
 import { LogoIcon } from '@/components/icons';
 import { BudgetReadout } from '@/components/budget-readout';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { authClient } from '@/lib/auth-client';
 import { FOCUS_RING, FOCUS_RING_ON_CANVAS } from '@/lib/focus-ring';
 import { initials } from '@/lib/name';
@@ -97,7 +98,7 @@ export function AppHeader() {
               identifies the app and the tab bar names where you are; the money
               is the thing this header exists to keep in front of the user. */}
           <span className="hidden font-display text-base font-bold tracking-tight sm:inline">
-            Budget<span className="text-teal-deep">Bite</span>
+            Budget<span className="text-teal-ink">Bite</span>
           </span>
         </Link>
 
@@ -113,6 +114,7 @@ export function AppHeader() {
           <div className="lg:hidden">
             <BudgetReadout variant="pill" />
           </div>
+          <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -188,13 +190,13 @@ export function AppHeader() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl border border-sand bg-surface px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
             >
               Go back and save
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleSignOut}
-              className={`min-h-11 rounded-xl bg-tomato-ink px-5 text-[13px] font-semibold text-white transition-colors hover:bg-tomato-ink/90 active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl bg-tomato-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-tomato-deep/90 active:scale-[0.97] ${FOCUS_RING}`}
             >
               Sign out anyway
             </AlertDialogAction>

@@ -13,14 +13,14 @@ const money = (n: number): string => formatPKR(n);
 
 const genStatusClass: Record<AdminPlanGeneration['status'], string> = {
   pending: 'bg-amber-tint text-amber-ink',
-  succeeded: 'bg-teal/15 text-teal-deep',
+  succeeded: 'bg-teal/15 text-teal-ink',
   failed: 'bg-tomato/10 text-tomato-ink',
   superseded: 'bg-sand/50 text-slate-muted',
 };
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-sand bg-white px-3 py-2.5">
+    <div className="rounded-lg border border-sand bg-surface px-3 py-2.5">
       <div className="font-mono tracking-[0.18em] text-[10px] uppercase text-slate-muted">
         {label}
       </div>
@@ -100,7 +100,7 @@ export default function AdminPlanDetailPage() {
               plan.generations.map((g) => (
                 <div
                   key={g.id}
-                  className="flex items-center justify-between rounded-lg border border-sand bg-white px-3 py-2"
+                  className="flex items-center justify-between rounded-lg border border-sand bg-surface px-3 py-2"
                 >
                   <div className="flex items-center gap-3">
                     <span
@@ -112,7 +112,7 @@ export default function AdminPlanDetailPage() {
                       {new Date(g.generatedAt).toLocaleString()}
                     </span>
                     {g.id === plan.activeGenerationId && (
-                      <span className="text-[11px] text-teal-deep">active</span>
+                      <span className="text-[11px] text-teal-ink">active</span>
                     )}
                   </div>
                   {g.errorCode && (
@@ -139,7 +139,7 @@ export default function AdminPlanDetailPage() {
                     {items.map((s) => (
                       <div
                         key={s.id}
-                        className="flex items-center justify-between rounded-lg border border-sand bg-white px-3 py-2"
+                        className="flex items-center justify-between rounded-lg border border-sand bg-surface px-3 py-2"
                       >
                         <div className="flex min-w-0 flex-col">
                           <span className="truncate text-[14px] text-charcoal">

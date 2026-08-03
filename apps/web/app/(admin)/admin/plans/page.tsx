@@ -31,7 +31,7 @@ const money = (n: number): string => formatPKR(n);
 
 const genStatusClass: Record<AdminPlanGeneration['status'], string> = {
   pending: 'bg-amber-tint text-amber-ink',
-  succeeded: 'bg-teal/15 text-teal-deep',
+  succeeded: 'bg-teal/15 text-teal-ink',
   failed: 'bg-tomato/10 text-tomato-ink',
   superseded: 'bg-sand/50 text-slate-muted',
 };
@@ -66,7 +66,7 @@ export default function AdminPlansPage() {
             setOffset(0);
           }}
         >
-          <SelectTrigger aria-label="Filter by plan status" className="w-40 bg-white">
+          <SelectTrigger aria-label="Filter by plan status" className="w-40 bg-surface">
             <SelectValue placeholder="All statuses" />
           </SelectTrigger>
           <SelectContent>
@@ -79,7 +79,7 @@ export default function AdminPlansPage() {
         {total > 0 && <span className="font-mono text-[12px] text-slate-muted">{total} total</span>}
       </div>
 
-      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-white'}>
+      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-surface'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate-muted" />
@@ -111,7 +111,7 @@ export default function AdminPlansPage() {
                   <TableCell>
                     <Link
                       href={`/admin/plans/${p.id}`}
-                      className="font-medium text-charcoal hover:text-teal-deep"
+                      className="font-medium text-charcoal hover:text-teal-ink"
                     >
                       {p.user.name}
                     </Link>

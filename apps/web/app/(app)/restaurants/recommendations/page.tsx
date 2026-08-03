@@ -35,7 +35,7 @@ const ITEM_PREVIEW_COUNT = 3;
 
 const STATUS_PILL: Record<string, { className: string; label: string }> = {
   pending: { className: 'bg-amber-tint text-amber-ink', label: 'Pending review' },
-  approved: { className: 'bg-teal/10 text-teal-deep', label: 'Approved' },
+  approved: { className: 'bg-teal/10 text-teal-ink', label: 'Approved' },
   rejected: { className: 'bg-tomato/10 text-tomato-ink', label: 'Rejected' },
 };
 
@@ -59,7 +59,7 @@ function RecommendationCard({
   const extra = rec.items.length - preview.length;
 
   return (
-    <div className="flex h-full flex-col gap-3 rounded-2xl border border-sand bg-white p-5 shadow-sm">
+    <div className="flex h-full flex-col gap-3 rounded-2xl border border-sand bg-surface p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <h3 className="min-w-0 font-display text-lg font-semibold tracking-tight text-charcoal [overflow-wrap:anywhere] line-clamp-2">
           {humanizeName(rec.name)}
@@ -106,7 +106,7 @@ function RecommendationCard({
         {rec.status === 'approved' && rec.createdRestaurantId ? (
           <Link
             href={`/restaurants/${rec.createdRestaurantId}`}
-            className={`rounded text-[12px] font-medium text-teal-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
+            className={`rounded text-[12px] font-medium text-teal-ink underline-offset-2 hover:underline ${FOCUS_RING}`}
           >
             View restaurant →
           </Link>
@@ -171,7 +171,7 @@ export default function MyRecommendationsPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/restaurants"
-              className={`inline-flex min-h-11 items-center gap-1.5 rounded px-1 text-[13px] text-slate underline-offset-2 transition-colors hover:text-teal-deep hover:underline sm:min-h-9 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded px-1 text-[13px] text-slate underline-offset-2 transition-colors hover:text-teal-ink hover:underline sm:min-h-9 ${FOCUS_RING}`}
             >
               <ArrowLeft aria-hidden className="h-3.5 w-3.5" />
               All restaurants
@@ -193,7 +193,7 @@ export default function MyRecommendationsPage() {
       ) : error ? (
         <DataError message="Could not load your recommendations." onRetry={() => refetch()} />
       ) : recommendations.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-white p-10 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-surface p-10 text-center">
           <p className="font-display text-[14px] font-semibold text-charcoal">Nothing here yet.</p>
           <p className="max-w-[380px] text-[13px] text-slate">
             Know a great local spot we don’t have? Recommend it and an admin will review it for the
@@ -221,7 +221,7 @@ export default function MyRecommendationsPage() {
                 type="button"
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
                 disabled={page === 0 || isFetching}
-                className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
+                className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-surface px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
               >
                 ← Prev
               </button>
@@ -233,7 +233,7 @@ export default function MyRecommendationsPage() {
                 type="button"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={(page + 1) * PAGE_SIZE >= total || isFetching}
-                className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
+                className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-surface px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
               >
                 Next →
               </button>
@@ -263,7 +263,7 @@ export default function MyRecommendationsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-lg border border-sand bg-surface px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
               disabled={withdraw.isPending}
             >
               Keep it
@@ -275,7 +275,7 @@ export default function MyRecommendationsPage() {
                 confirmWithdraw();
               }}
               disabled={withdraw.isPending}
-              className={`min-h-11 rounded-lg bg-tomato-ink px-5 text-[13px] font-semibold text-white transition-colors hover:bg-tomato-ink/90 active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-lg bg-tomato-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-tomato-deep/90 active:scale-[0.97] ${FOCUS_RING}`}
             >
               {withdraw.isPending ? 'Withdrawing…' : 'Withdraw'}
             </AlertDialogAction>

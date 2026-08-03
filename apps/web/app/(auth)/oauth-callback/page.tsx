@@ -26,7 +26,7 @@ export default function OAuthCallbackPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-canvas px-4 text-charcoal antialiased">
-      <div className="flex flex-col items-center gap-4 rounded-3xl border border-sand bg-white px-8 py-7 shadow-2xl">
+      <div className="flex flex-col items-center gap-4 rounded-3xl border border-sand bg-surface px-8 py-7 shadow-2xl">
         <div className="flex items-center gap-2">
           <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-teal" />
           <span className="text-xs font-normal uppercase tracking-widest text-charcoal/70">
@@ -34,7 +34,7 @@ export default function OAuthCallbackPage() {
           </span>
         </div>
         <p className="flex items-center gap-2 text-sm text-slate">
-          <Loader2 className="h-4 w-4 animate-spin text-teal-deep" />
+          <Loader2 className="h-4 w-4 animate-spin text-teal-ink" />
           Completing handshake…
         </p>
       </div>

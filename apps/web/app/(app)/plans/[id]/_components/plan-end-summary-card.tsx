@@ -26,11 +26,11 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
   }
 
   const saved = summary.variance >= 0;
-  const varianceTone = saved ? 'text-teal-deep' : 'text-tomato-ink';
+  const varianceTone = saved ? 'text-teal-ink' : 'text-tomato-ink';
   const statusLabel = plan.status === 'cancelled' ? 'cancelled' : 'wrapped up';
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-sand bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-sand bg-surface shadow-sm">
       <div className="flex flex-col gap-5 p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-1">
@@ -116,7 +116,7 @@ export function PlanEndSummaryCard({ plan }: { plan: BudgetPlanDetail }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl border border-sand bg-surface px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
             >
               Keep current plan
             </AlertDialogCancel>

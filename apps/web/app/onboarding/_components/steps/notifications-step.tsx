@@ -11,7 +11,7 @@ export const NotificationsStep = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-hidden rounded-[20px] border border-sand bg-white shadow-sm">
+      <div className="overflow-hidden rounded-[20px] border border-sand bg-surface shadow-sm">
         {values.slots.map((slot, i) => (
           <div
             key={slot.mealTypeId}
@@ -26,7 +26,7 @@ export const NotificationsStep = () => {
             >
               <span
                 aria-hidden
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal/15 text-sm font-bold uppercase text-teal-deep"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal/15 text-sm font-bold uppercase text-teal-ink"
               >
                 {slot.label.slice(0, 1)}
               </span>
@@ -59,7 +59,7 @@ export const NotificationsStep = () => {
                   }`}
                 >
                   <span
-                    className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-all ${
+                    className={`absolute top-1 h-4 w-4 rounded-full bg-surface shadow-sm transition-all ${
                       slot.enabled ? 'left-6' : 'left-1'
                     }`}
                   />
@@ -76,12 +76,12 @@ export const NotificationsStep = () => {
         </p>
       )}
 
-      <div className="flex items-start gap-3 rounded-[20px] border border-sand bg-white p-5 shadow-sm">
+      <div className="flex items-start gap-3 rounded-[20px] border border-sand bg-surface p-5 shadow-sm">
         <span
           aria-hidden
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sand/60"
         >
-          <BellOff className="h-4 w-4 text-teal-deep" />
+          <BellOff className="h-4 w-4 text-teal-ink" />
         </span>
         <p className="text-xs leading-relaxed text-slate">
           These are already set to sensible times — you only need to touch the ones you want to

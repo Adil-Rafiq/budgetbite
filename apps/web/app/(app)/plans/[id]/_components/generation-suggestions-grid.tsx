@@ -47,11 +47,11 @@ function GridSkeleton() {
 function SlotCard({ slot, ctx }: { slot: SuggestionSlot; ctx: BudgetStateContext }) {
   const { Icon } = getMealTypeVisual(slot.mealTypeKey);
   return (
-    <div className="flex h-full flex-col rounded-xl border border-sand bg-white p-4">
+    <div className="flex h-full flex-col rounded-xl border border-sand bg-surface p-4">
       <div className="mb-2 flex items-center gap-2">
         <div
           aria-hidden
-          className="flex h-7 w-7 items-center justify-center rounded-md bg-teal/10 text-teal-deep"
+          className="flex h-7 w-7 items-center justify-center rounded-md bg-teal/10 text-teal-ink"
         >
           <Icon className="h-3.5 w-3.5" />
         </div>
@@ -88,7 +88,7 @@ function SlotCard({ slot, ctx }: { slot: SuggestionSlot; ctx: BudgetStateContext
                         ? 'text-tomato-ink'
                         : fit === 'amber'
                           ? 'text-amber-ink'
-                          : 'text-teal-deep'
+                          : 'text-teal-ink'
                     }`}
                   >
                     {formatPKR(option.estimatedPrice)}
@@ -131,7 +131,7 @@ export function GenerationSuggestionsGrid({
 
   if (!data || data.days.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-sand bg-white p-4 text-center text-[13px] text-slate">
+      <div className="rounded-xl border border-dashed border-sand bg-surface p-4 text-center text-[13px] text-slate">
         This generation didn&apos;t produce any suggestions.
       </div>
     );

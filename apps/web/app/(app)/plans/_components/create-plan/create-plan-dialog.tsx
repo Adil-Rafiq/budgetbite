@@ -100,7 +100,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
           }}
         >
           <DialogHeader>
-            <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
+            <div className="text-xs font-semibold uppercase tracking-widest text-teal-ink">
               Step {stepNumber} · New plan
             </div>
             <DialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -140,7 +140,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
                 type="button"
                 onClick={actions.handleBack}
                 disabled={isSubmitting}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-sand bg-white px-4 text-sm font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-sand bg-surface px-4 text-sm font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
               >
                 ← Back
               </button>
@@ -180,7 +180,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className={`min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl border border-sand bg-surface px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas active:scale-[0.97] ${FOCUS_RING}`}
             >
               Keep editing
             </AlertDialogCancel>
@@ -190,7 +190,7 @@ export function CreatePlanDialog({ open, onOpenChange, replaceActivePlanId = nul
                 discard();
                 onOpenChange(false);
               }}
-              className={`min-h-11 rounded-xl bg-tomato-ink px-5 text-[13px] font-semibold text-white transition-colors hover:bg-tomato/90 active:scale-[0.97] ${FOCUS_RING}`}
+              className={`min-h-11 rounded-xl bg-tomato-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-tomato/90 active:scale-[0.97] ${FOCUS_RING}`}
             >
               Discard
             </AlertDialogAction>

@@ -6,7 +6,7 @@ import { MealTypeChoiceGroup } from '@/components/budget/meal-type-choice-group'
 import { formatPKR } from '@/lib/currency';
 import { FOCUS_RING } from '@/lib/focus-ring';
 
-const cardClass = 'rounded-[20px] border border-sand bg-white p-5 shadow-sm sm:p-6';
+const cardClass = 'rounded-[20px] border border-sand bg-surface p-5 shadow-sm sm:p-6';
 
 export const BudgetStep = () => {
   const { steps, mealTypes } = useOnboardingContext();
@@ -36,7 +36,7 @@ export const BudgetStep = () => {
       <div
         role="group"
         aria-label="Budget period"
-        className="flex gap-1 rounded-[18px] border border-sand bg-white p-2 shadow-sm"
+        className="flex gap-1 rounded-[18px] border border-sand bg-surface p-2 shadow-sm"
       >
         {(
           [
@@ -53,7 +53,7 @@ export const BudgetStep = () => {
               onClick={() => actions.setPlanType(type)}
               className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all ${FOCUS_RING} ${
                 active
-                  ? 'bg-teal-deep text-white shadow-md shadow-teal-deep/25'
+                  ? 'bg-teal-deep text-white shadow-md shadow-teal-ink/25'
                   : 'bg-transparent text-slate hover:text-charcoal'
               }`}
             >
@@ -73,7 +73,7 @@ export const BudgetStep = () => {
           Total food budget
         </label>
         <div className="mt-4 mb-5 flex items-end gap-3">
-          <span aria-hidden className="pb-1 font-display text-2xl font-bold text-teal-deep">
+          <span aria-hidden className="pb-1 font-display text-2xl font-bold text-teal-ink">
             ₨
           </span>
           <input
@@ -89,7 +89,7 @@ export const BudgetStep = () => {
             }}
             aria-describedby="budget-period"
             aria-invalid={errors.totalBudget ? true : undefined}
-            className={`min-w-0 flex-1 border-b-2 border-sand bg-transparent pb-1 font-display text-4xl font-bold text-charcoal transition-colors placeholder:text-slate/30 focus:border-teal-deep sm:text-5xl ${FOCUS_RING}`}
+            className={`min-w-0 flex-1 border-b-2 border-sand bg-transparent pb-1 font-display text-4xl font-bold text-charcoal transition-colors placeholder:text-slate/30 focus:border-teal-ink sm:text-5xl ${FOCUS_RING}`}
           />
           <span id="budget-period" className="pb-2 text-sm text-slate">
             / {values.planType === 'weekly' ? 'week' : 'month'}
@@ -108,8 +108,8 @@ export const BudgetStep = () => {
                 onClick={() => actions.setTotalBudget(preset)}
                 className={`min-h-11 rounded-full border px-4 py-2 text-xs font-medium transition-colors ${FOCUS_RING} ${
                   active
-                    ? 'border-teal-deep bg-teal/10 font-semibold text-teal-deep'
-                    : 'border-sand text-slate hover:border-teal-deep hover:text-teal-deep'
+                    ? 'border-teal-ink bg-teal/10 font-semibold text-teal-ink'
+                    : 'border-sand text-slate hover:border-teal-ink hover:text-teal-ink'
                 }`}
               >
                 {formatPKR(preset)}
@@ -120,7 +120,7 @@ export const BudgetStep = () => {
 
         {lastConversion && !errors.totalBudget && (
           <p className="mt-3 flex items-start gap-2 rounded-xl border border-sand bg-canvas px-3 py-2 text-xs text-slate">
-            <RefreshCw aria-hidden className="mt-0.5 h-3 w-3 shrink-0 text-teal-deep" />
+            <RefreshCw aria-hidden className="mt-0.5 h-3 w-3 shrink-0 text-teal-ink" />
             <span>
               Converted {formatPKR(lastConversion.from)} to{' '}
               <span className="font-semibold text-charcoal">{formatPKR(lastConversion.to)}</span> so
@@ -166,7 +166,7 @@ export const BudgetStep = () => {
             <button
               type="button"
               onClick={mealTypes.refetch}
-              className={`min-h-11 rounded-lg border border-sand bg-white px-3 py-2 text-xs font-semibold text-teal-deep transition-colors hover:border-teal-deep ${FOCUS_RING}`}
+              className={`min-h-11 rounded-lg border border-sand bg-surface px-3 py-2 text-xs font-semibold text-teal-ink transition-colors hover:border-teal-ink ${FOCUS_RING}`}
             >
               Try again
             </button>
@@ -183,7 +183,7 @@ export const BudgetStep = () => {
             <button
               type="button"
               onClick={mealTypes.refetch}
-              className={`mt-3 min-h-11 rounded-lg border border-sand bg-white px-3 py-2 text-xs font-semibold text-teal-deep transition-colors hover:border-teal-deep ${FOCUS_RING}`}
+              className={`mt-3 min-h-11 rounded-lg border border-sand bg-surface px-3 py-2 text-xs font-semibold text-teal-ink transition-colors hover:border-teal-ink ${FOCUS_RING}`}
             >
               Check again
             </button>

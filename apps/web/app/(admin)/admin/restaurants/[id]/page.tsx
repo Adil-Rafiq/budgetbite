@@ -128,7 +128,7 @@ export default function AdminRestaurantDetailPage() {
         Menu items
       </h2>
 
-      <div className={isError ? 'mt-3' : 'mt-3 rounded-xl border border-sand bg-white'}>
+      <div className={isError ? 'mt-3' : 'mt-3 rounded-xl border border-sand bg-surface'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate-muted" />

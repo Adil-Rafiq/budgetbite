@@ -23,7 +23,7 @@ export const LocationStep = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-[20px] border border-sand bg-white p-4 shadow-sm">
+      <div className="rounded-[20px] border border-sand bg-surface p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between gap-3">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-slate">
             Search or drop a pin
@@ -64,7 +64,7 @@ export const LocationStep = () => {
       typeof values.longitude === 'number' ? (
         <NearbyProof latitude={values.latitude} longitude={values.longitude} />
       ) : (
-        <div className="rounded-xl border border-dashed border-sand bg-white px-4 py-3">
+        <div className="rounded-xl border border-dashed border-sand bg-surface px-4 py-3">
           <p className="text-xs leading-relaxed text-slate">
             We compare this spot against every restaurant we have and only suggest ones within{' '}
             <span className="font-semibold text-charcoal">{ONBOARDING_NEARBY_RADIUS_KM} km</span>.

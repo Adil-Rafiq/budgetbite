@@ -51,7 +51,7 @@ const PACE_LABEL: Record<Pace, string> = {
 const PACE_TEXT: Record<Pace, string> = {
   over: 'text-tomato-ink',
   hot: 'text-amber-ink',
-  'on-track': 'text-teal-deep',
+  'on-track': 'text-teal-ink',
 };
 
 /**
@@ -167,7 +167,7 @@ function RailError({ onRetry }: { onRetry: () => void }) {
       <button
         type="button"
         onClick={onRetry}
-        className={`mt-3 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-tomato/40 bg-white px-3 text-[12px] font-semibold text-tomato-ink transition-colors hover:bg-tomato/10 ${FOCUS_RING}`}
+        className={`mt-3 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-tomato/40 bg-surface px-3 text-[12px] font-semibold text-tomato-ink transition-colors hover:bg-tomato/10 ${FOCUS_RING}`}
       >
         <RotateCw aria-hidden className="h-3.5 w-3.5" />
         Try again
@@ -183,13 +183,13 @@ function RailEmpty() {
       // is no `/plans/new` route and a rail that invented one would be a dead
       // end at the exact moment the app is asking for a first commitment.
       href="/plans"
-      className={`${RAIL_SHELL} border-dashed transition-colors hover:border-teal-deep hover:bg-white ${FOCUS_RING}`}
+      className={`${RAIL_SHELL} border-dashed transition-colors hover:border-teal-ink hover:bg-surface ${FOCUS_RING}`}
     >
       <p className="font-display text-sm font-semibold text-charcoal">No budget yet</p>
       <p className="mt-1 text-xs text-slate">
         Set a weekly or monthly amount and BudgetBite plans meals that fit it.
       </p>
-      <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-teal-deep">
+      <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-teal-ink">
         Start a plan
         <span aria-hidden>→</span>
       </span>
@@ -202,7 +202,7 @@ function RailReadout({ r }: { r: Readout }) {
   return (
     <Link
       href={`/plans/${r.planId}`}
-      className={`${RAIL_SHELL} transition-colors hover:border-teal-deep hover:bg-white ${FOCUS_RING}`}
+      className={`${RAIL_SHELL} transition-colors hover:border-teal-ink hover:bg-surface ${FOCUS_RING}`}
     >
       <p className="text-xs font-semibold uppercase tracking-wide text-slate">
         {r.periodLabel}
@@ -232,7 +232,7 @@ function RailReadout({ r }: { r: Readout }) {
       <div className="mt-3 flex items-center gap-2">
         <ProgressBar spentPercent={r.spentPercent} isOver={r.isOver} className="h-1.5 flex-1" />
         <span
-          className={`text-xs font-bold tabular-nums ${r.isOver ? 'text-tomato-ink' : 'text-teal-deep'}`}
+          className={`text-xs font-bold tabular-nums ${r.isOver ? 'text-tomato-ink' : 'text-teal-ink'}`}
         >
           {r.spentPercent}%
         </span>
@@ -252,7 +252,7 @@ function RailReadout({ r }: { r: Readout }) {
 
 function PillSkeleton() {
   return (
-    <div className="flex items-center gap-2.5 rounded-full border border-sand bg-white px-3.5 py-1.5 sm:px-4">
+    <div className="flex items-center gap-2.5 rounded-full border border-sand bg-surface px-3.5 py-1.5 sm:px-4">
       <span className="sr-only">Loading your remaining budget</span>
       <span aria-hidden className="h-3 w-8 animate-pulse rounded bg-sand" />
       <span aria-hidden className="h-3.5 w-16 animate-pulse rounded bg-sand" />
@@ -265,7 +265,7 @@ function PillError({ onRetry }: { onRetry: () => void }) {
     <button
       type="button"
       onClick={onRetry}
-      className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-tomato/40 bg-white px-3.5 text-xs font-semibold text-tomato-ink transition-colors hover:bg-tomato/10 sm:min-h-9 ${FOCUS_RING_ON_CANVAS}`}
+      className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-tomato/40 bg-surface px-3.5 text-xs font-semibold text-tomato-ink transition-colors hover:bg-tomato/10 sm:min-h-9 ${FOCUS_RING_ON_CANVAS}`}
     >
       <TriangleAlert aria-hidden className="h-3.5 w-3.5" />
       Budget unavailable
@@ -278,7 +278,7 @@ function PillEmpty() {
   return (
     <Link
       href="/plans"
-      className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-dashed border-sand-edge bg-white px-3.5 text-xs font-semibold text-teal-deep transition-colors hover:bg-canvas sm:min-h-9 ${FOCUS_RING_ON_CANVAS}`}
+      className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-dashed border-sand-edge bg-surface px-3.5 text-xs font-semibold text-teal-ink transition-colors hover:bg-canvas sm:min-h-9 ${FOCUS_RING_ON_CANVAS}`}
     >
       Start a plan
       <span aria-hidden>→</span>
@@ -294,7 +294,7 @@ function PillReadout({ r }: { r: Readout }) {
       // between its currency mark and its digits — "₨" on one line, "12,000" on
       // the next — which is the worst possible place for a money figure to
       // break, on the device where most spend-logging happens.
-      className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-sand bg-white px-3 shadow-sm transition-colors hover:border-teal-deep sm:min-h-9 sm:gap-3 sm:px-4 ${FOCUS_RING_ON_CANVAS}`}
+      className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-sand bg-surface px-3 shadow-sm transition-colors hover:border-teal-ink sm:min-h-9 sm:gap-3 sm:px-4 ${FOCUS_RING_ON_CANVAS}`}
     >
       <span className="text-xs font-semibold uppercase tracking-wide text-slate">
         {r.isOver ? 'Over' : 'Left'}

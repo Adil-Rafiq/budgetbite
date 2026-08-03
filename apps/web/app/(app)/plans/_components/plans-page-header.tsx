@@ -10,7 +10,7 @@ export function PlansPageHeader() {
   return (
     <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex flex-col gap-2">
-        <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
+        <div className="text-xs font-semibold uppercase tracking-widest text-teal-ink">
           Budgets · Your plans
         </div>
         <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">

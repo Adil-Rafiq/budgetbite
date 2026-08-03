@@ -36,35 +36,108 @@
    (dialog, dropdown, select, popover, sheet, …) stay in sync.
    ========================================================================== */
 
+/* ──────────────────────────────────────────────────────────────────────────
+   How theming works here
+
+   The brand palette is declared twice — once in `:root` and once in `.dark` —
+   and `@theme inline` below points every `--color-*` token at one of these
+   variables rather than at a literal hex. That indirection is the whole
+   mechanism: `bg-canvas` compiles to `background-color: var(--canvas)`, so it
+   resolves against whichever block is in scope and the ~3,000 existing brand
+   utilities became theme-aware without being touched. `inline` is load-bearing
+   — without it Tailwind copies the hex into the utility at build time and the
+   `.dark` override never lands.
+
+   `.dark` must stay *after* `:root`: both selectors have the same specificity,
+   so source order is what decides the winner.
+
+   Two consequences worth knowing before editing a value:
+
+   1. These names are roles, not literal colours. `charcoal` means "primary
+      ink", so in dark mode it is nearly white; `sand` means "the quiet edge
+      between surfaces", so it is a warm near-black. Read `text-charcoal` as
+      "the ink you read body copy in", never as "#1f1a14". The one name that
+      lies outright is `teal-deeper`: it is the hover state for a `teal-deep`
+      fill, and in dark mode a hover has to get *brighter*, so the "deeper"
+      token is the lighter of the pair.
+
+   2. Two names exist only because a role splits when inverted. `teal-ink` is
+      the brand as text/border/ring; `teal-deep` is the brand as a fill under a
+      white label. In light mode both are #0d6363 and the split is invisible,
+      which is exactly why it went unnoticed — but in dark mode no single teal
+      can be both readable on a near-black page and readable *under* white.
+      `onyx` is the mirror case: `bg-charcoal` was marking deliberately dark
+      surfaces (OAuth buttons, the landing feature band and footer) that must
+      stay dark in both themes, so inverting it with the ink would have turned
+      them white-on-white.
+
+   Every value below clears WCAG AA on the surfaces it is actually used on —
+   4.5:1 for text, 3:1 for control boundaries and focus rings. The pairs are
+   asserted by `scripts/check-tokens.mjs`, which fails the build on a
+   regression rather than trusting these comments.
+   ────────────────────────────────────────────────────────────────────────── */
+
 :root {
-  --background: #fbf7ee;
-  --foreground: #1f1a14;
-  --card: #ffffff;
-  --card-foreground: #1f1a14;
-  --popover: #ffffff;
-  --popover-foreground: #1f1a14;
+  /* ── Brand palette — light "terrace" ── */
+  --canvas: #fbf7ee;
+  --surface: #ffffff;
+  --sand: #ebe0cd;
+  --sand-edge: #8d8271;
+  --teal: #178a8a;
+  --teal-deep: #0d6363;
+  --teal-deeper: #094a4a;
+  --teal-ink: #0d6363;
+  --teal-mid: #2e9c9c;
+  --teal-tint: #e2f1f0;
+  --tomato: #c8402f;
+  --tomato-ink: #a02c1d;
+  --tomato-deep: #a02c1d;
+  --amber: #e9a020;
+  --amber-tint: #fdf2dc;
+  --amber-ink: #8a5a12;
+  --charcoal: #1f1a14;
+  --slate: #5c5145;
+  --slate-muted: #776b5c;
+  --onyx: #1f1a14;
+  --muted-surface: #f6eee0;
+
+  /* Hover elevation for the plan and restaurant cards, which raise on pointer
+     hover. It was inline in both files as `0 10px 24px rgba(0,0,0,0.07)` —
+     a value that says "elevated" only against a light page. */
+  --elevation-lift: 0 10px 24px rgb(0 0 0 / 0.07);
+
+  /* ── shadcn semantic tokens, mapped onto the brand palette ──
+     These are aliases, not a second palette: the ui/ primitives (dialog,
+     dropdown, select, popover, sheet, …) stay in sync with the brand because
+     they read the same variables. */
+  --background: var(--canvas);
+  --foreground: var(--charcoal);
+  --card: var(--surface);
+  --card-foreground: var(--charcoal);
+  --popover: var(--surface);
+  --popover-foreground: var(--charcoal);
   /* `primary` is a fill token: shadcn primitives pair it with
      `primary-foreground`, so it must be the value white is legible on. That is
-     teal-deep (7.04:1), not the decorative brand teal (4.17:1). The old
-     palette had #8cc63f here at 2.05:1 — white-on-primary was unreadable in
-     any ui/ primitive that used the pair. */
-  --primary: #0d6363;
+     teal-deep (7.04:1 light, 5.64:1 dark), not the decorative brand teal
+     (4.17:1). The old palette had #8cc63f here at 2.05:1 — white-on-primary
+     was unreadable in any ui/ primitive that used the pair. */
+  --primary: var(--teal-deep);
   --primary-foreground: #ffffff;
-  --secondary: #ebe0cd;
-  --secondary-foreground: #1f1a14;
-  --muted: #f6eee0;
-  --muted-foreground: #5c5145;
-  --accent: #ebe0cd;
-  --accent-foreground: #1f1a14;
-  --destructive: #c8402f;
+  --secondary: var(--sand);
+  --secondary-foreground: var(--charcoal);
+  --muted: var(--muted-surface);
+  --muted-foreground: var(--slate);
+  --accent: var(--sand);
+  --accent-foreground: var(--charcoal);
+  --destructive: var(--tomato);
   --destructive-foreground: #ffffff;
-  --border: #ebe0cd;
+  --border: var(--sand);
   /* Form-control boundary, not a decorative one — see --color-sand-edge. */
-  --input: #8d8271;
+  --input: var(--sand-edge);
   /* Drives `outline-ring/50` on every element via the base layer. The old
      value was the brand lime at 2.05:1, which at 50% opacity was no indicator
-     at all; teal-deep matches what lib/focus-ring.ts already concluded. */
-  --ring: #0d6363;
+     at all; teal-ink matches what lib/focus-ring.ts already concluded. */
+  --ring: var(--teal-ink);
   --chart-1: #178a8a;
   --chart-2: #0d6363;
   --chart-3: #c8402f;
@@ -83,12 +156,76 @@
    have produced a black sidebar in a light-only app with no warning. Removed
    together with the primitive. */
 
-/* BudgetBite ships a single, deliberate light "terrace" theme. A dark
-   token set used to live here but nothing ever applied a `.dark` class (no
-   theme provider, and the shell hardcodes the light palette), so it was dead
-   weight that read as a half-finished feature. If dark mode is wanted later,
-   reintroduce these tokens together with a real theme toggle and swap the
-   hardcoded brand classes for the semantic tokens. */
+/* `.on-onyx` marks a section that is dark in *both* themes — the landing
+   page's feature band and its footer. Such a section has the same problem a
+   dark theme has, so it gets the same answer: the dark palette, applied
+   locally, whatever the page theme is. Sharing one declaration block is the
+   point — a second hand-maintained copy would drift.
+
+   This also repairs something that was already broken. On that band
+   `text-teal-deep` measured 2.45:1 and `text-tomato-ink` 2.36:1 against
+   `bg-charcoal` — the brand inks were being used at roughly half the AA floor
+   because they were chosen for cream surfaces and then placed on a near-black
+   one. Inside this scope they resolve to their dark values (9.72:1 and
+   8.43:1) instead. */
+.dark,
+.on-onyx {
+  /* ── Brand palette — dark "terrace after hours" ──
+     A warm dark, not a blue-grey one: the neutrals keep the cream palette's
+     hue and are simply walked down past black, so the app reads as the same
+     room with the lights off rather than as a different product. */
+  --canvas: #14110c;
+  --surface: #1e1a13;
+  --sand: #332c22;
+  /* Still the control boundary, still held to 1.4.11's 3:1 — 4.66:1 on
+     surface. Barely moved in hue; it is the surfaces around it that fell. */
+  --sand-edge: #8f8371;
+  --teal: #2fa8a8;
+  /* The fill/hover pair. Both carry white labels (5.64:1 and 4.75:1), and
+     `deeper` is the *lighter* of the two so a hover brightens — see the note
+     about lying names above. */
+  --teal-deep: #0f7373;
+  --teal-deeper: #118080;
+  /* The brand as ink: 10.60:1 on canvas, 9.75:1 on surface, 7.83:1 on its own
+     tint. Nothing near teal-deep's darkness could have done this. */
+  --teal-ink: #63d4cc;
+  --teal-mid: #1d8887;
+  --teal-tint: #14312f;
+  --tomato: #c8402f;
+  --tomato-ink: #ff9a86;
+  /* The destructive *fill*, not the alarm ink — see the note on the token.
+     White sits on it at 5.53:1, and it clears 3:1 against the surface so a
+     Delete button still reads as a raised object rather than a stain. */
+  --tomato-deep: #bd3a24;
+  --amber: #eba82f;
+  --amber-tint: #33260e;
+  --amber-ink: #f0c46a;
+  --charcoal: #f7f2e7;
+  --slate: #bdb09c;
+  --slate-muted: #a2957f;
+  /* Lifted just clear of canvas rather than inverted. In light mode this is a
+     near-black band on cream; in dark mode it can only be a slightly raised
+     panel, because the contrast that made it emphatic no longer exists. */
+  --onyx: #241f17;
+  --muted-surface: #262017;
+
+  /* Elevation has to be built differently here. A drop shadow works by
+     darkening what is behind the card, and `canvas` is already within a
+     percent of black — there is nothing left to darken, so the light theme's
+     7% black cast is not merely subtle but arithmetically incapable of showing
+     anything. Depth on a dark surface comes from the lit edge instead: the
+     black blur is kept and deepened for the shape it gives, and a 7% white
+     hairline does the actual work of separating the raised card from the page. */
+  --elevation-lift: 0 10px 24px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.07);
+
+  /* Chart series, lightened to sit on a dark plot area. Same five hues in the
+     same order, so a saved screenshot still reads as the same series. */
+  --chart-1: #2fa8a8;
+  --chart-2: #63d4cc;
+  --chart-3: #ff9a86;
+  --chart-4: #eba82f;
+  --chart-5: #b18ad6;
+}
 
 @theme inline {
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
@@ -126,27 +263,58 @@
 
   /* Brand tokens — used directly across the app (bg-canvas, text-teal, …).
      These intentionally shadow a few Tailwind defaults (teal, slate), so
-     `text-teal` here is this palette's #178a8a, not Tailwind's teal-500. */
-  --color-canvas: #fbf7ee;
-  --color-sand: #ebe0cd;
-  --color-teal: #178a8a;
-  --color-tomato: #c8402f;
-  --color-charcoal: #1f1a14;
-  --color-slate: #5c5145;
+     `text-teal` here is this palette's brand teal, not Tailwind's teal-500.
+     Every one points at a variable rather than a hex so `.dark` can move it. */
+  --color-canvas: var(--canvas);
+  --color-sand: var(--sand);
+  --color-teal: var(--teal);
+  --color-tomato: var(--tomato);
+  --color-charcoal: var(--charcoal);
+  --color-slate: var(--slate);
 
-  /* The brand colour that text is allowed to be, and the only one a white
-     label may sit on. The split exists because `--color-teal` is a fill, not
-     an ink: the lime version was 2.05:1 on white, and the teal is 4.17:1 —
+  /* The card/panel surface. This exists because `bg-white` — which is what 214
+     call sites used to say — is a Tailwind default with a literal value, so it
+     was the one surface in the app that could not follow the theme. A white
+     card on a near-black page is not a dark mode; it is a flashbang. */
+  --color-surface: var(--surface);
+
+  /* A surface that is deliberately dark in *both* themes: the OAuth buttons,
+     the landing feature band, the footer. Split out of `charcoal` because that
+     token is the primary ink and has to invert — see the header note. */
+  --color-onyx: var(--onyx);
+
+  /* The brand as a *fill* that a white label sits on, plus its hover. The
+     split from `--color-teal` exists because the brand hue is a fill, not an
+     ink: the lime version was 2.05:1 on white, and the teal is 4.17:1 —
      better, but still under the 4.5:1 AA floor, so the rule it was written to
-     enforce still holds. Decoration only: dots, bars, scrollbar hover.
+     enforce still holds. `teal` is decoration only: dots, bars, scrollbar
+     hover.
 
-     teal-deep is 7.04:1 on white / 6.59:1 on canvas, and carries white labels
-     at the same 7.04:1. teal-deeper is 10.05:1 and exists so a hover state
-     gets darker rather than lighter. The token guard
-     (scripts/check-tokens.mjs) still fails the build on `dark-green`, the
-     sub-AA value from two palettes ago. */
-  --color-teal-deep: #0d6363;
-  --color-teal-deeper: #094a4a;
+     Light: teal-deep carries white at 7.04:1, teal-deeper at 10.05:1, so hover
+     darkens. Dark: 5.64:1 and 4.75:1, and hover *lightens* — the ramp inverts
+     even though the names cannot. Use these only where a white label is on
+     top; for the brand as text or as a border, reach for `teal-ink`.
+
+     The token guard (scripts/check-tokens.mjs) still fails the build on
+     `dark-green`, the sub-AA value from two palettes ago. */
+  --color-teal-deep: var(--teal-deep);
+  --color-teal-deeper: var(--teal-deeper);
+
+  /* The brand as an *ink* — body text, active borders, focus rings. Identical
+     to teal-deep in light mode (#0d6363, 7.04:1 on white, 6.59:1 on canvas),
+     which is why the app got away with one token for both jobs for so long.
+     Dark mode is where they part: an ink has to be readable *on* the page
+     (10.60:1 on canvas) while a fill has to be readable *under* white, and no
+     single teal does both. `text-teal-deep` was swept to `text-teal-ink`
+     across 178 sites in the commit that introduced this — a provable no-op in
+     light mode, since the two values were equal. */
+  --color-teal-ink: var(--teal-ink);
+
+  /* The middle step of the analytics category ramp, which needs five fills a
+     reader can tell apart rather than three. It was a bare `#2e9c9c` in
+     analytics/page.tsx with no token behind it — fine while the app had one
+     theme, impossible once the plot background can be near-black. */
+  --color-teal-mid: var(--teal-mid);
 
   /* The palest brand tint in the system: the "you are here" wash behind an
      active nav item. It was a bare hex in four places (both shells, the
@@ -158,16 +326,20 @@
      cannot carry "current page" for a low-vision user. Every active item that
      uses it also carries a filled teal-deep chip, semibold weight, and
      aria-current, so the tint is the least of four signals rather than the
-     only one. Text on it must still be teal-deep (6.06:1) or charcoal. */
-  --color-teal-tint: #e2f1f0;
+     only one. Text on it must still be teal-ink (6.06:1 light, 7.83:1 dark) or
+     charcoal. In dark mode it inverts to the darkest teal in the system — a
+     wash still, just one made of shadow rather than light. */
+  --color-teal-tint: var(--teal-tint);
 
   /* Control boundaries. WCAG 1.4.11 wants 3:1 for the visual information that
      identifies a form control, and `sand` as a border is 1.31:1 on white —
      an input outlined in it is decoration, not an affordance. This is sand
      walked toward the slate end of the same family: 3.77:1 on white, 3.53:1
      on canvas, applied to inputs, textareas and select triggers only. Cards,
-     panels and dividers keep plain `sand`; a decorative edge has no floor. */
-  --color-sand-edge: #8d8271;
+     panels and dividers keep plain `sand`; a decorative edge has no floor.
+     The dark value barely shifts in hue and clears the same floor from the
+     other side: 4.66:1 on surface, 5.07:1 on canvas. */
+  --color-sand-edge: var(--sand-edge);
 
   /* Secondary ink. `slate` at 60% opacity was doing this job in 87 places
      across the admin — timestamps, record descriptions, empty and error
@@ -181,8 +353,9 @@
      the same `slate/60` sat on white cards and on canvas. This is slate walked
      toward the sand end of the same family — 5.21:1 on white, 4.94:1 on
      canvas, clearing AA on both — so "quieter than the primary ink" stops
-     meaning "below the legibility floor". */
-  --color-slate-muted: #776b5c;
+     meaning "below the legibility floor". Dark keeps the same discipline:
+     5.89:1 on surface, 6.40:1 on canvas. */
+  --color-slate-muted: var(--slate-muted);
 
   /* Caution amber — the band between "on track" and "over budget".
      These three values were already in the app as loose hexes before they were
@@ -194,10 +367,10 @@
      Warmed slightly for this palette so caution reads as part of the cream
      world rather than a leftover. The ink is unchanged and still the only one
      of the three a label may use: `amber` itself is 1.99:1 on its own tint,
-     while `amber-ink` on `amber-tint` is 5.32:1. */
-  --color-amber: #e9a020;
-  --color-amber-tint: #fdf2dc;
-  --color-amber-ink: #8a5a12;
+     while `amber-ink` on `amber-tint` is 5.32:1 light and 8.99:1 dark. */
+  --color-amber: var(--amber);
+  --color-amber-tint: var(--amber-tint);
+  --color-amber-ink: var(--amber-ink);
 
   /* Readable ink for the alarm hue. `tomato` is a fill and a border colour: as
      text it is 4.96:1 on white but only 4.31:1 on its own 10% tint, which is
@@ -206,8 +379,21 @@
 
      `tomato` itself was darkened from #e84c3d in the previous palette, where a
      white label on the fill was 3.50:1. It is 4.96:1 now, so a destructive
-     button is finally legible. */
-  --color-tomato-ink: #a02c1d;
+     button is finally legible — and it is the one hue that did not have to
+     move for dark mode, since a saturated mid-tone red is legible under white
+     and against a near-black page alike. The ink flips to a pale coral
+     (8.43:1 on surface) because a dark red on a dark page is not an ink. */
+  --color-tomato-ink: var(--tomato-ink);
+
+  /* The destructive fill — Delete, Discard, Sign out anyway — under a white
+     label. This is `teal-deep` vs `teal-ink` again, one hue over: eight
+     buttons said `bg-tomato-ink` because in light mode the ink is the darker
+     of the two and therefore the better thing to put white on (7.31:1 against
+     tomato's 4.96:1). Dark mode is where an ink and a fill stop being
+     interchangeable — `tomato-ink` becomes a pale coral so it can be read *on*
+     the page, and white on pale coral is 1.9:1. Light value is unchanged, so
+     the sweep off `bg-tomato-ink` moved no pixels. */
+  --color-tomato-deep: var(--tomato-deep);
 }
 
 @layer base {
@@ -323,10 +509,10 @@ body::-webkit-scrollbar {
 /* The map pin is keyboard-operable (Leaflet's `keyboard` option gives it
    tabIndex=0 and role="button", and arrow keys nudge it), so it needs a focus
    indicator that matches the rest of the app rather than the UA default. Uses
-   teal-deep — the same 7.04:1 token as FOCUS_RING — because the pin sits over
-   arbitrary map tiles. */
+   teal-ink — the same token as FOCUS_RING — because the pin sits over
+   arbitrary map tiles and the ring has to stay findable in both themes. */
 .wispr-pin:focus-visible {
-  outline: 2px solid var(--color-teal-deep);
+  outline: 2px solid var(--color-teal-ink);
   outline-offset: 3px;
   border-radius: 4px;
 }

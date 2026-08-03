@@ -59,7 +59,7 @@ export default function AdminAuditPage() {
             setOffset(0);
           }}
         >
-          <SelectTrigger aria-label="Filter by entity type" className="w-44 bg-white">
+          <SelectTrigger aria-label="Filter by entity type" className="w-44 bg-surface">
             <SelectValue placeholder="All entities" />
           </SelectTrigger>
           <SelectContent>
@@ -74,7 +74,7 @@ export default function AdminAuditPage() {
         {total > 0 && <span className="font-mono text-[12px] text-slate-muted">{total} total</span>}
       </div>
 
-      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-white'}>
+      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-surface'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate-muted" />

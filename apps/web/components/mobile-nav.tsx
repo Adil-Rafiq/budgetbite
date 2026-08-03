@@ -20,7 +20,7 @@ export function MobileNav() {
   return (
     <nav
       aria-label="Main"
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-sand bg-white/95 lg:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-sand bg-surface/95 lg:hidden"
       style={{ backdropFilter: 'saturate(180%) blur(10px)' }}
     >
       <div className="flex items-stretch justify-around px-1 py-2">
@@ -33,7 +33,7 @@ export function MobileNav() {
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
               className={`flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-1 py-1.5 transition-colors ${FOCUS_RING_ON_CANVAS} ${
-                isActive ? 'text-teal-deep' : 'text-slate hover:text-teal-deep'
+                isActive ? 'text-teal-ink' : 'text-slate hover:text-teal-ink'
               }`}
             >
               {/* Active is a filled chip, not a hue swap. A colour change alone
@@ -57,7 +57,7 @@ export function MobileNav() {
           );
         })}
       </div>
-      <div className="bg-white" style={{ height: 'env(safe-area-inset-bottom)' }} />
+      <div className="bg-surface" style={{ height: 'env(safe-area-inset-bottom)' }} />
     </nav>
   );
 }

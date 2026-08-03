@@ -97,7 +97,7 @@ function FeedbackFields<T extends LogSuggestionForm | LogCustomForm | LogHomeFor
                   aria-pressed={v === true}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition ${
                     v === true
-                      ? 'border-teal bg-teal/10 text-teal-deep'
+                      ? 'border-teal bg-teal/10 text-teal-ink'
                       : 'border-sand bg-transparent text-slate'
                   }`}
                 >
@@ -184,7 +184,7 @@ function PrimaryButton({
       type="submit"
       disabled={disabled}
       className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:pointer-events-none disabled:opacity-50 ${
-        armed ? 'bg-tomato-ink hover:bg-tomato-ink/90' : 'bg-teal-deep hover:bg-teal-deeper'
+        armed ? 'bg-tomato-deep hover:bg-tomato-deep/90' : 'bg-teal-deep hover:bg-teal-deeper'
       }`}
     >
       {children}
@@ -488,7 +488,7 @@ export function LogMealModal({ state, onClose, onSave, isSaving, budget }: Props
     <Dialog open={state.open} onOpenChange={onClose}>
       <DialogContent className="max-h-[90vh] max-w-sm overflow-y-auto">
         <DialogHeader>
-          <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
+          <div className="text-xs font-semibold uppercase tracking-widest text-teal-ink">
             {eyebrow}
           </div>
           <DialogTitle className="font-display text-xl font-semibold tracking-tight text-charcoal">

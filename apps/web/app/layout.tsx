@@ -35,7 +35,16 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#178a8a',
+  /* Tints the mobile browser chrome. Two entries rather than one because a
+     single value leaves half the users with a light bar above a near-black
+     page. The light entry is the brand teal it has always been; the dark one
+     is `canvas`, so the chrome continues the page instead of capping it. */
+  // Next serialises these into a <meta> tag, where a var() would arrive as the
+  // literal string "var(--canvas)" and be ignored — hence the guard exemption.
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#178a8a' }, // token-guard-allow
+    { media: '(prefers-color-scheme: dark)', color: '#14110c' }, // token-guard-allow
+  ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -48,7 +57,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} scroll-smooth`}>
+    /* `suppressHydrationWarning` is required, not cosmetic: next-themes writes
+       the resolved theme onto <html> in a blocking pre-hydration script, so the
+       server-rendered markup and the DOM React sees genuinely differ by one
+       class. Without it React logs a hydration mismatch on every page load. */
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${display.variable} ${sans.variable} scroll-smooth`}
+    >
       <body className="font-sans antialiased">
         <Providers>
           {children}

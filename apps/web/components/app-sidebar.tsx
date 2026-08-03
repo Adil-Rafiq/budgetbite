@@ -33,7 +33,7 @@ export function AppSidebar() {
       // z-30 keeps the rail under the sticky header (z-40) and the API-wakeup
       // banner (z-50). Unlayered, this `fixed` element was painted over the
       // banner announcing the very outage that empties it.
-      className="fixed inset-y-0 left-0 z-30 hidden border-r border-sand bg-white text-charcoal lg:flex lg:w-64 lg:flex-col"
+      className="fixed inset-y-0 left-0 z-30 hidden border-r border-sand bg-surface text-charcoal lg:flex lg:w-64 lg:flex-col"
     >
       <Link
         href="/dashboard"
@@ -43,7 +43,7 @@ export function AppSidebar() {
           <LogoIcon size={16} />
         </span>
         <span className="font-display text-lg font-bold tracking-tight">
-          Budget<span className="text-teal-deep">Bite</span>
+          Budget<span className="text-teal-ink">Bite</span>
         </span>
       </Link>
 
@@ -65,7 +65,7 @@ export function AppSidebar() {
               aria-current={isActive ? 'page' : undefined}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${FOCUS_RING} ${
                 isActive
-                  ? 'bg-teal-tint font-semibold text-teal-deep'
+                  ? 'bg-teal-tint font-semibold text-teal-ink'
                   : 'text-slate hover:bg-canvas hover:text-charcoal'
               }`}
             >

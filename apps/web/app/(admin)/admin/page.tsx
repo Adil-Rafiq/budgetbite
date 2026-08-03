@@ -28,7 +28,7 @@ const TONE_ICON = {
 } as const;
 
 const TONE_TEXT: Record<Tone, string> = {
-  ok: 'text-teal-deep',
+  ok: 'text-teal-ink',
   warn: 'text-amber-ink',
   blocking: 'text-tomato-ink',
 };
@@ -190,7 +190,7 @@ export default function AdminOverviewPage() {
           <h2 className="mt-8 font-mono text-[11px] uppercase tracking-[0.22em] text-slate-muted">
             checks
           </h2>
-          <div className="mt-2 divide-y divide-sand overflow-hidden rounded-xl border border-sand bg-white">
+          <div className="mt-2 divide-y divide-sand overflow-hidden rounded-xl border border-sand bg-surface">
             {checks.map((check) => (
               <CheckRow key={check.label} check={check} />
             ))}
@@ -222,9 +222,9 @@ export default function AdminOverviewPage() {
                     <li key={item.href}>
                       <Link
                         href={item.href}
-                        className={`group -mx-2 flex min-h-11 flex-col justify-center rounded-lg px-2 py-1 transition-colors hover:bg-white ${FOCUS_RING_ON_CANVAS}`}
+                        className={`group -mx-2 flex min-h-11 flex-col justify-center rounded-lg px-2 py-1 transition-colors hover:bg-surface ${FOCUS_RING_ON_CANVAS}`}
                       >
-                        <span className="text-[14px] font-medium text-charcoal group-hover:text-teal-deep">
+                        <span className="text-[14px] font-medium text-charcoal group-hover:text-teal-ink">
                           {item.label}
                         </span>
                         <span className="text-[12.5px] text-slate-muted">{item.description}</span>

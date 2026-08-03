@@ -60,7 +60,7 @@ const TONE_DOT: Record<Tone, string> = {
 
 const TONE_ICON: Record<Tone, string> = {
   amber: 'text-amber',
-  teal: 'text-teal-deep',
+  teal: 'text-teal-ink',
   tomato: 'text-tomato-ink',
   slate: 'text-slate',
 };
@@ -107,7 +107,7 @@ export function GenerationAttemptItem({
       />
 
       <div
-        className={`flex flex-col gap-2 rounded-xl border bg-white p-4 transition ${
+        className={`flex flex-col gap-2 rounded-xl border bg-surface p-4 transition ${
           open ? 'border-teal/40' : 'border-sand'
         }`}
       >
@@ -124,7 +124,7 @@ export function GenerationAttemptItem({
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-[14px] font-medium text-charcoal">{visual.label(generation)}</p>
                 {isActive && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-teal/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-deep">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-teal/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-ink">
                     <Sparkles className="h-3 w-3" />
                     Active
                   </span>
@@ -145,7 +145,7 @@ export function GenerationAttemptItem({
                 type="button"
                 onClick={() => generate.mutate(planId)}
                 disabled={generate.isPending}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-tomato/30 bg-white px-3 text-[12px] font-medium text-tomato-ink transition-colors hover:bg-tomato/10 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-tomato/30 bg-surface px-3 text-[12px] font-medium text-tomato-ink transition-colors hover:bg-tomato/10 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
               >
                 <RefreshCw className={cn('h-3.5 w-3.5', generate.isPending && 'animate-spin')} />
                 Retry
@@ -156,7 +156,7 @@ export function GenerationAttemptItem({
                 <button
                   type="button"
                   className={cn(
-                    'inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-sand bg-white px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas',
+                    'inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-sand bg-surface px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas',
                     open && 'bg-canvas',
                     FOCUS_RING,
                   )}

@@ -166,7 +166,8 @@ function VerifyEmailForm() {
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-40"
         style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, #ebe0cd 1px, transparent 0)',
+          backgroundImage:
+            'radial-gradient(circle at 1px 1px, var(--color-sand) 1px, transparent 0)',
           backgroundSize: '32px 32px',
         }}
       />
@@ -177,7 +178,7 @@ function VerifyEmailForm() {
             <LogoIcon size={16} />
           </span>
           <span className="font-display text-xl font-bold tracking-tight">
-            Budget<span className="text-teal-deep">Bite</span>
+            Budget<span className="text-teal-ink">Bite</span>
           </span>
         </Link>
         <Link
@@ -191,7 +192,7 @@ function VerifyEmailForm() {
 
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[440px] flex-col justify-center px-6 pb-16">
         <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal/15 text-teal-deep">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal/15 text-teal-ink">
             <MailCheck className="h-6 w-6" />
           </div>
           <h1 className="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tight">
@@ -203,7 +204,7 @@ function VerifyEmailForm() {
           <p className="mt-0.5 text-[15px] font-semibold text-charcoal">{email}</p>
         </div>
 
-        <div className="mt-8 rounded-3xl border border-sand bg-white p-7 shadow-2xl">
+        <div className="mt-8 rounded-3xl border border-sand bg-surface p-7 shadow-2xl">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -234,9 +235,9 @@ function VerifyEmailForm() {
                         error
                           ? 'border-tomato/60 bg-tomato/5 text-tomato-ink'
                           : digit
-                            ? 'border-teal/50 bg-white text-charcoal'
+                            ? 'border-teal/50 bg-surface text-charcoal'
                             : 'border-sand bg-canvas text-charcoal'
-                      } focus:border-teal-deep focus:bg-white focus:ring-4 focus:ring-teal-deep/25 disabled:opacity-60`}
+                      } focus:border-teal-ink focus:bg-surface focus:ring-4 focus:ring-teal-ink/25 disabled:opacity-60`}
                     />
                     {/* subtle 3-3 grouping divider */}
                     {i === 2 && <span className="h-0.5 w-2 rounded-full bg-sand" />}
@@ -275,7 +276,7 @@ function VerifyEmailForm() {
               type="button"
               onClick={handleResend}
               disabled={resendCooldown > 0}
-              className="font-semibold text-teal-deep transition-colors hover:text-teal-deep disabled:cursor-not-allowed disabled:font-medium disabled:text-slate/60"
+              className="font-semibold text-teal-ink transition-colors hover:text-teal-ink disabled:cursor-not-allowed disabled:font-medium disabled:text-slate/60"
             >
               {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
             </button>

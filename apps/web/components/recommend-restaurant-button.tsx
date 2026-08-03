@@ -229,7 +229,7 @@ export function RecommendRestaurantButton({
               awaiting review. Once an admin reviews one — or you{' '}
               <Link
                 href="/restaurants/recommendations"
-                className={`rounded text-teal-deep underline underline-offset-2 ${FOCUS_RING}`}
+                className={`rounded text-teal-ink underline underline-offset-2 ${FOCUS_RING}`}
                 onClick={() => setOpen(false)}
               >
                 withdraw one
@@ -466,7 +466,7 @@ export function RecommendRestaurantButton({
               </span>
               <Link
                 href="/restaurants/recommendations"
-                className={`rounded text-[12px] text-teal-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
+                className={`rounded text-[12px] text-teal-ink underline-offset-2 hover:underline ${FOCUS_RING}`}
                 onClick={() => setOpen(false)}
               >
                 view your recommendations →

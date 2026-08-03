@@ -39,7 +39,7 @@ function OptionPrice({ option, ctx }: { option: SuggestionOption; ctx: BudgetSta
     <div className="flex shrink-0 flex-col items-end gap-1">
       <span
         className={`whitespace-nowrap text-right font-display text-[13px] font-semibold tabular-nums ${
-          fit === 'red' ? 'text-tomato-ink' : fit === 'amber' ? 'text-amber-ink' : 'text-teal-deep'
+          fit === 'red' ? 'text-tomato-ink' : fit === 'amber' ? 'text-amber-ink' : 'text-teal-ink'
         }`}
       >
         {formatPKR(option.estimatedPrice)}
@@ -64,8 +64,8 @@ function StatusBadge({ status }: { status: PlanTimelineSlot['status'] }) {
     PlanTimelineSlot['status'],
     { className: string; label: string; Icon: typeof Check } | null
   > = {
-    logged: { className: 'bg-teal/10 text-teal-deep', label: 'Logged', Icon: Check },
-    pinned: { className: 'bg-teal/10 text-teal-deep', label: 'Pinned', Icon: Pin },
+    logged: { className: 'bg-teal/10 text-teal-ink', label: 'Logged', Icon: Check },
+    pinned: { className: 'bg-teal/10 text-teal-ink', label: 'Pinned', Icon: Pin },
     suggested: { className: 'bg-slate/10 text-slate', label: 'Suggested', Icon: Sparkles },
     empty: null,
   };
@@ -187,7 +187,7 @@ function MealSection({
         <div className="flex min-w-0 items-center gap-2">
           <div
             aria-hidden
-            className="flex h-7 w-7 items-center justify-center rounded-md bg-teal/10 text-teal-deep"
+            className="flex h-7 w-7 items-center justify-center rounded-md bg-teal/10 text-teal-ink"
           >
             <Icon className="h-3.5 w-3.5" />
           </div>
@@ -223,10 +223,10 @@ function DayCard({ day, ctx }: { day: PlanTimelineDay; ctx: BudgetStateContext }
   }, [day.slots]);
 
   const containerClass = isToday
-    ? 'overflow-hidden rounded-2xl border-[1.5px] border-teal bg-white shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-teal)_10%,transparent)]'
+    ? 'overflow-hidden rounded-2xl border-[1.5px] border-teal bg-surface shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-teal)_10%,transparent)]'
     : isPast
       ? 'overflow-hidden rounded-2xl border border-sand bg-canvas'
-      : 'overflow-hidden rounded-2xl border border-sand bg-white';
+      : 'overflow-hidden rounded-2xl border border-sand bg-surface';
 
   const headerClass = isToday
     ? 'flex items-center justify-between gap-3 border-b border-sand bg-teal/[0.06] px-5 py-3.5'
@@ -242,7 +242,7 @@ function DayCard({ day, ctx }: { day: PlanTimelineDay; ctx: BudgetStateContext }
             {formatDay(day.slotDate)}
           </h3>
           {isToday && (
-            <span className="rounded-full bg-teal/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-teal-deep">
+            <span className="rounded-full bg-teal/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-teal-ink">
               today
             </span>
           )}
@@ -251,13 +251,13 @@ function DayCard({ day, ctx }: { day: PlanTimelineDay; ctx: BudgetStateContext }
         {(counts.logged > 0 || counts.pinned > 0) && (
           <div className="flex shrink-0 items-center gap-3 text-[11px] text-slate">
             {counts.logged > 0 && (
-              <span className="flex items-center gap-1 text-teal-deep">
+              <span className="flex items-center gap-1 text-teal-ink">
                 <Check className="h-3 w-3" />
                 {counts.logged} logged
               </span>
             )}
             {counts.pinned > 0 && (
-              <span className="flex items-center gap-1 text-teal-deep">
+              <span className="flex items-center gap-1 text-teal-ink">
                 <Pin className="h-3 w-3" />
                 {counts.pinned} pinned
               </span>
@@ -325,7 +325,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
   const header = (
     <div className="flex items-end justify-between">
       <div className="flex flex-col gap-1">
-        <span className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
+        <span className="text-xs font-semibold uppercase tracking-widest text-teal-ink">
           Timeline
         </span>
         <h2 className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -366,7 +366,7 @@ export function PlanTimeline({ plan }: PlanTimelineProps) {
     return (
       <div className="flex flex-col gap-4">
         {header}
-        <div className="rounded-2xl border border-dashed border-sand bg-white p-6 text-center text-[13px] text-slate">
+        <div className="rounded-2xl border border-dashed border-sand bg-surface p-6 text-center text-[13px] text-slate">
           No days in this plan yet.
         </div>
       </div>

@@ -56,7 +56,7 @@ function Slider({
           // A 16px thumb is under the 24px WCAG 2.5.8 floor and far under a
           // fingertip. The `before` pseudo-element widens the hit area to 44px
           // without changing how large the control looks.
-          className="border-teal-deep ring-ring/50 relative block size-5 shrink-0 rounded-full border-2 bg-white shadow-sm transition-[color,box-shadow] before:absolute before:top-1/2 before:left-1/2 before:size-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+          className="border-teal-ink ring-ring/50 relative block size-5 shrink-0 rounded-full border-2 bg-surface shadow-sm transition-[color,box-shadow] before:absolute before:top-1/2 before:left-1/2 before:size-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
         />
       ))}
     </SliderPrimitive.Root>

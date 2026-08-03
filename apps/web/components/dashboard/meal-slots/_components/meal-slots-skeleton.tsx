@@ -4,7 +4,7 @@ export function MealSlotsSkeleton() {
       {Array.from({ length: 3 }).map((_, i) => (
         <div
           key={i}
-          className="flex flex-col overflow-hidden rounded-2xl border border-sand bg-white shadow-sm"
+          className="flex flex-col overflow-hidden rounded-2xl border border-sand bg-surface shadow-sm"
         >
           <div className="flex items-center justify-between border-b border-sand/70 px-5 py-3">
             <div className="flex items-center gap-3">

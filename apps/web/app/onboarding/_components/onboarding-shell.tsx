@@ -7,6 +7,7 @@ import { useOnboardingContext } from '@/app/onboarding/_context/onboarding-conte
 import { ONBOARDING_STEPS } from '@/app/onboarding/constants';
 import type { OnboardingStepAccent } from '@/app/onboarding/types';
 import { LogoIcon } from '@/components/icons';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { FOCUS_RING_ON_CANVAS } from '@/lib/focus-ring';
 
 interface OnboardingShellProps {
@@ -14,8 +15,8 @@ interface OnboardingShellProps {
 }
 
 const ACCENT_CHIP: Record<OnboardingStepAccent, string> = {
-  teal: 'border-teal/30 bg-teal/10 text-teal-deep',
-  deep: 'border-teal/30 bg-sand/60 text-teal-deep',
+  teal: 'border-teal/30 bg-teal/10 text-teal-ink',
+  deep: 'border-teal/30 bg-sand/60 text-teal-ink',
 };
 
 export const OnboardingShell = ({ children }: OnboardingShellProps) => {
@@ -63,12 +64,15 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
                 <LogoIcon size={14} />
               </span>
               <span className="font-display text-base font-bold tracking-tight">
-                Budget<span className="text-teal-deep">Bite</span>
+                Budget<span className="text-teal-ink">Bite</span>
               </span>
             </Link>
-            <span className="text-xs font-semibold text-slate">
-              Step {currentStep + 1} of {totalSteps}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-slate">
+                Step {currentStep + 1} of {totalSteps}
+              </span>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
         <div className="mx-auto max-w-2xl px-4 pb-3 sm:px-6">
@@ -144,7 +148,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
                 onClick={handleContinue}
                 disabled={isSubmitting || !canAdvance}
                 aria-describedby={blockedReason ? 'nav-blocked-reason' : undefined}
-                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-teal-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-teal-deeper hover:shadow-lg hover:shadow-teal-deep/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
+                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-teal-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-teal-deeper hover:shadow-lg hover:shadow-teal-ink/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
               >
                 {isSubmitting ? (
                   'Saving…'
@@ -161,7 +165,7 @@ export const OnboardingShell = ({ children }: OnboardingShellProps) => {
                 onClick={handleFinish}
                 disabled={isSubmitting || !canAdvance}
                 aria-describedby={blockedReason ? 'nav-blocked-reason' : undefined}
-                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-teal-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-teal-deeper hover:shadow-lg hover:shadow-teal-deep/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
+                className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-teal-deep py-3.5 text-sm font-semibold text-white transition-all hover:bg-teal-deeper hover:shadow-lg hover:shadow-teal-ink/25 disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING_ON_CANVAS}`}
               >
                 {isSubmitting ? (
                   <>

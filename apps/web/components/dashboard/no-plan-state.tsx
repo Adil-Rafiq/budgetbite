@@ -30,10 +30,10 @@ const steps = [
  */
 export function NoPlanState() {
   return (
-    <section className="overflow-hidden rounded-3xl border border-sand bg-white shadow-sm">
+    <section className="overflow-hidden rounded-3xl border border-sand bg-surface shadow-sm">
       <div className="flex flex-col gap-6 p-7 sm:p-10">
         <div className="flex max-w-[560px] flex-col gap-3">
-          <span className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
+          <span className="text-xs font-semibold uppercase tracking-widest text-teal-ink">
             Get started
           </span>
           <h1 className="font-display text-3xl font-semibold leading-[1.05] tracking-tight text-charcoal sm:text-4xl">
@@ -58,7 +58,7 @@ export function NoPlanState() {
             const Icon = step.icon;
             return (
               <li key={step.title} className="flex gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal/10 text-teal-deep">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal/10 text-teal-ink">
                   <Icon className="h-4 w-4" />
                 </span>
                 <div className="flex flex-col gap-0.5">

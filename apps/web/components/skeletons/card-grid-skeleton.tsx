@@ -26,7 +26,7 @@ export function CardGridSkeleton({
         <div
           key={i}
           className={cn(
-            'w-full overflow-hidden rounded-2xl border border-sand bg-white p-5 shadow-sm',
+            'w-full overflow-hidden rounded-2xl border border-sand bg-surface p-5 shadow-sm',
             cardClassName,
           )}
         >

@@ -56,7 +56,7 @@ export const StepBudgetDetails = () => {
                 onClick={() => actions.setPlanType(type)}
                 className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl text-[13px] font-semibold transition-all ${FOCUS_RING} ${
                   active
-                    ? 'bg-teal-deep text-white shadow-sm shadow-teal-deep/20'
+                    ? 'bg-teal-deep text-white shadow-sm shadow-teal-ink/20'
                     : 'bg-transparent text-slate hover:text-charcoal'
                 }`}
               >
@@ -74,7 +74,7 @@ export const StepBudgetDetails = () => {
           Total budget (PKR)
         </label>
         <div className="flex items-end gap-2.5">
-          <span aria-hidden className="pb-1 font-display text-xl font-bold text-teal-deep">
+          <span aria-hidden className="pb-1 font-display text-xl font-bold text-teal-ink">
             ₨
           </span>
           <input
@@ -90,7 +90,7 @@ export const StepBudgetDetails = () => {
             }}
             aria-describedby="budget-period"
             aria-invalid={errors.totalBudget ? true : undefined}
-            className={`min-w-0 flex-1 border-b-2 border-sand bg-transparent pb-1 font-display text-3xl font-bold text-charcoal transition-colors placeholder:text-slate/30 focus:border-teal-deep ${FOCUS_RING}`}
+            className={`min-w-0 flex-1 border-b-2 border-sand bg-transparent pb-1 font-display text-3xl font-bold text-charcoal transition-colors placeholder:text-slate/30 focus:border-teal-ink ${FOCUS_RING}`}
           />
           <span id="budget-period" className="pb-1.5 text-[12px] text-slate">
             / {values.planType === 'weekly' ? 'week' : 'month'}
@@ -109,8 +109,8 @@ export const StepBudgetDetails = () => {
                 onClick={() => actions.setTotalBudget(preset)}
                 className={`min-h-11 rounded-full border px-3 text-[11px] font-medium transition-colors ${FOCUS_RING} ${
                   active
-                    ? 'border-teal-deep bg-teal/10 font-semibold text-teal-deep'
-                    : 'border-sand text-slate hover:border-teal-deep hover:text-teal-deep'
+                    ? 'border-teal-ink bg-teal/10 font-semibold text-teal-ink'
+                    : 'border-sand text-slate hover:border-teal-ink hover:text-teal-ink'
                 }`}
               >
                 {formatPKR(preset)}
@@ -121,7 +121,7 @@ export const StepBudgetDetails = () => {
 
         {lastConversion && !errors.totalBudget && (
           <p className="mt-1 flex items-start gap-2 rounded-xl border border-sand bg-canvas px-3 py-2 text-[11px] text-slate">
-            <RefreshCw aria-hidden className="mt-0.5 h-3 w-3 shrink-0 text-teal-deep" />
+            <RefreshCw aria-hidden className="mt-0.5 h-3 w-3 shrink-0 text-teal-ink" />
             <span>
               Converted {formatPKR(lastConversion.from)} to{' '}
               <span className="font-semibold text-charcoal">{formatPKR(lastConversion.to)}</span> so
@@ -165,7 +165,7 @@ export const StepBudgetDetails = () => {
             <button
               type="button"
               onClick={mealTypes.refetch}
-              className={`min-h-11 rounded-lg border border-sand bg-white px-3 text-[11px] font-semibold text-teal-deep transition-colors hover:border-teal-deep ${FOCUS_RING}`}
+              className={`min-h-11 rounded-lg border border-sand bg-surface px-3 text-[11px] font-semibold text-teal-ink transition-colors hover:border-teal-ink ${FOCUS_RING}`}
             >
               Try again
             </button>

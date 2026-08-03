@@ -8,7 +8,7 @@ export function RestaurantCardSkeleton({ className }: RestaurantCardSkeletonProp
   return (
     <div
       className={cn(
-        'flex h-full flex-col rounded-2xl border border-sand bg-white p-5 shadow-sm',
+        'flex h-full flex-col rounded-2xl border border-sand bg-surface p-5 shadow-sm',
         className,
       )}
     >

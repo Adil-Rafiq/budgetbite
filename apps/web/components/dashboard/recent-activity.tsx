@@ -23,14 +23,14 @@ export function RecentActivity() {
         <span className="text-[12px] text-slate">Last 5 entries</span>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-sand bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-sand bg-surface shadow-sm">
         {isLoading ? (
           <div className="flex flex-col">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
                 className={`h-14 animate-pulse ${i === 0 ? '' : 'border-t border-sand'} ${
-                  i % 2 === 0 ? 'bg-white' : 'bg-canvas'
+                  i % 2 === 0 ? 'bg-surface' : 'bg-canvas'
                 }`}
               />
             ))}
@@ -41,7 +41,7 @@ export function RecentActivity() {
             <button
               type="button"
               onClick={() => refetch()}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-tomato/40 bg-white px-3 py-1.5 text-[12px] font-semibold text-tomato-ink transition-colors hover:bg-tomato/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tomato/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-tomato/40 bg-surface px-3 py-1.5 text-[12px] font-semibold text-tomato-ink transition-colors hover:bg-tomato/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tomato/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             >
               <RotateCw className="h-3.5 w-3.5" />
               Try again
@@ -71,10 +71,10 @@ export function RecentActivity() {
                   key={item.id}
                   className={`flex items-center justify-between gap-4 px-5 py-3.5 ${
                     i === 0 ? '' : 'border-t border-sand'
-                  } ${i % 2 === 0 ? 'bg-white' : 'bg-canvas'}`}
+                  } ${i % 2 === 0 ? 'bg-surface' : 'bg-canvas'}`}
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-teal/10 text-[12px] font-semibold text-teal-deep">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-teal/10 text-[12px] font-semibold text-teal-ink">
                       {label.slice(0, 1).toUpperCase()}
                     </span>
                     <div className="flex min-w-0 flex-col">

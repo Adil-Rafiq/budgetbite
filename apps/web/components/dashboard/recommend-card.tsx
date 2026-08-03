@@ -11,7 +11,7 @@ export function RecommendCard() {
   const pendingCount = (data?.data ?? []).filter((r) => r.status === 'pending').length;
 
   return (
-    <div className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-dashed border-sand bg-white p-5 shadow-sm sm:flex-row sm:items-center">
+    <div className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-dashed border-sand bg-surface p-5 shadow-sm sm:flex-row sm:items-center">
       <div className="flex flex-col gap-1">
         <h3 className="font-display text-base font-semibold text-charcoal">Missing a spot?</h3>
         <p className="text-[13px] text-slate">
@@ -20,7 +20,7 @@ export function RecommendCard() {
         {pendingCount > 0 && (
           <Link
             href="/restaurants/recommendations"
-            className={`rounded text-[12px] font-medium text-teal-deep underline-offset-2 hover:text-teal-deep hover:underline ${FOCUS_RING}`}
+            className={`rounded text-[12px] font-medium text-teal-ink underline-offset-2 hover:text-teal-ink hover:underline ${FOCUS_RING}`}
           >
             {pendingCount} pending review — view yours →
           </Link>

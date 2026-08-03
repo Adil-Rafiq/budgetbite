@@ -7,7 +7,7 @@ import { DIETARY_PREFERENCE_OPTIONS, ALLERGEN_OPTIONS } from '@/app/onboarding/c
 import { DietaryTagPicker } from '@/components/dietary-tag-picker';
 import { FOCUS_RING } from '@/lib/focus-ring';
 
-const cardClass = 'rounded-[20px] border border-sand bg-white p-5 shadow-sm sm:p-6';
+const cardClass = 'rounded-[20px] border border-sand bg-surface p-5 shadow-sm sm:p-6';
 
 export const DietaryStep = () => {
   const { steps } = useOnboardingContext();
@@ -49,13 +49,13 @@ export const DietaryStep = () => {
         <button
           type="button"
           onClick={() => setShowAllergens(true)}
-          className={`flex min-h-11 items-center gap-3 rounded-[20px] border border-dashed border-sand bg-white p-5 text-left transition-colors hover:border-teal-deep ${FOCUS_RING}`}
+          className={`flex min-h-11 items-center gap-3 rounded-[20px] border border-dashed border-sand bg-surface p-5 text-left transition-colors hover:border-teal-ink ${FOCUS_RING}`}
         >
           <span
             aria-hidden
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sand/60"
           >
-            <ShieldAlert className="h-4 w-4 text-teal-deep" />
+            <ShieldAlert className="h-4 w-4 text-teal-ink" />
           </span>
           <span className="min-w-0">
             <span className="flex items-center gap-1.5 text-sm font-semibold text-charcoal">

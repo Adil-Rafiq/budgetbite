@@ -69,15 +69,15 @@ export function TimePicker({
           aria-label={ariaLabel ?? `Time, ${formatTimeOfDay(value)}`}
           aria-invalid={ariaInvalid}
           className={cn(
-            'inline-flex items-center justify-between gap-2 rounded-xl border bg-white outline-none transition',
-            'focus-visible:border-teal-deep focus-visible:ring-2 focus-visible:ring-teal-deep focus-visible:ring-offset-2 focus-visible:ring-offset-white',
-            'data-[state=open]:border-teal-deep data-[state=open]:ring-2 data-[state=open]:ring-teal-deep/40',
+            'inline-flex items-center justify-between gap-2 rounded-xl border bg-surface outline-none transition',
+            'focus-visible:border-teal-ink focus-visible:ring-2 focus-visible:ring-teal-ink focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+            'data-[state=open]:border-teal-ink data-[state=open]:ring-2 data-[state=open]:ring-teal-ink/40',
             'disabled:cursor-not-allowed',
             disabled
               ? 'border-sand/60 text-slate/50 line-through'
               : ariaInvalid
                 ? 'border-tomato text-charcoal hover:border-tomato'
-                : 'border-sand text-charcoal hover:border-teal-deep/50',
+                : 'border-sand text-charcoal hover:border-teal-ink/50',
             size === 'sm'
               ? 'min-h-9 w-[112px] px-2.5 py-1.5 text-[12px]'
               : 'min-h-11 w-[136px] px-3.5 py-2.5 text-[14px]',
@@ -100,7 +100,7 @@ export function TimePicker({
         align="end"
         sideOffset={6}
         className={cn(
-          'z-50 w-auto origin-(--radix-popover-content-transform-origin) overflow-hidden rounded-xl border border-sand bg-white p-0 shadow-[0_10px_28px_rgba(0,0,0,0.10)] outline-none',
+          'z-50 w-auto origin-(--radix-popover-content-transform-origin) overflow-hidden rounded-xl border border-sand bg-surface p-0 shadow-[0_10px_28px_rgba(0,0,0,0.10)] outline-none',
           'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
           'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
         )}
@@ -187,7 +187,7 @@ function TimeColumn({
               onClick={() => onSelect(v)}
               className={cn(
                 'flex h-9 w-full items-center justify-center text-[13px] tabular-nums transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-deep',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-ink',
                 isSelected
                   ? 'bg-teal-deep text-white'
                   : 'text-charcoal hover:bg-sand/40 focus:bg-sand/40',

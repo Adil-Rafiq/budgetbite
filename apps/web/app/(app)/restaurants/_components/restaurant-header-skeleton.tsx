@@ -8,7 +8,7 @@ export function RestaurantHeaderSkeleton({ className }: RestaurantHeaderSkeleton
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-2xl border border-sand bg-white p-5 shadow-sm',
+        'overflow-hidden rounded-2xl border border-sand bg-surface p-5 shadow-sm',
         className,
       )}
     >

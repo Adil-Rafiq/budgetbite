@@ -46,7 +46,7 @@ export function Section({
     <div
       role="group"
       aria-labelledby={headingId}
-      className={`flex h-full flex-col rounded-2xl border bg-white p-6 shadow-sm transition-colors ${
+      className={`flex h-full flex-col rounded-2xl border bg-surface p-6 shadow-sm transition-colors ${
         isDirty ? 'border-amber/60' : 'border-sand'
       }`}
     >

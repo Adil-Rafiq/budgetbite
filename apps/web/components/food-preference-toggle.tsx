@@ -83,7 +83,7 @@ export function FoodPreferenceToggle({
         className={`${baseBtn} ${BTN_SIZE[size]} ${
           isFavorite
             ? 'border-amber bg-amber-tint text-amber-ink'
-            : 'border-sand bg-white text-slate hover:border-amber hover:text-amber-ink'
+            : 'border-sand bg-surface text-slate hover:border-amber hover:text-amber-ink'
         }`}
       >
         <Heart
@@ -101,7 +101,7 @@ export function FoodPreferenceToggle({
         className={`${baseBtn} ${BTN_SIZE[size]} ${
           isBlocked
             ? 'border-tomato bg-tomato/10 text-tomato-ink'
-            : 'border-sand bg-white text-slate hover:border-tomato hover:text-tomato-ink'
+            : 'border-sand bg-surface text-slate hover:border-tomato hover:text-tomato-ink'
         }`}
       >
         <Ban className={ICON_SIZE[size]} />

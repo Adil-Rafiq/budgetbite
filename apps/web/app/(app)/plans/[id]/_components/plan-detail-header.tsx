@@ -14,7 +14,7 @@ const statusTone: Record<BudgetPlanDetail['status'], StatusTone> = {
 };
 
 const TONE_CLASS: Record<StatusTone, { pill: string; dot: string }> = {
-  active: { pill: 'bg-teal/10 text-teal-deep', dot: 'bg-teal' },
+  active: { pill: 'bg-teal/10 text-teal-ink', dot: 'bg-teal' },
   completed: { pill: 'bg-slate/10 text-slate', dot: 'bg-slate' },
   cancelled: { pill: 'bg-tomato/10 text-tomato-ink', dot: 'bg-tomato' },
 };
@@ -33,7 +33,7 @@ export function PlanDetailHeader({ plan }: { plan: BudgetPlanDetail }) {
     <div className="flex flex-col gap-3">
       <Link
         href="/plans"
-        className={`inline-flex w-fit items-center gap-1.5 rounded text-[12px] text-slate transition hover:text-teal-deep ${FOCUS_RING_ON_CANVAS}`}
+        className={`inline-flex w-fit items-center gap-1.5 rounded text-[12px] text-slate transition hover:text-teal-ink ${FOCUS_RING_ON_CANVAS}`}
       >
         ← Back to plans
       </Link>
@@ -42,7 +42,7 @@ export function PlanDetailHeader({ plan }: { plan: BudgetPlanDetail }) {
         <div className="flex min-w-0 flex-col gap-2">
           {/* The eyebrow used to read `Plan · 3f2a9b1c` — a UUID fragment was
               the only per-plan identity a user was ever given. */}
-          <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
+          <div className="text-xs font-semibold uppercase tracking-widest text-teal-ink">
             {planSubtitle(plan)}
           </div>
           <div className="flex flex-wrap items-center gap-3">

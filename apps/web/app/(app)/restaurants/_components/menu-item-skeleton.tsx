@@ -7,7 +7,10 @@ interface MenuItemSkeletonProps {
 export function MenuItemSkeleton({ className }: MenuItemSkeletonProps) {
   return (
     <div
-      className={cn('overflow-hidden rounded-2xl border border-sand bg-white shadow-sm', className)}
+      className={cn(
+        'overflow-hidden rounded-2xl border border-sand bg-surface shadow-sm',
+        className,
+      )}
     >
       <div className="h-32 w-full animate-pulse bg-sand" />
       <div className="flex items-start justify-between gap-4 p-4">

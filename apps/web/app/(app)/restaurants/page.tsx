@@ -292,7 +292,7 @@ function RestaurantsPageInner() {
               <RecommendRestaurantButton />
               <Link
                 href="/restaurants/recommendations"
-                className={`rounded text-[12px] font-medium text-teal-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
+                className={`rounded text-[12px] font-medium text-teal-ink underline-offset-2 hover:underline ${FOCUS_RING}`}
               >
                 Your recommendations →
               </Link>
@@ -303,13 +303,13 @@ function RestaurantsPageInner() {
 
       {!hasActivePlan && (
         <FadeUp delay={0.04}>
-          <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-sand bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-sand bg-surface p-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-[13px] text-slate">
               Start a budget plan to see which of these fit what you have left.
             </p>
             <Link
               href="/plans"
-              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-sand bg-surface px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
             >
               Create a plan
               <span aria-hidden>→</span>
@@ -319,7 +319,7 @@ function RestaurantsPageInner() {
       )}
 
       <FadeUp delay={0.08}>
-        <div className="overflow-hidden rounded-2xl border border-sand bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-sand bg-surface shadow-sm">
           <div className="flex flex-col gap-4 p-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
@@ -376,7 +376,7 @@ function RestaurantsPageInner() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <Label id="distance-label" className={labelClass}>
-                  Max distance: <span className="text-teal-deep">{maxDistanceKm} km</span>
+                  Max distance: <span className="text-teal-ink">{maxDistanceKm} km</span>
                 </Label>
                 <Slider
                   aria-labelledby="distance-label"
@@ -402,7 +402,7 @@ function RestaurantsPageInner() {
                         onClick={() => updateParams({ maxDistanceKm: String(km) })}
                         className={`${presetClass} ${
                           active
-                            ? 'border-teal-deep bg-teal/10 text-teal-deep'
+                            ? 'border-teal-ink bg-teal/10 text-teal-ink'
                             : 'border-sand bg-canvas text-slate hover:border-teal'
                         }`}
                       >
@@ -415,7 +415,7 @@ function RestaurantsPageInner() {
                   <p id="distance-hint" className="text-[12px] text-slate">
                     <Link
                       href="/profile"
-                      className={`rounded font-medium text-teal-deep underline underline-offset-2 ${FOCUS_RING}`}
+                      className={`rounded font-medium text-teal-ink underline underline-offset-2 ${FOCUS_RING}`}
                     >
                       Set your location
                     </Link>{' '}
@@ -427,9 +427,7 @@ function RestaurantsPageInner() {
               <div className="flex flex-col gap-2">
                 <Label id="rating-label" className={labelClass}>
                   Minimum rating:{' '}
-                  <span className="text-teal-deep">
-                    {minRating === 0 ? 'Any' : `${minRating}+`}
-                  </span>
+                  <span className="text-teal-ink">{minRating === 0 ? 'Any' : `${minRating}+`}</span>
                 </Label>
                 <Slider
                   aria-labelledby="rating-label"
@@ -459,7 +457,7 @@ function RestaurantsPageInner() {
                         }
                         className={`${presetClass} ${
                           active
-                            ? 'border-teal-deep bg-teal/10 text-teal-deep'
+                            ? 'border-teal-ink bg-teal/10 text-teal-ink'
                             : 'border-sand bg-canvas text-slate hover:border-teal'
                         }`}
                       >
@@ -484,7 +482,7 @@ function RestaurantsPageInner() {
               key={chip.key}
               type="button"
               onClick={chip.clear}
-              className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sand bg-white px-3 text-[12px] font-medium text-charcoal transition-colors hover:border-tomato hover:text-tomato-ink sm:min-h-9 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sand bg-surface px-3 text-[12px] font-medium text-charcoal transition-colors hover:border-tomato hover:text-tomato-ink sm:min-h-9 ${FOCUS_RING}`}
               aria-label={chip.a11yLabel}
             >
               {chip.label}
@@ -510,13 +508,13 @@ function RestaurantsPageInner() {
       ) : error ? (
         <DataError message="Could not load restaurants." onRetry={() => refetch()} />
       ) : data.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-white p-8 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-surface p-8 text-center">
           <p className="text-[13px] text-slate">{emptyMessage}</p>
           {page > 0 ? (
             <button
               type="button"
               onClick={() => goToPage(0)}
-              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-surface px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
             >
               Back to the first page
             </button>
@@ -524,7 +522,7 @@ function RestaurantsPageInner() {
             <button
               type="button"
               onClick={clearAll}
-              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-surface px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
             >
               Clear all filters
             </button>
@@ -532,7 +530,7 @@ function RestaurantsPageInner() {
             <button
               type="button"
               onClick={() => updateParams({ maxDistanceKm: '30' })}
-              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-surface px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas sm:min-h-10 ${FOCUS_RING}`}
             >
               Widen to 30 km
             </button>
@@ -593,12 +591,10 @@ function RestaurantsPageInner() {
                   >
                     <motion.div
                       whileHover={
-                        reduceMotion
-                          ? undefined
-                          : { y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }
+                        reduceMotion ? undefined : { y: -3, boxShadow: 'var(--elevation-lift)' }
                       }
                       transition={{ duration: 0.22, ease: 'easeOut' }}
-                      className="flex h-full flex-col rounded-2xl border border-sand bg-white p-5 shadow-sm"
+                      className="flex h-full flex-col rounded-2xl border border-sand bg-surface p-5 shadow-sm"
                     >
                       <div className="flex items-start justify-between gap-3">
                         {/* A thumbnail rather than a full-bleed banner: the
@@ -688,7 +684,7 @@ function RestaurantsPageInner() {
                 type="button"
                 onClick={() => goToPage(page - 1)}
                 disabled={!hasPrev || isFetching}
-                className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
+                className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-surface px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
               >
                 ← Prev
               </button>
@@ -699,7 +695,7 @@ function RestaurantsPageInner() {
                 type="button"
                 onClick={() => goToPage(page + 1)}
                 disabled={!hasNext || isFetching}
-                className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
+                className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-surface px-4 text-[13px] font-medium text-charcoal transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 sm:min-h-10 ${FOCUS_RING}`}
               >
                 Next →
               </button>

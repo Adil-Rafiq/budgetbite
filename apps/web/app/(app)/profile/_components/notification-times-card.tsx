@@ -144,7 +144,7 @@ export function NotificationTimesCard({
       <div
         role="status"
         aria-label="Loading your reminders"
-        className="h-[360px] w-full animate-pulse rounded-2xl border border-sand bg-white shadow-sm"
+        className="h-[360px] w-full animate-pulse rounded-2xl border border-sand bg-surface shadow-sm"
       />
     );
   }
@@ -158,7 +158,7 @@ export function NotificationTimesCard({
               You don&apos;t have an active plan, so there is nothing to be reminded about yet.{' '}
               <Link
                 href="/plans"
-                className={`rounded text-teal-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
+                className={`rounded text-teal-ink underline-offset-2 hover:underline ${FOCUS_RING}`}
               >
                 Start a budget plan
               </Link>{' '}
@@ -186,7 +186,7 @@ export function NotificationTimesCard({
           These belong to your active plan.{' '}
           <Link
             href={`/plans/${planId}`}
-            className={`rounded font-medium text-teal-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
+            className={`rounded font-medium text-teal-ink underline-offset-2 hover:underline ${FOCUS_RING}`}
           >
             Open the plan
           </Link>{' '}
@@ -219,7 +219,7 @@ export function NotificationTimesCard({
                 }
                 className={`inline-flex min-h-11 min-w-[56px] items-center justify-center rounded-xl border px-3 text-[12px] font-medium transition-colors ${FOCUS_RING} ${
                   slot.enabled
-                    ? 'border-teal bg-teal/10 text-teal-deep'
+                    ? 'border-teal bg-teal/10 text-teal-ink'
                     : 'border-sand bg-canvas text-slate hover:border-teal/40'
                 }`}
               >
@@ -254,7 +254,7 @@ export function NotificationTimesCard({
           disabled={!nextFreeTime}
           className={`inline-flex min-h-11 w-fit items-center gap-1.5 rounded-xl border px-4 text-[13px] font-medium transition-colors ${FOCUS_RING} ${
             nextFreeTime
-              ? 'border-sand bg-white text-slate hover:bg-canvas'
+              ? 'border-sand bg-surface text-slate hover:bg-canvas'
               : 'cursor-not-allowed border-sand bg-canvas text-slate'
           }`}
         >

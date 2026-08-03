@@ -52,7 +52,7 @@ export default function AdminConfigPage() {
           <DataError message="Could not load config." onRetry={() => refetch()} />
         </div>
       ) : (
-        <div className="mt-6 divide-y divide-sand rounded-xl border border-sand bg-white">
+        <div className="mt-6 divide-y divide-sand rounded-xl border border-sand bg-surface">
           {rows.map(({ key, label, description }) => (
             <div key={key} className="flex items-center justify-between gap-4 px-4 py-3">
               <div className="min-w-0">

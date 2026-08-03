@@ -20,7 +20,7 @@ L.Icon.Default.mergeOptions({
 const wisprIcon = L.divIcon({
   className: 'wispr-pin',
   html: `<svg width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M14 0C6.27 0 0 6.27 0 14c0 9.5 14 22 14 22s14-12.5 14-22C28 6.27 21.73 0 14 0z" fill="#c8402f"/>
+    <path d="M14 0C6.27 0 0 6.27 0 14c0 9.5 14 22 14 22s14-12.5 14-22C28 6.27 21.73 0 14 0z" fill="var(--color-tomato)"/>
     <circle cx="14" cy="14" r="5" fill="#ffffff"/>
   </svg>`,
   iconSize: [28, 36],
@@ -301,7 +301,7 @@ export function LocationMap({
           aria-activedescendant={
             activeIndex >= 0 ? `loc-result-${results[activeIndex]?.place_id}` : undefined
           }
-          className={`w-full rounded-xl border border-sand bg-white px-3.5 py-[11px] pr-9 text-[13px] text-charcoal transition-colors placeholder:text-slate/50 focus:border-teal-deep ${FOCUS_RING}`}
+          className={`w-full rounded-xl border border-sand bg-surface px-3.5 py-[11px] pr-9 text-[13px] text-charcoal transition-colors placeholder:text-slate/50 focus:border-teal-ink ${FOCUS_RING}`}
         />
         <span
           aria-hidden
@@ -322,7 +322,7 @@ export function LocationMap({
             id={listboxId}
             role="listbox"
             aria-label="Address results"
-            className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-56 overflow-y-auto rounded-xl border border-sand bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+            className="absolute left-0 right-0 top-full z-[1100] mt-1 max-h-56 overflow-y-auto rounded-xl border border-sand bg-surface py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
           >
             {results.map((r, i) => (
               <li key={r.place_id}>
@@ -388,7 +388,7 @@ export function LocationMap({
             type="button"
             aria-label="Zoom in"
             onClick={() => mapInstance?.zoomIn()}
-            className={`flex h-11 w-11 items-center justify-center rounded-full border border-sand bg-white text-[17px] text-charcoal shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-canvas ${FOCUS_RING}`}
+            className={`flex h-11 w-11 items-center justify-center rounded-full border border-sand bg-surface text-[17px] text-charcoal shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-canvas ${FOCUS_RING}`}
           >
             +
           </button>
@@ -396,20 +396,20 @@ export function LocationMap({
             type="button"
             aria-label="Zoom out"
             onClick={() => mapInstance?.zoomOut()}
-            className={`flex h-11 w-11 items-center justify-center rounded-full border border-sand bg-white text-[17px] text-charcoal shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-canvas ${FOCUS_RING}`}
+            className={`flex h-11 w-11 items-center justify-center rounded-full border border-sand bg-surface text-[17px] text-charcoal shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-colors hover:bg-canvas ${FOCUS_RING}`}
           >
             −
           </button>
         </div>
 
-        <div className="pointer-events-none absolute right-3 top-3 rounded-full border border-sand bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate backdrop-blur">
+        <div className="pointer-events-none absolute right-3 top-3 rounded-full border border-sand bg-surface/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate backdrop-blur">
           {hasPin ? 'Tap, drag, or arrow keys' : 'Tap to set your spot'}
         </div>
       </div>
 
       <div
         className={`flex items-start gap-3 rounded-xl border px-3.5 py-2.5 ${
-          hasPin ? 'border-teal/40 bg-teal/5' : 'border-dashed border-sand bg-white'
+          hasPin ? 'border-teal/40 bg-teal/5' : 'border-dashed border-sand bg-surface'
         }`}
       >
         <span

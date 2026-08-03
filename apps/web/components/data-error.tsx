@@ -24,7 +24,7 @@ export function DataError({ message, onRetry }: { message: string; onRetry?: () 
           // The house FOCUS_RING, not a bespoke tomato one. This is the single
           // control a keyboard user reaches during a failure; it should not be
           // the one control whose focus treatment they have never seen before.
-          className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-lg border border-tomato/40 bg-white px-3 text-[12px] font-semibold text-tomato-ink transition-colors hover:bg-tomato/10 sm:min-h-9 sm:self-auto ${FOCUS_RING}`}
+          className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-lg border border-tomato/40 bg-surface px-3 text-[12px] font-semibold text-tomato-ink transition-colors hover:bg-tomato/10 sm:min-h-9 sm:self-auto ${FOCUS_RING}`}
         >
           <RotateCw aria-hidden className="h-3.5 w-3.5" />
           Try again

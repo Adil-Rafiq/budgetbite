@@ -208,7 +208,7 @@ export default function AdminRestaurantsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name…"
-            className="max-w-xs bg-white"
+            className="max-w-xs bg-surface"
           />
           {total > 0 && (
             <span className="shrink-0 font-mono text-[12px] text-slate-muted">{total} total</span>
@@ -234,7 +234,7 @@ export default function AdminRestaurantsPage() {
           The Delete button used to mount and unmount inside that row, shifting
           Export and Add sideways every time a checkbox was ticked. */}
       {canDelete && selected.size > 0 && (
-        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-sand bg-white px-4 py-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-sand bg-surface px-4 py-3">
           <span className="text-[13px] text-charcoal">
             <span className="font-mono font-semibold tabular-nums">{selected.size}</span> selected
             {selectedOffPage > 0 && (
@@ -305,7 +305,7 @@ export default function AdminRestaurantsPage() {
         </div>
       )}
 
-      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-white'}>
+      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-surface'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate-muted" />
@@ -358,7 +358,7 @@ export default function AdminRestaurantsPage() {
                       </TableCell>
                     )}
                     <TableCell className="font-medium text-charcoal">
-                      <Link href={`/admin/restaurants/${r.id}`} className="hover:text-teal-deep">
+                      <Link href={`/admin/restaurants/${r.id}`} className="hover:text-teal-ink">
                         {r.name}
                       </Link>
                     </TableCell>

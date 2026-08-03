@@ -52,7 +52,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
         ? { cls: 'bg-tomato/10 text-tomato-ink', Icon: TriangleAlert, label: 'Watch spending' }
         : health === 'warning'
           ? { cls: BUDGET_FIT_PILL.amber.pill, Icon: TriangleAlert, label: 'Tight' }
-          : { cls: 'bg-teal/10 text-teal-deep', Icon: CircleCheck, label: 'On track' };
+          : { cls: 'bg-teal/10 text-teal-ink', Icon: CircleCheck, label: 'On track' };
 
   const hasActiveGen = !!plan.activeGeneration;
   const isPending = plan.latestAttempt?.status === 'pending';
@@ -67,13 +67,13 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
 
   const varianceTone =
     ctx.cumulativeVariance >= 0
-      ? 'text-teal-deep'
+      ? 'text-teal-ink'
       : ctx.cumulativeVariance < -total * 0.1
         ? 'text-tomato-ink'
         : BUDGET_FIT_PILL.amber.text;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-sand bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-sand bg-surface shadow-sm">
       <div className="flex flex-col gap-5 p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 flex-col gap-1">
@@ -140,7 +140,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
             </div>
             <Link
               href="/onboarding"
-              className={`inline-flex min-h-11 shrink-0 items-center rounded-lg border border-amber/40 bg-white px-3 text-[12px] font-medium text-amber-ink transition-colors hover:bg-amber-tint ${FOCUS_RING}`}
+              className={`inline-flex min-h-11 shrink-0 items-center rounded-lg border border-amber/40 bg-surface px-3 text-[12px] font-medium text-amber-ink transition-colors hover:bg-amber-tint ${FOCUS_RING}`}
             >
               Complete setup
             </Link>

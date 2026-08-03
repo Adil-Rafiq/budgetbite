@@ -14,11 +14,11 @@
 
 /** For controls on white cards. */
 export const FOCUS_RING =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-deep focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-ink focus-visible:ring-offset-2 focus-visible:ring-offset-surface';
 
 /** For controls on the page/canvas background (headers, sticky footers). */
 export const FOCUS_RING_ON_CANVAS =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-deep focus-visible:ring-offset-2 focus-visible:ring-offset-canvas';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-ink focus-visible:ring-offset-2 focus-visible:ring-offset-canvas';
 
 /** For controls sitting directly on a filled teal surface. */
 export const FOCUS_RING_ON_TEAL =

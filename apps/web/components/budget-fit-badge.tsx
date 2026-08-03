@@ -22,9 +22,9 @@ export const BUDGET_FIT_PILL: Record<
   // is a traffic-light classification that @repo/shared and the API both use.
   // It stays spelled `green` while rendering teal classes.
   green: {
-    pill: 'bg-teal/10 text-teal-deep',
+    pill: 'bg-teal/10 text-teal-ink',
     dot: 'bg-teal-deep',
-    text: 'text-teal-deep',
+    text: 'text-teal-ink',
     label: 'Fits budget',
   },
   amber: {

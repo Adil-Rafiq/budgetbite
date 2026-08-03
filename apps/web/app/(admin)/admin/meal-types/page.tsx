@@ -75,7 +75,7 @@ export default function AdminMealTypesPage() {
         )}
       </div>
 
-      <div className={isError ? 'mt-6' : 'mt-6 rounded-xl border border-sand bg-white'}>
+      <div className={isError ? 'mt-6' : 'mt-6 rounded-xl border border-sand bg-surface'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate-muted" />
@@ -113,7 +113,7 @@ export default function AdminMealTypesPage() {
                     <TableCell>
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[11px] ${
-                          mt.active ? 'bg-teal/15 text-teal-deep' : 'bg-sand/50 text-slate-muted'
+                          mt.active ? 'bg-teal/15 text-teal-ink' : 'bg-sand/50 text-slate-muted'
                         }`}
                       >
                         {mt.active ? 'active' : 'inactive'}

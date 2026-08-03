@@ -43,13 +43,13 @@ function Section({ spec }: { spec: GroupSpec }) {
   const clean = group.count === 0;
   const Icon = clean ? CircleCheck : severity === 'blocking' ? CircleAlert : CircleDot;
   const tone = clean
-    ? 'text-teal-deep'
+    ? 'text-teal-ink'
     : severity === 'blocking'
       ? 'text-tomato-ink'
       : 'text-amber-ink';
 
   return (
-    <div className="rounded-xl border border-sand bg-white p-4">
+    <div className="rounded-xl border border-sand bg-surface p-4">
       <div className="flex items-start gap-3">
         <Icon aria-hidden className={`mt-0.5 h-4 w-4 shrink-0 ${tone}`} />
         <div className="min-w-0 flex-1">
@@ -72,7 +72,7 @@ function Section({ spec }: { spec: GroupSpec }) {
                 {to ? (
                   <Link
                     href={to}
-                    className={`-mx-1 flex items-baseline gap-2 rounded px-1 py-0.5 text-slate transition-colors hover:text-teal-deep ${FOCUS_RING}`}
+                    className={`-mx-1 flex items-baseline gap-2 rounded px-1 py-0.5 text-slate transition-colors hover:text-teal-ink ${FOCUS_RING}`}
                   >
                     <span className="truncate">{e.name}</span>
                     {e.restaurantName && (
@@ -158,7 +158,7 @@ export default function AdminDataQualityPage() {
           type="button"
           onClick={() => refetch()}
           disabled={isFetching}
-          className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-sand bg-white px-3 text-[12px] text-slate transition-colors hover:text-charcoal disabled:opacity-60 ${FOCUS_RING_ON_CANVAS}`}
+          className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-sand bg-surface px-3 text-[12px] text-slate transition-colors hover:text-charcoal disabled:opacity-60 ${FOCUS_RING_ON_CANVAS}`}
         >
           {isFetching ? (
             <Spinner className="size-3.5" />
@@ -186,7 +186,7 @@ export default function AdminDataQualityPage() {
               role="status"
               className="mt-6 flex items-start gap-3 rounded-xl border border-teal/30 bg-teal/[0.06] p-4"
             >
-              <CircleCheck aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-teal-deep" />
+              <CircleCheck aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-teal-ink" />
               <p className="text-[13.5px] leading-relaxed text-charcoal">
                 No record would mislead a plan right now. Every restaurant has orderable items at
                 plausible prices.

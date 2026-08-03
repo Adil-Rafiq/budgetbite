@@ -92,7 +92,7 @@ export function PasswordCard({ onDirtyChange }: { onDirtyChange: (dirty: boolean
       <div
         role="status"
         aria-label="Loading your sign-in details"
-        className="h-[400px] w-full animate-pulse rounded-2xl border border-sand bg-white shadow-sm"
+        className="h-[400px] w-full animate-pulse rounded-2xl border border-sand bg-surface shadow-sm"
       />
     );
   }

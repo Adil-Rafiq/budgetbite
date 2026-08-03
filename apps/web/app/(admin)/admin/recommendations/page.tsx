@@ -44,7 +44,7 @@ const PAGE_SIZE = 20;
 
 const STATUS_PILL: Record<string, string> = {
   pending: 'bg-amber-tint text-amber-ink',
-  approved: 'bg-teal/15 text-teal-deep',
+  approved: 'bg-teal/15 text-teal-ink',
   rejected: 'bg-tomato/10 text-tomato-ink',
 };
 
@@ -115,7 +115,7 @@ export default function AdminRecommendationsPage() {
             setOffset(0);
           }}
         >
-          <SelectTrigger aria-label="Filter by recommendation status" className="w-40 bg-white">
+          <SelectTrigger aria-label="Filter by recommendation status" className="w-40 bg-surface">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -128,7 +128,7 @@ export default function AdminRecommendationsPage() {
         {total > 0 && <span className="font-mono text-[12px] text-slate-muted">{total} total</span>}
       </div>
 
-      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-white'}>
+      <div className={isError ? 'mt-4' : 'mt-4 rounded-xl border border-sand bg-surface'}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner className="size-5 text-slate-muted" />
@@ -167,7 +167,7 @@ export default function AdminRecommendationsPage() {
                           href={r.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[12px] text-teal-deep underline-offset-2 hover:underline"
+                          className="text-[12px] text-teal-ink underline-offset-2 hover:underline"
                         >
                           link
                         </a>
@@ -209,7 +209,7 @@ export default function AdminRecommendationsPage() {
                           href={`https://www.openstreetmap.org/?mlat=${r.latitude}&mlon=${r.longitude}#map=17/${r.latitude}/${r.longitude}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[12px] text-teal-deep underline-offset-2 hover:underline"
+                          className="text-[12px] text-teal-ink underline-offset-2 hover:underline"
                         >
                           view on map
                         </a>

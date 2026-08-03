@@ -61,9 +61,15 @@ import type { BudgetPlanResponse, BudgetStateContext } from '@repo/shared';
 
 /* ────────────────────────────────────────────────────────────────────────────
    Recharts needs concrete colour values rather than Tailwind classes, so the
-   @theme tokens are mirrored as hex here. Only tokens that actually exist are
-   listed: `dark-green` (#5a8a1a) was deleted from the theme for failing AA and
-   is banned by scripts/check-tokens.mjs, which now rejects the raw hex too.
+   @theme tokens are referenced as CSS variables here. These used to be mirrored
+   as raw hex, which meant the charts were the one surface that could not follow
+   the theme — a cream plot area with dark-teal bars on a near-black page. SVG
+   `fill`/`stroke` and inline styles both resolve `var()` at paint time, so the
+   indirection costs nothing and the ramp re-resolves when the theme flips.
+
+   Only tokens that actually exist are listed: `dark-green` (#5a8a1a) was
+   deleted from the theme for failing AA and is banned by
+   scripts/check-tokens.mjs, which now rejects the raw hex too.
 
    The split matters on this surface. `tomato`/`amber` carry *spending health*
    — over budget, and close to it — so they are never spent on categorical
@@ -71,23 +77,27 @@ import type { BudgetPlanResponse, BudgetStateContext } from '@repo/shared';
    meaning "lunch". Category colour is a single-hue ramp instead, and every
    category is directly labelled so colour is never the only encoding.
    ──────────────────────────────────────────────────────────────────────────── */
-const TEAL_DEEP = '#0d6363';
-const TEAL_DEEPER = '#094a4a';
-const TEAL_MID = '#2e9c9c';
-const SAND = '#ebe0cd';
-const SAND_EDGE = '#8d8271';
-const SLATE = '#5c5145';
-const TOMATO_INK = '#a02c1d';
-const WHITE = '#ffffff';
+const TEAL_DEEP = 'var(--color-teal-deep)';
+const TEAL_INK = 'var(--color-teal-ink)';
+const TEAL = 'var(--color-teal)';
+const TEAL_MID = 'var(--color-teal-mid)';
+const SAND = 'var(--color-sand)';
+const SAND_EDGE = 'var(--color-sand-edge)';
+const SLATE = 'var(--color-slate)';
+const TOMATO_INK = 'var(--color-tomato-ink)';
+const SURFACE = 'var(--color-surface)';
+const CHARCOAL = 'var(--color-charcoal)';
 
-/** Ordered light→dark is wrong for identity; ordered dark→light reads as rank. */
-const CATEGORY_RAMP = [TEAL_DEEPER, TEAL_DEEP, TEAL_MID, SAND_EDGE, SLATE];
+/** Ordered light→dark is wrong for identity; ordered dark→light reads as rank.
+ *  In dark mode the ramp inverts with its tokens and reads light→dark, which is
+ *  the same rank signal seen from the other side. */
+const CATEGORY_RAMP = [TEAL_INK, TEAL, TEAL_MID, SAND_EDGE, SLATE];
 
 const chartTooltipStyle = {
-  backgroundColor: WHITE,
+  backgroundColor: SURFACE,
   border: `1px solid ${SAND_EDGE}`,
   borderRadius: 12,
-  color: '#1f1a14',
+  color: CHARCOAL,
   fontFamily: 'var(--font-sans)',
   fontSize: 12,
 } as const;
@@ -181,7 +191,7 @@ function Panel({
   return (
     <section
       aria-label={title}
-      className={`flex flex-col rounded-2xl border border-sand bg-white shadow-sm ${className}`}
+      className={`flex flex-col rounded-2xl border border-sand bg-surface shadow-sm ${className}`}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b border-sand px-5 py-4">
         <div className="flex flex-col gap-1">
@@ -269,8 +279,8 @@ function ToggleButton({
       onClick={onClick}
       className={`min-h-11 rounded-full border px-3.5 text-[12px] font-medium transition-colors sm:min-h-9 ${FOCUS_RING} ${
         active
-          ? 'border-teal-deep bg-teal/10 font-semibold text-teal-deep'
-          : 'border-sand bg-white text-slate hover:border-teal-deep/50'
+          ? 'border-teal-ink bg-teal/10 font-semibold text-teal-ink'
+          : 'border-sand bg-surface text-slate hover:border-teal-ink/50'
       }`}
     >
       {children}
@@ -492,7 +502,7 @@ export default function AnalyticsPage() {
     return (
       <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8">
         <header className="flex flex-col gap-2">
-          <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
+          <div className="text-xs font-semibold uppercase tracking-widest text-teal-ink">
             Spend · Analytics
           </div>
           <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
@@ -502,7 +512,7 @@ export default function AnalyticsPage() {
             Loading your spending.
           </p>
         </header>
-        <div className="h-28 animate-pulse rounded-2xl border border-sand bg-white" />
+        <div className="h-28 animate-pulse rounded-2xl border border-sand bg-surface" />
         <div className="grid gap-4 lg:grid-cols-2 lg:gap-5">
           <ChartSkeleton variant="bar" />
           <ChartSkeleton variant="line" />
@@ -518,7 +528,7 @@ export default function AnalyticsPage() {
       <FadeUp>
         <header className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
-            <div className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
+            <div className="text-xs font-semibold uppercase tracking-widest text-teal-ink">
               Spend · Analytics
             </div>
             <h1 className="font-display text-[clamp(28px,3.6vw,40px)] font-semibold leading-[1.05] tracking-tight text-charcoal">
@@ -563,10 +573,10 @@ export default function AnalyticsPage() {
                       const plan = plans.find((p) => p.id === e.target.value);
                       if (plan) setRange(planRange(plan));
                     }}
-                    className={`min-h-11 rounded-full border bg-white px-3.5 text-[12px] font-medium text-slate transition-colors sm:min-h-9 ${FOCUS_RING_ON_CANVAS} ${
+                    className={`min-h-11 rounded-full border bg-surface px-3.5 text-[12px] font-medium text-slate transition-colors sm:min-h-9 ${FOCUS_RING_ON_CANVAS} ${
                       range.kind === 'plan'
-                        ? 'border-teal-deep font-semibold text-teal-deep'
-                        : 'border-sand hover:border-teal-deep/50'
+                        ? 'border-teal-ink font-semibold text-teal-ink'
+                        : 'border-sand hover:border-teal-ink/50'
                     }`}
                   >
                     <option value="">By budget plan…</option>
@@ -582,7 +592,7 @@ export default function AnalyticsPage() {
             </div>
 
             {range.kind === 'custom' && (
-              <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-sand bg-white px-4 py-3">
+              <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-sand bg-surface px-4 py-3">
                 <div className="flex items-center gap-2">
                   <label htmlFor="range-start" className="text-[12px] font-medium text-slate">
                     From
@@ -593,7 +603,7 @@ export default function AnalyticsPage() {
                     value={range.startDate}
                     max={range.endDate}
                     onChange={(e) => setCustom({ startDate: e.target.value })}
-                    className={`min-h-11 rounded-lg border border-sand-edge bg-white px-2.5 text-[13px] text-charcoal sm:min-h-9 ${FOCUS_RING}`}
+                    className={`min-h-11 rounded-lg border border-sand-edge bg-surface px-2.5 text-[13px] text-charcoal sm:min-h-9 ${FOCUS_RING}`}
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -606,7 +616,7 @@ export default function AnalyticsPage() {
                     value={range.endDate}
                     min={range.startDate}
                     onChange={(e) => setCustom({ endDate: e.target.value })}
-                    className={`min-h-11 rounded-lg border border-sand-edge bg-white px-2.5 text-[13px] text-charcoal sm:min-h-9 ${FOCUS_RING}`}
+                    className={`min-h-11 rounded-lg border border-sand-edge bg-surface px-2.5 text-[13px] text-charcoal sm:min-h-9 ${FOCUS_RING}`}
                   />
                 </div>
               </div>
@@ -1181,7 +1191,7 @@ function Verdict({
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-3 rounded-2xl border border-sand bg-white p-6">
+      <div className="flex flex-col gap-3 rounded-2xl border border-sand bg-surface p-6">
         <div className="h-4 w-40 animate-pulse rounded bg-canvas" />
         <div className="h-8 w-3/4 animate-pulse rounded bg-canvas" />
         <div className="h-4 w-1/2 animate-pulse rounded bg-canvas" />
@@ -1205,7 +1215,7 @@ function Verdict({
   return (
     <div
       className={`flex flex-col gap-3 rounded-2xl border p-6 ${
-        alarming ? 'border-tomato/30 bg-tomato/[0.06]' : 'border-sand bg-white'
+        alarming ? 'border-tomato/30 bg-tomato/[0.06]' : 'border-sand bg-surface'
       }`}
     >
       <p className="text-[12px] font-semibold uppercase tracking-widest text-slate">{label}</p>
@@ -1214,11 +1224,11 @@ function Verdict({
         <>
           <p className="font-display text-[clamp(20px,2.4vw,28px)] font-semibold leading-snug tracking-tight text-charcoal">
             You&rsquo;ve spent{' '}
-            <span className={alarming ? 'text-tomato-ink' : 'text-teal-deep'}>
+            <span className={alarming ? 'text-tomato-ink' : 'text-teal-ink'}>
               {formatPKR(budget.spent)}
             </span>{' '}
             of {formatPKR(budget.total)} —{' '}
-            <span className={alarming ? 'text-tomato-ink' : 'text-teal-deep'}>
+            <span className={alarming ? 'text-tomato-ink' : 'text-teal-ink'}>
               {formatPKR(Math.abs(budget.remaining))} {budget.remaining < 0 ? 'over' : 'left'}
             </span>
             .
@@ -1230,8 +1240,8 @@ function Verdict({
       ) : (
         <>
           <p className="font-display text-[clamp(20px,2.4vw,28px)] font-semibold leading-snug tracking-tight text-charcoal">
-            You&rsquo;ve spent <span className="text-teal-deep">{formatPKR(totalSpent)}</span>{' '}
-            across {mealCount} {mealCount === 1 ? 'meal' : 'meals'}.
+            You&rsquo;ve spent <span className="text-teal-ink">{formatPKR(totalSpent)}</span> across{' '}
+            {mealCount} {mealCount === 1 ? 'meal' : 'meals'}.
           </p>
           <p className="text-[14px] text-slate">
             These dates aren&rsquo;t a budget plan, so there&rsquo;s no budget to measure them
@@ -1240,7 +1250,7 @@ function Verdict({
               <button
                 type="button"
                 onClick={onPickActivePlan}
-                className={`rounded font-semibold text-teal-deep underline underline-offset-2 hover:text-teal-deeper ${FOCUS_RING}`}
+                className={`rounded font-semibold text-teal-ink underline underline-offset-2 hover:text-teal-ink ${FOCUS_RING}`}
               >
                 Show my current plan instead
               </button>
@@ -1362,7 +1372,7 @@ function MealHistoryTable({
         <button
           type="button"
           onClick={onShowAll}
-          className={`min-h-11 self-start rounded-full border border-sand bg-white px-4 text-[12px] font-semibold text-teal-deep transition-colors hover:border-teal-deep/50 sm:min-h-9 ${FOCUS_RING}`}
+          className={`min-h-11 self-start rounded-full border border-sand bg-surface px-4 text-[12px] font-semibold text-teal-ink transition-colors hover:border-teal-ink/50 sm:min-h-9 ${FOCUS_RING}`}
         >
           Show {hiddenCount} more {hiddenCount === 1 ? 'meal' : 'meals'}
         </button>

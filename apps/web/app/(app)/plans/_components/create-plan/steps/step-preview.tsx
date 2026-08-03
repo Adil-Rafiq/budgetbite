@@ -46,7 +46,7 @@ export const StepPreview = () => {
               {formatPKR(totalBudget)}
             </p>
           </div>
-          <span className="shrink-0 rounded-full border border-sand bg-white px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal">
+          <span className="shrink-0 rounded-full border border-sand bg-surface px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-charcoal">
             {planType}
           </span>
         </div>
@@ -114,7 +114,7 @@ export const StepPreview = () => {
 
 function PreviewStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-sand bg-white p-2.5">
+    <div className="rounded-lg border border-sand bg-surface p-2.5">
       <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate/60">{label}</p>
       <p className="mt-0.5 font-display text-sm font-semibold tracking-tight text-charcoal">
         {value}
@@ -133,8 +133,8 @@ function PreviewRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex gap-3 rounded-xl border border-sand bg-white p-3">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal/10 text-teal-deep">
+    <div className="flex gap-3 rounded-xl border border-sand bg-surface p-3">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal/10 text-teal-ink">
         <Icon className="h-4 w-4" />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-1">

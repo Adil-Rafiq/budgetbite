@@ -32,8 +32,8 @@ function TimelineSkeleton() {
 function TimelineEmpty({ planId }: { planId: string }) {
   const generate = useGenerateMealPlan();
   return (
-    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-white p-8 text-center">
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal/10 text-teal-deep">
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-surface p-8 text-center">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal/10 text-teal-ink">
         <Sparkles className="h-5 w-5" />
       </div>
       <div>
@@ -77,7 +77,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
     () => (
       <div className="flex items-end justify-between">
         <div className="flex flex-col gap-1">
-          <span className="text-xs font-semibold uppercase tracking-widest text-teal-deep">
+          <span className="text-xs font-semibold uppercase tracking-widest text-teal-ink">
             History
           </span>
           <h2 className="font-display text-xl font-semibold tracking-tight text-charcoal">
@@ -152,7 +152,7 @@ export function GenerationHistoryTimeline({ planId, plan }: GenerationHistoryTim
             type="button"
             onClick={() => setLimit((n) => n + PAGE_SIZE)}
             disabled={isFetching}
-            className={`min-h-11 rounded-lg border border-sand bg-white px-4 text-[12px] font-semibold text-teal-deep transition-colors hover:border-teal-deep disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+            className={`min-h-11 rounded-lg border border-sand bg-surface px-4 text-[12px] font-semibold text-teal-ink transition-colors hover:border-teal-ink disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
           >
             {isFetching ? 'Loading…' : 'Show older attempts'}
           </button>

@@ -39,14 +39,14 @@ function PreferenceRow({
     <li className="flex items-center gap-3 rounded-xl border border-sand bg-canvas py-1.5 pl-3 pr-1.5">
       <span
         aria-hidden
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white text-slate"
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-surface text-slate"
       >
         {isRestaurant ? <Store className="h-3.5 w-3.5" /> : <Utensils className="h-3.5 w-3.5" />}
       </span>
       <div className="flex min-w-0 flex-1 flex-col">
         <Link
           href={href}
-          className={`truncate rounded text-[13px] font-medium text-charcoal underline-offset-2 hover:text-teal-deep hover:underline ${FOCUS_RING}`}
+          className={`truncate rounded text-[13px] font-medium text-charcoal underline-offset-2 hover:text-teal-ink hover:underline ${FOCUS_RING}`}
         >
           {pref.name}
         </Link>
@@ -62,7 +62,7 @@ function PreferenceRow({
         onClick={onRemove}
         disabled={remove.isPending}
         aria-label={`Remove ${pref.name}`}
-        className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate transition-colors hover:bg-white hover:text-tomato-ink disabled:opacity-50 ${FOCUS_RING}`}
+        className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate transition-colors hover:bg-surface hover:text-tomato-ink disabled:opacity-50 ${FOCUS_RING}`}
       >
         <X aria-hidden className="h-4 w-4" />
       </button>
@@ -83,7 +83,7 @@ function Group({
   items: FoodPreferenceResponse[];
   tone: 'positive' | 'danger';
 }) {
-  const toneClass = tone === 'positive' ? 'text-teal-deep' : 'text-tomato-ink';
+  const toneClass = tone === 'positive' ? 'text-teal-ink' : 'text-tomato-ink';
   const listRef = useRef<HTMLUListElement>(null);
   const headingRef = useRef<HTMLSpanElement>(null);
 
@@ -147,12 +147,12 @@ export function FoodPreferencesCard() {
       ) : favorites.length === 0 && blocked.length === 0 ? (
         <div className="rounded-xl border border-dashed border-sand bg-canvas p-4 text-[13px] text-slate">
           Use the{' '}
-          <Heart aria-hidden className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-teal-deep" />{' '}
-          and <Ban aria-hidden className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-tomato-ink" />{' '}
+          <Heart aria-hidden className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-teal-ink" /> and{' '}
+          <Ban aria-hidden className="mx-0.5 inline h-3.5 w-3.5 align-[-2px] text-tomato-ink" />{' '}
           buttons on a{' '}
           <Link
             href="/restaurants"
-            className={`rounded text-teal-deep underline-offset-2 hover:underline ${FOCUS_RING}`}
+            className={`rounded text-teal-ink underline-offset-2 hover:underline ${FOCUS_RING}`}
           >
             restaurant or dish
           </Link>{' '}

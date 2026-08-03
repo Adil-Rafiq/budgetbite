@@ -45,7 +45,7 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
       <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-4">
         <Link
           href="/plans"
-          className={`inline-flex w-fit items-center gap-1.5 rounded text-[12px] text-slate transition hover:text-teal-deep ${FOCUS_RING_ON_CANVAS}`}
+          className={`inline-flex w-fit items-center gap-1.5 rounded text-[12px] text-slate transition hover:text-teal-ink ${FOCUS_RING_ON_CANVAS}`}
         >
           ← Back to plans
         </Link>
@@ -59,11 +59,11 @@ export default function PlanDetailPage({ params }: { params: Promise<{ id: strin
       <div className="mx-auto flex w-full max-w-[1180px] flex-col items-start gap-4">
         <Link
           href="/plans"
-          className={`inline-flex items-center gap-1.5 rounded text-[12px] text-slate transition hover:text-teal-deep ${FOCUS_RING_ON_CANVAS}`}
+          className={`inline-flex items-center gap-1.5 rounded text-[12px] text-slate transition hover:text-teal-ink ${FOCUS_RING_ON_CANVAS}`}
         >
           ← Back to plans
         </Link>
-        <div className="w-full rounded-2xl border border-dashed border-sand bg-white p-8 text-center">
+        <div className="w-full rounded-2xl border border-dashed border-sand bg-surface p-8 text-center">
           <p className="text-sm text-slate">
             This plan doesn&apos;t exist or you don&apos;t have access to it.
           </p>

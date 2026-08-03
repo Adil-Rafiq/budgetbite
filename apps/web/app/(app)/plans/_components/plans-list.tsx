@@ -26,7 +26,7 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 type PlanStatus = BudgetPlanResponse['status'];
 
 const STATUS_CLASS: Record<PlanStatus, { pill: string; dot: string }> = {
-  active: { pill: 'bg-teal/10 text-teal-deep', dot: 'bg-teal' },
+  active: { pill: 'bg-teal/10 text-teal-ink', dot: 'bg-teal' },
   completed: { pill: 'bg-slate/10 text-slate', dot: 'bg-slate' },
   cancelled: { pill: 'bg-tomato/10 text-tomato-ink', dot: 'bg-tomato' },
 };
@@ -46,7 +46,7 @@ function PlansListSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="rounded-2xl border border-sand bg-white p-5">
+        <div key={i} className="rounded-2xl border border-sand bg-surface p-5">
           <div className="flex items-center justify-between">
             <div className="h-3 w-20 animate-pulse rounded bg-sand" />
             <div className="h-5 w-16 animate-pulse rounded-full bg-sand" />
@@ -75,14 +75,14 @@ function PlansListEmpty({ filtered, onClear }: { filtered: boolean; onClear: () 
 
   if (filtered) {
     return (
-      <div className="rounded-2xl border border-dashed border-sand bg-white p-8 text-center">
+      <div className="rounded-2xl border border-dashed border-sand bg-surface p-8 text-center">
         <p className="font-display text-lg font-semibold tracking-tight text-charcoal">
           No plans with this status.
         </p>
         <button
           type="button"
           onClick={onClear}
-          className={`mt-3 min-h-11 rounded-xl border border-sand bg-white px-4 text-[13px] font-semibold text-teal-deep transition-colors hover:border-teal-deep ${FOCUS_RING_ON_CANVAS}`}
+          className={`mt-3 min-h-11 rounded-xl border border-sand bg-surface px-4 text-[13px] font-semibold text-teal-ink transition-colors hover:border-teal-ink ${FOCUS_RING_ON_CANVAS}`}
         >
           Show all plans
         </button>
@@ -91,7 +91,7 @@ function PlansListEmpty({ filtered, onClear }: { filtered: boolean; onClear: () 
   }
 
   return (
-    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-white p-8 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-sand bg-surface p-8 text-center">
       <p className="font-display text-xl font-semibold tracking-tight text-charcoal">
         Set your first budget.
       </p>
@@ -167,8 +167,8 @@ export default function PlansList() {
             }}
             className={`min-h-11 rounded-full border px-3.5 text-[12px] font-medium transition-colors ${FOCUS_RING_ON_CANVAS} ${
               active
-                ? 'border-teal-deep bg-teal/10 font-semibold text-teal-deep'
-                : 'border-sand bg-white text-slate hover:border-teal-deep/50'
+                ? 'border-teal-ink bg-teal/10 font-semibold text-teal-ink'
+                : 'border-sand bg-surface text-slate hover:border-teal-ink/50'
             }`}
           >
             {filter.label}
@@ -234,12 +234,10 @@ export default function PlansList() {
               >
                 <motion.div
                   whileHover={
-                    prefersReducedMotion
-                      ? undefined
-                      : { y: -3, boxShadow: '0 10px 24px rgba(0,0,0,0.07)' }
+                    prefersReducedMotion ? undefined : { y: -3, boxShadow: 'var(--elevation-lift)' }
                   }
                   transition={{ duration: 0.22, ease: 'easeOut' }}
-                  className="rounded-2xl border border-sand bg-white p-5 shadow-sm"
+                  className="rounded-2xl border border-sand bg-surface p-5 shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -328,7 +326,7 @@ export default function PlansList() {
               type="button"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={!hasPrev || isFetching}
-              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING_ON_CANVAS}`}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-surface px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING_ON_CANVAS}`}
             >
               ← Prev
             </button>
@@ -336,7 +334,7 @@ export default function PlansList() {
               type="button"
               onClick={() => setPage((p) => p + 1)}
               disabled={!hasNext || isFetching}
-              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-white px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING_ON_CANVAS}`}
+              className={`inline-flex min-h-11 items-center rounded-lg border border-sand bg-surface px-3 text-[12px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING_ON_CANVAS}`}
             >
               Next →
             </button>
