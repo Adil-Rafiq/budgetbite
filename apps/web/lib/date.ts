@@ -73,6 +73,35 @@ export function periodElapsedFraction(
 }
 
 /**
+ * Compact "how long ago" for an event timestamp: "just now", "12m", "6h", "3d".
+ *
+ * Distinct from `pricesUpdatedAgoLabel`, which is a day-grained sentence for a
+ * menu snapshot the user reads. This is a glanceable figure for the admin
+ * status board, where the difference between a scrape 40 minutes ago and one
+ * 40 hours ago is the whole signal and "0 days ago" would flatten it.
+ *
+ * Null for missing or unparseable input so callers omit the fact rather than
+ * print a wrong one.
+ */
+export function timeAgoLabel(input: Date | string | null | undefined): string | null {
+  if (input == null) return null;
+  const then = input instanceof Date ? input : new Date(input);
+  if (Number.isNaN(then.getTime())) return null;
+
+  const seconds = Math.max(0, Math.floor((Date.now() - then.getTime()) / 1000));
+  if (seconds < 60) return 'just now';
+
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+/**
  * "prices updated today" / "prices updated 1 day ago" / "… N days ago" hint
  * for a menu snapshot timestamp. Returns null for missing/unparseable input
  * so callers can just skip rendering.

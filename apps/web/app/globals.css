@@ -169,6 +169,21 @@
      panels and dividers keep plain `sand`; a decorative edge has no floor. */
   --color-sand-edge: #8d8271;
 
+  /* Secondary ink. `slate` at 60% opacity was doing this job in 87 places
+     across the admin — timestamps, record descriptions, empty and error
+     states, "N total", "Page X of Y" — and `color-mix(slate 60%, white)`
+     computes to #9d968f, which is 2.90:1 on white. Under the 4.5:1 body floor
+     and under even the 3:1 large-text floor, applied to the columns an
+     operator reads to judge whether a scraped record is trustworthy.
+
+     A muted step has to be a token, not an opacity, because opacity resolves
+     against whichever surface it lands on and neither of ours had headroom:
+     the same `slate/60` sat on white cards and on canvas. This is slate walked
+     toward the sand end of the same family — 5.21:1 on white, 4.94:1 on
+     canvas, clearing AA on both — so "quieter than the primary ink" stops
+     meaning "below the legibility floor". */
+  --color-slate-muted: #776b5c;
+
   /* Caution amber — the band between "on track" and "over budget".
      These three values were already in the app as loose hexes before they were
      tokenised: the fill and its tint in the budget-fit pill and the location
