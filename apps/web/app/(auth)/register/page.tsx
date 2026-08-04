@@ -5,18 +5,20 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { authClient, type AuthErrorCode } from '@/lib/auth-client';
 import { registerSchema, type RegisterInput } from '@repo/shared';
-import { showToast, type ToastOptions } from '@/lib/toast';
-import { LogoIcon, GoogleIcon, GitHubIcon } from '@/components/icons';
-
-type OAuthProvider = 'google' | 'github';
+import { showToast } from '@/lib/toast';
+import { LogoIcon } from '@/components/icons';
+import { FOCUS_RING } from '@/lib/focus-ring';
+import { AuthField } from '../_components/auth-field';
+import { AuthFormAlert, type AuthFormError } from '../_components/auth-form-alert';
+import { OAuthButtons, type OAuthProvider } from '../_components/oauth-buttons';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
+  const [formError, setFormError] = useState<AuthFormError | null>(null);
 
   const {
     register,
@@ -24,35 +26,34 @@ export default function RegisterPage() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
   });
 
   const onSubmit = async (data: RegisterInput) => {
+    setFormError(null);
+
+    const name = `${data.firstName} ${data.lastName}`.trim();
     const { error } = await authClient.signUp.email({
       email: data.email,
       password: data.password,
-      name: `${data.firstName ?? ''} ${data.lastName ?? ''}`.trim(),
+      name,
     });
 
     if (error) {
-      const errorCode = error.code as AuthErrorCode;
-      const toastOptions: ToastOptions = {
-        title: 'Registration failed',
-        description: error.message,
-        variant: 'error',
-      };
-
-      switch (errorCode) {
-        case 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL':
-          toastOptions.description =
-            'An account with this email already exists. Please use a different email or login.';
-          toastOptions.action = {
-            label: 'Go to login',
-            onClick: () => router.push('/login'),
-          };
-          break;
+      if ((error.code as AuthErrorCode) === 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL') {
+        setFormError({
+          title: 'That email is already registered',
+          description: 'Sign in with it instead, or create the account under a different address.',
+          action: { label: 'Go to sign in', onClick: () => router.push('/login') },
+        });
+        return;
       }
 
-      showToast(toastOptions);
+      setFormError({
+        title: 'Could not create your account',
+        description: error.message || 'Something went wrong. Please try again.',
+      });
       return;
     }
 
@@ -82,6 +83,7 @@ export default function RegisterPage() {
   };
 
   const handleOAuthSignIn = async (provider: OAuthProvider) => {
+    setFormError(null);
     setOauthLoading(provider);
     const { error } = await authClient.signIn.social({
       provider,
@@ -90,17 +92,13 @@ export default function RegisterPage() {
 
     if (error) {
       setOauthLoading(null);
-      showToast({
+      setFormError({
         title: 'Sign-in failed',
         description: error.message || `Could not start ${provider} sign-in. Please try again.`,
-        variant: 'error',
       });
     }
   };
 
-  const inputClass =
-    'w-full rounded-xl border border-sand bg-surface px-3.5 py-3 text-[14px] text-charcoal outline-none transition-colors placeholder:text-slate/50 focus:border-teal';
-  const labelClass = 'text-xs font-semibold uppercase tracking-wide text-slate';
   const busy = isSubmitting || oauthLoading !== null;
 
   return (
@@ -116,7 +114,11 @@ export default function RegisterPage() {
       />
 
       <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-6 py-6 sm:px-8">
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link
+          href="/"
+          aria-label="BudgetBite — go to home"
+          className={`flex items-center gap-2.5 rounded-lg ${FOCUS_RING}`}
+        >
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-deep text-white">
             <LogoIcon size={16} />
           </span>
@@ -126,9 +128,9 @@ export default function RegisterPage() {
         </Link>
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-slate transition-colors hover:text-charcoal"
+          className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-slate transition-colors hover:text-charcoal ${FOCUS_RING}`}
         >
-          <ArrowLeft className="h-3.5 w-3.5" />
+          <ArrowLeft aria-hidden className="h-3.5 w-3.5" />
           Back to home
         </Link>
       </header>
@@ -136,7 +138,7 @@ export default function RegisterPage() {
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[460px] flex-col justify-center px-6 pb-16">
         <div className="text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-sand bg-surface px-4 py-1.5 shadow-sm">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-teal" />
+            <span aria-hidden className="h-2 w-2 animate-pulse rounded-full bg-teal" />
             <span className="text-xs font-normal uppercase tracking-widest text-charcoal/70">
               Create your account
             </span>
@@ -150,89 +152,73 @@ export default function RegisterPage() {
         </div>
 
         <div className="mt-8 rounded-3xl border border-sand bg-surface p-7 shadow-2xl">
-          <form onSubmit={handleSubmit(onSubmit)} autoComplete="on" className="flex flex-col gap-5">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            // See the note on the sign-in form: Zod owns validation, so the
+            // native bubble must not fire ahead of it.
+            noValidate
+            autoComplete="on"
+            className="flex flex-col gap-5"
+          >
+            <AuthFormAlert error={formError} />
+
             <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="firstName" className={labelClass}>
-                  First name
-                </label>
-                <input
-                  id="firstName"
-                  placeholder="Ahmed"
-                  autoComplete="given-name"
-                  className={inputClass}
-                  {...register('firstName')}
-                />
-                {errors.firstName && (
-                  <p className="text-xs text-tomato-ink">{errors.firstName.message}</p>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <label htmlFor="lastName" className={labelClass}>
-                  Last name
-                </label>
-                <input
-                  id="lastName"
-                  placeholder="Khan"
-                  autoComplete="family-name"
-                  className={inputClass}
-                  {...register('lastName')}
-                />
-                {errors.lastName && (
-                  <p className="text-xs text-tomato-ink">{errors.lastName.message}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label htmlFor="email" className={labelClass}>
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                placeholder="ahmed@example.com"
-                autoComplete="email"
-                className={inputClass}
-                {...register('email')}
+              <AuthField
+                label="First name"
+                placeholder="Ahmed"
+                autoComplete="given-name"
+                error={errors.firstName?.message}
+                {...register('firstName')}
               />
-              {errors.email && <p className="text-xs text-tomato-ink">{errors.email.message}</p>}
+              <AuthField
+                label="Last name"
+                placeholder="Khan"
+                autoComplete="family-name"
+                error={errors.lastName?.message}
+                {...register('lastName')}
+              />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label htmlFor="password" className={labelClass}>
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="At least 8 characters"
-                  autoComplete="new-password"
-                  className={`${inputClass} pr-11`}
-                  {...register('password')}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((p) => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate transition-colors hover:text-charcoal"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-xs text-tomato-ink">{errors.password.message}</p>
-              )}
-            </div>
+            <AuthField
+              label="Email"
+              type="email"
+              inputMode="email"
+              placeholder="ahmed@example.com"
+              autoComplete="email"
+              autoCapitalize="none"
+              spellCheck={false}
+              error={errors.email?.message}
+              {...register('email')}
+            />
+
+            <AuthField
+              label="Password"
+              revealable
+              placeholder="At least 8 characters"
+              autoComplete="new-password"
+              // A placeholder is not an instruction: it vanishes at the first
+              // keystroke, exactly when the rule starts to matter, and screen
+              // readers treat it as a fallback for a missing label rather than
+              // as guidance. The rule now stands next to the field permanently
+              // and is announced as the field's description.
+              hint="Use at least 8 characters. Longer is better than more complicated."
+              error={errors.password?.message}
+              {...register('password')}
+            />
 
             <p className="text-xs leading-relaxed text-charcoal/45">
               By creating an account you agree to our{' '}
-              <a href="#" className="font-medium text-teal-ink hover:text-teal-ink">
+              <a
+                href="#"
+                className={`rounded font-medium text-teal-ink hover:underline ${FOCUS_RING}`}
+              >
                 terms
               </a>{' '}
               and{' '}
-              <a href="#" className="font-medium text-teal-ink hover:text-teal-ink">
+              <a
+                href="#"
+                className={`rounded font-medium text-teal-ink hover:underline ${FOCUS_RING}`}
+              >
                 privacy policy
               </a>
               .
@@ -241,66 +227,40 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={busy}
-              className="mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-teal-deeper disabled:pointer-events-none disabled:opacity-50"
+              aria-busy={isSubmitting}
+              className={`mt-1 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-teal-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 aria-hidden className="h-4 w-4 animate-spin" />
                   Creating account…
                 </>
               ) : (
                 <>
                   Create account
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight aria-hidden className="h-4 w-4" />
                 </>
               )}
             </button>
           </form>
 
           <div className="my-6 flex items-center gap-3">
-            <span className="h-px flex-1 bg-sand" />
+            <span aria-hidden className="h-px flex-1 bg-sand" />
             <span className="text-xs font-normal text-charcoal/40">or</span>
-            <span className="h-px flex-1 bg-sand" />
+            <span aria-hidden className="h-px flex-1 bg-sand" />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => handleOAuthSignIn('google')}
-              disabled={busy}
-              className="flex min-h-11 items-center justify-center gap-2.5 rounded-xl border border-sand bg-surface text-sm font-medium text-charcoal shadow-sm transition-all hover:border-teal/40 hover:bg-canvas disabled:pointer-events-none disabled:opacity-50"
-            >
-              {oauthLoading === 'google' ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <GoogleIcon size={18} />
-              )}
-              {oauthLoading === 'google' ? 'Connecting…' : 'Google'}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleOAuthSignIn('github')}
-              disabled={busy}
-              className="flex min-h-11 items-center justify-center gap-2.5 rounded-xl bg-onyx text-sm font-medium text-white transition-all hover:bg-onyx/90 disabled:pointer-events-none disabled:opacity-50"
-            >
-              {oauthLoading === 'github' ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <GitHubIcon size={18} />
-              )}
-              {oauthLoading === 'github' ? 'Connecting…' : 'GitHub'}
-            </button>
-          </div>
+          <OAuthButtons pending={oauthLoading} disabled={busy} onSelect={handleOAuthSignIn} />
         </div>
 
         <p className="mt-7 text-center text-[13px] text-charcoal/60">
           Already have an account?{' '}
           <Link
             href="/login"
-            className="inline-flex items-center gap-1 font-semibold text-teal-ink transition-colors hover:text-teal-ink"
+            className={`inline-flex items-center gap-1 rounded px-1 font-semibold text-teal-ink transition-colors hover:underline ${FOCUS_RING}`}
           >
             Sign in
-            <ArrowRight className="h-3.5 w-3.5" />
+            <ArrowRight aria-hidden className="h-3.5 w-3.5" />
           </Link>
         </p>
       </main>
