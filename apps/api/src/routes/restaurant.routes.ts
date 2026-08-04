@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { listMenuSchema, listRestaurantsSchema, uuidSchema } from '@repo/shared';
+import {
+  listMenuSchema,
+  listRestaurantMapQuerySchema,
+  listRestaurantsSchema,
+  uuidSchema,
+} from '@repo/shared';
 
 import { optionalAuthMiddleware } from '../middleware/auth.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
@@ -17,6 +22,19 @@ router.get(
   optionalAuthMiddleware,
   validate({ query: listRestaurantsSchema }),
   asyncHandler(restaurantController.listRestaurants),
+);
+
+/**
+ * The same filtered set as `/`, as map pins, unpaginated. Returns RestaurantMap.
+ *
+ * Must stay above `/:id` — Express matches in declaration order, and `/:id`
+ * would otherwise swallow "map" and reject it as a malformed uuid.
+ */
+router.get(
+  '/map',
+  optionalAuthMiddleware,
+  validate({ query: listRestaurantMapQuerySchema }),
+  asyncHandler(restaurantController.listRestaurantMap),
 );
 
 /** Get one restaurant by id. Public. Returns Restaurant. */

@@ -2,31 +2,16 @@
 
 import 'leaflet/dist/leaflet.css';
 
-import L from 'leaflet';
+import type L from 'leaflet';
 import { useEffect, useId, useRef, useState } from 'react';
 import { MapPin, Search } from 'lucide-react';
-import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, Marker, useMap, useMapEvents } from 'react-leaflet';
 
 import { FOCUS_RING } from '@/lib/focus-ring';
+import { placedPinIcon } from '@/components/map/icons';
+import { ThemedTileLayer } from '@/components/map/themed-tile-layer';
 
-const LEAFLET_ICON_BASE = 'https://unpkg.com/leaflet@1.9.4/dist/images/';
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: `${LEAFLET_ICON_BASE}marker-icon-2x.png`,
-  iconUrl: `${LEAFLET_ICON_BASE}marker-icon.png`,
-  shadowUrl: `${LEAFLET_ICON_BASE}marker-shadow.png`,
-});
-
-const wisprIcon = L.divIcon({
-  className: 'wispr-pin',
-  html: `<svg width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M14 0C6.27 0 0 6.27 0 14c0 9.5 14 22 14 22s14-12.5 14-22C28 6.27 21.73 0 14 0z" fill="var(--color-tomato)"/>
-    <circle cx="14" cy="14" r="5" fill="#ffffff"/>
-  </svg>`,
-  iconSize: [28, 36],
-  iconAnchor: [14, 36],
-  popupAnchor: [0, -34],
-});
+const wisprIcon = placedPinIcon();
 
 const round = (n: number) => Number(n.toFixed(4));
 
@@ -353,12 +338,7 @@ export function LocationMap({
           zoomControl={false}
           style={{ height: `${height}px`, width: '100%', background: 'var(--color-canvas)' }}
         >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-            subdomains="abcd"
-            maxZoom={20}
-          />
+          <ThemedTileLayer />
           {/* `keyboard` makes Leaflet set `tabIndex=0` and `role="button"` on the
               marker element. The `alt` option cannot name it: Leaflet applies
               `alt` only when the icon is an image element, and this is a

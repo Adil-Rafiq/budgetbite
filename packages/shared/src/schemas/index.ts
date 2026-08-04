@@ -8,6 +8,7 @@ export * from './common.js';
 export * from './auth.js';
 export * from './user.js';
 export * from './restaurant.js';
+export * from './map.js';
 export * from './menu-item.js';
 export * from './meal-type.js';
 export * from './budget-state.js';

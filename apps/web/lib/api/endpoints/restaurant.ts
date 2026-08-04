@@ -2,10 +2,12 @@ import { apiClient } from '@/lib/api/client';
 import type {
   ListMenuQuery,
   ListMenuResponse,
+  ListRestaurantMapQuery,
   ListRestaurantsQuery,
   ListRestaurantsResponse,
   MenuFacets,
   Restaurant,
+  RestaurantMap,
 } from '@repo/shared';
 
 function stripUndefined<T extends Record<string, unknown>>(
@@ -23,6 +25,15 @@ export const restaurantApi = {
     apiClient
       .get('api/restaurants', { searchParams: stripUndefined(query) })
       .json<ListRestaurantsResponse>(),
+
+  /**
+   * The same filtered set as `list`, as pins, unpaginated. A map cannot page:
+   * pins 1–24 of 200 would be a map of an arbitrary quarter of the city.
+   */
+  map: (query: Partial<ListRestaurantMapQuery>) =>
+    apiClient
+      .get('api/restaurants/map', { searchParams: stripUndefined(query) })
+      .json<RestaurantMap>(),
 
   getById: (id: string) => apiClient.get(`api/restaurants/${id}`).json<Restaurant>(),
 

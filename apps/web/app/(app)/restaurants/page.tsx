@@ -1,9 +1,10 @@
 'use client';
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Search, Star, X } from 'lucide-react';
+import { List, Map as MapIcon, Search, Star, X } from 'lucide-react';
 
 import type { RestaurantSort } from '@repo/shared';
 import { classifyBudgetFit, typicalMealCost } from '@repo/shared';
@@ -29,7 +30,7 @@ import { formatCount } from '@/lib/format-count';
 import { FOCUS_RING } from '@/lib/focus-ring';
 import { useActiveBudgetPlan } from '@/hooks/use-budget-plan';
 import { useUser } from '@/hooks/use-user';
-import { useRestaurants } from '@/hooks/use-restaurant';
+import { useRestaurantMap, useRestaurants } from '@/hooks/use-restaurant';
 import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
 import { RecommendRestaurantButton } from '@/components/recommend-restaurant-button';
 import { RestaurantImage } from '@/components/restaurant-image';
@@ -37,6 +38,17 @@ import { humanizeName } from '@/lib/humanize-name';
 import { motion, useReducedMotion } from 'motion/react';
 
 import { RestaurantCardSkeleton } from './_components/restaurant-card-skeleton';
+
+/** Leaflet reads `window` at import time, so the map stays out of the server bundle. */
+const RestaurantMapView = dynamic(
+  () => import('./_components/restaurant-map-view').then((m) => m.RestaurantMapView),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-full w-full animate-pulse rounded-2xl border border-sand bg-surface" />
+    ),
+  },
+);
 
 const PAGE_SIZE = 24;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -97,6 +109,12 @@ function RestaurantsPageInner() {
   );
   const minRating = parseNumberParam(searchParams.get('minRating'), DEFAULT_MIN_RATING, 0, 5);
   const page = Math.max(0, Number(searchParams.get('page') ?? '0') || 0);
+  /**
+   * List or map. In the URL rather than in component state so a reader who has
+   * found something on the map can send the map, filters and all — the same
+   * reason every other control on this page writes to the query string.
+   */
+  const view: 'list' | 'map' = searchParams.get('view') === 'map' ? 'map' : 'list';
 
   const updateParams = useCallback(
     (updates: Record<string, string | null>, opts: { resetPage?: boolean } = {}) => {
@@ -179,9 +197,29 @@ function RestaurantsPageInner() {
     [userLat, userLng, hasLocation, maxDistanceKm, minRating, urlQ, resolvedSort, page],
   );
 
-  const { data: result, isLoading, error, isFetching, refetch } = useRestaurants(query);
+  /** The same filters, without the page cursor — a map cannot page. */
+  const mapQuery = useMemo(
+    () => ({
+      userLat: userLat ?? undefined,
+      userLng: userLng ?? undefined,
+      maxDistanceKm: hasLocation ? maxDistanceKm : undefined,
+      minRating: minRating > 0 ? minRating : undefined,
+      q: urlQ || undefined,
+    }),
+    [userLat, userLng, hasLocation, maxDistanceKm, minRating, urlQ],
+  );
+
+  // Only the view actually on screen fetches. The list is the default and most
+  // readers never open the map, so its 500 pins should cost them nothing.
+  const listQuery = useRestaurants(query, view === 'list');
+  const mapQueryResult = useRestaurantMap(mapQuery, view === 'map');
+
+  const { isLoading, error, isFetching, refetch } = view === 'map' ? mapQueryResult : listQuery;
+
+  const result = listQuery.data;
   const data = result?.data ?? [];
-  const total = result?.meta.total ?? 0;
+  const mapPins = useMemo(() => mapQueryResult.data?.data ?? [], [mapQueryResult.data]);
+  const total = view === 'map' ? (mapQueryResult.data?.total ?? 0) : (result?.meta.total ?? 0);
   const totalPages = total > 0 ? Math.ceil(total / PAGE_SIZE) : 1;
   const hasPrev = page > 0;
   const hasNext = (page + 1) * PAGE_SIZE < total;
@@ -233,7 +271,9 @@ function RestaurantsPageInner() {
 
   const clearAll = () => {
     setSearchInput('');
-    router.replace(pathname, { scroll: false });
+    // Clearing filters is not a request to leave the map. `view` is how the
+    // reader is looking at the results, not one of the filters being cleared.
+    router.replace(view === 'map' ? `${pathname}?view=map` : pathname, { scroll: false });
   };
 
   const goToPage = (next: number) => {
@@ -499,7 +539,105 @@ function RestaurantsPageInner() {
         </div>
       )}
 
-      {isLoading ? (
+      {/* The view control sits with the tally it re-draws, and outside the
+          loading/error/empty branches below — a reader who lands on an empty
+          map must still be able to get back to the list. */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p role="status" aria-live="polite" className="text-[12px] tabular-nums text-slate">
+          {isLoading
+            ? ''
+            : `${total} restaurant${total === 1 ? '' : 's'}${
+                activeChips.length > 0 ? ' match your filters' : ''
+              }${view === 'list' && totalPages > 1 ? ` · page ${page + 1} of ${totalPages}` : ''}${
+                isFetching ? ' · updating…' : ''
+              }`}
+        </p>
+
+        <div
+          role="group"
+          aria-label="Result view"
+          className="flex shrink-0 items-center gap-0.5 rounded-full border border-sand bg-surface p-0.5"
+        >
+          {(
+            [
+              { id: 'list', label: 'List', Icon: List },
+              { id: 'map', label: 'Map', Icon: MapIcon },
+            ] as const
+          ).map(({ id, label, Icon }) => {
+            const active = view === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={active}
+                onClick={() =>
+                  updateParams({ view: id === 'list' ? null : id }, { resetPage: false })
+                }
+                className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition-colors ${FOCUS_RING} ${
+                  active
+                    ? 'bg-teal-deep text-white'
+                    : 'text-slate hover:bg-canvas hover:text-charcoal'
+                }`}
+              >
+                <Icon aria-hidden className="h-3.5 w-3.5" />
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {view === 'map' ? (
+        error ? (
+          <DataError message="Could not load the map." onRetry={() => refetch()} />
+        ) : (
+          <div className="flex flex-col gap-2">
+            <div className="relative h-[62vh] min-h-[380px]">
+              {isLoading ? (
+                <div className="h-full w-full animate-pulse rounded-2xl border border-sand bg-surface" />
+              ) : (
+                <RestaurantMapView
+                  pins={mapPins}
+                  origin={hasLocation ? { latitude: userLat, longitude: userLng } : null}
+                  radiusKm={hasLocation ? maxDistanceKm : null}
+                  avgPerMeal={avgPerMeal}
+                  amountRemaining={amountRemaining}
+                  hasActivePlan={hasActivePlan}
+                />
+              )}
+
+              {/* Sits over the map rather than replacing it: with a location
+                  set, an empty map inside the radius ring is itself the answer
+                  — "nothing delivers to you within 5 km" is more legible as a
+                  circle with nothing in it than as a sentence. */}
+              {!isLoading && mapPins.length === 0 && (
+                <div className="pointer-events-none absolute inset-x-3 top-3 z-[950] flex justify-center">
+                  <p className="pointer-events-auto max-w-md rounded-xl border border-sand bg-surface/95 px-4 py-2.5 text-center text-[13px] text-slate shadow-sm">
+                    {emptyMessage}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {mapQueryResult.data?.truncated && (
+              <p className="text-[12px] text-slate">
+                Showing the nearest 500 of {total}. Narrow the distance or rating to see the rest.
+              </p>
+            )}
+            {!hasLocation && (
+              <p className="text-[12px] text-slate">
+                <Link
+                  href="/profile"
+                  className={`rounded font-medium text-teal-ink underline underline-offset-2 ${FOCUS_RING}`}
+                >
+                  Set your location
+                </Link>{' '}
+                to see how far each of these is from you.
+              </p>
+            )}
+          </div>
+        )
+      ) : isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <RestaurantCardSkeleton key={i} />
@@ -538,25 +676,15 @@ function RestaurantsPageInner() {
         </div>
       ) : (
         <>
-          {/* The count and the explanation of "Typical meal" both used to sit
-              below the grid — the tally inside the pagination block, so it only
-              existed past 24 results, and the footnote after every card it was
-              written to inform. Filtering 44 down to 3 showed no number and
-              announced nothing. Both belong above the results they describe. */}
-          <div className="flex flex-col gap-2">
-            <p role="status" aria-live="polite" className="text-[12px] tabular-nums text-slate">
-              {total} restaurant{total === 1 ? '' : 's'}
-              {activeChips.length > 0 ? ' match your filters' : ''}
-              {totalPages > 1 ? ` · page ${page + 1} of ${totalPages}` : ''}
-              {isFetching ? ' · updating…' : ''}
-            </p>
-            <p className="max-w-[640px] text-[12px] leading-relaxed text-slate">
-              &ldquo;Typical meal&rdquo; is the average dish here plus delivery, raised to the
-              minimum order where there is one. Prices are estimates from the last menu update, not
-              quotes — BudgetBite never orders for you, so what you log after ordering is what
-              counts.
-            </p>
-          </div>
+          {/* The footnote used to sit after every card it was written to
+              inform. It belongs above the results it describes; the tally that
+              was beside it now lives with the view toggle, which redraws the
+              same set. */}
+          <p className="max-w-[640px] text-[12px] leading-relaxed text-slate">
+            &ldquo;Typical meal&rdquo; is the average dish here plus delivery, raised to the minimum
+            order where there is one. Prices are estimates from the last menu update, not quotes —
+            BudgetBite never orders for you, so what you log after ordering is what counts.
+          </p>
 
           <Stagger className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" stagger={0.02}>
             {data.map((r) => {

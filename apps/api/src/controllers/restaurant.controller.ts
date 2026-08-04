@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { ListMenuQuery, ListRestaurantsQuery } from '@repo/shared';
+import type { ListMenuQuery, ListRestaurantMapQuery, ListRestaurantsQuery } from '@repo/shared';
 
 import { restaurantService } from '../services/restaurant.service.js';
 import type { AuthRequest } from '../middleware/auth.middleware.js';
@@ -12,6 +12,14 @@ export async function listRestaurants(req: AuthRequest, res: Response): Promise<
     req.userId,
   );
   res.json(list);
+}
+
+export async function listRestaurantMap(req: AuthRequest, res: Response): Promise<void> {
+  const pins = await restaurantService.mapPins(
+    req.query as unknown as ListRestaurantMapQuery,
+    req.userId,
+  );
+  res.json(pins);
 }
 
 export async function getRestaurant(req: Request, res: Response): Promise<void> {

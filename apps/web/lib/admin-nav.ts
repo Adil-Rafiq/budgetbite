@@ -3,6 +3,7 @@ import {
   Database,
   Gauge,
   LayoutGrid,
+  Map as MapIcon,
   ScrollText,
   Settings2,
   Sparkles,
@@ -67,6 +68,13 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         label: 'Restaurants',
         icon: Store,
         description: 'Browse, edit, and remove restaurants and their menu items.',
+      },
+      {
+        href: '/admin/map',
+        label: 'Coverage',
+        icon: MapIcon,
+        description:
+          'Where the catalogue is, where the users are, and which coordinates are wrong.',
       },
       {
         href: '/admin/meal-types',

@@ -224,6 +224,11 @@ export async function getMetrics(_req: Request, res: Response): Promise<void> {
   res.json(result);
 }
 
+export async function getCoverageMap(_req: Request, res: Response): Promise<void> {
+  const result = await adminAnalyticsService.coverage();
+  res.json(result);
+}
+
 // ─── Config ────────────────────────────────────────────────────────────────
 
 export async function getConfig(_req: Request, res: Response): Promise<void> {

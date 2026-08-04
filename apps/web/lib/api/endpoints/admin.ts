@@ -1,6 +1,7 @@
 import { apiClient } from '@/lib/api/client';
 import type {
   AdminConfig,
+  AdminMap,
   AdminMetrics,
   AdminPlanDetail,
   AdminPlanListResponse,
@@ -127,6 +128,9 @@ export const adminApi = {
   getDataQuality: () => apiClient.get('api/admin/data-quality').json<DataQuality>(),
 
   getMetrics: () => apiClient.get('api/admin/metrics').json<AdminMetrics>(),
+
+  // Restaurant pins + user density as a k-anonymised grid. No individual user.
+  getCoverageMap: () => apiClient.get('api/admin/map').json<AdminMap>(),
 
   // ── Config (read-only) ──
   getConfig: () => apiClient.get('api/admin/config').json<AdminConfig>(),

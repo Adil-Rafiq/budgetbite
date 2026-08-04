@@ -2,6 +2,7 @@ export * from './schemas/index.js';
 export * from './types/index.js';
 export * from './transform/numeric.js';
 export * from './geo/haversine.js';
+export * from './geo/outliers.js';
 export * from './plan/plan-math.js';
 export * from './constants/budget-fit.js';
 export * from './auth/permissions.js';

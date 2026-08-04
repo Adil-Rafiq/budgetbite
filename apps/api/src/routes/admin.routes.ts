@@ -254,6 +254,20 @@ router.get(
   asyncHandler(adminController.getMetrics),
 );
 
+/**
+ * Coverage map: restaurant pins with their defect facts, plus user locations
+ * reduced to a k-anonymised density grid. Returns AdminMap.
+ *
+ * `analytics:read` rather than `restaurant:read` because what this produces is
+ * an analysis of the catalogue's shape — the pins are a trimmed projection for
+ * drawing, not the restaurant resource. No individual user is returned.
+ */
+router.get(
+  '/map',
+  requirePermission('analytics:read'),
+  asyncHandler(adminController.getCoverageMap),
+);
+
 // ─── Config ────────────────────────────────────────────────────────────────
 
 /** Effective values of the safe, read-only tuning knobs. No secrets. */

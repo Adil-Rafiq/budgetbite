@@ -516,3 +516,214 @@ body::-webkit-scrollbar {
   outline-offset: 3px;
   border-radius: 4px;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Map markers, clusters and the density grid.
+
+   These live in CSS rather than in Leaflet's colour props for one reason: a
+   prop takes a resolved literal, and a literal cannot invert. Every value here
+   is a token or a mix of tokens, so one rule serves both themes — the same
+   reasoning that put the hex ban in scripts/check-tokens.mjs.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.bb-marker {
+  /* Leaflet gives markers a default background/border in some builds. */
+  background: transparent;
+  border: 0;
+}
+
+.bb-marker__dot {
+  display: block;
+  width: var(--bb-dot-size);
+  height: var(--bb-dot-size);
+  border-radius: 9999px;
+  background: var(--bb-dot-fill);
+  /* A ring in the surface colour, not white: this is what keeps a teal dot
+     from dissolving into a dark basemap and a pale one from vanishing on
+     cream. It is the 2px separator every overlapping mark needs. */
+  box-shadow:
+    0 0 0 2px var(--color-surface),
+    0 1px 3px rgb(0 0 0 / 0.35);
+  transition:
+    transform 0.16s ease-out,
+    box-shadow 0.16s ease-out;
+}
+
+.bb-marker--dot:hover .bb-marker__dot {
+  transform: scale(1.25);
+}
+
+.bb-marker--selected .bb-marker__dot {
+  box-shadow:
+    0 0 0 3px var(--color-surface),
+    0 0 0 6px color-mix(in srgb, var(--color-teal) 55%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.4);
+}
+
+.bb-marker--dimmed .bb-marker__dot {
+  opacity: 0.45;
+}
+
+/* "You are here" — a ringed puck, deliberately unlike the restaurant dots it
+   sits among. Charcoal core so it reads as the reader's own position rather
+   than as one more brand-coloured place. */
+.bb-marker__home {
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin: 6px;
+  border-radius: 9999px;
+  background: var(--color-charcoal);
+  box-shadow:
+    0 0 0 3px var(--color-surface),
+    0 0 0 5px color-mix(in srgb, var(--color-charcoal) 35%, transparent),
+    0 1px 4px rgb(0 0 0 / 0.4);
+}
+
+.bb-marker--outlier {
+  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.4));
+  transition: transform 0.16s ease-out;
+}
+
+.bb-marker--outlier:hover {
+  transform: scale(1.15);
+}
+
+.bb-cluster__body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--bb-cluster-size);
+  height: var(--bb-cluster-size);
+  border-radius: 9999px;
+  background: var(--color-teal-deep);
+  color: #ffffff; /* token-guard-allow — the pair validated in CONTRAST_PAIRS */
+  font-family: var(--font-mono, ui-monospace), monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--color-surface) 78%, transparent),
+    0 2px 8px rgb(0 0 0 / 0.35);
+  transition:
+    transform 0.16s ease-out,
+    background-color 0.16s ease-out;
+}
+
+.bb-cluster:hover .bb-cluster__body {
+  transform: scale(1.08);
+  background: var(--color-teal-deeper);
+}
+
+/* A group that contains a broken coordinate says so, rather than making the
+   operator open every bubble to find which one it is hiding. The ring differs
+   in colour *and* in weight, so it is not a hue-only signal. */
+.bb-cluster--alert .bb-cluster__body {
+  background: var(--color-tomato-deep);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--color-surface) 78%, transparent),
+    0 0 0 5px color-mix(in srgb, var(--color-tomato) 55%, transparent),
+    0 2px 8px rgb(0 0 0 / 0.35);
+}
+
+.bb-cluster--alert:hover .bb-cluster__body {
+  background: var(--color-tomato);
+}
+
+/* Sequential density ramp — one hue, mixed into the page's own canvas.
+   In light mode that runs cream → teal (more is darker); on the near-black
+   canvas the identical formula runs the other way and more becomes brighter,
+   which is the direction a dark surface needs. One rule, two correct themes. */
+.bb-density,
+.bb-density-swatch {
+  --bb-density-mix: 25%;
+}
+
+.bb-density--1 {
+  --bb-density-mix: 25%;
+}
+.bb-density--2 {
+  --bb-density-mix: 42%;
+}
+.bb-density--3 {
+  --bb-density-mix: 58%;
+}
+.bb-density--4 {
+  --bb-density-mix: 76%;
+}
+.bb-density--5 {
+  --bb-density-mix: 94%;
+}
+
+.bb-density {
+  fill: color-mix(in srgb, var(--color-teal) var(--bb-density-mix), var(--color-canvas));
+  fill-opacity: 0.82;
+}
+
+.bb-density-swatch {
+  background: color-mix(in srgb, var(--color-teal) var(--bb-density-mix), var(--color-canvas));
+}
+
+/* The distance filter, drawn as an area. Colour lives here for the same reason
+   the density ramp's does: Leaflet writes its `color`/`fillColor` options out
+   as SVG presentation attributes, and `var()` does not resolve in one — so a
+   themed ring can only be done from CSS, where the property beats the
+   attribute in the cascade. */
+.bb-radius-ring {
+  stroke: var(--color-teal-ink);
+  fill: var(--color-teal);
+  fill-opacity: 0.07;
+}
+
+/* Leaflet's tooltip, popup and attribution ship hardcoded white backgrounds,
+   which is the same stranded-light-mode problem the basemap had. */
+.leaflet-container .leaflet-popup-content-wrapper,
+.leaflet-container .leaflet-popup-tip {
+  background: var(--color-surface);
+  color: var(--color-charcoal);
+  box-shadow: var(--elevation-lift);
+}
+
+.leaflet-container .leaflet-popup-content-wrapper {
+  border: 1px solid var(--color-sand);
+  border-radius: 14px;
+}
+
+.leaflet-container .leaflet-popup-content {
+  margin: 12px 14px;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--color-slate);
+  width: 28px;
+  height: 28px;
+  padding: 6px 6px 0 0;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: var(--color-charcoal);
+  background: transparent;
+}
+
+.leaflet-tooltip.bb-map-tooltip,
+.leaflet-container .leaflet-control-attribution {
+  background: var(--color-surface);
+  color: var(--color-slate);
+  border: 1px solid var(--color-sand);
+  box-shadow: none;
+}
+
+.leaflet-tooltip.bb-map-tooltip {
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--color-charcoal);
+}
+
+.leaflet-tooltip.bb-map-tooltip::before {
+  border-top-color: var(--color-sand);
+}
+
+.leaflet-container .leaflet-control-attribution a {
+  color: var(--color-teal-ink);
+}

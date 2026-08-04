@@ -1,5 +1,5 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import type { ListMenuQuery, ListRestaurantsQuery } from '@repo/shared';
+import type { ListMenuQuery, ListRestaurantMapQuery, ListRestaurantsQuery } from '@repo/shared';
 
 import { restaurantApi } from '@/lib/api/endpoints/restaurant';
 
@@ -16,6 +16,23 @@ export const useRestaurants = (query: Partial<ListRestaurantsQuery>, enabled: bo
   useQuery({
     queryKey: ['restaurants', query] as const,
     queryFn: () => restaurantApi.list(query),
+    placeholderData: keepPreviousData,
+    staleTime: 60_000,
+    enabled,
+  });
+
+/**
+ * The same filtered set as `useRestaurants`, as pins.
+ *
+ * `enabled` is how the map view avoids costing anything until it is opened —
+ * the list is the default, and most readers never switch. Same
+ * `keepPreviousData` reasoning as the list: dragging the distance slider must
+ * not blank the map between one step and the next.
+ */
+export const useRestaurantMap = (query: Partial<ListRestaurantMapQuery>, enabled: boolean = true) =>
+  useQuery({
+    queryKey: ['restaurantMap', query] as const,
+    queryFn: () => restaurantApi.map(query),
     placeholderData: keepPreviousData,
     staleTime: 60_000,
     enabled,

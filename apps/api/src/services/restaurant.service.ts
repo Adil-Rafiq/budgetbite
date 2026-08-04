@@ -1,6 +1,8 @@
 import type {
   ListRestaurantsQuery,
+  ListRestaurantMapQuery,
   CreateRestaurantInput,
+  RestaurantMap,
   UpdateRestaurantInput,
   CreateMenuItemInput,
   ListMenuQuery,
@@ -56,20 +58,45 @@ async function resolveBudgetFitTarget(userId?: string): Promise<number | null> {
   return adjusted.avgBudgetPerRemainingMeal > 0 ? adjusted.avgBudgetPerRemainingMeal : null;
 }
 
+/**
+ * The coordinates to measure distance from: whatever the caller passed, else
+ * the logged-in user's saved profile location.
+ *
+ * Shared by the list and the map so the two cannot disagree about where the
+ * user is — a map whose distance filter measured from a different origin than
+ * the list's would drop pins the list had just shown.
+ */
+async function resolveOrigin(
+  query: { userLat?: number; userLng?: number },
+  userId?: string,
+): Promise<{ lat?: number; lng?: number }> {
+  let lat = query.userLat;
+  let lng = query.userLng;
+  // Controllers stay out of data access, so the profile lookup lives here.
+  if (userId && (lat == null || lng == null)) {
+    const profile = await userRepository.findProfileByUserId(userId);
+    if (profile?.latitude != null && profile?.longitude != null) {
+      lat = lat ?? Number(profile.latitude);
+      lng = lng ?? Number(profile.longitude);
+    }
+  }
+  return { lat, lng };
+}
+
+/**
+ * How many pins one map request will return.
+ *
+ * The list endpoint's `paginationSchema` caps a page at 100, which a map cannot
+ * use: pins 1–100 of 400 is a map of an arbitrary quarter of the city, and
+ * unlike a list there is no "next page" affordance that would make the omission
+ * legible. So the map gets its own, much higher cap — and reports when it hits
+ * it rather than silently drawing a subset.
+ */
+const MAP_PIN_CAP = 500;
+
 export const restaurantService = {
   async list(query: ListRestaurantsQuery, userId?: string) {
-    let lat = query.userLat;
-    let lng = query.userLng;
-    // If the caller is logged in and didn't pass coords, pull them from the
-    // user's profile (single place that knows user coords — controllers stay
-    // out of data access).
-    if (userId && (lat == null || lng == null)) {
-      const profile = await userRepository.findProfileByUserId(userId);
-      if (profile?.latitude != null && profile?.longitude != null) {
-        lat = lat ?? Number(profile.latitude);
-        lng = lng ?? Number(profile.longitude);
-      }
-    }
+    const { lat, lng } = await resolveOrigin(query, userId);
 
     // budget-fit sort needs the active plan's per-meal target. Compute it
     // only when the caller actually asked for that sort to avoid the extra
@@ -114,6 +141,55 @@ export const restaurantService = {
         limit: query.limit,
         offset: query.offset,
       },
+    };
+  },
+
+  /**
+   * The same filtered set as `list`, as map pins.
+   *
+   * Runs the identical repository query — same filters, same distance
+   * expression — so the map and the list are two drawings of one result set
+   * rather than two queries that happen to look alike. What differs is the
+   * projection: a pin drops the image, order URL, slug and timestamps it will
+   * never render, which is what makes 500 of them cheaper on the wire than 24
+   * full rows.
+   *
+   * Sorting is deliberately left at the repository default. Order is meaningless
+   * to a map — every pin is drawn at once — and asking for `budget-fit` would
+   * cost the plan-context lookup for nothing.
+   */
+  async mapPins(query: ListRestaurantMapQuery, userId?: string): Promise<RestaurantMap> {
+    const { lat, lng } = await resolveOrigin(query, userId);
+
+    const filters = {
+      maxDistanceKm: query.maxDistanceKm,
+      userLat: lat,
+      userLng: lng,
+      minRating: query.minRating,
+      q: query.q,
+    };
+
+    const [results, total] = await Promise.all([
+      restaurantRepository.list({ ...filters, limit: MAP_PIN_CAP, offset: 0 }),
+      restaurantRepository.count(filters),
+    ]);
+
+    return {
+      data: results.map((r) => ({
+        id: r.restaurant.id,
+        name: r.restaurant.name,
+        latitude: Number(r.restaurant.latitude),
+        longitude: Number(r.restaurant.longitude),
+        rating: r.restaurant.rating != null ? Number(r.restaurant.rating) : null,
+        ratingCount: r.restaurant.ratingCount,
+        distanceKm: r.distanceKm != null ? Number(r.distanceKm) : undefined,
+        minItemPrice: r.minItemPrice,
+        avgItemPrice: r.avgItemPrice,
+        deliveryFee: r.restaurant.deliveryFee != null ? Number(r.restaurant.deliveryFee) : null,
+        minimumOrder: r.restaurant.minimumOrder != null ? Number(r.restaurant.minimumOrder) : null,
+      })),
+      total,
+      truncated: total > MAP_PIN_CAP,
     };
   },
 
