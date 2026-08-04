@@ -4,6 +4,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import * as schema from '@repo/database';
 import { sendEmail } from './email/email.service.js';
 import { otpTemplate } from './email/templates/otp.template.js';
+import { passwordResetTemplate } from './email/templates/password-reset.template.js';
 import { allowedOrigins } from './origins.js';
 
 const crossSiteCookies = process.env.CROSS_SITE_COOKIES === 'true';
@@ -66,6 +67,21 @@ export const auth = betterAuth({
   plugins: [
     emailOTP({
       async sendVerificationOTP({ email, otp, type }) {
+        // `forget-password` used to fall through this function silently, so
+        // /email-otp/request-password-reset happily minted a code, stored it,
+        // answered `{ success: true }` and mailed nobody. The password reset
+        // flow was unreachable from the moment the plugin was added.
+        //
+        // `sign-in` is the third type the plugin can emit; BudgetBite does not
+        // offer OTP sign-in, and no endpoint that produces it is exposed.
+        if (type === 'forget-password') {
+          await sendEmail({
+            to: email,
+            ...passwordResetTemplate(otp, email),
+          });
+          return;
+        }
+
         if (type === 'email-verification') {
           await sendEmail({
             to: email,
