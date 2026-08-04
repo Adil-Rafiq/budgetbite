@@ -656,38 +656,92 @@ body::-webkit-scrollbar {
     0 2px 8px rgb(0 0 0 / 0.35);
 }
 
-/* Sequential density ramp — one hue, mixed into the page's own canvas.
-   In light mode that runs cream → teal (more is darker); on the near-black
-   canvas the identical formula runs the other way and more becomes brighter,
-   which is the direction a dark surface needs. One rule, two correct themes. */
-.bb-density,
-.bb-density-swatch {
-  --bb-density-mix: 25%;
+/* User density — graduated circles, in the one data hue this map has not
+   already spent. Restaurants own teal on this canvas, so painting people in
+   teal too left the reader deciding whether a patch of colour was supply or
+   demand. `chart-5` is the palette's purple: not teal, and not the tomato or
+   amber that mean "broken" and "needs attention" everywhere else in admin.
+
+   The fill is deliberately faint. This layer annotates a city the operator
+   still has to read — street names, the ring road, where the restaurants are —
+   so it tints the basemap rather than replacing it. Magnitude is carried by
+   area, which survives being this transparent; opacity only reinforces it. */
+.bb-density {
+  fill: var(--color-chart-5);
+  stroke: var(--color-chart-5);
+  stroke-opacity: 0.85;
 }
 
 .bb-density--1 {
-  --bb-density-mix: 25%;
+  fill-opacity: 0.16;
 }
 .bb-density--2 {
-  --bb-density-mix: 42%;
+  fill-opacity: 0.21;
 }
 .bb-density--3 {
-  --bb-density-mix: 58%;
+  fill-opacity: 0.26;
 }
 .bb-density--4 {
-  --bb-density-mix: 76%;
+  fill-opacity: 0.31;
 }
 .bb-density--5 {
-  --bb-density-mix: 94%;
+  fill-opacity: 0.36;
 }
 
-.bb-density {
-  fill: color-mix(in srgb, var(--color-teal) var(--bb-density-mix), var(--color-canvas));
-  fill-opacity: 0.82;
+/* A wash that reads on cream is nearly invisible on the near-black canvas —
+   the same alpha buys less separation when it is lightening rather than
+   darkening. Each step gets the same amount of extra presence. */
+.dark .bb-density--1 {
+  fill-opacity: 0.2;
+}
+.dark .bb-density--2 {
+  fill-opacity: 0.26;
+}
+.dark .bb-density--3 {
+  fill-opacity: 0.32;
+}
+.dark .bb-density--4 {
+  fill-opacity: 0.38;
+}
+.dark .bb-density--5 {
+  fill-opacity: 0.44;
 }
 
-.bb-density-swatch {
-  background: color-mix(in srgb, var(--color-teal) var(--bb-density-mix), var(--color-canvas));
+/* The count, printed in the circle rather than hidden behind a hover. The
+   halo is what makes it survive whatever the basemap puts underneath it —
+   a park, a motorway, or nothing. */
+.bb-density-count,
+.bb-density__count {
+  pointer-events: none;
+}
+
+.bb-density__count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--color-charcoal);
+  font-family: var(--font-mono, ui-monospace), monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-shadow:
+    0 0 3px var(--color-surface),
+    0 0 6px var(--color-surface),
+    0 0 9px var(--color-surface);
+}
+
+/* The legend's keys are circles at the same square-root scale as the map's,
+   because a size encoding can only be read against sized examples. A gradient
+   bar would be a key to a channel this layer no longer leans on. */
+.bb-density-key {
+  display: block;
+  width: var(--bb-key-size);
+  height: var(--bb-key-size);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-chart-5) 26%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-chart-5) 85%, transparent);
 }
 
 /* The distance filter, drawn as an area. Colour lives here for the same reason
