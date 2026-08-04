@@ -92,6 +92,42 @@ export function DensityLegend({
   // product already speaks in (radius, distance-to-restaurant).
   const cellKm = (cellDegrees * 111).toFixed(1);
 
+  /**
+   * Nothing drawn is the state that needs the most words, not the fewest.
+   *
+   * An overlay that is switched on and paints nothing is indistinguishable
+   * from an overlay that is broken, and the honest reason — every square is
+   * below the anonymity floor — is not one a reader can deduce from an empty
+   * map. So the empty case leads with the explanation and drops the ramp,
+   * which would otherwise be a scale running from 3 to nothing.
+   */
+  if (cells.length === 0) {
+    return (
+      <div className="flex flex-col gap-1.5 rounded-xl border border-dashed border-sand bg-surface p-3">
+        <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-muted">
+          users per square
+        </span>
+        <p className="text-[12px] font-medium text-charcoal">Nothing to draw yet.</p>
+        <p className="text-[11.5px] leading-relaxed text-slate-muted">
+          {suppressed > 0 ? (
+            <>
+              {suppressed} {suppressed === 1 ? 'user has' : 'users have'} a location, but{' '}
+              {suppressed === 1 ? 'it sits' : 'they sit'} in squares holding fewer than{' '}
+              {minCellCount} people. Those are withheld — a square that thin would point at a person
+              rather than at a place. The overlay fills in once {minCellCount} users share one{' '}
+              {cellKm} km square.
+            </>
+          ) : (
+            <>
+              No user has set a location yet. The overlay fills in once {minCellCount} users share
+              one {cellKm} km square.
+            </>
+          )}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-sand bg-surface p-3">
       <div className="flex items-center justify-between gap-3">
@@ -108,7 +144,7 @@ export function DensityLegend({
             <span key={i} className={`bb-density-swatch bb-density--${i + 1} flex-1`} />
           ))}
         </div>
-        <span className="font-mono text-[11px] tabular-nums text-slate">{max || '—'}</span>
+        <span className="font-mono text-[11px] tabular-nums text-slate">{max}</span>
       </div>
 
       <p className="text-[11.5px] leading-relaxed text-slate-muted">

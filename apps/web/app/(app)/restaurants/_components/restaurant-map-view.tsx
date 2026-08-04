@@ -139,6 +139,43 @@ function PinPopup({
   );
 }
 
+/**
+ * Several restaurants at one point.
+ *
+ * Rendered as a scrollable list rather than a "zoom in for more" hint, because
+ * there is no zoom level that separates them — they are at the same
+ * coordinate. Sorted by name so the order is stable between openings.
+ */
+function StackPopup({ items }: { items: RestaurantMapPin[] }) {
+  const sorted = [...items].sort((a, b) => a.name.localeCompare(b.name));
+  return (
+    <div className="flex w-[220px] flex-col gap-1.5">
+      <p className="text-[12px] font-semibold text-charcoal">{sorted.length} restaurants here</p>
+      <p className="text-[11px] leading-relaxed text-slate">
+        These share one location, so they cannot be separated on the map.
+      </p>
+      <ul className="mt-0.5 flex max-h-48 flex-col overflow-y-auto">
+        {sorted.map((pin) => (
+          <li key={pin.id}>
+            <Link
+              href={`/restaurants/${pin.id}`}
+              className={`flex items-center justify-between gap-2 rounded-md px-1.5 py-1.5 text-[12px] text-charcoal transition-colors hover:bg-canvas ${FOCUS_RING}`}
+            >
+              <span className="min-w-0 truncate">{humanizeName(pin.name)}</span>
+              {pin.rating != null && (
+                <span className="flex shrink-0 items-center gap-0.5 tabular-nums text-slate">
+                  <Star aria-hidden className="h-2.5 w-2.5 fill-amber text-amber" />
+                  {pin.rating.toFixed(1)}
+                </span>
+              )}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function PinMarkers({
   pins,
   avgPerMeal,
@@ -159,6 +196,25 @@ function PinMarkers({
     <>
       {nodes.map((node) => {
         if (node.kind === 'cluster') {
+          // A stack shares one coordinate, so zooming can never open it. It
+          // lists its members in a popup instead — otherwise a food court's
+          // worth of restaurants hides behind one dot and the reader gets
+          // whichever happened to be drawn on top.
+          if (node.isStack) {
+            return (
+              <Marker
+                key={`stack-${node.id}`}
+                position={[node.latitude, node.longitude]}
+                icon={clusterIcon(node.count, { isStack: true })}
+                keyboard={false}
+                ref={(marker) => marker?.getElement()?.setAttribute('aria-hidden', 'true')}
+              >
+                <Popup>
+                  <StackPopup items={node.items} />
+                </Popup>
+              </Marker>
+            );
+          }
           return (
             <Marker
               key={`cluster-${node.id}`}

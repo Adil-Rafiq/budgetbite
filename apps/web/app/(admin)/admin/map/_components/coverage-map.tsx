@@ -24,6 +24,8 @@ interface CoverageMapProps {
   showDensity: boolean;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  /** A group sharing one coordinate, handed to the panel because zoom cannot open it. */
+  onOpenStack: (ids: string[]) => void;
   /** Fires on settle with the ids currently on screen, for the list and the count. */
   onViewportChange: (visibleIds: string[], view: MapView) => void;
   /** Restored from the URL. When absent the map fits itself to the catalogue. */
@@ -132,10 +134,12 @@ function Markers({
   pins,
   selectedId,
   onSelect,
+  onOpenStack,
 }: {
   pins: AdminMapPin[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  onOpenStack: (ids: string[]) => void;
 }) {
   const map = useMap();
   const reduceMotion = useReducedMotion() ?? false;
@@ -150,19 +154,28 @@ function Markers({
             <Marker
               key={`cluster-${node.id}`}
               position={[node.latitude, node.longitude]}
-              icon={clusterIcon(node.count, { hasOutlier })}
+              icon={clusterIcon(node.count, { hasOutlier, isStack: node.isStack })}
               // The list beside the map is the keyboard path; 300 focusable
               // markers would be 300 tab stops between the filters and the
               // footer. Leaflet makes markers focusable by default.
               keyboard={false}
               eventHandlers={{
-                click: () =>
+                click: () => {
+                  // Zooming at a stack is a promise the map cannot keep: its
+                  // members are at one point, so every zoom level draws the
+                  // same bubble. Hand the group to the panel instead, which is
+                  // where the operator can actually act on nineteen records.
+                  if (node.isStack) {
+                    onOpenStack(node.items.map((item) => item.id));
+                    return;
+                  }
                   moveMapTo(
                     map,
                     [node.latitude, node.longitude],
                     expansionZoom(node.id, map.getZoom() + 2),
                     reduceMotion,
-                  ),
+                  );
+                },
               }}
               ref={(marker) => marker?.getElement()?.setAttribute('aria-hidden', 'true')}
             />
@@ -194,6 +207,7 @@ export function CoverageMap({
   showDensity,
   selectedId,
   onSelect,
+  onOpenStack,
   onViewportChange,
   initialView,
 }: CoverageMapProps) {
@@ -211,7 +225,7 @@ export function CoverageMap({
       className="h-full w-full rounded-2xl border border-sand"
     >
       {showDensity && <DensityLayer cells={cells} cellDegrees={cellDegrees} />}
-      <Markers pins={pins} selectedId={selectedId} onSelect={onSelect} />
+      <Markers pins={pins} selectedId={selectedId} onSelect={onSelect} onOpenStack={onOpenStack} />
       <InitialView pins={pins} view={initialView} />
       <SelectionFocus pin={selectedPin} />
       <ViewportReporter pins={pins} onChange={onViewportChange} />

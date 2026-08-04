@@ -630,6 +630,32 @@ body::-webkit-scrollbar {
   background: var(--color-tomato);
 }
 
+/* A group sharing one coordinate. It cannot be split by zooming, so it is
+   drawn as a stack — an offset second ring behind the bubble — rather than as
+   an ordinary cluster whose gesture is "zoom in". Shape, not just colour: the
+   difference has to survive a monochrome or colour-blind reading, because
+   acting on the wrong one wastes the operator's time on a zoom that does
+   nothing. */
+.bb-cluster--stack .bb-cluster__body {
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--color-surface) 78%, transparent),
+    4px 4px 0 1px var(--color-teal-deep),
+    4px 4px 0 4px color-mix(in srgb, var(--color-surface) 78%, transparent),
+    0 2px 8px rgb(0 0 0 / 0.35);
+}
+
+.bb-cluster--stack:hover .bb-cluster__body {
+  transform: scale(1.08);
+}
+
+.bb-cluster--stack.bb-cluster--alert .bb-cluster__body {
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--color-surface) 78%, transparent),
+    4px 4px 0 1px var(--color-tomato-deep),
+    4px 4px 0 4px color-mix(in srgb, var(--color-surface) 78%, transparent),
+    0 2px 8px rgb(0 0 0 / 0.35);
+}
+
 /* Sequential density ramp — one hue, mixed into the page's own canvas.
    In light mode that runs cream → teal (more is darker); on the near-black
    canvas the identical formula runs the other way and more becomes brighter,

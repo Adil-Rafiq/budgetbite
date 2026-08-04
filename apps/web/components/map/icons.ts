@@ -121,15 +121,28 @@ export function clusterDiameter(count: number): number {
   return Math.round(MIN + (MAX - MIN) * ratio);
 }
 
-/** A group of places, labelled with how many. */
-export function clusterIcon(count: number, options: { hasOutlier?: boolean } = {}): L.DivIcon {
+/**
+ * A group of places, labelled with how many.
+ *
+ * `isStack` marks a group that shares one coordinate and therefore will never
+ * come apart, however far you zoom. It gets its own silhouette — a stacked
+ * double ring — because the two kinds of bubble answer to different gestures:
+ * an ordinary cluster rewards zooming, a stack only rewards a click. Drawing
+ * them identically is what makes a map feel broken, since half the bubbles
+ * stop responding to the gesture the other half taught.
+ */
+export function clusterIcon(
+  count: number,
+  options: { hasOutlier?: boolean; isStack?: boolean } = {},
+): L.DivIcon {
   const size = clusterDiameter(count);
   // A cluster hiding a broken coordinate says so, rather than making the
   // operator zoom into every bubble to find out which one it is in.
   const tone = options.hasOutlier ? 'bb-cluster--alert' : '';
+  const stack = options.isStack ? 'bb-cluster--stack' : '';
 
   return L.divIcon({
-    className: `${BASE_CLASS} bb-cluster ${tone}`.trim(),
+    className: `${BASE_CLASS} bb-cluster ${tone} ${stack}`.replace(/\s+/g, ' ').trim(),
     html: `<span class="bb-cluster__body" style="--bb-cluster-size:${size}px">${count}</span>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],

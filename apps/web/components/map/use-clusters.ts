@@ -22,8 +22,43 @@ export interface ClusterablePoint {
 }
 
 export type ClusterNode<T> =
-  | { kind: 'cluster'; id: number; latitude: number; longitude: number; count: number; items: T[] }
+  | {
+      kind: 'cluster';
+      id: number;
+      latitude: number;
+      longitude: number;
+      count: number;
+      items: T[];
+      /**
+       * Every member sits on effectively one coordinate, so no amount of
+       * zooming will ever separate them. Clicking this must list its members;
+       * zooming at it is a promise the map cannot keep.
+       */
+      isStack: boolean;
+    }
   | { kind: 'point'; id: string; latitude: number; longitude: number; item: T };
+
+/**
+ * How close two points have to be before the map treats them as one place:
+ * ~1 m. Below that no zoom level can draw them apart, so the distinction is
+ * not one the map is able to offer.
+ */
+const STACK_EPSILON_DEG = 1e-5;
+
+export function isCoincident(points: readonly ClusterablePoint[]): boolean {
+  if (points.length < 2) return false;
+  let minLat = Infinity,
+    maxLat = -Infinity,
+    minLng = Infinity,
+    maxLng = -Infinity;
+  for (const p of points) {
+    if (p.latitude < minLat) minLat = p.latitude;
+    if (p.latitude > maxLat) maxLat = p.latitude;
+    if (p.longitude < minLng) minLng = p.longitude;
+    if (p.longitude > maxLng) maxLng = p.longitude;
+  }
+  return maxLat - minLat < STACK_EPSILON_DEG && maxLng - minLng < STACK_EPSILON_DEG;
+}
 
 /** What the map is looking at. Recomputed only when it settles, never mid-drag. */
 interface Viewport {
@@ -48,6 +83,17 @@ export interface UseClustersOptions {
   threshold?: number;
   /** Cluster radius in pixels. */
   radius?: number;
+  /**
+   * The deepest zoom the index still clusters at. Deliberately the map's own
+   * maximum rather than something lower.
+   *
+   * Above this zoom supercluster stops clustering and returns raw points — and
+   * points that share a coordinate then render as one marker on top of another,
+   * so a stack of nineteen restaurants becomes a single dot that answers for
+   * all of them. Keeping the index clustering all the way up means such a
+   * group stays a labelled bubble at every zoom instead of quietly collapsing
+   * into a lie.
+   */
   maxZoom?: number;
 }
 
@@ -68,7 +114,7 @@ export function useClusters<T extends ClusterablePoint>(
   points: readonly T[],
   options: UseClustersOptions = {},
 ): ClusterResult<T> {
-  const { threshold = 12, radius = 58, maxZoom = 17 } = options;
+  const { threshold = 12, radius = 58, maxZoom = 20 } = options;
   const map = useMap();
   const [viewport, setViewport] = useState<Viewport | null>(null);
 
@@ -117,16 +163,18 @@ export function useClusters<T extends ClusterablePoint>(
       // the discriminant it sets on the aggregated ones.
       if ('cluster' in props && props.cluster) {
         const clusterId = props.cluster_id;
+        // `Infinity` is the whole cluster, not a page of it: a bubble that
+        // reported "contains a defect" from a sample of ten would be wrong
+        // exactly when it mattered.
+        const items = index.getLeaves(clusterId, Infinity).map((leaf) => leaf.properties.item);
         return {
           kind: 'cluster' as const,
           id: clusterId,
           latitude,
           longitude,
           count: props.point_count,
-          // `Infinity` is the whole cluster, not a page of it: a bubble that
-          // reported "contains a defect" from a sample of ten would be wrong
-          // exactly when it mattered.
-          items: index.getLeaves(clusterId, Infinity).map((leaf) => leaf.properties.item),
+          items,
+          isStack: isCoincident(items),
         };
       }
       const item = (props as { item: T }).item;

@@ -11,7 +11,14 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { FOCUS_RING, FOCUS_RING_ON_CANVAS } from '@/lib/focus-ring';
-import { MAP_FILTERS, isMapFilterId, staleCutoff, type MapFilterId } from './_components/filters';
+import {
+  MAP_FILTERS,
+  findStackedIds,
+  isMapFilterId,
+  staleCutoff,
+  type MapFilterContext,
+  type MapFilterId,
+} from './_components/filters';
 import { PinDetail } from './_components/pin-detail';
 import { PinList } from './_components/pin-list';
 import type { MapView } from './_components/coverage-map';
@@ -66,6 +73,14 @@ export default function AdminMapPage() {
   const [selectedId, setSelectedId] = useState<string | null>(initial.selected);
   const [visibleIds, setVisibleIds] = useState<string[]>([]);
   const [announcement, setAnnouncement] = useState('');
+  /**
+   * A group of restaurants sharing one coordinate, opened from the map.
+   *
+   * The panel normally lists what is in view; while this is set it lists the
+   * stack instead, because "what is in view" is the wrong answer to a click on
+   * a bubble that nineteen records are hiding behind.
+   */
+  const [stackIds, setStackIds] = useState<string[] | null>(null);
 
   const viewRef = useRef<MapView | null>(initial.view);
   const announceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -79,23 +94,29 @@ export default function AdminMapPage() {
 
   const allPins = useMemo(() => data?.restaurants ?? [], [data?.restaurants]);
 
+  const stackedIds = useMemo(() => findStackedIds(allPins), [allPins]);
+  const filterContext = useMemo<MapFilterContext>(
+    () => ({ staleBefore, stackedIds }),
+    [staleBefore, stackedIds],
+  );
+
   /** Chip counts describe the whole catalogue, so they do not move as you filter. */
   const counts = useMemo(() => {
     const out: Record<string, number> = {};
     for (const f of MAP_FILTERS) {
-      out[f.id] = allPins.filter((p) => f.matches(p, { staleBefore })).length;
+      out[f.id] = allPins.filter((p) => f.matches(p, filterContext)).length;
     }
     return out;
-  }, [allPins, staleBefore]);
+  }, [allPins, filterContext]);
 
   const pins = useMemo(() => {
     const active = MAP_FILTERS.find((f) => f.id === filter) ?? MAP_FILTERS[0];
     return allPins.filter(
       (p) =>
-        active?.matches(p, { staleBefore }) &&
+        active?.matches(p, filterContext) &&
         (debouncedSearch === '' || p.name.toLowerCase().includes(debouncedSearch)),
     );
-  }, [allPins, filter, debouncedSearch, staleBefore]);
+  }, [allPins, filter, debouncedSearch, filterContext]);
 
   const outliers = useMemo(() => allPins.filter((p) => p.isOutlier), [allPins]);
 
@@ -103,6 +124,15 @@ export default function AdminMapPage() {
     const inView = new Set(visibleIds);
     return pins.filter((p) => inView.has(p.id));
   }, [pins, visibleIds]);
+
+  /** What the panel is listing: an opened stack, else whatever is on screen. */
+  const stackPins = useMemo(() => {
+    if (!stackIds) return null;
+    const wanted = new Set(stackIds);
+    return allPins.filter((p) => wanted.has(p.id));
+  }, [stackIds, allPins]);
+
+  const panelPins = stackPins ?? visiblePins;
 
   const selectedPin = useMemo(
     () => allPins.find((p) => p.id === selectedId) ?? null,
@@ -171,21 +201,35 @@ export default function AdminMapPage() {
   const handleFilter = useCallback(
     (id: MapFilterId) => {
       setFilter(id);
+      // The stack was opened from the previous set of pins; asking a new
+      // question about the catalogue retires the old answer.
+      setStackIds(null);
       syncUrl({ filter: id });
     },
     [syncUrl],
   );
 
-  // Escape clears the selection wherever focus happens to be — the panel, the
-  // list, or the map itself.
+  // Opening the group deliberately does not select one of them: nineteen
+  // equally plausible records is the situation where guessing is worst.
+  const handleOpenStack = useCallback((ids: string[]) => setStackIds(ids), []);
+
+  // Changing the search re-asks the question too.
   useEffect(() => {
-    if (!selectedId) return;
+    setStackIds(null);
+  }, [debouncedSearch]);
+
+  // Escape backs out one layer at a time — the selected pin first, then the
+  // opened stack — so it never throws away more context than the reader meant.
+  useEffect(() => {
+    if (!selectedId && !stackIds) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleSelect(null);
+      if (e.key !== 'Escape') return;
+      if (selectedId) handleSelect(null);
+      else setStackIds(null);
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [selectedId, handleSelect]);
+  }, [selectedId, stackIds, handleSelect]);
 
   const activeFilter = MAP_FILTERS.find((f) => f.id === filter);
 
@@ -316,6 +360,7 @@ export default function AdminMapPage() {
                 showDensity={showDensity}
                 selectedId={selectedId}
                 onSelect={handleSelect}
+                onOpenStack={handleOpenStack}
                 onViewportChange={handleViewportChange}
                 initialView={initial.view}
               />
@@ -330,16 +375,46 @@ export default function AdminMapPage() {
                     onClose={() => handleSelect(null)}
                   />
                 )}
-                <div className="flex items-center justify-between gap-2 border-b border-sand px-3 py-2.5">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-muted">
-                    in view
-                  </span>
-                  <span className="font-mono text-[11px] tabular-nums text-slate-muted">
-                    {visiblePins.length} of {pins.length}
-                  </span>
-                </div>
+                {stackPins ? (
+                  <div className="border-b border-sand bg-tomato/[0.06] px-3 py-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-tomato-ink">
+                        one coordinate
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setStackIds(null)}
+                        className={`rounded px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-slate transition-colors hover:text-charcoal ${FOCUS_RING}`}
+                      >
+                        back to view
+                      </button>
+                    </div>
+                    <p className="mt-1 text-[12px] leading-relaxed text-charcoal">
+                      <span className="font-semibold">
+                        {stackPins.length} restaurants share this exact point.
+                      </span>{' '}
+                      No zoom level can draw them apart, so the map shows them as one bubble. Real
+                      addresses do not agree to seven decimal places — these need their coordinates
+                      corrected or the duplicates removed.
+                    </p>
+                    {stackPins[0] && (
+                      <p className="mt-1 font-mono text-[11px] tabular-nums text-slate-muted">
+                        {stackPins[0].latitude.toFixed(6)}, {stackPins[0].longitude.toFixed(6)}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between gap-2 border-b border-sand px-3 py-2.5">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-muted">
+                      in view
+                    </span>
+                    <span className="font-mono text-[11px] tabular-nums text-slate-muted">
+                      {visiblePins.length} of {pins.length}
+                    </span>
+                  </div>
+                )}
                 <PinList
-                  pins={visiblePins}
+                  pins={panelPins}
                   selectedId={selectedId}
                   onSelect={handleSelect}
                   staleBefore={staleBefore}
