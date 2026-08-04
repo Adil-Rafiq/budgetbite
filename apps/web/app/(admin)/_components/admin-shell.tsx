@@ -1,13 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, LogOut, Menu } from 'lucide-react';
 import { useUser } from '@/hooks/use-user';
 import { useAdminRecommendations } from '@/hooks/use-admin-recommendations';
 import { useAdminIngestionHealth } from '@/hooks/use-admin-ingestion-health';
-import { authClient } from '@/lib/auth-client';
+import { useSignOut } from '@/hooks/use-sign-out';
 import { LogoIcon } from '@/components/icons';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -142,11 +142,10 @@ function Wordmark({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const { data: user } = useUser();
   const { data: pendingRecs } = useAdminRecommendations({ status: 'pending', limit: 1 });
   const { data: ingestion } = useAdminIngestionHealth();
-  const [signingOut, setSigningOut] = useState(false);
+  const { signOut, signingOut } = useSignOut();
   const [menuOpen, setMenuOpen] = useState(false);
 
   // The drawer is navigation, and navigation that survives its own destination
@@ -168,16 +167,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           srLabel: ingestion.consecutiveFailures === 1 ? 'failed run' : 'consecutive failed runs',
         }
       : undefined,
-  };
-
-  const handleSignOut = async () => {
-    setSigningOut(true);
-    try {
-      await authClient.signOut();
-      router.push('/login');
-    } finally {
-      setSigningOut(false);
-    }
   };
 
   const userCard = (
@@ -291,8 +280,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               </Link>
               <button
                 type="button"
-                onClick={handleSignOut}
+                onClick={() => void signOut()}
                 disabled={signingOut}
+                aria-busy={signingOut}
                 className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-sand bg-surface px-3 text-[12px] text-slate transition-all hover:text-charcoal active:scale-95 disabled:opacity-60 ${FOCUS_RING_ON_CANVAS}`}
               >
                 <LogOut aria-hidden className="h-3.5 w-3.5" />

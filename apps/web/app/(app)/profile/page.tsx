@@ -1,8 +1,6 @@
 'use client';
 
 import { useCallback, useId, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
 import { BadgeCheck, LogOut, ShieldCheck } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -23,9 +21,9 @@ import { LocationCard } from '@/app/(app)/profile/_components/location-card';
 import { NotificationTimesCard } from '@/app/(app)/profile/_components/notification-times-card';
 import { PasswordCard } from '@/app/(app)/profile/_components/password-card';
 import { PersonalCard } from '@/app/(app)/profile/_components/personal-card';
+import { useSignOut } from '@/hooks/use-sign-out';
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes';
 import { useUser } from '@/hooks/use-user';
-import { authClient } from '@/lib/auth-client';
 import { FOCUS_RING, FOCUS_RING_ON_CANVAS } from '@/lib/focus-ring';
 import { initials } from '@/lib/name';
 
@@ -73,8 +71,7 @@ function Band({
 }
 
 export default function ProfilePage() {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+  const { signOut, signingOut } = useSignOut();
   const { data: user, isPending } = useUser();
   const [avatarBroken, setAvatarBroken] = useState(false);
 
@@ -103,21 +100,6 @@ export default function ProfilePage() {
   const hasUnsaved = dirtyCount > 0;
 
   const { pendingHref, confirmLeave, cancelLeave, runGuarded } = useUnsavedChanges(hasUnsaved);
-
-  const [signingOut, setSigningOut] = useState(false);
-
-  const signOut = async () => {
-    setSigningOut(true);
-    try {
-      await authClient.signOut();
-      // The cache outlived the session before this, so the next account to sign
-      // in on this browser briefly saw the previous one's data.
-      queryClient.clear();
-      router.push('/login');
-    } finally {
-      setSigningOut(false);
-    }
-  };
 
   if (isPending || !user) {
     return (
@@ -210,8 +192,9 @@ export default function ProfilePage() {
           </div>
           <button
             type="button"
-            onClick={() => runGuarded(signOut)}
+            onClick={() => runGuarded(() => void signOut())}
             disabled={signingOut}
+            aria-busy={signingOut}
             className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-sand bg-surface px-4 text-[13px] font-medium text-slate transition-colors hover:bg-canvas disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
           >
             <LogOut aria-hidden className="h-3.5 w-3.5" />

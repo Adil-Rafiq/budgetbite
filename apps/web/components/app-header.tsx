@@ -2,18 +2,17 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
+import { usePathname } from 'next/navigation';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { useUser } from '@/hooks/use-user';
 import { LogoIcon } from '@/components/icons';
 import { BudgetReadout } from '@/components/budget-readout';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { authClient } from '@/lib/auth-client';
 import { FOCUS_RING, FOCUS_RING_ON_CANVAS } from '@/lib/focus-ring';
 import { initials } from '@/lib/name';
 import { ADMIN_NAV_ITEM, canSeeAdmin, sectionLabel } from '@/lib/nav';
 import { useHasUnsavedChanges } from '@/hooks/use-unsaved-changes';
+import { useSignOut } from '@/hooks/use-sign-out';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,29 +54,14 @@ function breadcrumbFor(pathname: string): string {
 }
 
 export function AppHeader() {
-  const router = useRouter();
-  const queryClient = useQueryClient();
   const pathname = usePathname();
   const { data: user } = useUser();
-  const [signingOut, setSigningOut] = useState(false);
+  const { signOut, signingOut } = useSignOut();
   // This Sign out is a menu item, not an anchor, so the profile page's
   // click-interceptor guard could never see it — one tap here discarded every
   // unsaved edit on that page, forty pixels from a Sign out that confirmed.
   const hasUnsavedChanges = useHasUnsavedChanges();
   const [confirmSignOutOpen, setConfirmSignOutOpen] = useState(false);
-
-  const handleSignOut = async () => {
-    setSigningOut(true);
-    try {
-      await authClient.signOut();
-      // Without this the query cache outlives the session, so the next account
-      // to sign in on this browser sees the previous one's data on first paint.
-      queryClient.clear();
-      router.push('/login');
-    } finally {
-      setSigningOut(false);
-    }
-  };
 
   return (
     <header
@@ -122,8 +106,19 @@ export function AppHeader() {
                 // Stays 44px at every width. It used to shrink to 36 above the
                 // `sm` breakpoint, which is under the 44px target floor — on
                 // the only path to sign out, Profile, and Admin.
-                className={`inline-flex size-11 items-center justify-center rounded-full bg-teal-deep text-xs font-semibold text-white transition-all hover:bg-teal-deeper active:scale-95 ${FOCUS_RING_ON_CANVAS}`}
+                className={`inline-flex size-11 items-center justify-center rounded-full bg-teal-deep text-xs font-semibold text-white transition-all hover:bg-teal-deeper active:scale-95 aria-busy:opacity-60 ${FOCUS_RING_ON_CANVAS}`}
                 aria-label={user?.name ? `Account menu for ${user.name}` : 'Account menu'}
+                // The menu item that starts a sign-out unmounts the instant it
+                // is chosen, so its own "Signing out…" label was never once
+                // displayed. The trigger outlives the menu, so the pending
+                // state has to live here — otherwise a slow sign-out looks
+                // exactly like a press that did nothing.
+                //
+                // Busy rather than disabled: Radix returns focus here as the
+                // menu closes, and a disabled button cannot receive it, so a
+                // sign-out that fails would strand the keyboard on <body>.
+                // `useSignOut` already refuses a second concurrent call.
+                aria-busy={signingOut}
               >
                 {initials(user?.name)}
               </button>
@@ -162,13 +157,21 @@ export function AppHeader() {
               <DropdownMenuItem
                 variant="destructive"
                 onSelect={() => {
-                  if (hasUnsavedChanges) setConfirmSignOutOpen(true);
-                  else handleSignOut();
+                  if (!hasUnsavedChanges) {
+                    void signOut();
+                    return;
+                  }
+                  // Deferred past this task on purpose. Radix closes the menu
+                  // and hands focus back to the trigger synchronously during
+                  // select; mounting the dialog inside that same tick stacks
+                  // two focus scopes and two `pointer-events: none` locks on
+                  // <body>, and whichever unwinds last leaves the page
+                  // unclickable behind a dialog that has already closed.
+                  setTimeout(() => setConfirmSignOutOpen(true), 0);
                 }}
-                disabled={signingOut}
               >
-                <LogOut className="h-4 w-4" />
-                {signingOut ? 'Signing out…' : 'Sign out'}
+                <LogOut aria-hidden className="h-4 w-4" />
+                Sign out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -195,7 +198,7 @@ export function AppHeader() {
               Go back and save
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleSignOut}
+              onClick={() => void signOut()}
               className={`min-h-11 rounded-xl bg-tomato-deep px-5 text-[13px] font-semibold text-white transition-colors hover:bg-tomato-deep/90 active:scale-[0.97] ${FOCUS_RING}`}
             >
               Sign out anyway
@@ -203,6 +206,10 @@ export function AppHeader() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <span aria-live="polite" className="sr-only">
+        {signingOut ? 'Signing out…' : ''}
+      </span>
     </header>
   );
 }
