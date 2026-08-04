@@ -1,21 +1,17 @@
 'use client';
 
-import {
-  Suspense,
-  useEffect,
-  useRef,
-  useState,
-  type ClipboardEvent,
-  type KeyboardEvent,
-} from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Loader2, MailCheck } from 'lucide-react';
+import { ArrowRight, Loader2, MailCheck } from 'lucide-react';
+import { OTP_EXPIRY_MINUTES, OTP_LENGTH } from '@repo/shared';
 import { authClient } from '@/lib/auth-client';
-import { LogoIcon } from '@/components/icons';
+import { FOCUS_RING } from '@/lib/focus-ring';
+import { AuthShell } from '../_components/auth-shell';
+import { OtpInput, type OtpInputHandle } from '../_components/otp-input';
 
-const OTP_LENGTH = 6;
 const EMPTY_CODE = Array<string>(OTP_LENGTH).fill('');
+const RESEND_COOLDOWN_SECONDS = 60;
 
 export default function VerifyEmailPage() {
   return (
@@ -27,19 +23,19 @@ export default function VerifyEmailPage() {
 
 function VerifyEmailForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const email = searchParams.get('email') ?? '';
+  const email = useSearchParams().get('email') ?? '';
 
   const [digits, setDigits] = useState<string[]>(EMPTY_CODE);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
+  const otpRef = useRef<OtpInputHandle>(null);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const startCooldown = () => {
-    setResendCooldown(60);
+    if (cooldownRef.current) clearInterval(cooldownRef.current);
+    setResendCooldown(RESEND_COOLDOWN_SECONDS);
     cooldownRef.current = setInterval(() => {
       setResendCooldown((prev) => {
         if (prev <= 1) {
@@ -53,17 +49,11 @@ function VerifyEmailForm() {
 
   useEffect(() => {
     startCooldown();
-    inputsRef.current[0]?.focus();
+    otpRef.current?.focusFirst();
     return () => {
       if (cooldownRef.current) clearInterval(cooldownRef.current);
     };
   }, []);
-
-  const focusCell = (index: number) => {
-    const clamped = Math.max(0, Math.min(OTP_LENGTH - 1, index));
-    inputsRef.current[clamped]?.focus();
-    inputsRef.current[clamped]?.select();
-  };
 
   const submit = async (code: string) => {
     if (code.length !== OTP_LENGTH || submitting) return;
@@ -75,68 +65,18 @@ function VerifyEmailForm() {
       setSubmitting(false);
       setError('Invalid or expired code. Please try again.');
       setDigits(EMPTY_CODE);
-      focusCell(0);
+      otpRef.current?.focusFirst();
       return;
     }
 
     router.push('/onboarding');
   };
 
-  const setCode = (next: string[]) => {
+  const onDigitsChange = (next: string[]) => {
     setDigits(next);
     if (error) setError(null);
+    // Six digits is the whole answer, so there is nothing left to press.
     if (next.every((d) => d !== '')) void submit(next.join(''));
-  };
-
-  const handleChange = (index: number, raw: string) => {
-    const value = raw.replace(/\D/g, '');
-    if (!value) {
-      // Clearing the cell (e.g. selecting and deleting).
-      const next = [...digits];
-      next[index] = '';
-      setDigits(next);
-      return;
-    }
-
-    const next = [...digits];
-    // Spread across cells when multiple digits arrive (autofill / fast typing).
-    for (let i = 0; i < value.length && index + i < OTP_LENGTH; i++) {
-      next[index + i] = value[i]!;
-    }
-    setCode(next);
-    focusCell(index + value.length);
-  };
-
-  const handleKeyDown = (index: number, event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Backspace') {
-      event.preventDefault();
-      const next = [...digits];
-      if (next[index]) {
-        next[index] = '';
-        setDigits(next);
-      } else if (index > 0) {
-        next[index - 1] = '';
-        setDigits(next);
-        focusCell(index - 1);
-      }
-      if (error) setError(null);
-    } else if (event.key === 'ArrowLeft') {
-      event.preventDefault();
-      focusCell(index - 1);
-    } else if (event.key === 'ArrowRight') {
-      event.preventDefault();
-      focusCell(index + 1);
-    }
-  };
-
-  const handlePaste = (event: ClipboardEvent<HTMLInputElement>) => {
-    event.preventDefault();
-    const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH);
-    if (!pasted) return;
-    const next = [...EMPTY_CODE];
-    for (let i = 0; i < pasted.length; i++) next[i] = pasted[i]!;
-    setCode(next);
-    focusCell(pasted.length);
   };
 
   const handleResend = async () => {
@@ -154,145 +94,103 @@ function VerifyEmailForm() {
 
     setDigits(EMPTY_CODE);
     setError(null);
-    focusCell(0);
+    otpRef.current?.focusFirst();
     startCooldown();
   };
 
   const isComplete = digits.every((d) => d !== '');
 
   return (
-    <div className="relative min-h-screen bg-canvas text-charcoal antialiased">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-40"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle at 1px 1px, var(--color-sand) 1px, transparent 0)',
-          backgroundSize: '32px 32px',
-        }}
-      />
-
-      <header className="relative z-10 mx-auto flex max-w-[1180px] items-center justify-between px-6 py-6 sm:px-8">
-        <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-deep text-white">
-            <LogoIcon size={16} />
-          </span>
-          <span className="font-display text-xl font-bold tracking-tight">
-            Budget<span className="text-teal-ink">Bite</span>
-          </span>
-        </Link>
-        <Link
-          href="/login"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-slate transition-colors hover:text-charcoal"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back to login
-        </Link>
-      </header>
-
-      <main className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-[440px] flex-col justify-center px-6 pb-16">
-        <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal/15 text-teal-ink">
-            <MailCheck className="h-6 w-6" />
-          </div>
-          <h1 className="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tight">
-            Check your email.
-          </h1>
-          <p className="mt-3 text-[15px] leading-relaxed text-charcoal/60">
-            Enter the 6-digit code we sent to
-          </p>
-          <p className="mt-0.5 text-[15px] font-semibold text-charcoal">{email}</p>
+    <AuthShell back={{ href: '/login', label: 'Back to sign in' }}>
+      <div className="text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal/15 text-teal-ink">
+          <MailCheck aria-hidden className="h-6 w-6" />
         </div>
-
-        <div className="mt-8 rounded-3xl border border-sand bg-surface p-7 shadow-2xl">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              void submit(digits.join(''));
-            }}
-            className="flex flex-col gap-5"
-          >
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center justify-center gap-2 sm:gap-2.5">
-                {digits.map((digit, i) => (
-                  <div key={i} className="flex items-center gap-2 sm:gap-2.5">
-                    <input
-                      ref={(el) => {
-                        inputsRef.current[i] = el;
-                      }}
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete={i === 0 ? 'one-time-code' : 'off'}
-                      maxLength={OTP_LENGTH}
-                      aria-label={`Digit ${i + 1}`}
-                      value={digit}
-                      disabled={submitting}
-                      onChange={(e) => handleChange(i, e.target.value)}
-                      onKeyDown={(e) => handleKeyDown(i, e)}
-                      onPaste={handlePaste}
-                      onFocus={(e) => e.target.select()}
-                      className={`h-14 w-11 rounded-xl border-2 text-center text-2xl font-bold tabular-nums outline-none transition-all sm:h-16 sm:w-12 ${
-                        error
-                          ? 'border-tomato/60 bg-tomato/5 text-tomato-ink'
-                          : digit
-                            ? 'border-teal/50 bg-surface text-charcoal'
-                            : 'border-sand bg-canvas text-charcoal'
-                      } focus:border-teal-ink focus:bg-surface focus:ring-4 focus:ring-teal-ink/25 disabled:opacity-60`}
-                    />
-                    {/* subtle 3-3 grouping divider */}
-                    {i === 2 && <span className="h-0.5 w-2 rounded-full bg-sand" />}
-                  </div>
-                ))}
-              </div>
-              {error ? (
-                <p className="text-center text-xs font-medium text-tomato-ink">{error}</p>
-              ) : (
-                <p className="text-center text-xs text-slate">The code expires in 10 minutes.</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={submitting || !isComplete}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-teal-deeper disabled:pointer-events-none disabled:opacity-50"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Verifying…
-                </>
-              ) : (
-                <>
-                  Verify email
-                  <ArrowRight className="h-4 w-4" />
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-5 border-t border-sand/70 pt-4 text-center text-[13px] text-charcoal/60">
-            <span>Didn&apos;t receive it? </span>
-            <button
-              type="button"
-              onClick={handleResend}
-              disabled={resendCooldown > 0}
-              className="font-semibold text-teal-ink transition-colors hover:text-teal-ink disabled:cursor-not-allowed disabled:font-medium disabled:text-slate/60"
-            >
-              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
-            </button>
-          </div>
-        </div>
-
-        <p className="mt-6 text-center text-[13px] text-charcoal/50">
-          Wrong address?{' '}
-          <Link
-            href="/register"
-            className="font-semibold text-charcoal/70 transition-colors hover:text-charcoal"
-          >
-            Go back and re-enter it
-          </Link>
+        <h1 className="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tight">
+          Check your email.
+        </h1>
+        <p className="mt-3 text-[15px] leading-relaxed text-charcoal/60">
+          Enter the {OTP_LENGTH}-digit code we sent to
         </p>
-      </main>
-    </div>
+        <p className="mt-0.5 text-[15px] font-semibold text-charcoal">{email}</p>
+      </div>
+
+      <div className="mt-8 rounded-3xl border border-sand bg-surface p-7 shadow-2xl">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void submit(digits.join(''));
+          }}
+          className="flex flex-col gap-5"
+        >
+          <div className="flex flex-col gap-2.5">
+            <OtpInput
+              ref={otpRef}
+              label="Verification code"
+              value={digits}
+              onChange={onDigitsChange}
+              disabled={submitting}
+              invalid={!!error}
+              describedBy="otp-status"
+            />
+            {/* One node, not two branches: the code is rejected without a page
+                change, so the failure has to be announced where it appears.
+                Swapping between two separate elements would have replaced the
+                live region instead of updating it, and the message would never
+                have been read out. */}
+            <p
+              id="otp-status"
+              role="status"
+              className={`text-center text-xs ${
+                error ? 'font-medium text-tomato-ink' : 'text-slate'
+              }`}
+            >
+              {error ?? `The code expires in ${OTP_EXPIRY_MINUTES} minutes.`}
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting || !isComplete}
+            aria-busy={submitting}
+            className={`flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-teal-deep text-sm font-semibold text-white shadow-md transition-all hover:bg-teal-deeper disabled:pointer-events-none disabled:opacity-50 ${FOCUS_RING}`}
+          >
+            {submitting ? (
+              <>
+                <Loader2 aria-hidden className="h-4 w-4 animate-spin" />
+                Verifying…
+              </>
+            ) : (
+              <>
+                Verify email
+                <ArrowRight aria-hidden className="h-4 w-4" />
+              </>
+            )}
+          </button>
+        </form>
+
+        <div className="mt-5 border-t border-sand/70 pt-4 text-center text-[13px] text-charcoal/60">
+          <span>Didn&apos;t receive it? </span>
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resendCooldown > 0}
+            className={`rounded px-1 font-semibold text-teal-ink transition-colors hover:underline disabled:cursor-not-allowed disabled:font-medium disabled:text-slate/60 disabled:no-underline ${FOCUS_RING}`}
+          >
+            {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
+          </button>
+        </div>
+      </div>
+
+      <p className="mt-6 text-center text-[13px] text-charcoal/50">
+        Wrong address?{' '}
+        <Link
+          href="/register"
+          className={`rounded px-1 font-semibold text-charcoal/70 transition-colors hover:underline ${FOCUS_RING}`}
+        >
+          Go back and re-enter it
+        </Link>
+      </p>
+    </AuthShell>
   );
 }
