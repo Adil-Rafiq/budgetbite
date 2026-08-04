@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const exactPublicRoutes = ['/'];
-const prefixPublicRoutes = ['/login', '/register', '/verify-email'];
-const authRoutes = ['/login', '/register', '/verify-email']; // redirect to dashboard if already logged in
+// Every signed-out screen. `/forgot-password` and `/reset-password` were absent
+// from both lists, so the sign-in form's "Forgot?" pointed at a route the guard
+// below treated as protected — one redirect later you were back on /login,
+// which read as a button that did nothing.
+const prefixPublicRoutes = [
+  '/login',
+  '/register',
+  '/verify-email',
+  '/forgot-password',
+  '/reset-password',
+];
+const authRoutes = prefixPublicRoutes; // redirect to dashboard if already logged in
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
